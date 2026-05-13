@@ -4,7 +4,7 @@ import { MembershipTab } from "./MembershipTab";
 import { TippingTab } from "./TippingTab";
 import { ProfileTab } from "./ProfileTab";
 
-export const TabbedInterface = () => {
+export const Tab = () => {
   return (
     <div className="w-full max-w-4xl mx-auto p-4">
       <Tabs defaultValue="membership" className="w-full">
