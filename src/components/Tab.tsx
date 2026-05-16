@@ -1,40 +1,53 @@
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { User, Music, Settings } from "lucide-react";
-import { MembershipTab } from "./MembershipTab";
-import { TippingTab } from "./TippingTab";
-import { ProfileTab } from "./ProfileTab";
+import { useState } from "react";
+import { Header } from "./tab-platform/Header";
+import { Hero } from "./tab-platform/Hero";
+import { StatsBanner, CreatorMap } from "./tab-platform/Sections";
+import { FeaturedCreators } from "./tab-platform/FeaturedCreators";
+import { MembershipModal } from "./tab-platform/MembershipModal";
+import { Toaster } from "@/components/ui/toaster";
 
 export const Tab = () => {
+  const [isMembershipOpen, setIsMembershipOpen] = useState(false);
+
   return (
-    <div className="w-full max-w-4xl mx-auto p-4">
-      <Tabs defaultValue="membership" className="w-full">
-        <TabsList className="grid w-full grid-cols-3">
-          <TabsTrigger value="membership" className="flex-1">
-            <User className="mr-2 h-4 w-4" />
-            Membership
-          </TabsTrigger>
-          <TabsTrigger value="tipping" className="flex-1">
-            <Music className="mr-2 h-4 w-4" />
-            Tipping
-          </TabsTrigger>
-          <TabsTrigger value="profile" className="flex-1">
-            <Settings className="mr-2 h-4 w-4" />
-            Profile
-          </TabsTrigger>
-        </TabsList>
-        
-        <TabsContent value="membership" className="p-4">
-          <MembershipTab />
-        </TabsContent>
-        
-        <TabsContent value="tipping" className="p-4">
-          <TippingTab />
-        </TabsContent>
-        
-        <TabsContent value="profile" className="p-4">
-          <ProfileTab />
-        </TabsContent>
-      </Tabs>
+    <div className="min-h-screen bg-[#0a0514] text-white selection:bg-purple-500/30">
+      <Header onBecomeCreator={() => setIsMembershipOpen(true)} />
+      
+      <main>
+        <Hero />
+        <StatsBanner />
+        <CreatorMap />
+        <FeaturedCreators onAddYourself={() => setIsMembershipOpen(true)} />
+      </main>
+      
+      <footer className="py-20 border-t border-white/5 bg-black/20 mt-20">
+        <div className="container mx-auto px-6 text-center">
+          <div className="mb-8">
+            <span className="text-3xl font-black italic tracking-tighter">
+              <span className="text-orange-500">TAB</span>
+            </span>
+          </div>
+          <p className="text-white/40 max-w-md mx-auto mb-10">
+            Empowering creators through direct, fee-free tipping on the XPR Network. Join the future of creator support.
+          </p>
+          <div className="flex justify-center gap-8 text-white/60 font-medium">
+            <a href="#" className="hover:text-purple-400 transition-colors">Documentation</a>
+            <a href="#" className="hover:text-purple-400 transition-colors">Twitter</a>
+            <a href="#" className="hover:text-purple-400 transition-colors">Telegram</a>
+            <a href="#" className="hover:text-purple-400 transition-colors">Support</a>
+          </div>
+          <div className="mt-20 pt-10 border-t border-white/5 text-white/20 text-xs">
+            © {new Date().getFullYear()} TAB Platform. Built on XPR Network.
+          </div>
+        </div>
+      </footer>
+      
+      <MembershipModal 
+        isOpen={isMembershipOpen} 
+        onOpenChange={setIsMembershipOpen} 
+      />
+      
+      <Toaster />
     </div>
   );
 };

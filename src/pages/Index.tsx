@@ -1,9 +1,9 @@
-import { TabbedInterface } from "@/components/TabbedInterface";
+import { Tab } from "@/components/Tab";
 
 const Index = () => {
   return (
-    <div className="min-h-screen bg-background">
-      <TabbedInterface />
+    <div className="min-h-screen bg-[#0a0514] text-white">
+      <Tab />
     </div>
   );
 };
