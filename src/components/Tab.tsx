@@ -1,13 +1,17 @@
 import { useState } from "react";
 import { Header } from "./tab-platform/Header";
 import { Hero } from "./tab-platform/Hero";
-import { StatsBanner, CreatorMap } from "./tab-platform/Sections";
+import { StatsBanner } from "./tab-platform/Sections";
+import { WorldMap } from "./tab-platform/WorldMap";
 import { FeaturedCreators } from "./tab-platform/FeaturedCreators";
 import { MembershipModal } from "./tab-platform/MembershipModal";
+import { TippingModal } from "./tab-platform/TippingModal";
 import { Toaster } from "@/components/ui/toaster";
+import { Creator } from "@/data/creators";
 
 export const Tab = () => {
   const [isMembershipOpen, setIsMembershipOpen] = useState(false);
+  const [selectedCreator, setSelectedCreator] = useState<Creator | null>(null);
 
   return (
     <div className="min-h-screen bg-[#0a0514] text-white selection:bg-purple-500/30">
@@ -16,8 +20,22 @@ export const Tab = () => {
       <main>
         <Hero />
         <StatsBanner />
-        <CreatorMap />
-        <FeaturedCreators onAddYourself={() => setIsMembershipOpen(true)} />
+        
+        <section className="py-20 container mx-auto px-6">
+          <div className="flex items-center gap-2 mb-8">
+            <div className="h-4 w-4 rounded-full bg-purple-500 flex items-center justify-center">
+              <div className="h-2 w-2 rounded-full bg-white animate-pulse" />
+            </div>
+            <h2 className="text-xl font-bold">Global Creator Network</h2>
+            <span className="text-white/40 text-sm">— click a pin to tip instantly</span>
+          </div>
+          <WorldMap onSelectCreator={setSelectedCreator} />
+        </section>
+
+        <FeaturedCreators 
+          onSelectCreator={setSelectedCreator} 
+          onAddYourself={() => setIsMembershipOpen(true)} 
+        />
       </main>
       
       <footer className="py-20 border-t border-white/5 bg-black/20 mt-20">
@@ -45,6 +63,11 @@ export const Tab = () => {
       <MembershipModal 
         isOpen={isMembershipOpen} 
         onOpenChange={setIsMembershipOpen} 
+      />
+
+      <TippingModal 
+        creator={selectedCreator} 
+        onClose={() => setSelectedCreator(null)} 
       />
       
       <Toaster />
