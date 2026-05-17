@@ -51,34 +51,41 @@ export const Hero = () => {
           </div>
           
           <div className="flex-1 relative lg:block hidden">
-            <div className="relative z-10">
-              <img 
-                src="/src/assets/logo.png" 
-                alt="TIPTAB Logo"
-                className="w-full max-w-[500px] mx-auto drop-shadow-[0_0_100px_rgba(249,115,22,0.2)] animate-bounce-slow"
-              />
+            <div className="relative z-10 flex items-center justify-center">
+              {/* Massive glow behind logo */}
+              <div className="absolute inset-0 bg-orange-500/20 blur-[120px] rounded-full animate-pulse-slow scale-150" />
               
-              {/* Floating elements */}
-              <div className="absolute top-0 -left-10 bg-white/5 backdrop-blur-xl border border-white/10 p-6 rounded-[32px] shadow-2xl animate-float">
+              <div className="relative group">
+                <img 
+                  src="/src/assets/logo.png" 
+                  alt="TIPTAB Logo"
+                  className="w-full max-w-[480px] mx-auto drop-shadow-[0_0_50px_rgba(249,115,22,0.4)] animate-delayed-spin cursor-pointer transition-transform duration-700 group-hover:scale-105"
+                />
+              </div>
+              
+              {/* Floating elements optimized based on your reference */}
+              <div className="absolute -top-12 -left-16 bg-white/5 backdrop-blur-2xl border border-white/10 p-6 rounded-[32px] shadow-[0_32px_64px_-16px_rgba(0,0,0,0.6)] animate-float overflow-hidden">
+                <div className="absolute bottom-0 left-4 right-12 h-0.5 bg-red-600/60" /> {/* Red accent line */}
                 <div className="flex items-center gap-4">
-                  <div className="h-10 w-10 rounded-xl bg-orange-500 flex items-center justify-center">
-                    <Zap className="h-6 w-6 text-white" />
+                  <div className="h-12 w-12 rounded-2xl bg-orange-500 flex items-center justify-center shadow-lg shadow-orange-500/20">
+                    <Zap className="h-7 w-7 text-white fill-white" />
                   </div>
                   <div>
-                    <p className="text-[10px] font-black uppercase tracking-widest text-white/40">Recent Tip</p>
-                    <p className="text-xl font-black">500 TAB</p>
+                    <p className="text-[10px] font-black uppercase tracking-[0.2em] text-white/40 mb-0.5">Recent Tip</p>
+                    <p className="text-2xl font-black text-white">500 TAB</p>
                   </div>
                 </div>
               </div>
 
-              <div className="absolute bottom-10 -right-10 bg-white/5 backdrop-blur-xl border border-white/10 p-6 rounded-[32px] shadow-2xl animate-float-delayed">
+              <div className="absolute -bottom-4 -right-12 bg-white/5 backdrop-blur-2xl border border-white/10 p-6 rounded-[32px] shadow-[0_32px_64px_-16px_rgba(0,0,0,0.6)] animate-float-delayed overflow-hidden">
+                <div className="absolute top-0 left-4 right-12 h-0.5 bg-red-600/60" /> {/* Red accent line */}
                 <div className="flex items-center gap-4">
-                  <div className="h-10 w-10 rounded-xl bg-purple-500 flex items-center justify-center">
-                    <Sparkles className="h-6 w-6 text-white" />
+                  <div className="h-12 w-12 rounded-2xl bg-purple-500 flex items-center justify-center shadow-lg shadow-purple-500/20">
+                    <Sparkles className="h-7 w-7 text-white fill-white" />
                   </div>
                   <div>
-                    <p className="text-[10px] font-black uppercase tracking-widest text-white/40">New Creator</p>
-                    <p className="text-xl font-black">@alex_arts</p>
+                    <p className="text-[10px] font-black uppercase tracking-[0.2em] text-white/40 mb-0.5">New Creator</p>
+                    <p className="text-2xl font-black text-white">@alex_arts</p>
                   </div>
                 </div>
               </div>
@@ -86,6 +93,35 @@ export const Hero = () => {
           </div>
         </div>
       </div>
+
+      <style>{`
+        @keyframes delayed-spin {
+          0%, 50% { transform: rotate(0deg); }
+          100% { transform: rotate(360deg); }
+        }
+        .animate-delayed-spin {
+          animation: delayed-spin 20s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+          animation-delay: 10s;
+        }
+        @keyframes pulse-slow {
+          0%, 100% { opacity: 0.3; transform: scale(1.3); }
+          50% { opacity: 0.6; transform: scale(1.6); }
+        }
+        .animate-pulse-slow {
+          animation: pulse-slow 8s ease-in-out infinite;
+        }
+        @keyframes float {
+          0%, 100% { transform: translateY(0) translateX(0); }
+          50% { transform: translateY(-15px) translateX(5px); }
+        }
+        .animate-float {
+          animation: float 6s ease-in-out infinite;
+        }
+        .animate-float-delayed {
+          animation: float 6s ease-in-out infinite;
+          animation-delay: 3s;
+        }
+      `}</style>
     </section>
   );
 };
