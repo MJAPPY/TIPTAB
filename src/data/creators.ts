@@ -17,7 +17,7 @@ export const CREATORS: Creator[] = [
     id: "1",
     name: "TAB Project",
     handle: "tabxpr",
-    bio: "The official TAB project account. Supporting the $TAB ecosystem on XPR Network.",
+    bio: "The official TAB project account. Supporting the TAB ecosystem on XPR Network.",
     location: "London, UK",
     coordinates: [-0.1276, 51.5074],
     category: "Content",

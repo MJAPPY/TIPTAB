@@ -132,9 +132,9 @@ export const MembershipModal = ({ isOpen, onOpenChange }: MembershipModalProps) 
                 <p className="text-white/40 font-bold uppercase tracking-widest text-xs mb-2">Membership Fee</p>
                 <div className="flex items-center justify-center gap-3">
                   <span className="text-6xl font-black tracking-tighter">2,500</span>
-                  <span className="text-2xl font-bold text-orange-500">$TAB</span>
+                  <span className="text-2xl font-bold text-orange-500">TAB</span>
                 </div>
-                <p className="mt-4 text-sm text-white/40 italic">approx. $25.00 USD</p>
+                <p className="mt-4 text-sm text-white/40 italic">approx. 25.00 USD</p>
               </div>
 
               <div className="space-y-4">

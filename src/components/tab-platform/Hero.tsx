@@ -11,7 +11,7 @@ export const Hero = () => {
         <div className="flex-1 text-left space-y-6">
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-purple-500/10 border border-purple-500/20 text-purple-400 text-sm font-medium">
             <Zap className="h-4 w-4" />
-            Powered by $TAB on XPR Network
+            Powered by TAB on XPR Network
           </div>
           
           <h1 className="text-5xl md:text-7xl font-black tracking-tight leading-none">
@@ -19,7 +19,7 @@ export const Hero = () => {
           </h1>
           
           <p className="text-xl text-white/60 max-w-xl">
-            Support your favorite builders, artists, educators, service providers, and sports professionals directly with $TAB tokens. Zero fees. Instant. On XPR Network.
+            Support your favorite builders, artists, educators, service providers, and sports professionals directly with TAB tokens. Zero fees. Instant. On XPR Network.
           </p>
           
           <div className="flex flex-wrap items-center gap-6 pt-4 text-sm text-white/50">

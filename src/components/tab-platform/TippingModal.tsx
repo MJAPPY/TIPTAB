@@ -21,7 +21,7 @@ export const TippingModal = ({ creator, onClose }: TippingModalProps) => {
 
   const handleSendTip = async () => {
     if (!tipAmount || isNaN(Number(tipAmount))) {
-      toast({ title: "Invalid amount", description: "Please enter a valid $TAB amount.", variant: "destructive" });
+      toast({ title: "Invalid amount", description: "Please enter a valid TAB amount.", variant: "destructive" });
       return;
     }
 
@@ -31,7 +31,7 @@ export const TippingModal = ({ creator, onClose }: TippingModalProps) => {
       await new Promise(resolve => setTimeout(resolve, 2000));
       toast({
         title: "Tip Sent Successfully!",
-        description: `You've sent ${tipAmount} $TAB to ${creator?.name}.`,
+        description: `You've sent ${tipAmount} TAB to ${creator?.name}.`,
       });
       onClose();
     } catch (error) {
@@ -82,7 +82,7 @@ export const TippingModal = ({ creator, onClose }: TippingModalProps) => {
           <div className="space-y-4">
             <div className="flex items-center justify-between text-sm font-medium">
               <span className="text-white/60">Tip Amount</span>
-              <span className="text-orange-500">$TAB Tokens</span>
+              <span className="text-orange-500">TAB Tokens</span>
             </div>
             
             <div className="grid grid-cols-3 gap-3">
@@ -105,7 +105,7 @@ export const TippingModal = ({ creator, onClose }: TippingModalProps) => {
                 onChange={(e) => setTipAmount(e.target.value)}
                 className="bg-white/5 border-white/10 h-14 rounded-2xl text-lg font-bold px-6"
               />
-              <span className="absolute right-6 top-1/2 -translate-y-1/2 text-white/40 font-bold">$TAB</span>
+              <span className="absolute right-6 top-1/2 -translate-y-1/2 text-white/40 font-bold">TAB</span>
             </div>
             
             <Button 

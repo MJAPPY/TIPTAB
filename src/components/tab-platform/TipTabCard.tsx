@@ -119,7 +119,7 @@ export const TipTabCard = ({ creator }: TipTabCardProps) => {
                 <span className="truncate">{creator.location}</span>
               </div>
               <p className="text-slate-400 text-[11px] font-medium leading-tight max-w-[180px]">
-                Direct $TAB tipping on the XPR Network.
+                Direct TAB tipping on the XPR Network.
               </p>
             </div>
             
