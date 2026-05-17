@@ -61,7 +61,7 @@ export const Header = ({ onBecomeCreator }: HeaderProps) => {
   );
 
   return (
-    <header className="fixed top-10 left-0 right-0 z-50 px-4 md:px-6">
+    <header className="fixed top-6 left-0 right-0 z-50 px-4 md:px-6">
       <div className="container mx-auto">
         <div className="border border-white/10 bg-[#0a0514]/80 backdrop-blur-md rounded-2xl md:rounded-[32px] px-4 md:px-6 py-3 md:py-4 flex items-center justify-between shadow-[0_20px_50px_rgba(0,0,0,0.5)]">
           

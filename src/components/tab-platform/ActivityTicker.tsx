@@ -26,41 +26,36 @@ export const ActivityTicker = () => {
   };
 
   return (
-    <div className="fixed top-0 left-0 right-0 z-[60] bg-[#0a0514]/90 backdrop-blur-xl border-b border-white/10 h-10 flex items-center overflow-hidden shadow-[0_0_30px_rgba(0,0,0,0.5)]">
+    <div className="fixed top-32 left-0 right-0 z-40 bg-[#0a0514]/60 backdrop-blur-xl border-y border-white/5 h-10 flex items-center overflow-hidden shadow-[0_10px_30px_rgba(0,0,0,0.3)]">
       {/* Live Indicator Badge */}
-      <div className="relative z-20 flex items-center h-full bg-orange-600 px-4 gap-2 shadow-[10px_0_30px_rgba(234,88,12,0.3)]">
-        <div className="h-2 w-2 rounded-full bg-white animate-pulse shadow-[0_0_10px_rgba(255,255,255,1)]" />
-        <span className="text-[10px] font-black uppercase tracking-[0.2em] text-white whitespace-nowrap">Live Activity</span>
-        <div className="absolute top-0 right-0 bottom-0 w-8 bg-gradient-to-r from-orange-600 to-transparent translate-x-full" />
+      <div className="relative z-20 flex items-center h-full bg-orange-600/90 px-4 gap-2">
+        <div className="h-2 w-2 rounded-full bg-white animate-pulse" />
+        <span className="text-[9px] font-black uppercase tracking-[0.2em] text-white whitespace-nowrap">Live Feed</span>
+        <div className="absolute top-0 right-0 bottom-0 w-8 bg-gradient-to-r from-[#0a0514]/0 to-transparent translate-x-full" />
       </div>
 
       <div className="flex whitespace-nowrap animate-marquee items-center pl-10">
         {/* First set of activities */}
         {ACTIVITIES.map((activity, i) => (
           <div key={`a-${i}`} className="flex items-center gap-3 px-10 group cursor-default">
-            <div className={`h-1.5 w-1.5 rounded-full bg-white/20 group-hover:bg-white transition-colors`} />
-            <activity.icon className={`h-3.5 w-3.5 ${activity.color} drop-shadow-[0_0_5px_currentColor]`} />
-            <span className="text-[10px] font-black uppercase tracking-[0.15em] text-white/80 group-hover:text-white transition-colors">
+            <div className={`h-1 w-1 rounded-full bg-white/10 group-hover:bg-white/40 transition-colors`} />
+            <activity.icon className={`h-3 w-3 ${activity.color} drop-shadow-[0_0_5px_currentColor]`} />
+            <span className="text-[10px] font-black uppercase tracking-[0.15em] text-white/60 group-hover:text-white transition-colors">
               {formatText(activity.text, activity.color)}
             </span>
-            <div className="ml-10 h-4 w-px bg-white/5" />
           </div>
         ))}
         {/* Duplicate set for seamless loop */}
         {ACTIVITIES.map((activity, i) => (
           <div key={`b-${i}`} className="flex items-center gap-3 px-10 group cursor-default">
-            <div className={`h-1.5 w-1.5 rounded-full bg-white/20 group-hover:bg-white transition-colors`} />
-            <activity.icon className={`h-3.5 w-3.5 ${activity.color} drop-shadow-[0_0_5px_currentColor]`} />
-            <span className="text-[10px] font-black uppercase tracking-[0.15em] text-white/80 group-hover:text-white transition-colors">
+            <div className={`h-1 w-1 rounded-full bg-white/10 group-hover:bg-white/40 transition-colors`} />
+            <activity.icon className={`h-3 w-3 ${activity.color} drop-shadow-[0_0_5px_currentColor]`} />
+            <span className="text-[10px] font-black uppercase tracking-[0.15em] text-white/60 group-hover:text-white transition-colors">
               {formatText(activity.text, activity.color)}
             </span>
-            <div className="ml-10 h-4 w-px bg-white/5" />
           </div>
         ))}
       </div>
-
-      {/* Decorative neon bottom line */}
-      <div className="absolute bottom-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-orange-500/50 to-transparent opacity-50" />
 
       <style>{`
         @keyframes marquee {
@@ -68,10 +63,7 @@ export const ActivityTicker = () => {
           100% { transform: translateX(-50%); }
         }
         .animate-marquee {
-          animation: marquee 50s linear infinite;
-        }
-        .animate-marquee:hover {
-          animation-play-state: paused;
+          animation: marquee 60s linear infinite;
         }
       `}</style>
     </div>
