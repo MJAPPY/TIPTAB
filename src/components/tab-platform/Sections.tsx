@@ -3,11 +3,11 @@ import React from "react";
 export const StatsBanner = () => {
   const stats = [
     { label: "Powered by", value: "WebAuth Protocol" },
-    { label: "Community", value: "Creators & Athletes" },
-    { label: "Network", value: "XPR Network" },
+    { label: "Community", value: "XPR Network Creators & Athletes" },
     { label: "Settlement", value: "Instant & Zero Fee" },
     { label: "Ecosystem", value: "TAB Token Rewards" },
-    { label: "Security", value: "On-Chain Verified" }
+    { label: "Security", value: "On-Chain Verified" },
+    { label: "Platform", value: "Global XPR Network Hub" }
   ];
 
   return (
@@ -24,7 +24,7 @@ export const StatsBanner = () => {
                 {stat.value}
               </span>
             </div>
-            <div className="h-2 w-2 rounded-full bg-purple-500 shadow-[0_0_10px_rgba(168,85,247,0.8)] animate-pulse" />
+            <div className="h-2 w-2 rounded-full bg-purple-500 shadow-[0_0_100px_rgba(168,85,247,0.8)] animate-pulse" />
           </div>
         ))}
         {/* Duplicate set for seamless loop */}
@@ -49,7 +49,7 @@ export const StatsBanner = () => {
           100% { transform: translateX(-50%); }
         }
         .animate-stats-ticker {
-          animation: stats-ticker 30s linear infinite;
+          animation: stats-ticker 35s linear infinite;
         }
         .animate-stats-ticker:hover {
           animation-play-state: paused;
