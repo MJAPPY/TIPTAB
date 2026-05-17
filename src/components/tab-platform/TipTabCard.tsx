@@ -1,5 +1,7 @@
+"use client";
+
 import React, { useRef } from "react";
-import { QrCode, Zap, MapPin, Share2, Download, Check, ShieldCheck, Heart } from "lucide-react";
+import { QrCode, MapPin, Share2, Download, Check, ShieldCheck, Heart } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Creator } from "@/data/creators";
 import { useToast } from "@/hooks/use-toast";
@@ -42,26 +44,25 @@ export const TipTabCard = ({ creator }: TipTabCardProps) => {
     
     setIsDownloading(true);
     try {
-      // Sticker-optimized download (high DPI, crisp edges)
       const dataUrl = await toPng(cardRef.current, { 
         quality: 1, 
-        pixelRatio: 4,
-        backgroundColor: 'transparent' // Perfect for stickers
+        pixelRatio: 3,
+        backgroundColor: '#0a0514' 
       });
       
       const link = document.createElement('a');
-      link.download = `TIPTAB-Sticker-${creator.handle}.png`;
+      link.download = `TipTab-${creator.handle}.png`;
       link.href = dataUrl;
       link.click();
       
       toast({
-        title: "Sticker Ready!",
-        description: "Your high-res sticker file has been generated.",
+        title: "Card Downloaded",
+        description: "Your high-resolution TipTab card has been saved.",
       });
     } catch (err) {
       toast({
-        title: "Error",
-        description: "Could not generate sticker file.",
+        title: "Download Failed",
+        description: "Could not generate card image.",
         variant: "destructive",
       });
     } finally {
@@ -70,105 +71,99 @@ export const TipTabCard = ({ creator }: TipTabCardProps) => {
   };
 
   return (
-    <div className="group relative w-full max-w-[480px]">
-      {/* Sticker Container - This is the exported part */}
+    <div className="group relative w-full max-w-[460px] mx-auto">
+      {/* Main Card Container */}
       <div 
         ref={cardRef}
-        className="relative p-2" // Space for the die-cut border
+        className="w-full aspect-[1.5/1] bg-[#0a0514] rounded-[48px] p-8 border border-white/10 shadow-[0_32px_64px_-16px_rgba(0,0,0,0.6)] relative overflow-hidden flex flex-col justify-between"
       >
-        <div className="w-full aspect-[1.4/1] bg-[#0a0514] rounded-[54px] p-10 border-[6px] border-white shadow-[0_40px_80px_-20px_rgba(0,0,0,0.8)] relative overflow-hidden">
-          
-          {/* Sticker Background - High Vibrancy for Visibility */}
-          <div className="absolute inset-0 bg-gradient-to-br from-purple-900/40 via-transparent to-orange-500/30" />
-          <div className="absolute -top-40 -right-40 w-[400px] h-[400px] bg-orange-500/20 blur-[100px] rounded-full" />
-          <div className="absolute -bottom-40 -left-40 w-[400px] h-[400px] bg-purple-600/30 blur-[100px] rounded-full" />
-          
-          <div className="relative z-10 h-full flex flex-col justify-between">
-            {/* Header: Brand & CTA */}
-            <div className="flex justify-between items-start">
-              <div className="space-y-1">
-                <div className="flex items-center gap-2 px-3 py-1 bg-orange-500 text-white rounded-full w-fit">
-                  <Heart className="h-3.5 w-3.5 fill-white" />
-                  <span className="text-[10px] font-black uppercase tracking-widest">Support Me</span>
-                </div>
-                <h3 className="text-4xl font-black text-white tracking-tighter leading-tight drop-shadow-lg">
-                  {creator.name}
-                </h3>
+        
+        {/* Dynamic Background Glows */}
+        <div className="absolute top-0 right-0 w-full h-full bg-gradient-to-br from-purple-600/10 via-transparent to-orange-500/10 pointer-events-none" />
+        <div className="absolute -top-32 -right-32 w-80 h-80 bg-purple-500/20 blur-[100px] rounded-full" />
+        <div className="absolute -bottom-32 -left-32 w-80 h-80 bg-orange-500/10 blur-[100px] rounded-full" />
+        
+        {/* Header Section */}
+        <div className="relative z-10 flex justify-between items-start gap-4">
+          <div className="flex items-center gap-4 min-w-0">
+            <div className={`h-16 w-16 shrink-0 rounded-2xl ${creator.color} flex items-center justify-center text-2xl font-black border-2 border-white/20 shadow-xl`}>
+              {creator.avatar}
+            </div>
+            <div className="min-w-0">
+              <h3 className="text-2xl font-black text-white truncate tracking-tight">{creator.name}</h3>
+              <p className="text-purple-400 font-bold truncate">@{creator.handle}</p>
+            </div>
+          </div>
+          <div className="flex flex-col items-end shrink-0">
+             <span className="text-xl font-black italic tracking-tighter text-white">TIP<span className="text-orange-500">TAB</span></span>
+             <div className="mt-1 flex items-center gap-1 px-2 py-0.5 rounded-full bg-orange-500/20 border border-orange-500/30">
+               <Heart className="h-3 w-3 text-orange-500 fill-orange-500" />
+               <span className="text-[10px] font-black text-orange-500 uppercase tracking-widest">Verified</span>
+             </div>
+          </div>
+        </div>
+
+        {/* Content Section */}
+        <div className="relative z-10 flex items-end justify-between gap-6 mt-4">
+          {/* Left Info Column */}
+          <div className="space-y-4 flex-1 min-w-0 pb-2">
+            <div className="space-y-2">
+              <div className="flex items-center gap-2 text-white/60 text-sm font-medium truncate">
+                <MapPin className="h-4 w-4 text-purple-500 shrink-0" />
+                <span className="truncate">{creator.location}</span>
               </div>
-              <div className="flex flex-col items-end">
-                 <span className="text-2xl font-black italic tracking-tighter text-white">TIP<span className="text-orange-500">TAB</span></span>
-                 <p className="text-[10px] font-bold text-white/40 uppercase tracking-[0.3em] mt-1">XPR Network</p>
+              <p className="text-white/40 text-sm font-medium leading-tight max-w-[200px]">
+                Scan the QR code to support my work on XPR Network.
+              </p>
+            </div>
+            
+            <div className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-white/5 border border-white/10 w-fit">
+              <ShieldCheck className="h-4 w-4 text-green-500" />
+              <span className="text-[10px] font-black uppercase tracking-widest text-white/80">Fee-Free Tip</span>
+            </div>
+          </div>
+
+          {/* Right QR Column */}
+          <div className="flex flex-col items-center gap-3 shrink-0">
+            <div className="relative">
+              <div className="absolute inset-[-8px] bg-white/10 blur-xl rounded-full" />
+              <div className="relative bg-white p-3 rounded-3xl shadow-2xl">
+                <div className="h-24 w-24 bg-black flex items-center justify-center rounded-2xl overflow-hidden">
+                  <QrCode className="h-20 w-20 text-white" />
+                </div>
               </div>
             </div>
-
-            {/* Main Content Area: Massive QR Focus */}
-            <div className="flex items-center justify-between gap-8 mt-4">
-              <div className="flex-1 space-y-6">
-                <div className="space-y-4">
-                  <div className="flex items-center gap-3 text-white/80 text-xl font-bold">
-                    <MapPin className="h-6 w-6 text-orange-500" />
-                    {creator.location}
-                  </div>
-                  <p className="text-white/60 text-lg font-medium leading-tight max-w-[180px]">
-                    Scan to support my work directly
-                  </p>
-                </div>
-                
-                <div className="flex items-center gap-3 px-4 py-2 bg-white/10 rounded-2xl border border-white/20 w-fit backdrop-blur-md">
-                  <ShieldCheck className="h-5 w-5 text-green-400" />
-                  <span className="text-xs font-black uppercase tracking-widest text-white">Verified</span>
-                </div>
-              </div>
-
-              {/* Massive White-Bordered QR (Scan Reliability) */}
-              <div className="shrink-0 relative">
-                {/* Visual indicator that this is the action point */}
-                <div className="absolute -inset-4 bg-orange-500/20 blur-2xl rounded-full animate-pulse" />
-                
-                <div className="relative bg-white p-5 rounded-[40px] shadow-[0_30px_60px_rgba(0,0,0,0.6)]">
-                  <div className="h-36 w-36 bg-black flex items-center justify-center rounded-3xl overflow-hidden">
-                    <QrCode className="h-32 w-32 text-white" />
-                  </div>
-                </div>
-                
-                <div className="absolute -bottom-4 left-1/2 -translate-x-1/2 bg-black text-white px-4 py-1.5 rounded-full border border-white/20 shadow-xl whitespace-nowrap">
-                   <p className="text-[10px] font-black uppercase tracking-[0.2em]">Scan to Tip</p>
-                </div>
-              </div>
+            <div className="text-center space-y-0.5">
+              <p className="text-[10px] font-black uppercase tracking-[0.2em] text-white/30">Scan to Tip</p>
+              <p className="text-xs font-black text-orange-500 tracking-tighter">DIRECT $TAB</p>
             </div>
           </div>
         </div>
       </div>
 
       {/* Action Buttons */}
-      <div className="mt-8 grid grid-cols-2 gap-5">
+      <div className="mt-8 grid grid-cols-2 gap-4">
         <Button 
           variant="secondary" 
           onClick={handleShare}
-          className="rounded-[28px] bg-white/5 border border-white/10 hover:bg-white/10 text-white gap-3 h-16 font-bold text-lg transition-all"
+          className="rounded-2xl bg-white/5 border border-white/10 hover:bg-white/10 text-white gap-2.5 h-14 font-bold text-base transition-all"
         >
-          {isCopied ? <Check className="h-6 w-6 text-green-500" /> : <Share2 className="h-6 w-6 text-purple-400" />}
+          {isCopied ? <Check className="h-5 w-5 text-green-500" /> : <Share2 className="h-5 w-5 text-purple-400" />}
           {isCopied ? "Link Copied" : "Share URL"}
         </Button>
         <Button 
           variant="secondary" 
           onClick={handleDownload}
           disabled={isDownloading}
-          className="rounded-[28px] bg-purple-600 hover:bg-purple-500 text-white gap-3 h-16 font-black text-lg transition-all hover:scale-[1.02] shadow-xl shadow-purple-500/20"
+          className="rounded-2xl bg-white/5 border border-white/10 hover:bg-white/10 text-white gap-2.5 h-14 font-bold text-base transition-all"
         >
           {isDownloading ? (
-            <div className="h-6 w-6 border-2 border-white/20 border-t-white rounded-full animate-spin" />
+            <div className="h-5 w-5 border-2 border-white/20 border-t-white rounded-full animate-spin" />
           ) : (
-            <Download className="h-6 w-6" />
+            <Download className="h-5 w-5 text-orange-400" />
           )}
-          {isDownloading ? "..." : "Get Sticker"}
+          {isDownloading ? "Saving..." : "Download Card"}
         </Button>
-      </div>
-      
-      <div className="mt-6 p-4 rounded-2xl bg-white/5 border border-white/5 text-center">
-        <p className="text-xs text-white/40 font-bold uppercase tracking-widest leading-relaxed">
-          Sticker optimized for: Physical printing • High-visibility <br /> Direct creator support • Instant scanning
-        </p>
       </div>
     </div>
   );
