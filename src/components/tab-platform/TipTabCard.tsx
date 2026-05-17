@@ -111,38 +111,38 @@ export const TipTabCard = ({ creator }: TipTabCardProps) => {
         </div>
 
         {/* Content Section */}
-        <div className="relative z-10 flex items-end justify-between gap-6 mt-4">
+        <div className="relative z-10 flex items-end justify-between gap-4 mt-4">
           {/* Left Info Column */}
-          <div className="space-y-4 flex-1 min-w-0 pb-2">
-            <div className="space-y-2">
-              <div className="flex items-center gap-2 text-slate-300 text-sm font-medium truncate">
-                <MapPin className="h-4 w-4 text-purple-500 shrink-0" />
+          <div className="space-y-4 flex-1 min-w-0 pb-1">
+            <div className="space-y-1.5">
+              <div className="flex items-center gap-2 text-slate-300 text-[13px] font-bold truncate">
+                <MapPin className="h-3.5 w-3.5 text-purple-500 shrink-0" />
                 <span className="truncate">{creator.location}</span>
               </div>
-              <p className="text-slate-400 text-sm font-medium leading-tight max-w-[200px]">
-                Scan the QR code to support my work on XPR Network.
+              <p className="text-slate-400 text-[12px] font-medium leading-tight max-w-[200px]">
+                Scan to support my work on XPR Network via TIPTAB.
               </p>
             </div>
             
-            <div className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-slate-500/10 border border-slate-500/20 w-fit">
-              <ShieldCheck className="h-4 w-4 text-green-400" />
-              <span className="text-[10px] font-black uppercase tracking-widest text-slate-200">Fee-Free Tip</span>
+            <div className="flex items-center gap-2 px-2.5 py-1 rounded-lg bg-slate-500/10 border border-slate-500/20 w-fit">
+              <ShieldCheck className="h-3.5 w-3.5 text-green-400" />
+              <span className="text-[9px] font-black uppercase tracking-widest text-slate-200">Zero Fees</span>
             </div>
           </div>
 
           {/* Right QR Column */}
-          <div className="flex flex-col items-center gap-3 shrink-0">
+          <div className="flex flex-col items-center gap-2 shrink-0">
             <div className="relative">
-              <div className="absolute inset-[-8px] bg-white/10 blur-xl rounded-full" />
-              <div className="relative bg-white p-3 rounded-3xl shadow-2xl">
-                <div className="h-24 w-24 bg-black flex items-center justify-center rounded-2xl overflow-hidden">
-                  <QrCode className="h-20 w-20 text-white" />
+              <div className="absolute inset-[-6px] bg-white/10 blur-lg rounded-full" />
+              <div className="relative bg-white p-2.5 rounded-[20px] shadow-2xl">
+                <div className="h-20 w-20 bg-black flex items-center justify-center rounded-xl overflow-hidden">
+                  <QrCode className="h-16 w-16 text-white" />
                 </div>
               </div>
             </div>
-            <div className="text-center space-y-0.5">
-              <p className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500">Scan to Tip</p>
-              <p className="text-xs font-black text-orange-500 tracking-tighter">DIRECT $TAB</p>
+            <div className="text-center space-y-0">
+              <p className="text-[9px] font-black uppercase tracking-[0.1em] text-slate-500">Scan to Tip</p>
+              <p className="text-[11px] font-black text-orange-500 tracking-tighter">DIRECT $TAB</p>
             </div>
           </div>
         </div>
