@@ -69,77 +69,71 @@ export const TipTabCard = ({ creator }: TipTabCardProps) => {
   };
 
   return (
-    <div className="group relative w-full max-w-[440px]">
+    <div className="group relative w-full max-w-[460px]">
       {/* Main Card Container */}
       <div 
         ref={cardRef}
-        className="w-full aspect-[1.6/1] bg-[#0a0514] rounded-[40px] p-8 border border-white/10 shadow-[0_32px_64px_-16px_rgba(0,0,0,0.6)] relative overflow-hidden transition-all duration-700 group-hover:scale-[1.03] group-hover:border-purple-500/40"
+        className="w-full aspect-[1.6/1] bg-[#0a0514] rounded-[48px] p-10 border border-white/10 shadow-[0_32px_64px_-16px_rgba(0,0,0,0.6)] relative overflow-hidden transition-all duration-700 group-hover:scale-[1.03] group-hover:border-purple-500/40"
       >
         
         {/* Dynamic Background Effects */}
-        <div className="absolute top-0 right-0 w-full h-full bg-gradient-to-br from-purple-600/10 via-transparent to-orange-500/10 pointer-events-none" />
-        <div className="absolute -top-32 -right-32 w-80 h-80 bg-purple-500/20 blur-[100px] rounded-full animate-pulse" />
-        <div className="absolute -bottom-32 -left-32 w-80 h-80 bg-orange-500/10 blur-[100px] rounded-full" />
+        <div className="absolute top-0 right-0 w-full h-full bg-gradient-to-br from-purple-600/15 via-transparent to-orange-500/15 pointer-events-none" />
+        <div className="absolute -top-32 -right-32 w-96 h-96 bg-purple-500/20 blur-[100px] rounded-full animate-pulse" />
+        <div className="absolute -bottom-32 -left-32 w-96 h-96 bg-orange-500/10 blur-[100px] rounded-full" />
         
         <div className="relative z-10 h-full flex flex-col justify-between">
           {/* Top Section: Profile & Logo */}
           <div className="flex justify-between items-start">
-            <div className="flex items-center gap-5">
-              <div className={`h-16 w-16 rounded-2xl ${creator.color} flex items-center justify-center text-2xl font-black border-2 border-white/20 shadow-2xl rotate-[-2deg] group-hover:rotate-0 transition-transform duration-500`}>
+            <div className="flex items-center gap-6">
+              <div className={`h-20 w-20 rounded-[28px] ${creator.color} flex items-center justify-center text-3xl font-black border-2 border-white/20 shadow-2xl rotate-[-2deg] group-hover:rotate-0 transition-transform duration-500`}>
                 {creator.avatar}
               </div>
-              <div className="space-y-1">
-                <h3 className="text-2xl font-black text-white tracking-tight leading-none">{creator.name}</h3>
-                <p className="text-purple-400 text-sm font-bold">@{creator.handle}</p>
+              <div className="space-y-1.5">
+                <h3 className="text-3xl font-black text-white tracking-tight leading-none">{creator.name}</h3>
+                <p className="text-purple-400 text-lg font-bold">@{creator.handle}</p>
               </div>
             </div>
             <div className="flex flex-col items-end">
-               <span className="text-sm font-black italic tracking-tighter text-white/60">TIP<span className="text-orange-500">TAB</span></span>
-               <div className="mt-1 flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-orange-500/20 border border-orange-500/30">
-                 <Zap className="h-3 w-3 text-orange-500 fill-orange-500" />
-                 <span className="text-[10px] font-black text-orange-500 uppercase tracking-widest leading-none">Pro</span>
+               <span className="text-lg font-black italic tracking-tighter text-white/60">TIP<span className="text-orange-500">TAB</span></span>
+               <div className="mt-2 flex items-center gap-1.5 px-3 py-1 rounded-full bg-orange-500/20 border border-orange-500/30">
+                 <Zap className="h-4 w-4 text-orange-500 fill-orange-500" />
+                 <span className="text-[11px] font-black text-orange-500 uppercase tracking-widest leading-none">Pro</span>
                </div>
             </div>
           </div>
 
           {/* Bottom Section: Info & QR */}
           <div className="flex items-end justify-between">
-            <div className="space-y-6">
-              <div className="space-y-3">
-                <div className="flex items-center gap-2 text-white/60 text-sm font-medium">
-                  <MapPin className="h-4 w-4 text-purple-500" />
+            <div className="space-y-8">
+              <div className="space-y-4">
+                <div className="flex items-center gap-3 text-white/70 text-lg font-medium">
+                  <MapPin className="h-5 w-5 text-purple-500" />
                   {creator.location}
                 </div>
-                <div className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-white/5 border border-white/10 w-fit">
-                  <ShieldCheck className="h-4 w-4 text-green-500" />
-                  <span className="text-[10px] font-black uppercase tracking-[0.2em] text-white/80">Network Verified</span>
+                <div className="flex items-center gap-2.5 px-4 py-2 rounded-2xl bg-white/5 border border-white/10 w-fit">
+                  <ShieldCheck className="h-5 w-5 text-green-500" />
+                  <span className="text-[11px] font-black uppercase tracking-[0.2em] text-white/80">Network Verified</span>
                 </div>
               </div>
-
-              {/* Security Chip Simulation */}
-              <div className="w-12 h-9 rounded-lg bg-gradient-to-br from-yellow-400/30 to-yellow-600/50 border border-yellow-500/40 relative overflow-hidden shadow-inner">
-                <div className="absolute inset-0 grid grid-cols-2 grid-rows-3 opacity-20">
-                  <div className="border-r border-b border-white" /><div className="border-b border-white" />
-                  <div className="border-r border-b border-white" /><div className="border-b border-white" />
-                  <div className="border-r border-white" /><div className="border-white" />
-                </div>
-              </div>
+              
+              {/* Added small detail to fill space nicely */}
+              <p className="text-[10px] text-white/20 font-bold uppercase tracking-[0.3em]">Built on XPR Network</p>
             </div>
 
-            {/* QR Code Column */}
-            <div className="flex flex-col items-center gap-3">
+            {/* Enlarged QR Code Column */}
+            <div className="flex flex-col items-center gap-4">
               <div className="relative group/qr">
                 {/* Glow behind QR */}
-                <div className="absolute inset-0 bg-white/20 blur-xl rounded-2xl group-hover/qr:bg-purple-500/30 transition-colors" />
-                <div className="relative bg-white p-3 rounded-[24px] shadow-[0_20px_40px_rgba(0,0,0,0.4)] transition-transform duration-500 group-hover:scale-110">
-                  <div className="h-20 w-20 bg-black flex items-center justify-center rounded-xl overflow-hidden">
-                    <QrCode className="h-16 w-16 text-white" />
+                <div className="absolute inset-[-10px] bg-white/10 blur-2xl rounded-[32px] group-hover/qr:bg-purple-500/30 transition-colors" />
+                <div className="relative bg-white p-4 rounded-[32px] shadow-[0_20px_60px_rgba(0,0,0,0.5)] transition-transform duration-500 group-hover:scale-105">
+                  <div className="h-28 w-28 bg-black flex items-center justify-center rounded-2xl overflow-hidden">
+                    <QrCode className="h-24 w-24 text-white" />
                   </div>
                 </div>
               </div>
               <div className="text-center space-y-1">
-                <p className="text-[10px] font-black uppercase tracking-[0.2em] text-white/40">Scan to Tip</p>
-                <p className="text-xs font-black text-orange-500 tracking-tighter">PRO CREATOR</p>
+                <p className="text-[11px] font-black uppercase tracking-[0.3em] text-white/50">Scan to Tip</p>
+                <p className="text-sm font-black text-orange-500 tracking-tighter">DIRECT PAYMENT</p>
               </div>
             </div>
           </div>
@@ -147,25 +141,25 @@ export const TipTabCard = ({ creator }: TipTabCardProps) => {
       </div>
 
       {/* Optimized Action Buttons */}
-      <div className="mt-8 grid grid-cols-2 gap-4">
+      <div className="mt-10 grid grid-cols-2 gap-5">
         <Button 
           variant="secondary" 
           onClick={handleShare}
-          className="rounded-[20px] bg-white/5 border border-white/10 hover:bg-white/10 text-white gap-3 h-16 font-bold text-base transition-all hover:scale-[1.02] active:scale-[0.98] shadow-xl"
+          className="rounded-[24px] bg-white/5 border border-white/10 hover:bg-white/10 text-white gap-3 h-16 font-bold text-lg transition-all hover:scale-[1.02] active:scale-[0.98] shadow-2xl"
         >
-          {isCopied ? <Check className="h-5 w-5 text-green-500" /> : <Share2 className="h-5 w-5 text-purple-400" />}
+          {isCopied ? <Check className="h-6 w-6 text-green-500" /> : <Share2 className="h-6 w-6 text-purple-400" />}
           {isCopied ? "Copied!" : "Share Link"}
         </Button>
         <Button 
           variant="secondary" 
           onClick={handleDownload}
           disabled={isDownloading}
-          className="rounded-[20px] bg-white/5 border border-white/10 hover:bg-white/10 text-white gap-3 h-16 font-bold text-base transition-all hover:scale-[1.02] active:scale-[0.98] shadow-xl"
+          className="rounded-[24px] bg-white/5 border border-white/10 hover:bg-white/10 text-white gap-3 h-16 font-bold text-lg transition-all hover:scale-[1.02] active:scale-[0.98] shadow-2xl"
         >
           {isDownloading ? (
-            <div className="h-5 w-5 border-2 border-white/20 border-t-white rounded-full animate-spin" />
+            <div className="h-6 w-6 border-2 border-white/20 border-t-white rounded-full animate-spin" />
           ) : (
-            <Download className="h-5 w-5 text-orange-400" />
+            <Download className="h-6 w-6 text-orange-400" />
           )}
           {isDownloading ? "..." : "Save PNG"}
         </Button>
