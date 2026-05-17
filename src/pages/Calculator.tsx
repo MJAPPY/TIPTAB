@@ -14,8 +14,8 @@ import { cn } from "@/lib/utils";
 const Calculator = () => {
   const [isMembershipOpen, setIsMembershipOpen] = useState(false);
   const [amount, setAmount] = useState<string>("1");
-  const [fromCurrency, setFromCurrency] = useState("TAB");
-  const [toCurrency, setToCurrency] = useState("CAD");
+  const [fromCurrency, setFromCurrency] = useState("XPR");
+  const [toCurrency, setToCurrency] = useState("TAB");
   const [result, setResult] = useState<number>(0);
   const [isSyncing, setIsSyncing] = useState(false);
 
@@ -122,8 +122,9 @@ const Calculator = () => {
   }, [amount, fromCurrency, toCurrency, rates]);
 
   const handleSwap = () => {
+    const oldFrom = fromCurrency;
     setFromCurrency(toCurrency);
-    setToCurrency(fromCurrency);
+    setToCurrency(oldFrom);
   };
 
   const buyTabLink = "https://alcor.exchange/v/xpr/swap?input=xpr-eosio.token&output=tab-tokencreate";
