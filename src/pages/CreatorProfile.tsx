@@ -1,10 +1,9 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { useParams, Link, useNavigate } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import { 
   Zap, 
-  ArrowLeft, 
   Twitter, 
   Instagram, 
   Globe, 
@@ -37,7 +36,6 @@ const CreatorProfile = () => {
     if (found) {
       setCreator(found);
     } else {
-      // Check local storage for the user's own profile if not in mock data
       const savedUser = localStorage.getItem("tiptab_user_profile");
       if (savedUser) {
         const localUser = JSON.parse(savedUser) as Creator;
@@ -61,29 +59,36 @@ const CreatorProfile = () => {
   };
 
   const handleShare = async () => {
+    const shareUrl = window.location.href;
     const shareData = {
       title: `Support ${creator?.name} on TIPTAB`,
-      text: `Hey! Check out my TIPTAB profile and support my hustle on the XPR Network.`,
-      url: window.location.href,
+      text: `Check out ${creator?.name}'s profile on TIPTAB and support them using the XPR Network!`,
+      url: shareUrl,
     };
 
     if (navigator.share) {
       try {
         await navigator.share(shareData);
       } catch (err) {
-        // Fallback to clipboard if sharing fails or is cancelled
-        copyToClipboard();
+        // User cancelled or share failed
+        if (err instanceof Error && err.name !== 'AbortError') {
+          copyToClipboard(shareUrl);
+        }
       }
     } else {
-      copyToClipboard();
+      copyToClipboard(shareUrl);
     }
   };
 
-  const copyToClipboard = () => {
-    navigator.clipboard.writeText(window.location.href);
-    setIsCopied(true);
-    toast({ title: "Link Copied!", description: "Profile link has been copied to your clipboard." });
-    setTimeout(() => setIsCopied(false), 2000);
+  const copyToClipboard = (url: string) => {
+    navigator.clipboard.writeText(url).then(() => {
+      setIsCopied(true);
+      toast({ 
+        title: "Link Copied!", 
+        description: "Profile URL has been saved to your clipboard.",
+      });
+      setTimeout(() => setIsCopied(false), 2000);
+    });
   };
 
   if (!creator) return null;
@@ -92,19 +97,15 @@ const CreatorProfile = () => {
     <div className="min-h-screen bg-[#0a0514] text-white selection:bg-purple-500/30">
       <Header onBecomeCreator={() => setIsMembershipOpen(true)} />
 
-      {/* Hero Background with Creator Color */}
       <div className="relative h-[40vh] md:h-[50vh] w-full overflow-hidden">
         <div className={cn("absolute inset-0 opacity-40 blur-[100px]", creator.color)} />
         <div className="absolute inset-0 bg-gradient-to-t from-[#0a0514] via-[#0a0514]/40 to-transparent" />
-        
-        {/* Animated Particles/Grid */}
         <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')] opacity-10" />
       </div>
 
       <main className="container mx-auto px-6 -mt-32 relative z-10 pb-24">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12">
           
-          {/* Left Column: Profile Info */}
           <div className="lg:col-span-7 space-y-8">
             <div className="flex flex-col md:flex-row items-center md:items-end gap-8">
               <div className={cn(
@@ -182,7 +183,6 @@ const CreatorProfile = () => {
             </div>
           </div>
 
-          {/* Right Column: Tipping Interface */}
           <div className="lg:col-span-5">
             <div className="sticky top-40 space-y-6">
               <div className="bg-[#130b21] border border-white/10 rounded-[48px] p-10 shadow-[0_30px_60px_-15px_rgba(0,0,0,0.5)] relative overflow-hidden">
@@ -194,7 +194,7 @@ const CreatorProfile = () => {
                     variant="ghost" 
                     size="icon" 
                     onClick={handleShare}
-                    className="h-12 w-12 rounded-2xl bg-white/5 border border-white/10 hover:bg-white/10"
+                    className="h-12 w-12 rounded-2xl bg-white/5 border border-white/10 hover:bg-white/10 transition-all active:scale-95"
                   >
                     {isCopied ? <Check className="h-5 w-5 text-green-500" /> : <Share2 className="h-5 w-5 text-white/40" />}
                   </Button>
