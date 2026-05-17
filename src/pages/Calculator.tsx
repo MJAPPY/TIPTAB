@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Calculator as CalcIcon, RefreshCw, Zap, TrendingUp, DollarSign, ArrowRightLeft, Info } from "lucide-react";
+import { Calculator as CalcIcon, RefreshCw, Zap, TrendingUp, DollarSign, ArrowRightLeft, Info, ArrowUpRight, ShoppingCart } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const Calculator = () => {
@@ -48,6 +48,8 @@ const Calculator = () => {
     setTimeout(() => setIsSyncing(false), 800);
   };
 
+  const buyTabLink = "https://alcor.exchange/v/xpr/swap?input=xpr-eosio.token&output=tab-tokencreate";
+
   return (
     <div className="min-h-screen bg-[#0a0514] text-white selection:bg-orange-500/30">
       <Header onBecomeCreator={() => setIsMembershipOpen(true)} />
@@ -73,26 +75,23 @@ const Calculator = () => {
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
             {/* Main Calculator Card */}
             <Card className="lg:col-span-7 bg-[#0d071a] border-white/10 rounded-[40px] overflow-hidden shadow-2xl relative border-t-white/10">
-              <div className="absolute top-0 right-0 p-6 z-20">
-                <Button 
-                  variant="ghost" 
-                  size="icon" 
-                  onClick={handleSync}
-                  className={cn(
-                    "h-10 w-10 rounded-xl bg-white/5 border border-white/10 hover:bg-white/10", 
-                    isSyncing && "animate-spin"
-                  )}
-                >
-                  <RefreshCw className={cn("h-4 w-4", isSyncing ? "text-orange-500" : "text-white/40")} />
-                </Button>
-              </div>
-              
               <div className="p-8 space-y-8">
                 {/* Input Section */}
                 <div className="space-y-4">
                   <div className="flex items-center justify-between px-1">
                     <Label className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">Input Amount</Label>
-                    <span className="text-[9px] font-black text-purple-400 uppercase tracking-widest bg-purple-500/10 px-2 py-0.5 rounded">Source</span>
+                    <Button 
+                      variant="ghost" 
+                      size="sm" 
+                      onClick={handleSync}
+                      className={cn(
+                        "h-8 px-3 rounded-xl bg-white/5 border border-white/10 hover:bg-white/10 text-[9px] font-black uppercase tracking-widest gap-2 transition-all", 
+                        isSyncing && "text-orange-500"
+                      )}
+                    >
+                      <RefreshCw className={cn("h-3 w-3", isSyncing && "animate-spin")} />
+                      Refresh Rates
+                    </Button>
                   </div>
                   <div className="group relative flex items-center gap-3 bg-white/[0.03] border border-white/10 rounded-[24px] p-1.5 focus-within:border-orange-500/40 transition-all">
                     <Input 
@@ -187,17 +186,36 @@ const Calculator = () => {
                 </div>
               </Card>
 
-              <div className="bg-gradient-to-br from-orange-500/10 to-[#0d071a] border border-white/10 rounded-[32px] p-8 relative overflow-hidden group shadow-xl">
-                <div className="flex items-center gap-3 mb-3">
-                  <Info className="h-4 w-4 text-orange-400" />
-                  <h4 className="font-black text-lg tracking-tight italic text-white">NETWORK</h4>
+              <div className="bg-gradient-to-br from-orange-500/10 to-[#0d071a] border border-white/10 rounded-[32px] p-8 relative overflow-hidden group shadow-xl space-y-6">
+                <div className="space-y-3">
+                  <div className="flex items-center gap-3">
+                    <Info className="h-4 w-4 text-orange-400" />
+                    <h4 className="font-black text-lg tracking-tight italic text-white uppercase">Network Hub</h4>
+                  </div>
+                  <p className="text-slate-400 text-xs leading-relaxed font-medium">
+                    TAB tokens represent direct network value for immediate payout. Buy TAB to support creators or fuel your own tipping power.
+                  </p>
                 </div>
-                <p className="text-slate-400 text-xs leading-relaxed font-medium mb-6">
-                  TAB tokens represent direct network value for immediate payout.
-                </p>
-                <Button className="w-full bg-white text-black font-black h-12 rounded-xl hover:bg-orange-500 hover:text-white transition-all text-sm">
-                  Connect WebAuth
-                </Button>
+                
+                <div className="flex flex-col gap-3">
+                  <Button 
+                    asChild
+                    className="w-full bg-orange-500 hover:bg-orange-600 text-white font-black h-14 rounded-2xl shadow-lg shadow-orange-500/20 text-lg group transition-all"
+                  >
+                    <a href={buyTabLink} target="_blank" rel="noopener noreferrer">
+                      <ShoppingCart className="mr-2 h-5 w-5" />
+                      Buy TAB Tokens
+                      <ArrowUpRight className="ml-1 h-4 w-4 opacity-50 group-hover:opacity-100 transition-opacity" />
+                    </a>
+                  </Button>
+                  
+                  <Button 
+                    variant="outline"
+                    className="w-full bg-white/5 border-white/10 text-white font-black h-12 rounded-xl hover:bg-white/10 transition-all text-sm"
+                  >
+                    Connect WebAuth
+                  </Button>
+                </div>
               </div>
             </div>
           </div>
