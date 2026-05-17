@@ -10,9 +10,11 @@ import {
   Map as MapIcon,
   Calculator as CalcIcon,
   CheckCircle2,
-  Coins
+  LogOut,
+  User,
+  ChevronDown
 } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
 import {
   Sheet,
@@ -21,6 +23,14 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { useToast } from "@/hooks/use-toast";
 
 interface HeaderProps {
@@ -30,6 +40,7 @@ interface HeaderProps {
 export const Header = ({ onBecomeCreator }: HeaderProps) => {
   const [isOpen, setIsOpen] = useState(false);
   const [isConnected, setIsConnected] = useState(false);
+  const navigate = useNavigate();
   const [walletData, setWalletData] = useState({
     address: "",
     username: "",
@@ -67,6 +78,25 @@ export const Header = ({ onBecomeCreator }: HeaderProps) => {
     toast({
       title: "Wallet Connected",
       description: `Welcome back, @${mockData.username}!`,
+    });
+  };
+
+  const handleLogout = () => {
+    setIsConnected(false);
+    setWalletData({
+      address: "",
+      username: "",
+      tabBalance: "0",
+      xprBalance: "0"
+    });
+    localStorage.removeItem("tiptab_wallet_connected");
+    localStorage.removeItem("tiptab_wallet_data");
+    setIsOpen(false);
+    navigate("/");
+    
+    toast({
+      title: "Disconnected",
+      description: "You have been logged out of your wallet.",
     });
   };
 
@@ -155,30 +185,44 @@ export const Header = ({ onBecomeCreator }: HeaderProps) => {
               </div>
             ) : null}
 
-            <Button 
-              onClick={handleConnect}
-              className={`flex items-center gap-2 rounded-2xl h-10 md:h-14 px-4 md:px-8 font-black text-[10px] md:text-sm transition-all active:scale-95 group shrink-0 ${
-                isConnected 
-                  ? "bg-white/5 border border-white/10 text-white hover:bg-white/10 shadow-xl" 
-                  : "bg-[#a855f7] hover:bg-[#9333ea] text-white shadow-2xl shadow-purple-500/40"
-              }`}
-            >
-              {isConnected ? (
-                <>
-                  <div className="flex flex-col items-start -space-y-1 text-left mr-2">
-                    <span className="text-[10px] md:text-xs font-black text-purple-400">@{walletData.username}</span>
-                    <span className="text-[8px] md:text-[9px] font-bold text-white/40 uppercase tracking-tighter">{walletData.address}</span>
-                  </div>
-                  <CheckCircle2 className="h-4 w-4 md:h-5 md:w-5 text-green-500" />
-                </>
-              ) : (
-                <>
-                  <Wallet className="h-4 w-4 md:h-6 md:w-6 group-hover:rotate-12 transition-transform" />
-                  <span className="hidden xs:inline whitespace-nowrap">Connect WebAuth</span>
-                  <span className="xs:hidden">Connect</span>
-                </>
-              )}
-            </Button>
+            {isConnected ? (
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button 
+                    className="flex items-center gap-2 rounded-2xl h-10 md:h-14 px-4 md:px-8 font-black text-[10px] md:text-sm transition-all active:scale-95 group shrink-0 bg-white/5 border border-white/10 text-white hover:bg-white/10 shadow-xl"
+                  >
+                    <div className="flex flex-col items-start -space-y-1 text-left mr-2">
+                      <span className="text-[10px] md:text-xs font-black text-purple-400">@{walletData.username}</span>
+                      <span className="text-[8px] md:text-[9px] font-bold text-white/40 uppercase tracking-tighter">{walletData.address}</span>
+                    </div>
+                    <ChevronDown className="h-4 w-4 text-white/40 group-data-[state=open]:rotate-180 transition-transform" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-56 bg-[#1a102d] border-white/10 text-white rounded-2xl p-2 mt-2 shadow-2xl">
+                  <DropdownMenuLabel className="text-[10px] font-black uppercase tracking-widest text-white/40 px-3 py-2">Account Actions</DropdownMenuLabel>
+                  <DropdownMenuSeparator className="bg-white/5" />
+                  <DropdownMenuItem asChild className="focus:bg-white/5 focus:text-white rounded-xl cursor-pointer">
+                    <Link to="/dashboard" className="flex items-center gap-3 px-3 py-2.5">
+                      <User className="h-4 w-4 text-purple-400" />
+                      <span className="font-bold">Creator Dashboard</span>
+                    </Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={handleLogout} className="focus:bg-red-500/10 focus:text-red-500 rounded-xl cursor-pointer text-red-400 flex items-center gap-3 px-3 py-2.5">
+                    <LogOut className="h-4 w-4" />
+                    <span className="font-bold">Logout Wallet</span>
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            ) : (
+              <Button 
+                onClick={handleConnect}
+                className="flex items-center gap-2 rounded-2xl h-10 md:h-14 px-4 md:px-8 font-black text-[10px] md:text-sm transition-all active:scale-95 group shrink-0 bg-[#a855f7] hover:bg-[#9333ea] text-white shadow-2xl shadow-purple-500/40"
+              >
+                <Wallet className="h-4 w-4 md:h-6 md:w-6 group-hover:rotate-12 transition-transform" />
+                <span className="hidden xs:inline whitespace-nowrap">Connect WebAuth</span>
+                <span className="xs:hidden">Connect</span>
+              </Button>
+            )}
 
             {/* Mobile Menu Trigger */}
             <Sheet open={isOpen} onOpenChange={setIsOpen}>
@@ -227,6 +271,17 @@ export const Header = ({ onBecomeCreator }: HeaderProps) => {
                     </Button>
                   </Link>
                   <NavItems />
+                  
+                  {isConnected && (
+                    <Button 
+                      variant="ghost" 
+                      onClick={handleLogout}
+                      className="w-full text-red-400 hover:text-red-500 hover:bg-red-500/10 flex items-center justify-start gap-4 font-bold border border-red-500/20 rounded-2xl h-16 px-6 mt-4 transition-all"
+                    >
+                      <LogOut className="h-6 w-6" />
+                      Logout Wallet
+                    </Button>
+                  )}
                 </div>
                 <div className="absolute bottom-12 left-8 right-8 text-center">
                    <div className="h-px bg-white/10 w-full mb-6" />
