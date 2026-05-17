@@ -84,7 +84,7 @@ export const MembershipModal = ({ isOpen, onOpenChange }: MembershipModalProps) 
               
               <div className="space-y-4">
                 {[
-                  { title: "Verified Status", desc: "Get the exclusive orange checkmark", icon: ShieldCheck },
+                  { title: "Valued Community Member", desc: "Get the exclusive orange checkmark", icon: ShieldCheck },
                   { title: "Zero Platform Fees", desc: "Keep 100% of everything you earn", icon: Zap },
                   { title: "Global Discovery", desc: "Appear on the interactive creator map", icon: Sparkles },
                 ].map((item, i) => (
