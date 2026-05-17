@@ -35,7 +35,7 @@ export const Tab = () => {
       <Header onBecomeCreator={() => setIsMembershipOpen(true)} />
       <ActivityTicker />
       
-      <main className="pt-40">
+      <main className="pt-24 md:pt-32">
         <Hero creators={displayCreators} />
         <StatsBanner />
         
