@@ -89,17 +89,19 @@ export const Header = ({ onBecomeCreator }: HeaderProps) => {
           </Button>
         </Link>
       )}
-      <Button 
-        variant="outline" 
-        onClick={() => {
-          onBecomeCreator();
-          setIsOpen(false);
-        }}
-        className="w-full lg:w-auto border-orange-500/50 bg-orange-500/5 text-orange-500 hover:bg-orange-500 hover:text-white flex items-center justify-start lg:justify-center gap-3 font-black rounded-2xl h-12 px-5 transition-all"
-      >
-        <Sparkles className="h-4 w-4" />
-        Become a Creator
-      </Button>
+      {!isConnected && (
+        <Button 
+          variant="outline" 
+          onClick={() => {
+            onBecomeCreator();
+            setIsOpen(false);
+          }}
+          className="w-full lg:w-auto border-orange-500/50 bg-orange-500/5 text-orange-500 hover:bg-orange-500 hover:text-white flex items-center justify-start lg:justify-center gap-3 font-black rounded-2xl h-12 px-5 transition-all"
+        >
+          <Sparkles className="h-4 w-4" />
+          Become a Creator
+        </Button>
+      )}
     </>
   );
 
