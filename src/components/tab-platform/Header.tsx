@@ -31,7 +31,7 @@ export const Header = ({ onBecomeCreator }: HeaderProps) => {
       <Link to="/leaderboard" onClick={() => setIsOpen(false)} className="w-full xl:w-auto">
         <Button 
           variant="ghost" 
-          className="w-full lg:w-auto text-white hover:text-yellow-400 flex items-center justify-start lg:justify-center gap-3 font-bold bg-white/5 border border-white/10 rounded-xl h-12 px-5"
+          className="w-full lg:w-auto text-white hover:text-yellow-400 flex items-center justify-start lg:justify-center gap-3 font-bold bg-white/5 border border-white/10 rounded-2xl h-12 px-5"
         >
           <Trophy className="h-4 w-4" />
           Tip Leaderboard
@@ -40,7 +40,7 @@ export const Header = ({ onBecomeCreator }: HeaderProps) => {
       <Link to="/dashboard" onClick={() => setIsOpen(false)} className="w-full xl:w-auto">
         <Button 
           variant="ghost" 
-          className="w-full lg:w-auto text-white hover:text-purple-400 flex items-center justify-start lg:justify-center gap-3 font-bold bg-white/5 border border-white/10 rounded-xl h-12 px-5"
+          className="w-full lg:w-auto text-white hover:text-purple-400 flex items-center justify-start lg:justify-center gap-3 font-bold bg-white/5 border border-white/10 rounded-2xl h-12 px-5"
         >
           <LayoutDashboard className="h-4 w-4" />
           My Dashboard
@@ -52,7 +52,7 @@ export const Header = ({ onBecomeCreator }: HeaderProps) => {
           onBecomeCreator();
           setIsOpen(false);
         }}
-        className="w-full lg:w-auto border-orange-500/50 bg-orange-500/5 text-orange-500 hover:bg-orange-500 hover:text-white flex items-center justify-start lg:justify-center gap-3 font-black rounded-xl h-12 px-5 transition-all"
+        className="w-full lg:w-auto border-orange-500/50 bg-orange-500/5 text-orange-500 hover:bg-orange-500 hover:text-white flex items-center justify-start lg:justify-center gap-3 font-black rounded-2xl h-12 px-5 transition-all"
       >
         <Sparkles className="h-4 w-4" />
         Become a Creator
@@ -61,9 +61,9 @@ export const Header = ({ onBecomeCreator }: HeaderProps) => {
   );
 
   return (
-    <header className="fixed top-[52px] left-0 right-0 z-50 px-2 md:px-4">
+    <header className="fixed top-[52px] left-0 right-0 z-50 px-3 md:px-6">
       <div className="mx-auto w-full max-w-[98%] xl:max-w-[1600px]">
-        <div className="border border-white/10 bg-[#0a0514]/85 backdrop-blur-md rounded-2xl md:rounded-full px-3 md:px-8 py-2 md:py-3.5 flex items-center justify-between shadow-[0_20px_60px_rgba(0,0,0,0.7)]">
+        <div className="border border-white/10 bg-[#0a0514]/85 backdrop-blur-md rounded-[28px] px-3 md:px-8 py-2 md:py-3.5 flex items-center justify-between shadow-[0_20px_60px_rgba(0,0,0,0.7)]">
           
           {/* Logo Section */}
           <Link to="/" className="flex items-center gap-2 md:gap-4 group shrink-0">
@@ -81,14 +81,14 @@ export const Header = ({ onBecomeCreator }: HeaderProps) => {
             </div>
           </Link>
 
-          {/* Desktop Navigation (Centered-ish) */}
+          {/* Desktop Navigation */}
           <div className="hidden xl:flex items-center gap-3 mx-4">
             <NavItems />
           </div>
 
           {/* Right Actions */}
           <div className="flex items-center gap-2 md:gap-4">
-            <Button className="bg-[#a855f7] hover:bg-[#9333ea] text-white flex items-center gap-2 rounded-xl md:rounded-full h-10 md:h-14 px-3 md:px-10 font-black text-[10px] md:text-base shadow-2xl shadow-purple-500/40 transition-all active:scale-95 group shrink-0">
+            <Button className="bg-[#a855f7] hover:bg-[#9333ea] text-white flex items-center gap-2 rounded-2xl h-10 md:h-14 px-4 md:px-10 font-black text-[10px] md:text-base shadow-2xl shadow-purple-500/40 transition-all active:scale-95 group shrink-0">
               <Wallet className="h-4 w-4 md:h-6 md:w-6 group-hover:rotate-12 transition-transform" />
               <span className="hidden xs:inline whitespace-nowrap">Connect WebAuth</span>
               <span className="xs:hidden">Connect</span>
@@ -97,7 +97,7 @@ export const Header = ({ onBecomeCreator }: HeaderProps) => {
             {/* Mobile Menu Trigger */}
             <Sheet open={isOpen} onOpenChange={setIsOpen}>
               <SheetTrigger asChild>
-                <Button variant="ghost" size="icon" className="xl:hidden text-white hover:bg-white/10 h-10 w-10 md:h-14 md:w-14 rounded-xl md:rounded-full border border-white/10 shrink-0">
+                <Button variant="ghost" size="icon" className="xl:hidden text-white hover:bg-white/10 h-10 w-10 md:h-14 md:w-14 rounded-2xl border border-white/10 shrink-0">
                   <Menu className="h-5 w-5 md:h-6 md:w-6" />
                 </Button>
               </SheetTrigger>
