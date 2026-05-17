@@ -121,6 +121,11 @@ const Calculator = () => {
     setResult(converted);
   }, [amount, fromCurrency, toCurrency, rates]);
 
+  const handleSwap = () => {
+    setFromCurrency(toCurrency);
+    setToCurrency(fromCurrency);
+  };
+
   const buyTabLink = "https://alcor.exchange/v/xpr/swap?input=xpr-eosio.token&output=tab-tokencreate";
   const explorerLink = "https://explorer.xprnetwork.org/tokens/TAB-proton-tokencreate";
 
@@ -187,9 +192,12 @@ const Calculator = () => {
                 </div>
 
                 <div className="flex justify-center -my-4 md:-my-6 relative z-10">
-                  <div className="h-10 w-10 md:h-12 md:w-12 rounded-xl bg-orange-500 flex items-center justify-center shadow-lg border-4 border-[#0d071a]">
+                  <Button
+                    onClick={handleSwap}
+                    className="h-10 w-10 md:h-12 md:w-12 rounded-xl bg-orange-500 hover:bg-orange-600 flex items-center justify-center shadow-lg border-4 border-[#0d071a] p-0 transition-transform active:scale-90"
+                  >
                     <ArrowRightLeft className="h-4 w-4 md:h-5 md:w-5 text-white" />
-                  </div>
+                  </Button>
                 </div>
 
                 <div className="space-y-3 md:space-y-4">
