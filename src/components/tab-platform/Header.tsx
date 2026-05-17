@@ -7,7 +7,8 @@ import {
   Sparkles, 
   Trophy, 
   Menu,
-  Map as MapIcon
+  Map as MapIcon,
+  Calculator as CalcIcon
 } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useState } from "react";
@@ -34,7 +35,16 @@ export const Header = ({ onBecomeCreator }: HeaderProps) => {
           className="w-full lg:w-auto text-white hover:text-yellow-400 flex items-center justify-start lg:justify-center gap-3 font-bold bg-white/5 border border-white/10 rounded-2xl h-12 px-5"
         >
           <Trophy className="h-4 w-4" />
-          Tip Leaderboard
+          Leaderboard
+        </Button>
+      </Link>
+      <Link to="/calculator" onClick={() => setIsOpen(false)} className="w-full xl:w-auto">
+        <Button 
+          variant="ghost" 
+          className="w-full lg:w-auto text-white hover:text-cyan-400 flex items-center justify-start lg:justify-center gap-3 font-bold bg-white/5 border border-white/10 rounded-2xl h-12 px-5"
+        >
+          <CalcIcon className="h-4 w-4" />
+          Calculator
         </Button>
       </Link>
       <Link to="/dashboard" onClick={() => setIsOpen(false)} className="w-full xl:w-auto">
