@@ -31,13 +31,13 @@ export const Tab = () => {
         <Hero />
         <StatsBanner />
         
-        <section className="py-20 container mx-auto px-6">
-          <div className="flex items-center gap-2 mb-8">
-            <div className="h-4 w-4 rounded-full bg-purple-500 flex items-center justify-center">
-              <div className="h-2 w-2 rounded-full bg-white animate-pulse" />
+        <section className="py-12 container mx-auto px-6">
+          <div className="flex items-center gap-2 mb-6">
+            <div className="h-3 w-3 rounded-full bg-purple-500 flex items-center justify-center">
+              <div className="h-1.5 w-1.5 rounded-full bg-white animate-pulse" />
             </div>
-            <h2 className="text-xl font-bold">Global Creator Network</h2>
-            <span className="text-white/40 text-sm">— click a pin to tip instantly</span>
+            <h2 className="text-lg font-bold">Global Creator Network</h2>
+            <span className="text-white/40 text-xs">— click a pin to tip instantly</span>
           </div>
           <WorldMap creators={displayCreators} onSelectCreator={setSelectedCreator} />
         </section>
