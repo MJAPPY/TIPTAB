@@ -63,7 +63,7 @@ export const Tab = () => {
         <div className="container mx-auto px-6 text-center">
           <Link to="/" className="mb-12 flex flex-col items-center gap-8 group inline-flex">
             <img src="/src/assets/logo.png" alt="TIPTAB Logo" className="h-40 w-40 object-contain drop-shadow-[0_0_30px_rgba(249,115,22,0.2)] group-hover:scale-105 transition-transform duration-500" />
-            <span className="text-5xl font-black italic tracking-tighter text-white group-hover:text-red-500 transition-colors duration-300">
+            <span className="text-5xl font-black italic tracking-tighter text-white group-hover:text-[#ff3131] transition-colors duration-300">
               TIP<span className="text-orange-500">TAB</span>
             </span>
           </Link>
