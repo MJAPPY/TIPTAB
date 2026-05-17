@@ -7,7 +7,9 @@ interface HeroProps {
 }
 
 export const Hero = ({ creators }: HeroProps) => {
+  // Take the first 4 creators for the preview avatars
   const previewCreators = creators.slice(0, 4);
+  // Calculate a dynamic count (using a base of 10k to maintain the 'scale' vibe)
   const formattedCount = (10 + (creators.length / 1000)).toFixed(1);
 
   return (
@@ -19,39 +21,41 @@ export const Hero = ({ creators }: HeroProps) => {
       <div className="container mx-auto px-6">
         <div className="flex flex-col lg:flex-row items-center justify-between gap-12 lg:gap-20">
           <div className="flex-1 text-left space-y-8 md:space-y-10 max-w-3xl">
-            <div className="inline-flex items-center gap-3 px-4 py-2 rounded-xl bg-white/5 border border-white/10 backdrop-blur-md shadow-2xl">
+            <div className="inline-flex items-center gap-3 px-4 py-2 rounded-full bg-white/5 border border-white/10 backdrop-blur-md shadow-2xl">
               <Heart className="h-4 w-4 text-purple-500 fill-purple-500" />
-              <span className="text-white/60 text-[10px] font-black uppercase tracking-[0.3em]">Network Powered by XPR</span>
+              <span className="text-white/60 text-xs font-black uppercase tracking-[0.2em]">Powered by XPR Network</span>
             </div>
             
-            <h1 className="text-6xl md:text-9xl font-black tracking-tighter leading-[0.85] text-white">
+            <h1 className="text-5xl md:text-8xl font-black tracking-tighter leading-[0.9] text-white">
               The Global <br />
               <span className="text-transparent bg-clip-text bg-gradient-to-r from-orange-400 via-pink-500 to-purple-600">Appreciation Hub</span>
             </h1>
             
             <p className="text-xl md:text-2xl text-white/40 max-w-2xl leading-relaxed font-medium">
-              Direct connection for delivery pros, coaches, and creators to their fans via the <span className="text-white font-black">XPR Network</span>. Zero fees. <span className="text-orange-500 italic">Instant TAB settlement.</span>
+              Whether you're a delivery pro, a fitness coach, or a digital creator—TIPTAB connects you directly to the people who value your hustle via the <span className="text-purple-400 font-black">XPR Network</span>. Zero fees. Instant TAB rewards.
             </p>
             
             <div className="flex flex-wrap items-center gap-4 md:gap-6 pt-2 md:pt-4">
-              {[
-                { icon: Zap, text: "Direct Tipping", color: "text-orange-500" },
-                { icon: UserCheck, text: "Everyday Hustle", color: "text-purple-500" },
-                { icon: Rocket, text: "Gig Economy", color: "text-cyan-400" }
-              ].map((badge, i) => (
-                <div key={i} className="flex items-center gap-3 bg-white/[0.03] px-6 py-4 rounded-2xl border border-white/5 hover:border-white/10 transition-all">
-                  <badge.icon className={cn("h-5 w-5 fill-current", badge.color)} />
-                  <span className="text-[11px] font-black uppercase tracking-widest text-white/80">{badge.text}</span>
-                </div>
-              ))}
+              <div className="flex items-center gap-3 bg-white/5 px-6 py-3 rounded-2xl border border-white/5">
+                <Zap className="h-5 w-5 text-orange-500 fill-orange-500" />
+                <span className="text-sm font-black uppercase tracking-widest text-white/80">Direct Tipping</span>
+              </div>
+              <div className="flex items-center gap-3 bg-white/5 px-6 py-3 rounded-2xl border border-white/5">
+                <UserCheck className="h-5 w-5 text-purple-500" />
+                <span className="text-sm font-black uppercase tracking-widest text-white/80">Everyday Hustle</span>
+              </div>
+              <div className="flex items-center gap-3 bg-white/5 px-6 py-3 rounded-2xl border border-white/5">
+                <Rocket className="h-5 w-5 text-cyan-400" />
+                <span className="text-sm font-black uppercase tracking-widest text-white/80">Gig Economy Ready</span>
+              </div>
             </div>
 
-            <div className="flex items-center gap-6 pt-6">
+            <div className="flex items-center gap-4 pt-4">
               <div className="flex -space-x-3">
                 {previewCreators.map((creator) => (
                   <div 
                     key={creator.id} 
-                    className={`h-14 w-14 rounded-2xl border-4 border-[#0a0514] ${creator.color} flex items-center justify-center font-black text-[10px] overflow-hidden shadow-xl`}
+                    className={`h-12 w-12 rounded-full border-4 border-[#0a0514] ${creator.color} flex items-center justify-center font-black text-[10px] overflow-hidden shadow-xl`}
                   >
                     {creator.avatarImage ? (
                       <img src={creator.avatarImage} alt={creator.name} className="w-full h-full object-cover" />
@@ -60,43 +64,42 @@ export const Hero = ({ creators }: HeroProps) => {
                     )}
                   </div>
                 ))}
-                <div className="h-14 w-14 rounded-2xl border-4 border-[#0a0514] bg-white/10 backdrop-blur-sm flex items-center justify-center font-black text-xs text-white/60">
+                <div className="h-12 w-12 rounded-full border-4 border-[#0a0514] bg-white/10 backdrop-blur-sm flex items-center justify-center font-black text-[10px] text-white/60">
                   +{creators.length > 4 ? creators.length - 4 : 0}
                 </div>
               </div>
-              <div className="space-y-0.5">
-                <p className="text-sm font-black text-white tracking-wide">
-                  Join {formattedCount}k+ pros
-                </p>
-                <p className="text-[10px] font-black uppercase tracking-widest text-white/20">On the Global Map</p>
-              </div>
+              <p className="text-sm font-bold text-white/30 tracking-wide">
+                Join <span className="text-white">{formattedCount}k+</span> pros on the <span className="text-purple-400">XPR Network</span>
+              </p>
             </div>
           </div>
           
           <div className="flex-1 relative lg:block hidden">
             <div className="relative z-10 flex items-center justify-center">
               <div className="absolute inset-0 bg-purple-500/10 blur-[120px] rounded-full scale-150" />
-              <img 
-                src="/src/assets/logo.png" 
-                alt="TIPTAB Logo"
-                className="w-full max-w-[520px] mx-auto drop-shadow-[0_0_80px_rgba(168,85,247,0.3)] animate-float cursor-pointer"
-              />
+              
+              <div className="relative group">
+                <img 
+                  src="/src/assets/logo.png" 
+                  alt="TIPTAB Logo"
+                  className="w-full max-w-[480px] mx-auto drop-shadow-[0_0_50px_rgba(168,85,247,0.4)] animate-delayed-spin cursor-pointer transition-transform duration-700 group-hover:scale-105"
+                />
+              </div>
             </div>
           </div>
         </div>
       </div>
 
       <style>{`
-        @keyframes float {
-          0%, 100% { transform: translateY(0px); }
-          50% { transform: translateY(-20px); }
+        @keyframes delayed-spin {
+          0%, 50% { transform: rotate(0deg); }
+          100% { transform: rotate(360deg); }
         }
-        .animate-float {
-          animation: float 6s ease-in-out infinite;
+        .animate-delayed-spin {
+          animation: delayed-spin 20s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+          animation-delay: 10s;
         }
       `}</style>
     </section>
   );
 };
-
-import { cn } from "@/lib/utils";

@@ -1,15 +1,19 @@
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Search, Plus, MapPin, QrCode, Twitter, Globe, Instagram, Zap } from "lucide-react";
+import { Search, Plus, MapPin, QrCode, Twitter, Globe, Instagram, Video, Zap } from "lucide-react";
 import { useState, useMemo } from "react";
 import { Creator } from "@/data/creators";
 import { cn } from "@/lib/utils";
 
 const CATEGORIES = [
-  { name: "All", color: "#a855f7" },
+  { name: "All", color: "#a855f7" }, // XPR Purple
   { name: "Content", color: "#ff00ff" },
   { name: "Dev", color: "#00ffff" },
   { name: "Art", color: "#39ff14" },
+  { name: "Education", color: "#ffff00" },
+  { name: "Gaming", color: "#bc13fe" },
+  { name: "Music", color: "#ff3131" },
+  { name: "Sports", color: "#1f51ff" },
   { name: "Service", color: "#ff5f1f" },
   { name: "Other", color: "#ffffff" }
 ];
@@ -34,72 +38,131 @@ export const FeaturedCreators = ({ creators, onSelectCreator, onAddYourself }: F
     });
   }, [creators, activeCategory, searchQuery]);
 
+  const getCategoryTheme = (categoryName: string) => {
+    return CATEGORIES.find(c => c.name === categoryName) || CATEGORIES[CATEGORIES.length - 1];
+  };
+
   return (
     <section className="py-32 container mx-auto px-6 relative">
-      <div className="flex flex-col md:flex-row md:items-end justify-between gap-10 mb-20">
+      <div className="flex flex-col md:flex-row md:items-end justify-between gap-10 mb-16">
         <div className="space-y-6">
-          <div className="inline-flex items-center gap-2.5 px-4 py-1.5 rounded-lg bg-white/5 border border-white/10 text-[10px] font-black uppercase tracking-[0.3em] text-orange-500">
-            <Zap className="h-3 w-3 fill-current" />
+          <div className="inline-flex items-center gap-2.5 px-4 py-1.5 rounded-full bg-white/5 border border-white/10 text-[10px] font-black uppercase tracking-[0.2em] text-white/50">
+            <Zap className="h-3 w-3 text-orange-500 fill-orange-500" />
             Verified Network
           </div>
-          <h2 className="text-6xl md:text-8xl font-black tracking-tighter leading-none text-white">
-            Global <br />
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-white via-white to-white/20 italic">Creators</span>
+          <h2 className="text-6xl md:text-7xl font-black tracking-tighter leading-[0.85] text-white">
+            Discover <br />
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-white via-white to-white/30 italic">Featured Pros</span>
           </h2>
         </div>
         
         <Button 
           onClick={onAddYourself}
-          className="bg-white text-black hover:bg-purple-600 hover:text-white flex items-center gap-4 rounded-2xl h-20 px-12 font-black text-2xl shadow-2xl transition-all active:scale-95 group"
+          className="bg-white text-black hover:bg-purple-500 hover:text-white flex items-center gap-3 rounded-[24px] h-16 px-10 font-black text-xl shadow-[0_20px_40px_rgba(255,255,255,0.1)] transition-all active:scale-95 group"
         >
-          <Plus className="h-7 w-7 group-hover:rotate-90 transition-transform" />
-          Join Map
+          <Plus className="h-6 w-6 group-hover:rotate-90 transition-transform" />
+          Join The Map
         </Button>
       </div>
       
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-        {filteredCreators.map(creator => (
-          <div 
-            key={creator.id} 
-            onClick={() => onSelectCreator(creator)}
-            className="group bg-[#130b21]/40 border border-white/5 rounded-[48px] p-10 hover:border-purple-500/40 hover:bg-[#1a102d]/80 transition-all duration-500 cursor-pointer relative overflow-hidden flex flex-col shadow-2xl"
-          >
-            <div className="flex items-start justify-between gap-6 mb-10">
-              <div className="flex items-center gap-6">
-                <div className={cn("h-24 w-24 rounded-3xl flex items-center justify-center text-3xl font-black border-4 border-white/10 shadow-2xl overflow-hidden bg-black/40 group-hover:scale-105 transition-transform duration-500", creator.color)}>
-                  {creator.avatarImage ? (
-                    <img src={creator.avatarImage} alt="Avatar" className="w-full h-full object-cover" />
-                  ) : (
-                    creator.avatar
-                  )}
+      <div className="space-y-6 mb-16">
+        <div className="flex flex-col lg:flex-row items-center gap-4 bg-white/[0.02] p-3 rounded-[32px] border border-white/10 backdrop-blur-3xl shadow-2xl">
+          <div className="relative flex-1 w-full group">
+            <Search className="absolute left-7 top-1/2 -translate-y-1/2 h-5 w-5 text-white/20 group-focus-within:text-purple-500 transition-colors" />
+            <Input 
+              placeholder="Search by name, handle, or city..." 
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="pl-16 bg-transparent border-transparent h-16 rounded-[24px] text-xl focus-visible:ring-0 placeholder:text-white/10 text-white font-bold tracking-tight"
+            />
+          </div>
+          
+          <div className="flex items-center gap-2 overflow-x-auto no-scrollbar py-1 px-1 w-full lg:w-auto">
+            {CATEGORIES.map(cat => (
+              <Button
+                key={cat.name}
+                variant="ghost"
+                onClick={() => setActiveCategory(cat.name)}
+                className={cn(
+                  "rounded-2xl h-12 px-6 whitespace-nowrap font-black text-[11px] uppercase tracking-[0.15em] transition-all border-2",
+                  activeCategory === cat.name 
+                  ? "bg-purple-500/10 border-purple-500/50 text-purple-400 shadow-[0_0_20px_rgba(168,85,247,0.2)]" 
+                  : "bg-white/5 border-transparent text-white/30 hover:text-white hover:bg-white/10"
+                )}
+              >
+                {cat.name}
+              </Button>
+            ))}
+          </div>
+        </div>
+      </div>
+      
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-8">
+        {filteredCreators.map(creator => {
+          const theme = getCategoryTheme(creator.category);
+          return (
+            <div 
+              key={creator.id} 
+              onClick={() => onSelectCreator(creator)}
+              className="group bg-[#130b21]/40 border border-white/5 rounded-[48px] p-8 hover:border-purple-500/30 hover:bg-[#1a102d]/60 transition-all duration-500 cursor-pointer relative overflow-hidden flex flex-col min-h-[340px] shadow-2xl"
+            >
+              {/* Dynamic Neon Glow Overlay */}
+              <div 
+                className="absolute -top-24 -right-24 w-64 h-64 blur-[100px] rounded-full opacity-0 group-hover:opacity-20 transition-opacity duration-700 pointer-events-none"
+                style={{ backgroundColor: theme.color }}
+              />
+              
+              <div className="flex items-start justify-between gap-6 mb-8 relative z-10">
+                <div className="flex items-center gap-5">
+                  <div 
+                    className="h-20 w-20 rounded-[32px] flex items-center justify-center text-2xl font-black border-4 border-white/5 shadow-2xl overflow-hidden bg-black/40 group-hover:scale-105 transition-transform duration-500"
+                    style={{ borderColor: theme.color + '40' }}
+                  >
+                    {creator.avatarImage ? (
+                      <img src={creator.avatarImage} alt="Avatar" className="w-full h-full object-cover" />
+                    ) : (
+                      <span style={{ color: theme.color }}>{creator.avatar}</span>
+                    )}
+                  </div>
+                  <div className="space-y-1">
+                    <h3 className="text-2xl font-black tracking-tighter text-white group-hover:text-purple-400 transition-colors">{creator.name}</h3>
+                    <p className="font-bold text-sm tracking-wide opacity-50">@{creator.handle}</p>
+                  </div>
                 </div>
-                <div>
-                  <h3 className="text-3xl font-black tracking-tighter text-white group-hover:text-purple-400 transition-colors">{creator.name}</h3>
-                  <p className="font-black text-sm tracking-widest text-white/30 uppercase">@{creator.handle}</p>
+                
+                <div 
+                  className="px-4 py-1.5 rounded-full border-2 text-[10px] font-black uppercase tracking-[0.2em] bg-black/40"
+                  style={{ borderColor: theme.color + '30', color: theme.color }}
+                >
+                  {creator.category}
                 </div>
-              </div>
-              <div className="px-4 py-1.5 rounded-lg border border-white/10 text-[10px] font-black uppercase tracking-widest bg-white/5 text-white/60">
-                {creator.category}
-              </div>
-            </div>
-            
-            <p className="text-white/40 text-xl leading-relaxed mb-10 line-clamp-2 font-medium tracking-tight group-hover:text-white/80 transition-colors">
-              {creator.bio}
-            </p>
-            
-            <div className="flex items-center justify-between mt-auto pt-8 border-t border-white/5">
-              <div className="flex items-center gap-4 text-white/20 font-black uppercase tracking-widest text-[11px]">
-                <MapPin className="h-4 w-4 text-purple-500" />
-                {creator.location}
               </div>
               
-              <div className="flex items-center gap-3 bg-white/5 border border-white/10 rounded-2xl px-6 py-4 group-hover:bg-purple-600 group-hover:border-purple-400 transition-all shadow-xl group-hover:shadow-purple-600/40">
-                <span className="text-xs font-black uppercase tracking-[0.2em] text-white">Tip Me</span>
-                <QrCode className="h-5 w-5 text-white/40 group-hover:text-white" />
+              <p className="text-white/50 text-lg leading-relaxed mb-8 line-clamp-2 relative z-10 font-medium tracking-tight group-hover:text-white/80 transition-colors">
+                {creator.bio}
+              </p>
+              
+              <div className="flex items-center justify-between mt-auto pt-6 border-t border-white/5 relative z-10">
+                <div className="flex items-center gap-6">
+                  <div className="flex items-center gap-2.5 text-white/30 text-xs font-black uppercase tracking-widest group-hover:text-white/60 transition-colors">
+                    <MapPin className="h-4 w-4" style={{ color: theme.color }} />
+                    {creator.location}
+                  </div>
+                  <div className="flex items-center gap-4">
+                    {creator.twitter && <Twitter className="h-4 w-4 text-white/20 hover:text-white transition-colors" />}
+                    {creator.instagram && <Instagram className="h-4 w-4 text-white/20 hover:text-white transition-colors" />}
+                    {creator.website && <Globe className="h-4 w-4 text-white/20 hover:text-white transition-colors" />}
+                  </div>
+                </div>
+                
+                <div className="flex items-center gap-3 bg-white/5 border border-white/10 rounded-2xl px-6 py-3 group-hover:bg-purple-500 group-hover:border-purple-400 transition-all shadow-xl group-hover:shadow-purple-500/20">
+                  <span className="text-[11px] font-black uppercase tracking-[0.2em] text-white/40 group-hover:text-white">Tip Me</span>
+                  <QrCode className="h-4 w-4 text-white/20 group-hover:text-white group-hover:scale-110 transition-all" />
+                </div>
               </div>
             </div>
-          </div>
-        ))}
+          );
+        })}
       </div>
     </section>
   );
