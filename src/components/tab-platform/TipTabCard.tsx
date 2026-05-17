@@ -84,49 +84,52 @@ export const TipTabCard = ({ creator }: TipTabCardProps) => {
         <div className="absolute -bottom-32 -left-32 w-80 h-80 bg-orange-500/10 blur-[100px] rounded-full" />
         
         {/* Header Section */}
-        <div className="relative z-10 flex justify-between items-start gap-4">
-          <div className="flex items-center gap-4 min-w-0">
-            <div className={`h-16 w-16 shrink-0 rounded-2xl ${creator.color} flex items-center justify-center text-2xl font-black border-2 border-white/20 shadow-xl`}>
+        <div className="relative z-10 flex items-start gap-4 h-24">
+          {/* Creator Info - Takes remaining space */}
+          <div className="flex items-center gap-3 flex-1 min-w-0">
+            <div className={`h-14 w-14 shrink-0 rounded-2xl ${creator.color} flex items-center justify-center text-xl font-black border-2 border-white/20 shadow-xl`}>
               {creator.avatar}
             </div>
             <div className="min-w-0">
-              <h3 className="text-3xl font-black text-white truncate tracking-tight drop-shadow-sm">
+              <h3 className="text-2xl font-black text-white leading-tight break-words">
                 {creator.name}
               </h3>
-              <p className="text-purple-400 font-bold truncate">@{creator.handle}</p>
+              <p className="text-purple-400 font-bold text-sm">@{creator.handle}</p>
             </div>
           </div>
-          <div className="flex flex-col items-end shrink-0">
-             <div className="flex items-center gap-1">
+
+          {/* Branding - Fixed to the right */}
+          <div className="flex flex-col items-end shrink-0 pt-1">
+             <div className="flex items-center gap-1 -mr-2">
                <img src="/src/assets/logo.png" alt="TAB" className="h-16 w-16 object-contain" />
-               <span className="text-2xl font-black italic tracking-tighter bg-gradient-to-b from-white to-slate-400 bg-clip-text text-transparent">
+               <span className="text-xl font-black italic tracking-tighter text-white">
                 TIP<span className="text-orange-500">TAB</span>
                </span>
              </div>
              <div className="mt-1 flex items-center gap-1 px-2 py-0.5 rounded-full bg-slate-500/20 border border-slate-500/30">
-               <Heart className="h-3 w-3 text-slate-300 fill-slate-300" />
-               <span className="text-[10px] font-black text-slate-300 uppercase tracking-widest">Verified</span>
+               <Heart className="h-2.5 w-2.5 text-slate-300 fill-slate-300" />
+               <span className="text-[9px] font-black text-slate-300 uppercase tracking-widest">Verified</span>
              </div>
           </div>
         </div>
 
         {/* Content Section */}
-        <div className="relative z-10 flex items-end justify-between gap-4 mt-4">
+        <div className="relative z-10 flex items-end justify-between gap-4 mt-2">
           {/* Left Info Column */}
           <div className="space-y-4 flex-1 min-w-0 pb-1">
             <div className="space-y-1.5">
-              <div className="flex items-center gap-2 text-slate-300 text-[13px] font-bold truncate">
+              <div className="flex items-center gap-2 text-slate-300 text-[13px] font-bold">
                 <MapPin className="h-3.5 w-3.5 text-purple-500 shrink-0" />
                 <span className="truncate">{creator.location}</span>
               </div>
-              <p className="text-slate-400 text-[12px] font-medium leading-tight max-w-[200px]">
-                Scan to support my work on XPR Network via TIPTAB.
+              <p className="text-slate-400 text-[11px] font-medium leading-tight max-w-[180px]">
+                Direct $TAB tipping on the XPR Network.
               </p>
             </div>
             
-            <div className="flex items-center gap-2 px-2.5 py-1 rounded-lg bg-slate-500/10 border border-slate-500/20 w-fit">
+            <div className="flex items-center gap-2 px-2.5 py-1 rounded-lg bg-green-500/10 border border-green-500/20 w-fit">
               <ShieldCheck className="h-3.5 w-3.5 text-green-400" />
-              <span className="text-[9px] font-black uppercase tracking-widest text-slate-200">Zero Fees</span>
+              <span className="text-[9px] font-black uppercase tracking-widest text-green-400">Zero Fees</span>
             </div>
           </div>
 
@@ -142,7 +145,7 @@ export const TipTabCard = ({ creator }: TipTabCardProps) => {
             </div>
             <div className="text-center space-y-0">
               <p className="text-[9px] font-black uppercase tracking-[0.1em] text-slate-500">Scan to Tip</p>
-              <p className="text-[11px] font-black text-orange-500 tracking-tighter">DIRECT $TAB</p>
+              <p className="text-[11px] font-black text-orange-500 tracking-tighter">XPR NETWORK</p>
             </div>
           </div>
         </div>
