@@ -27,14 +27,20 @@ export const ActivityTicker = () => {
 
   return (
     <div className="fixed top-32 left-0 right-0 z-40 bg-[#0a0514]/40 backdrop-blur-xl border-y border-white/5 h-10 flex items-center overflow-hidden shadow-[0_10px_30px_rgba(0,0,0,0.3)]">
-      {/* Live Indicator Badge with Blended Flame Look */}
-      <div className="relative z-30 flex items-center h-full pl-6 pr-10">
-        <div className="absolute inset-0 bg-orange-600/90 [clip-path:polygon(0%_0%,_100%_0%,_85%_100%,_0%_100%)] shadow-[10px_0_20px_rgba(234,88,12,0.5)]" />
-        <div className="absolute inset-y-0 right-0 w-20 bg-gradient-to-r from-orange-600/90 to-transparent z-10 translate-x-[20%]" />
+      {/* Live Indicator Badge with Enhanced Blend */}
+      <div className="relative z-30 flex items-center h-full pl-6 pr-32">
+        {/* Main Badge Background with Long Gradient Falloff */}
+        <div className="absolute inset-y-0 left-0 w-full bg-gradient-to-r from-orange-600 via-orange-600 to-transparent opacity-90 shadow-[inset_-20px_0_40px_-20px_rgba(0,0,0,0.5)]" />
+        
+        {/* Extra glowing edge blur */}
+        <div className="absolute inset-y-0 right-16 w-24 bg-orange-500/20 blur-xl pointer-events-none" />
         
         <div className="relative z-20 flex items-center gap-2.5">
-          <div className="h-2 w-2 rounded-full bg-white animate-pulse shadow-[0_0_8px_rgba(255,255,255,0.8)]" />
-          <span className="text-[10px] font-black uppercase tracking-[0.25em] text-white whitespace-nowrap drop-shadow-md">
+          <div className="relative flex h-2 w-2">
+            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-white opacity-75"></span>
+            <span className="relative inline-flex rounded-full h-2 w-2 bg-white shadow-[0_0_10px_rgba(255,255,255,0.8)]"></span>
+          </div>
+          <span className="text-[10px] font-black uppercase tracking-[0.25em] text-white whitespace-nowrap drop-shadow-lg">
             Live Feed
           </span>
         </div>
