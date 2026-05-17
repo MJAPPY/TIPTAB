@@ -8,12 +8,10 @@ import {
   Trophy, 
   Menu,
   Map as MapIcon,
-  Calculator as CalcIcon,
-  Check
+  Calculator as CalcIcon
 } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useState } from "react";
-import { useToast } from "@/hooks/use-toast";
 import {
   Sheet,
   SheetContent,
@@ -28,35 +26,6 @@ interface HeaderProps {
 
 export const Header = ({ onBecomeCreator }: HeaderProps) => {
   const [isOpen, setIsOpen] = useState(false);
-  const [walletAddress, setWalletAddress] = useState<string | null>(null);
-  const [isConnecting, setIsConnecting] = useState(false);
-  const { toast } = useToast();
-
-  const handleConnect = async () => {
-    if (walletAddress) return; // Already connected
-
-    setIsConnecting(true);
-    try {
-      // Simulate WebAuth wallet connection delay
-      await new Promise(resolve => setTimeout(resolve, 1200));
-      
-      const mockAddress = "0x71C7656EC7ab88b098defB751B7401B5f6d8976F";
-      setWalletAddress(mockAddress);
-      
-      toast({
-        title: "Wallet Connected",
-        description: "Successfully connected to XPR Network via WebAuth.",
-      });
-    } catch (error) {
-      toast({
-        title: "Connection Failed",
-        description: "Could not establish connection to WebAuth.",
-        variant: "destructive"
-      });
-    } finally {
-      setIsConnecting(false);
-    }
-  };
 
   const NavItems = () => (
     <>
@@ -129,29 +98,10 @@ export const Header = ({ onBecomeCreator }: HeaderProps) => {
 
           {/* Right Actions */}
           <div className="flex items-center gap-2 md:gap-4">
-            <Button 
-              onClick={handleConnect}
-              disabled={isConnecting}
-              className={`flex items-center gap-2 rounded-2xl h-10 md:h-14 px-4 md:px-10 font-black text-[10px] md:text-base shadow-2xl transition-all active:scale-95 group shrink-0 ${
-                walletAddress 
-                ? "bg-green-500/10 border border-green-500/50 text-green-400 hover:bg-green-500/20" 
-                : "bg-[#a855f7] hover:bg-[#9333ea] text-white shadow-purple-500/40"
-              }`}
-            >
-              {isConnecting ? (
-                <div className="h-4 w-4 md:h-6 md:w-6 border-2 border-white/20 border-t-white rounded-full animate-spin" />
-              ) : walletAddress ? (
-                <Check className="h-4 w-4 md:h-6 md:w-6" />
-              ) : (
-                <Wallet className="h-4 w-4 md:h-6 md:w-6 group-hover:rotate-12 transition-transform" />
-              )}
-              
-              <span className="hidden xs:inline whitespace-nowrap">
-                {isConnecting ? "Connecting..." : walletAddress ? `${walletAddress.slice(0, 6)}...${walletAddress.slice(-4)}` : "Connect WebAuth"}
-              </span>
-              <span className="xs:hidden">
-                {isConnecting ? "..." : walletAddress ? "Active" : "Connect"}
-              </span>
+            <Button className="bg-[#a855f7] hover:bg-[#9333ea] text-white flex items-center gap-2 rounded-2xl h-10 md:h-14 px-4 md:px-10 font-black text-[10px] md:text-base shadow-2xl shadow-purple-500/40 transition-all active:scale-95 group shrink-0">
+              <Wallet className="h-4 w-4 md:h-6 md:w-6 group-hover:rotate-12 transition-transform" />
+              <span className="hidden xs:inline whitespace-nowrap">Connect WebAuth</span>
+              <span className="xs:hidden">Connect</span>
             </Button>
 
             {/* Mobile Menu Trigger */}
