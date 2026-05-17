@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import { UserPlus, Wallet, LayoutDashboard } from "lucide-react";
+import { UserPlus, Wallet, LayoutDashboard, Sparkles } from "lucide-react";
 import { Link } from "react-router-dom";
 
 interface HeaderProps {
@@ -24,21 +24,21 @@ export const Header = ({ onBecomeCreator }: HeaderProps) => {
       </div>
       
       <div className="flex items-center gap-4">
-        <Link to="/dashboard">
+        <Link to="/dashboard" className="hidden md:block">
           <Button 
             variant="ghost" 
-            className="text-white hover:text-purple-400 hidden md:flex items-center gap-2 font-bold bg-white/5 border border-white/10 rounded-xl h-14"
+            className="text-white hover:text-purple-400 flex items-center gap-2 font-bold bg-white/5 border border-white/10 rounded-xl h-14"
           >
             <LayoutDashboard className="h-5 w-5" />
             My Dashboard
           </Button>
         </Link>
         <Button 
-          variant="ghost" 
+          variant="outline" 
           onClick={onBecomeCreator}
-          className="text-white hover:text-orange-500 hidden lg:flex items-center gap-2 font-bold"
+          className="border-orange-500/50 bg-orange-500/5 text-orange-500 hover:bg-orange-500 hover:text-white hidden lg:flex items-center gap-2 font-black rounded-xl h-14 px-6 transition-all"
         >
-          <UserPlus className="h-5 w-5" />
+          <Sparkles className="h-5 w-5" />
           Become a Creator
         </Button>
         <Button className="bg-[#a855f7] hover:bg-[#9333ea] text-white flex items-center gap-2 rounded-2xl h-14 px-8 font-black text-lg shadow-xl shadow-purple-500/30">
