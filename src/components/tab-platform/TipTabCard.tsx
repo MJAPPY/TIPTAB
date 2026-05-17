@@ -130,18 +130,22 @@ export const TipTabCard = ({ creator }: TipTabCardProps) => {
           </div>
 
           {/* Right QR Column */}
-          <div className="flex flex-col items-center gap-2 shrink-0">
+          <div className="flex flex-col items-center gap-2.5 shrink-0">
             <div className="relative">
-              <div className="absolute inset-[-6px] bg-white/10 blur-lg rounded-full" />
-              <div className="relative bg-white p-2.5 rounded-[20px] shadow-2xl">
-                <div className="h-20 w-20 bg-black flex items-center justify-center rounded-xl overflow-hidden">
-                  <QrCode className="h-16 w-16 text-white" />
+              <div className="absolute inset-[-8px] bg-white/20 blur-xl rounded-full" />
+              <div className="relative bg-white p-3 rounded-[24px] shadow-2xl">
+                <div className="h-24 w-24 bg-black flex items-center justify-center rounded-xl overflow-hidden">
+                  <QrCode className="h-20 w-20 text-white" />
                 </div>
               </div>
             </div>
-            <div className="text-center space-y-0">
-              <p className="text-[9px] font-black uppercase tracking-[0.1em] text-slate-500">Scan to Tip</p>
-              <p className="text-[11px] font-black text-orange-500 tracking-tighter">XPR NETWORK</p>
+            <div className="text-center space-y-0.5">
+              <p className="text-[11px] font-black uppercase tracking-[0.15em] text-white bg-orange-500 px-3 py-1 rounded-full shadow-lg shadow-orange-500/20">
+                Scan to Tip Me
+              </p>
+              <p className="text-[10px] font-black text-white/40 tracking-widest uppercase pt-1">
+                XPR Network
+              </p>
             </div>
           </div>
         </div>
