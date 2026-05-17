@@ -1,7 +1,7 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { 
-  User, 
+  User as UserIcon, 
   Settings, 
   CreditCard, 
   TrendingUp, 
@@ -15,17 +15,30 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Tabs, TabsContent } from "@/components/ui/tabs";
 import { TipTabCard } from "@/components/tab-platform/TipTabCard";
 import { ProfileEditor } from "@/components/tab-platform/ProfileEditor";
-import { CREATORS } from "@/data/creators";
+import { CREATORS, Creator } from "@/data/creators";
 
 const Dashboard = () => {
-  // Mock logged in user
-  const user = CREATORS[0];
+  // Initial user state from localStorage or default creator
+  const [user, setUser] = useState<Creator>(() => {
+    const saved = localStorage.getItem("tiptab_user_profile");
+    return saved ? JSON.parse(saved) : CREATORS[0];
+  });
+  
   const [activeTab, setActiveTab] = useState("analytics");
+
+  // Persist user changes to localStorage
+  useEffect(() => {
+    localStorage.setItem("tiptab_user_profile", JSON.stringify(user));
+  }, [user]);
+
+  const handleUpdateProfile = (updatedData: Creator) => {
+    setUser(updatedData);
+  };
 
   const navigationItems = [
     { id: "analytics", icon: TrendingUp, label: "Analytics" },
     { id: "card", icon: CreditCard, label: "My TipTab Card" },
-    { id: "settings", icon: User, label: "Profile Settings" },
+    { id: "settings", icon: UserIcon, label: "Profile Settings" },
     { id: "payouts", icon: Wallet, label: "Payouts & Wallet" },
     { id: "account", icon: Settings, label: "Account Prefs" },
   ];
@@ -54,10 +67,10 @@ const Dashboard = () => {
               <div className="absolute top-2 right-2 h-2 w-2 bg-orange-500 rounded-full border-2 border-[#0a0514]" />
             </Button>
             <div className="flex items-center gap-3 bg-white/5 border border-white/10 rounded-full px-4 py-1.5">
-              <div className="h-6 w-6 rounded-full bg-purple-500 flex items-center justify-center text-[10px] font-bold">
+              <div className={`h-6 w-6 rounded-full ${user.color} flex items-center justify-center text-[10px] font-bold`}>
                 {user.avatar}
               </div>
-              <span className="text-sm font-bold text-white/80">0x71...4F2a</span>
+              <span className="text-sm font-bold text-white/80">{user.name}</span>
             </div>
           </div>
         </div>
@@ -91,9 +104,11 @@ const Dashboard = () => {
                 <p className="text-xs text-white/60 mb-4 leading-relaxed">
                   You are a Pro Creator. 0% platform fees active.
                 </p>
-                <Button className="w-full bg-orange-500 hover:bg-orange-600 text-white font-bold h-10 rounded-xl text-xs shadow-lg shadow-orange-500/20 transition-all">
-                  View Public Profile
-                </Button>
+                <Link to="/">
+                  <Button className="w-full bg-orange-500 hover:bg-orange-600 text-white font-bold h-10 rounded-xl text-xs shadow-lg shadow-orange-500/20 transition-all">
+                    View Public Profile
+                  </Button>
+                </Link>
               </div>
             </div>
           </div>
@@ -133,7 +148,7 @@ const Dashboard = () => {
                     </CardHeader>
                     <CardContent>
                       <div className="text-xs text-orange-500 font-bold flex items-center gap-1">
-                        Trending in Content
+                        Trending in {user.category}
                       </div>
                     </CardContent>
                   </Card>
@@ -192,7 +207,7 @@ const Dashboard = () => {
 
               {/* Profile Settings Section */}
               <TabsContent value="settings" className="mt-0 animate-in fade-in slide-in-from-bottom-4 duration-300">
-                <ProfileEditor initialData={user} />
+                <ProfileEditor initialData={user} onSave={handleUpdateProfile} />
               </TabsContent>
 
               {/* Coming Soon Sections */}

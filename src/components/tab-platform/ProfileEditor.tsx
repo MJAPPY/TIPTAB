@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { User, AtSign, MapPin, Globe, Twitter, Edit3, Save, Check, Image as ImageIcon } from "lucide-react";
+import { User, AtSign, MapPin, Globe, Twitter, Edit3, Save, Image as ImageIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -11,9 +11,10 @@ import { Creator } from "@/data/creators";
 
 interface ProfileEditorProps {
   initialData: Creator;
+  onSave: (updatedData: Creator) => void;
 }
 
-export const ProfileEditor = ({ initialData }: ProfileEditorProps) => {
+export const ProfileEditor = ({ initialData, onSave }: ProfileEditorProps) => {
   const [isEditing, setIsEditing] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [formData, setFormData] = useState({
@@ -31,9 +32,17 @@ export const ProfileEditor = ({ initialData }: ProfileEditorProps) => {
   const handleSave = async () => {
     setIsSaving(true);
     try {
-      // Simulate API call
-      await new Promise((resolve) => setTimeout(resolve, 1500));
+      // Simulate network delay
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+      
+      const updatedCreator: Creator = {
+        ...initialData,
+        ...formData,
+      };
+      
+      onSave(updatedCreator);
       setIsEditing(false);
+      
       toast({
         title: "Profile Updated",
         description: "Your changes have been saved to the XPR Network.",
@@ -73,7 +82,18 @@ export const ProfileEditor = ({ initialData }: ProfileEditorProps) => {
           <div className="flex gap-2">
             <Button 
               variant="ghost" 
-              onClick={() => setIsEditing(false)}
+              onClick={() => {
+                setFormData({
+                  name: initialData.name,
+                  handle: initialData.handle,
+                  bio: initialData.bio,
+                  location: initialData.location,
+                  category: initialData.category,
+                  twitter: initialData.twitter || "",
+                  website: initialData.website || "",
+                });
+                setIsEditing(false);
+              }}
               className="rounded-xl font-bold text-white/60 hover:text-white"
             >
               Cancel
@@ -90,7 +110,6 @@ export const ProfileEditor = ({ initialData }: ProfileEditorProps) => {
       </CardHeader>
       <CardContent className="p-8">
         <div className="space-y-8">
-          {/* Avatar Section */}
           <div className="flex items-center gap-6 pb-8 border-b border-white/5">
             <div className={`h-24 w-24 rounded-3xl ${initialData.color} flex items-center justify-center text-3xl font-black border-4 border-white/10 shadow-xl`}>
               {initialData.avatar}
