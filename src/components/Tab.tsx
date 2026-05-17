@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { Header } from "./tab-platform/Header";
 import { Hero } from "./tab-platform/Hero";
 import { StatsBanner } from "./tab-platform/Sections";
@@ -7,11 +7,20 @@ import { FeaturedCreators } from "./tab-platform/FeaturedCreators";
 import { MembershipModal } from "./tab-platform/MembershipModal";
 import { TippingModal } from "./tab-platform/TippingModal";
 import { Toaster } from "@/components/ui/toaster";
-import { Creator } from "@/data/creators";
+import { CREATORS, Creator } from "@/data/creators";
 
 export const Tab = () => {
   const [isMembershipOpen, setIsMembershipOpen] = useState(false);
   const [selectedCreator, setSelectedCreator] = useState<Creator | null>(null);
+
+  // Sync local user profile updates to the display list
+  const displayCreators = useMemo(() => {
+    const savedUser = localStorage.getItem("tiptab_user_profile");
+    if (!savedUser) return CREATORS;
+    
+    const localUser = JSON.parse(savedUser) as Creator;
+    return CREATORS.map(c => c.id === localUser.id ? localUser : c);
+  }, []);
 
   return (
     <div className="min-h-screen bg-[#0a0514] text-white selection:bg-purple-500/30">
@@ -29,10 +38,11 @@ export const Tab = () => {
             <h2 className="text-xl font-bold">Global Creator Network</h2>
             <span className="text-white/40 text-sm">— click a pin to tip instantly</span>
           </div>
-          <WorldMap onSelectCreator={setSelectedCreator} />
+          <WorldMap creators={displayCreators} onSelectCreator={setSelectedCreator} />
         </section>
 
         <FeaturedCreators 
+          creators={displayCreators}
           onSelectCreator={setSelectedCreator} 
           onAddYourself={() => setIsMembershipOpen(true)} 
         />

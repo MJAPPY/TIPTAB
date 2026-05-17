@@ -2,28 +2,29 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Search, Plus, MapPin, QrCode, Twitter, Globe, Instagram, Video } from "lucide-react";
 import { useState, useMemo } from "react";
-import { CREATORS, Creator } from "@/data/creators";
+import { Creator } from "@/data/creators";
 
 const CATEGORIES = ["All", "Content", "Dev", "Art", "Education", "Gaming", "Music", "Sports", "Service", "Other"];
 
 interface FeaturedCreatorsProps {
+  creators: Creator[];
   onSelectCreator: (creator: Creator) => void;
   onAddYourself: () => void;
 }
 
-export const FeaturedCreators = ({ onSelectCreator, onAddYourself }: FeaturedCreatorsProps) => {
+export const FeaturedCreators = ({ creators, onSelectCreator, onAddYourself }: FeaturedCreatorsProps) => {
   const [activeCategory, setActiveCategory] = useState("All");
   const [searchQuery, setSearchQuery] = useState("");
 
   const filteredCreators = useMemo(() => {
-    return CREATORS.filter(creator => {
+    return creators.filter(creator => {
       const matchesCategory = activeCategory === "All" || creator.category === activeCategory;
       const matchesSearch = creator.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
                            creator.handle.toLowerCase().includes(searchQuery.toLowerCase()) ||
                            creator.location.toLowerCase().includes(searchQuery.toLowerCase());
       return matchesCategory && matchesSearch;
     });
-  }, [activeCategory, searchQuery]);
+  }, [creators, activeCategory, searchQuery]);
 
   return (
     <section className="py-20 container mx-auto px-6">
@@ -73,7 +74,7 @@ export const FeaturedCreators = ({ onSelectCreator, onAddYourself }: FeaturedCre
         </div>
         <div className="flex items-center justify-between px-4">
           <p className="text-sm font-medium text-white/40">
-            <span className="text-white font-bold">{filteredCreators.length}</span> of {CREATORS.length} creators found
+            <span className="text-white font-bold">{filteredCreators.length}</span> of {creators.length} creators found
           </p>
         </div>
       </div>
@@ -90,7 +91,7 @@ export const FeaturedCreators = ({ onSelectCreator, onAddYourself }: FeaturedCre
             
             <div className="flex items-start justify-between gap-4 mb-6 relative z-10">
               <div className="flex items-center gap-5">
-                <div className={`h-16 w-16 rounded-2xl ${creator.color} flex items-center justify-center text-2xl font-black border border-white/20 shadow-xl group-hover:scale-110 transition-transform`}>
+                <div className={`h-16 w-16 rounded-2xl ${creator.color} flex items-center justify-center text-2xl font-black border border-white/20 shadow-xl group-hover:scale-110 transition-transform overflow-hidden`}>
                   {creator.avatarImage ? (
                     <img src={creator.avatarImage} alt="Avatar" className="w-full h-full object-cover" />
                   ) : (
