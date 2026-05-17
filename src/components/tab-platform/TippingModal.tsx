@@ -4,10 +4,11 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Plus, Twitter, Globe, X, Instagram, Video } from "lucide-react";
+import { Plus, Twitter, Globe, X, Instagram, Video, Zap, ShieldCheck } from "lucide-react";
 import { useState } from "react";
 import { Creator } from "@/data/creators";
 import { useToast } from "@/hooks/use-toast";
+import { cn } from "@/lib/utils";
 
 interface TippingModalProps {
   creator: Creator | null;
@@ -15,135 +16,174 @@ interface TippingModalProps {
 }
 
 export const TippingModal = ({ creator, onClose }: TippingModalProps) => {
-  const [tipAmount, setTipAmount] = useState("");
+  const [tipAmount, setTipAmount] = useState<string>("100");
   const [isProcessing, setIsProcessing] = useState(false);
   const { toast } = useToast();
 
   const handleSendTip = async () => {
-    if (!tipAmount || isNaN(Number(tipAmount))) {
-      toast({ title: "Invalid amount", description: "Please enter a valid TAB amount.", variant: "destructive" });
+    if (!tipAmount || isNaN(Number(tipAmount)) || Number(tipAmount) <= 0) {
+      toast({ 
+        title: "Invalid amount", 
+        description: "Please enter a valid TAB amount to send.", 
+        variant: "destructive" 
+      });
       return;
     }
 
     setIsProcessing(true);
     try {
-      // Simulate transaction
+      // Simulate XPR Network transaction
       await new Promise(resolve => setTimeout(resolve, 2000));
+      
       toast({
         title: "Tip Sent Successfully!",
-        description: `You've sent ${tipAmount} TAB to ${creator?.name}.`,
+        description: `You've sent ${tipAmount} TAB to ${creator?.name}. appreciation delivered!`,
       });
       onClose();
     } catch (error) {
-      toast({ title: "Transaction failed", description: "Please try again.", variant: "destructive" });
+      toast({ 
+        title: "Transaction failed", 
+        description: "Please check your connection and try again.", 
+        variant: "destructive" 
+      });
     } finally {
       setIsProcessing(false);
     }
   };
 
+  if (!creator) return null;
+
+  const amounts = ["50", "100", "500", "1000"];
+
   return (
     <Dialog open={!!creator} onOpenChange={(open) => !open && onClose()}>
-      <DialogContent className="bg-[#130b21] border-white/10 text-white sm:max-w-[450px] rounded-[32px] p-0 overflow-hidden">
-        <div className="relative h-32 bg-gradient-to-br from-purple-900 to-[#130b21]">
-           <Button 
-             variant="ghost" 
-             size="icon" 
-             className="absolute top-4 right-4 text-white/60 hover:text-white"
-             onClick={onClose}
-           >
-             <X className="h-5 w-5" />
-           </Button>
+      <DialogContent className="bg-[#0d071a]/95 backdrop-blur-[32px] border-white/10 text-white sm:max-w-[460px] rounded-[40px] p-0 overflow-hidden shadow-[0_0_100px_rgba(0,0,0,0.8)] border-t-purple-500/20">
+        
+        {/* Dynamic Header Background */}
+        <div className="relative h-32 w-full overflow-hidden">
+          <div className={cn("absolute inset-0 opacity-40", creator.color)} />
+          <div className="absolute inset-0 bg-gradient-to-t from-[#0d071a] to-transparent" />
+          <Button 
+            variant="ghost" 
+            size="icon" 
+            className="absolute top-6 right-6 text-white/40 hover:text-white hover:bg-white/10 rounded-full z-20"
+            onClick={onClose}
+          >
+            <X className="h-5 w-5" />
+          </Button>
         </div>
         
-        <div className="px-8 pb-8 -mt-12 relative">
-          <div className={`h-24 w-24 rounded-[32px] ${creator?.color} flex items-center justify-center text-3xl font-bold border-4 border-[#130b21] shadow-xl mb-4 overflow-hidden`}>
-            {creator?.avatarImage ? (
-              <img src={creator.avatarImage} alt="Avatar" className="w-full h-full object-cover" />
-            ) : (
-              creator?.avatar
-            )}
-          </div>
-          
-          <div className="flex items-start justify-between mb-6">
-            <div>
-              <h3 className="text-2xl font-bold">{creator?.name}</h3>
-              <p className="text-purple-500 font-medium">@{creator?.handle}</p>
-            </div>
-            <div className="flex flex-wrap gap-2 justify-end">
-              {creator?.twitter && (
-                <Button variant="secondary" size="icon" className="rounded-xl bg-white/5 border border-white/10 hover:bg-white/10" asChild>
-                  <a href={creator.twitter} target="_blank" rel="noopener noreferrer">
-                    <Twitter className="h-4 w-4" />
-                  </a>
-                </Button>
+        <div className="px-10 pb-10 -mt-14 relative z-10">
+          {/* Avatar Section */}
+          <div className="flex items-end justify-between mb-6">
+            <div className={cn(
+              "h-28 w-28 rounded-[36px] flex items-center justify-center text-4xl font-black border-[6px] border-[#0d071a] shadow-2xl overflow-hidden",
+              creator.color
+            )}>
+              {creator.avatarImage ? (
+                <img src={creator.avatarImage} alt={creator.name} className="w-full h-full object-cover" />
+              ) : (
+                creator.avatar
               )}
-              {creator?.instagram && (
-                <Button variant="secondary" size="icon" className="rounded-xl bg-white/5 border border-white/10 hover:bg-white/10" asChild>
-                  <a href={creator.instagram} target="_blank" rel="noopener noreferrer">
-                    <Instagram className="h-4 w-4" />
-                  </a>
-                </Button>
-              )}
-              {creator?.videoUrl && (
-                <Button variant="secondary" size="icon" className="rounded-xl bg-white/5 border border-white/10 hover:bg-white/10" asChild>
-                  <a href={creator.videoUrl} target="_blank" rel="noopener noreferrer">
-                    <Video className="h-4 w-4" />
-                  </a>
-                </Button>
-              )}
-              {creator?.website && (
-                <Button variant="secondary" size="icon" className="rounded-xl bg-white/5 border border-white/10 hover:bg-white/10" asChild>
-                  <a href={creator.website} target="_blank" rel="noopener noreferrer">
-                    <Globe className="h-4 w-4" />
-                  </a>
-                </Button>
-              )}
-            </div>
-          </div>
-          
-          <p className="text-white/60 text-sm mb-8">
-            {creator?.bio}
-          </p>
-          
-          <div className="space-y-4">
-            <div className="flex items-center justify-between text-sm font-medium">
-              <span className="text-white/60">Tip Amount</span>
-              <span className="text-orange-500">TAB Tokens</span>
             </div>
             
-            <div className="grid grid-cols-3 gap-3">
-              {["100", "500", "1000"].map(amount => (
+            <div className="flex gap-2 mb-2">
+              {creator.twitter && (
+                <Button variant="outline" size="icon" className="rounded-xl bg-white/5 border-white/10 hover:border-white/30 h-10 w-10" asChild>
+                  <a href={creator.twitter} target="_blank" rel="noopener noreferrer"><Twitter className="h-4 w-4" /></a>
+                </Button>
+              )}
+              {creator.instagram && (
+                <Button variant="outline" size="icon" className="rounded-xl bg-white/5 border-white/10 hover:border-white/30 h-10 w-10" asChild>
+                  <a href={creator.instagram} target="_blank" rel="noopener noreferrer"><Instagram className="h-4 w-4" /></a>
+                </Button>
+              )}
+              {creator.website && (
+                <Button variant="outline" size="icon" className="rounded-xl bg-white/5 border-white/10 hover:border-white/30 h-10 w-10" asChild>
+                  <a href={creator.website} target="_blank" rel="noopener noreferrer"><Globe className="h-4 w-4" /></a>
+                </Button>
+              )}
+            </div>
+          </div>
+          
+          <div className="space-y-1 mb-6">
+            <h3 className="text-3xl font-black tracking-tight">{creator.name}</h3>
+            <div className="flex items-center gap-2">
+              <span className="text-purple-400 font-bold">@{creator.handle}</span>
+              <div className="h-1 w-1 rounded-full bg-white/20" />
+              <span className="text-white/40 text-xs font-bold uppercase tracking-widest">{creator.category}</span>
+            </div>
+          </div>
+          
+          <p className="text-white/60 text-sm leading-relaxed mb-8 font-medium">
+            {creator.bio}
+          </p>
+          
+          <div className="space-y-6">
+            <div className="flex items-center justify-between">
+              <span className="text-xs font-black uppercase tracking-[0.2em] text-white/30">Select Amount</span>
+              <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-green-500/10 border border-green-500/20">
+                <ShieldCheck className="h-3 w-3 text-green-400" />
+                <span className="text-[10px] font-black uppercase tracking-widest text-green-400">Zero Fee</span>
+              </div>
+            </div>
+            
+            <div className="grid grid-cols-4 gap-3">
+              {amounts.map(amount => (
                 <Button
                   key={amount}
-                  variant="secondary"
+                  variant="ghost"
                   onClick={() => setTipAmount(amount)}
-                  className={`h-12 rounded-xl border ${tipAmount === amount ? "border-orange-500 bg-orange-500/10 text-orange-500" : "bg-white/5 border-white/10 hover:bg-white/10"}`}
+                  className={cn(
+                    "h-12 rounded-2xl border-2 font-black transition-all",
+                    tipAmount === amount 
+                      ? "border-orange-500 bg-orange-500/10 text-orange-500 shadow-[0_0_20px_rgba(249,115,22,0.2)]" 
+                      : "bg-white/5 border-transparent hover:bg-white/10 text-white/60 hover:text-white"
+                  )}
                 >
                   {amount}
                 </Button>
               ))}
             </div>
             
-            <div className="relative">
+            <div className="relative group">
+              <div className="absolute inset-y-0 left-6 flex items-center pointer-events-none">
+                <span className="text-white/20 font-black tracking-widest text-sm uppercase">Custom</span>
+              </div>
               <Input 
-                placeholder="Custom amount..." 
+                placeholder="0.00" 
                 value={tipAmount}
                 onChange={(e) => setTipAmount(e.target.value)}
-                className="bg-white/5 border-white/10 h-14 rounded-2xl text-lg font-bold px-6"
+                className="bg-white/5 border-white/10 h-16 rounded-3xl text-right text-2xl font-black px-8 focus:ring-orange-500/50 focus:bg-white/10 transition-all"
               />
-              <span className="absolute right-6 top-1/2 -translate-y-1/2 text-white/40 font-bold">TAB</span>
+              <div className="absolute inset-y-0 right-6 flex items-center pointer-events-none">
+                <span className="text-orange-500 font-black ml-2">TAB</span>
+              </div>
             </div>
             
             <Button 
               onClick={handleSendTip}
               disabled={isProcessing}
-              className="w-full h-16 bg-gradient-to-r from-orange-500 to-purple-600 hover:from-orange-600 hover:to-purple-700 text-white font-bold text-xl rounded-2xl shadow-lg mt-4 transition-all group"
+              className="w-full h-20 bg-gradient-to-r from-orange-500 to-purple-600 hover:from-orange-600 hover:to-purple-700 text-white font-black text-2xl rounded-3xl shadow-[0_20px_40px_-10px_rgba(249,115,22,0.3)] mt-2 transition-all active:scale-[0.98] group overflow-hidden"
             >
-              {isProcessing ? "Processing..." : <>Send Tip <Plus className="ml-2 h-5 w-5 group-hover:rotate-90 transition-transform" /></>}
+              <div className="relative z-10 flex items-center justify-center gap-3">
+                {isProcessing ? (
+                  <>
+                    <div className="h-6 w-6 border-4 border-white/20 border-t-white rounded-full animate-spin" />
+                    <span>Sending...</span>
+                  </>
+                ) : (
+                  <>
+                    <span>Send Tip</span>
+                    <Zap className="h-6 w-6 fill-white group-hover:scale-110 transition-transform" />
+                  </>
+                )}
+              </div>
+              <div className="absolute inset-0 bg-white/10 translate-y-full group-hover:translate-y-0 transition-transform duration-500" />
             </Button>
             
-            <p className="text-[10px] text-center text-white/20 uppercase tracking-widest pt-4">
-              Instant • Zero Fees • Direct to Creator
+            <p className="text-[10px] text-center text-white/20 uppercase tracking-[0.3em] pt-2 font-black">
+              Processed via XPR Network • Instant
             </p>
           </div>
         </div>
