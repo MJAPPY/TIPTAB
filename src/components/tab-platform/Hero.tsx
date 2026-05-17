@@ -22,8 +22,8 @@ export const Hero = ({ creators }: HeroProps) => {
         <div className="flex flex-col lg:flex-row items-center justify-between gap-20">
           <div className="flex-1 text-left space-y-10 max-w-3xl">
             <div className="inline-flex items-center gap-3 px-4 py-2 rounded-full bg-white/5 border border-white/10 backdrop-blur-md shadow-2xl">
-              <Heart className="h-4 w-4 text-pink-500 fill-pink-500" />
-              <span className="text-white/60 text-xs font-black uppercase tracking-[0.2em]">Empowering Everyday Heroes</span>
+              <Heart className="h-4 w-4 text-purple-500 fill-purple-500" />
+              <span className="text-white/60 text-xs font-black uppercase tracking-[0.2em]">Powered by XPR Network</span>
             </div>
             
             <h1 className="text-6xl md:text-8xl font-black tracking-tighter leading-[0.9] text-white">
@@ -32,7 +32,7 @@ export const Hero = ({ creators }: HeroProps) => {
             </h1>
             
             <p className="text-2xl text-white/40 max-w-2xl leading-relaxed font-medium">
-              Whether you're a delivery pro, a fitness coach, wait staff, or a digital creator—TIPTAB connects you directly to the people who value your hustle. Zero fees. Instant TAB rewards.
+              Whether you're a delivery pro, a fitness coach, or a digital creator—TIPTAB connects you directly to the people who value your hustle via the <span className="text-purple-400 font-black">XPR Network</span>. Zero fees. Instant TAB rewards.
             </p>
             
             <div className="flex flex-wrap items-center gap-8 pt-4">
@@ -41,8 +41,8 @@ export const Hero = ({ creators }: HeroProps) => {
                 <span className="text-sm font-black uppercase tracking-widest text-white/80">Direct Tipping</span>
               </div>
               <div className="flex items-center gap-3 bg-white/5 px-6 py-3 rounded-2xl border border-white/5">
-                <UserCheck className="h-5 w-5 text-green-500" />
-                <span className="text-sm font-black uppercase tracking-widest text-white/80">Gig-Economy Ready</span>
+                <UserCheck className="h-5 w-5 text-purple-500" />
+                <span className="text-sm font-black uppercase tracking-widest text-white/80">XPR Infrastructure</span>
               </div>
             </div>
 
@@ -65,20 +65,20 @@ export const Hero = ({ creators }: HeroProps) => {
                 </div>
               </div>
               <p className="text-sm font-bold text-white/30 tracking-wide">
-                Join <span className="text-white">{formattedCount}k+</span> service pros & creators
+                Join <span className="text-white">{formattedCount}k+</span> pros on the <span className="text-purple-400">XPR Network</span>
               </p>
             </div>
           </div>
           
           <div className="flex-1 relative lg:block hidden">
             <div className="relative z-10 flex items-center justify-center">
-              <div className="absolute inset-0 bg-orange-500/10 blur-[120px] rounded-full scale-150" />
+              <div className="absolute inset-0 bg-purple-500/10 blur-[120px] rounded-full scale-150" />
               
               <div className="relative group">
                 <img 
                   src="/src/assets/logo.png" 
                   alt="TIPTAB Logo"
-                  className="w-full max-w-[480px] mx-auto drop-shadow-[0_0_50px_rgba(249,115,22,0.4)] animate-delayed-spin cursor-pointer transition-transform duration-700 group-hover:scale-105"
+                  className="w-full max-w-[480px] mx-auto drop-shadow-[0_0_50px_rgba(168,85,247,0.4)] animate-delayed-spin cursor-pointer transition-transform duration-700 group-hover:scale-105"
                 />
               </div>
             </div>

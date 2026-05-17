@@ -44,7 +44,7 @@ export const Tab = () => {
             <div className="h-3 w-3 rounded-full bg-purple-500 flex items-center justify-center">
               <div className="h-1.5 w-1.5 rounded-full bg-white animate-pulse" />
             </div>
-            <h2 className="text-lg font-bold">Global Creator Network</h2>
+            <h2 className="text-lg font-bold">Live on XPR Network</h2>
             <span className="text-white/40 text-xs">— click a pin to tip instantly</span>
           </div>
           <WorldMap creators={displayCreators} onSelectCreator={setSelectedCreator} />
@@ -62,13 +62,13 @@ export const Tab = () => {
       <footer className="py-24 border-t border-white/5 bg-black/20 mt-20">
         <div className="container mx-auto px-6 text-center">
           <Link to="/" className="mb-12 flex flex-col items-center gap-8 group inline-flex">
-            <img src="/src/assets/logo.png" alt="TIPTAB Logo" className="h-40 w-40 object-contain drop-shadow-[0_0_30px_rgba(249,115,22,0.2)] group-hover:scale-105 transition-transform duration-500" />
-            <span className="text-5xl font-black italic tracking-tighter text-white group-hover:text-[#ff3131] transition-colors duration-300">
+            <img src="/src/assets/logo.png" alt="TIPTAB Logo" className="h-40 w-40 object-contain drop-shadow-[0_0_30px_rgba(168,85,247,0.2)] group-hover:scale-105 transition-transform duration-500" />
+            <span className="text-5xl font-black italic tracking-tighter text-white group-hover:text-[#a855f7] transition-colors duration-300">
               TIP<span className="text-orange-500">TAB</span>
             </span>
           </Link>
-          <p className="text-white/40 max-w-md mx-auto mb-12 text-lg">
-            Empowering creators through direct, fee-free tipping on the XPR Network. Join the future of creator support.
+          <p className="text-white/40 max-w-md mx-auto mb-12 text-lg font-medium">
+            Empowering the global workforce through direct, fee-free tipping on the <span className="text-purple-400">XPR Network</span>. Join the future of appreciation.
           </p>
           <div className="flex justify-center gap-10 text-white/60 font-bold">
             <a href="#" className="hover:text-purple-400 transition-colors">Documentation</a>
@@ -76,8 +76,8 @@ export const Tab = () => {
             <a href="#" className="hover:text-purple-400 transition-colors">Telegram</a>
             <a href="#" className="hover:text-purple-400 transition-colors">Support</a>
           </div>
-          <div className="mt-20 pt-10 border-t border-white/5 text-white/20 text-xs font-medium tracking-widest uppercase">
-            © {new Date().getFullYear()} TIPTAB Platform. Built on XPR Network.
+          <div className="mt-20 pt-10 border-t border-white/5 text-white/20 text-xs font-black uppercase tracking-[0.3em]">
+            © {new Date().getFullYear()} TIPTAB Platform. SECURED BY XPR NETWORK.
           </div>
         </div>
       </footer>
