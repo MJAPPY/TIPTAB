@@ -1,15 +1,30 @@
 import { Zap, Sparkles, TrendingUp, Heart } from "lucide-react";
 
 const ACTIVITIES = [
-  { icon: Zap, text: "New Tip: 500 TAB sent to @alex_arts", color: "text-orange-500", glow: "shadow-[0_0_8px_rgba(249,115,22,0.4)]" },
-  { icon: Sparkles, text: "@sarahcodes just joined the global map!", color: "text-purple-400", glow: "shadow-[0_0_8px_rgba(168,85,247,0.4)]" },
-  { icon: TrendingUp, text: "Network Milestone: 1.2M TAB tipped globally", color: "text-green-400", glow: "shadow-[0_0_8px_rgba(34,197,94,0.4)]" },
-  { icon: Heart, text: "Top Supporter: 0x71...4F2a sent a 5,000 TAB tip!", color: "text-pink-500", glow: "shadow-[0_0_8px_rgba(236,72,153,0.4)]" },
-  { icon: Zap, text: "New Tip: 250 TAB sent to @priyatech", color: "text-orange-500", glow: "shadow-[0_0_8px_rgba(249,115,22,0.4)]" },
-  { icon: Sparkles, text: "@mwright is now a verified creator", color: "text-purple-400", glow: "shadow-[0_0_8px_rgba(168,85,247,0.4)]" },
+  { icon: Zap, text: "New Tip: 500 TAB sent to @alex_arts", color: "text-orange-500" },
+  { icon: Sparkles, text: "@sarahcodes just joined the global map!", color: "text-purple-400" },
+  { icon: TrendingUp, text: "Network Milestone: 1.2M TAB tipped globally", color: "text-green-400" },
+  { icon: Heart, text: "Top Supporter: 0x71...4F2a sent a 5,000 TAB tip!", color: "text-pink-500" },
+  { icon: Zap, text: "New Tip: 250 TAB sent to @priyatech", color: "text-orange-500" },
+  { icon: Sparkles, text: "@mwright is now a verified creator", color: "text-purple-400" },
 ];
 
 export const ActivityTicker = () => {
+  // Helper to highlight handles in the text
+  const formatText = (text: string, colorClass: string) => {
+    const parts = text.split(/(@\w+)/g);
+    return parts.map((part, i) => {
+      if (part.startsWith('@')) {
+        return (
+          <span key={i} className={`${colorClass} brightness-125 drop-shadow-[0_0_8px_currentColor] font-black`}>
+            {part}
+          </span>
+        );
+      }
+      return <span key={i}>{part}</span>;
+    });
+  };
+
   return (
     <div className="fixed top-0 left-0 right-0 z-[60] bg-[#0a0514]/90 backdrop-blur-xl border-b border-white/10 h-10 flex items-center overflow-hidden shadow-[0_0_30px_rgba(0,0,0,0.5)]">
       {/* Live Indicator Badge */}
@@ -26,7 +41,7 @@ export const ActivityTicker = () => {
             <div className={`h-1.5 w-1.5 rounded-full bg-white/20 group-hover:bg-white transition-colors`} />
             <activity.icon className={`h-3.5 w-3.5 ${activity.color} drop-shadow-[0_0_5px_currentColor]`} />
             <span className="text-[10px] font-black uppercase tracking-[0.15em] text-white/80 group-hover:text-white transition-colors">
-              {activity.text}
+              {formatText(activity.text, activity.color)}
             </span>
             <div className="ml-10 h-4 w-px bg-white/5" />
           </div>
@@ -37,7 +52,7 @@ export const ActivityTicker = () => {
             <div className={`h-1.5 w-1.5 rounded-full bg-white/20 group-hover:bg-white transition-colors`} />
             <activity.icon className={`h-3.5 w-3.5 ${activity.color} drop-shadow-[0_0_5px_currentColor]`} />
             <span className="text-[10px] font-black uppercase tracking-[0.15em] text-white/80 group-hover:text-white transition-colors">
-              {activity.text}
+              {formatText(activity.text, activity.color)}
             </span>
             <div className="ml-10 h-4 w-px bg-white/5" />
           </div>
