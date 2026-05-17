@@ -14,6 +14,7 @@ export const ActivityTicker = () => {
   const formatText = (text: string, colorClass: string) => {
     const parts = text.split(/(@\w+)/g);
     return parts.map((part, i) => {
+      part = String(part);
       if (part.startsWith('@')) {
         return (
           <span key={i} className={`${colorClass} brightness-125 drop-shadow-[0_0_8px_currentColor] font-black`}>
@@ -27,14 +28,23 @@ export const ActivityTicker = () => {
 
   return (
     <div className="fixed top-32 left-0 right-0 z-40 bg-[#0a0514]/40 backdrop-blur-xl border-y border-white/5 h-10 flex items-center overflow-hidden shadow-[0_10px_30px_rgba(0,0,0,0.3)]">
-      {/* Live Indicator Badge with Blended Flame Look */}
-      <div className="relative z-30 flex items-center h-full pl-6 pr-10">
-        <div className="absolute inset-0 bg-orange-600/90 [clip-path:polygon(0%_0%,_100%_0%,_85%_100%,_0%_100%)] shadow-[10px_0_20px_rgba(234,88,12,0.5)]" />
-        <div className="absolute inset-y-0 right-0 w-20 bg-gradient-to-r from-orange-600/90 to-transparent z-10 translate-x-[20%]" />
+      {/* Live Indicator Badge with Jagged Flame Tail */}
+      <div className="relative z-30 flex items-center h-full pl-6 pr-14 group">
+        {/* The Flame Shape */}
+        <div 
+          className="absolute inset-0 bg-gradient-to-r from-orange-600 via-orange-500 to-orange-400 animate-pulse-slow shadow-[0_0_20px_rgba(249,115,22,0.4)]" 
+          style={{ 
+            clipPath: 'polygon(0% 0%, 100% 0%, 82% 20%, 95% 45%, 80% 70%, 100% 100%, 0% 100%)',
+            animation: 'flicker 3s ease-in-out infinite'
+          }} 
+        />
+        
+        {/* Blended Glow Trail */}
+        <div className="absolute inset-y-0 right-0 w-24 bg-gradient-to-r from-orange-500/80 to-transparent z-10 translate-x-[20%] blur-md pointer-events-none" />
         
         <div className="relative z-20 flex items-center gap-2.5">
-          <div className="h-2 w-2 rounded-full bg-white animate-pulse shadow-[0_0_8px_rgba(255,255,255,0.8)]" />
-          <span className="text-[10px] font-black uppercase tracking-[0.25em] text-white whitespace-nowrap drop-shadow-md">
+          <div className="h-2 w-2 rounded-full bg-white animate-pulse shadow-[0_0_10px_rgba(255,255,255,1)]" />
+          <span className="text-[10px] font-black uppercase tracking-[0.25em] text-white whitespace-nowrap drop-shadow-[0_2px_4px_rgba(0,0,0,0.5)]">
             Live Feed
           </span>
         </div>
@@ -67,6 +77,10 @@ export const ActivityTicker = () => {
         @keyframes marquee {
           0% { transform: translateX(0); }
           100% { transform: translateX(-50%); }
+        }
+        @keyframes flicker {
+          0%, 100% { opacity: 0.95; transform: scaleX(1); }
+          50% { opacity: 1; transform: scaleX(1.02); }
         }
         .animate-marquee {
           animation: marquee 60s linear infinite;
