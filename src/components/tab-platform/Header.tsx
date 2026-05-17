@@ -72,7 +72,7 @@ export const Header = ({ onBecomeCreator }: HeaderProps) => {
               <img src="/src/assets/logo.png" alt="TIPTAB Logo" className="h-10 w-10 md:h-16 md:w-16 object-contain relative z-10" />
             </div>
             <div className="flex flex-col -space-y-1">
-              <span className="text-xl md:text-3xl font-black italic tracking-tighter text-white">
+              <span className="text-xl md:text-3xl font-black italic tracking-tighter text-white group-hover:text-red-500 transition-colors duration-300">
                 TIP<span className="text-orange-500">TAB</span>
               </span>
               <span className="text-[8px] md:text-[10px] text-muted-foreground hidden xs:inline uppercase tracking-widest font-black">
