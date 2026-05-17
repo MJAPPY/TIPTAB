@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Calculator as CalcIcon, RefreshCw, Zap, TrendingUp, DollarSign, ArrowRightLeft, Info, ArrowUpRight, ShoppingCart } from "lucide-react";
+import { Calculator as CalcIcon, RefreshCw, Zap, TrendingUp, DollarSign, ArrowRightLeft, Info, ArrowUpRight, ShoppingCart, ExternalLink } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const Calculator = () => {
@@ -21,7 +21,7 @@ const Calculator = () => {
 
   // Initial rates - will be updated by live fetches
   const [rates, setRates] = useState<Record<string, number>>({
-    TAB: 1.0000,
+    TAB: 2.768, // Default ratio (if 1 TAB = 0.3612 XPR, then 1 XPR = 2.768 TAB)
     XPR: 1.0000,
     USD: 0.00092,
     EUR: 0.00085,
@@ -62,21 +62,19 @@ const Calculator = () => {
       const cgData = await cgResponse.json();
       
       // 2. Fetch TAB/XPR rate from Alcor Exchange
-      // We use the Proton-specific Alcor API
       const alcorResponse = await fetch("https://proton.alcor.exchange/api/v2/tickers");
       const alcorData = await alcorResponse.json();
       
-      // Find the TAB_XPR market
-      // TAB: tokencreate@TAB, XPR: eosio.token@XPR
+      // Market ID for TAB/XPR on Proton Alcor
       const tabMarket = alcorData.find((m: any) => m.ticker_id === "TAB_XPR");
       
-      // Calculate TAB/XPR ratio (How many TAB for 1 XPR)
-      // If 1 TAB = 0.8 XPR, then 1 XPR = 1.25 TAB
-      let tabRatio = 1.0; 
+      // Calculation: How many TAB tokens for 1 XPR
+      let tabRatio = 2.768; // Fallback to current approx value
       if (tabMarket && tabMarket.last_price) {
-        const priceOfTabInXpr = parseFloat(tabMarket.last_price);
-        if (priceOfTabInXpr > 0) {
-          tabRatio = 1 / priceOfTabInXpr;
+        const xprPerTab = parseFloat(tabMarket.last_price);
+        if (xprPerTab > 0) {
+          // If 1 TAB = 0.3612 XPR, then 1 XPR = 1 / 0.3612 = 2.768 TAB
+          tabRatio = 1 / xprPerTab;
         }
       }
 
@@ -99,7 +97,7 @@ const Calculator = () => {
         });
       }
     } catch (error) {
-      console.error("Failed to fetch live rates from Alcor/CoinGecko:", error);
+      console.error("Failed to fetch live rates:", error);
     } finally {
       setTimeout(() => setIsSyncing(false), 800);
     }
@@ -129,6 +127,7 @@ const Calculator = () => {
   }, [amount, fromCurrency, toCurrency, rates]);
 
   const buyTabLink = "https://alcor.exchange/v/xpr/swap?input=xpr-eosio.token&output=tab-tokencreate";
+  const explorerLink = "https://explorer.xprnetwork.org/tokens/TAB-proton-tokencreate";
 
   return (
     <div className="min-h-screen bg-[#0a0514] text-white selection:bg-orange-500/30">
@@ -141,13 +140,13 @@ const Calculator = () => {
           <div className="text-center space-y-4">
             <div className="inline-flex items-center gap-2 px-4 py-1 rounded-full bg-white/5 border border-white/20 text-[10px] font-black uppercase tracking-[0.2em] text-cyan-300">
               <div className={cn("h-1.5 w-1.5 rounded-full bg-cyan-400", !isSyncing && "animate-pulse")} />
-              {isSyncing ? "Syncing Alcor/CG..." : "Live Network Parity"}
+              {isSyncing ? "Syncing Alcor Orderbooks..." : "Live Network Parity"}
             </div>
             <h1 className="text-4xl md:text-6xl font-black tracking-tighter italic leading-none text-white">
               VALUE <span className="text-transparent bg-clip-text bg-gradient-to-r from-orange-500 to-purple-500">ENGINE</span>
             </h1>
             <p className="text-slate-200 text-lg max-w-xl mx-auto font-medium leading-relaxed">
-              Real-time TAB valuation powered by <span className="text-orange-500">Alcor Exchange</span> and <span className="text-purple-400">XPR Network</span> data.
+              Precision TAB valuation powered by <span className="text-orange-500">Alcor Liquidity</span> and <span className="text-purple-400">XPR Network</span> Explorer data.
             </p>
           </div>
 
@@ -228,7 +227,7 @@ const Calculator = () => {
                   </div>
                   <div className="flex items-center gap-1.5 text-emerald-400 uppercase tracking-widest font-black">
                     <div className="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-pulse" />
-                    Data Source: Alcor API
+                    Data Sync: Alcor Terminal
                   </div>
                 </div>
               </div>
@@ -241,7 +240,7 @@ const Calculator = () => {
                 </h3>
                 <div className="space-y-5">
                   {[
-                    { pair: "TAB / XPR", rate: (1/rates.TAB).toFixed(4), change: "+0.00%", icon: Zap },
+                    { pair: "TAB / XPR", rate: (1/rates.TAB).toFixed(4), change: "Live", icon: Zap },
                     { pair: "TAB / USD", rate: (rates.USD / rates.TAB).toFixed(5), change: "Live", icon: DollarSign },
                     { pair: "XPR / EUR", rate: rates.EUR.toFixed(5), change: "Live", icon: TrendingUp }
                   ].map((item, i) => (
@@ -254,7 +253,7 @@ const Calculator = () => {
                       </div>
                       <div className="text-right">
                         <p className="font-black text-sm text-white">{item.rate}</p>
-                        <p className={cn("text-[9px] font-black", "text-emerald-400")}>{item.change}</p>
+                        <p className="text-[9px] font-black text-emerald-400 uppercase">Synced</p>
                       </div>
                     </div>
                   ))}
@@ -265,32 +264,31 @@ const Calculator = () => {
                 <div className="space-y-3">
                   <div className="flex items-center gap-3">
                     <Info className="h-4 w-4 text-orange-400" />
-                    <h4 className="font-black text-lg tracking-tight italic text-white uppercase">Market Direct</h4>
+                    <h4 className="font-black text-lg tracking-tight italic text-white uppercase">Explorer Data</h4>
                   </div>
                   <p className="text-slate-200 text-xs leading-relaxed font-bold">
-                    View full order books and depth for TAB directly on the exchange terminal.
+                    View on-chain supply, holders, and contract details for TAB on the XPR Network.
                   </p>
                 </div>
                 
                 <div className="flex flex-col gap-3">
                   <Button 
                     asChild
-                    className="w-full bg-purple-600 hover:bg-purple-700 text-white font-black h-14 rounded-2xl shadow-lg shadow-purple-500/20 text-lg group transition-all"
+                    className="w-full bg-white/5 border border-white/20 hover:bg-white/10 text-white font-black h-14 rounded-2xl shadow-lg text-sm group transition-all"
                   >
-                    <a href="https://alcor.exchange/v/xpr/terminal/tab-tokencreate" target="_blank" rel="noopener noreferrer">
-                      View Alcor Terminal
-                      <ArrowUpRight className="ml-1 h-4 w-4 opacity-70 group-hover:opacity-100 transition-opacity" />
+                    <a href={explorerLink} target="_blank" rel="noopener noreferrer">
+                      <ExternalLink className="mr-2 h-4 w-4" />
+                      View Token Explorer
                     </a>
                   </Button>
                   
                   <Button 
                     asChild
-                    variant="outline"
-                    className="w-full bg-white/5 border-white/10 text-white font-black h-12 rounded-xl hover:bg-white/10 transition-all text-sm"
+                    className="w-full bg-orange-500 hover:bg-orange-600 text-white font-black h-12 rounded-xl transition-all text-sm"
                   >
                     <a href={buyTabLink} target="_blank" rel="noopener noreferrer">
                       <ShoppingCart className="mr-2 h-4 w-4" />
-                      Swap XPR for TAB
+                      Trade on Alcor
                     </a>
                   </Button>
                 </div>
