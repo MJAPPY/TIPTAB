@@ -9,7 +9,8 @@ import {
   Menu,
   Map as MapIcon,
   Calculator as CalcIcon,
-  CheckCircle2
+  CheckCircle2,
+  Coins
 } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useState, useEffect } from "react";
@@ -29,32 +30,43 @@ interface HeaderProps {
 export const Header = ({ onBecomeCreator }: HeaderProps) => {
   const [isOpen, setIsOpen] = useState(false);
   const [isConnected, setIsConnected] = useState(false);
-  const [walletAddress, setWalletAddress] = useState("");
+  const [walletData, setWalletData] = useState({
+    address: "",
+    username: "",
+    tabBalance: "0",
+    xprBalance: "0"
+  });
   const { toast } = useToast();
 
   // Load connection state from storage on mount
   useEffect(() => {
     const saved = localStorage.getItem("tiptab_wallet_connected");
-    const address = localStorage.getItem("tiptab_wallet_address");
-    if (saved === "true" && address) {
+    const data = localStorage.getItem("tiptab_wallet_data");
+    if (saved === "true" && data) {
       setIsConnected(true);
-      setWalletAddress(address);
+      setWalletData(JSON.parse(data));
     }
   }, []);
 
   const handleConnect = () => {
     if (isConnected) return; // Already connected
 
-    // Simulate connection
-    const mockAddress = "0x71c...4f2a";
+    // Simulate connection with real XPR-style metadata
+    const mockData = {
+      address: "0x71c...4f2a",
+      username: "cryptopro",
+      tabBalance: "12,500",
+      xprBalance: "45,000"
+    };
+
     setIsConnected(true);
-    setWalletAddress(mockAddress);
+    setWalletData(mockData);
     localStorage.setItem("tiptab_wallet_connected", "true");
-    localStorage.setItem("tiptab_wallet_address", mockAddress);
+    localStorage.setItem("tiptab_wallet_data", JSON.stringify(mockData));
     
     toast({
       title: "Wallet Connected",
-      description: "Successfully connected to WebAuth Protocol.",
+      description: `Welcome back, @${mockData.username}!`,
     });
   };
 
@@ -133,19 +145,31 @@ export const Header = ({ onBecomeCreator }: HeaderProps) => {
 
           {/* Right Actions */}
           <div className="flex items-center gap-2 md:gap-4">
+            {isConnected ? (
+              <div className="hidden md:flex items-center gap-3 mr-2">
+                <div className="flex flex-col items-end -space-y-1">
+                  <span className="text-[10px] font-black text-orange-500 uppercase tracking-widest">{walletData.tabBalance} TAB</span>
+                  <span className="text-[10px] font-bold text-white/40 uppercase tracking-widest">{walletData.xprBalance} XPR</span>
+                </div>
+                <div className="h-8 w-px bg-white/10" />
+              </div>
+            ) : null}
+
             <Button 
               onClick={handleConnect}
-              className={`flex items-center gap-2 rounded-2xl h-10 md:h-14 px-4 md:px-10 font-black text-[10px] md:text-base transition-all active:scale-95 group shrink-0 ${
+              className={`flex items-center gap-2 rounded-2xl h-10 md:h-14 px-4 md:px-8 font-black text-[10px] md:text-sm transition-all active:scale-95 group shrink-0 ${
                 isConnected 
-                  ? "bg-green-500/10 border border-green-500/20 text-green-400 hover:bg-green-500/20" 
+                  ? "bg-white/5 border border-white/10 text-white hover:bg-white/10 shadow-xl" 
                   : "bg-[#a855f7] hover:bg-[#9333ea] text-white shadow-2xl shadow-purple-500/40"
               }`}
             >
               {isConnected ? (
                 <>
-                  <CheckCircle2 className="h-4 w-4 md:h-6 md:w-6" />
-                  <span className="hidden xs:inline whitespace-nowrap">{walletAddress}</span>
-                  <span className="xs:hidden">Linked</span>
+                  <div className="flex flex-col items-start -space-y-1 text-left mr-2">
+                    <span className="text-[10px] md:text-xs font-black text-purple-400">@{walletData.username}</span>
+                    <span className="text-[8px] md:text-[9px] font-bold text-white/40 uppercase tracking-tighter">{walletData.address}</span>
+                  </div>
+                  <CheckCircle2 className="h-4 w-4 md:h-5 md:w-5 text-green-500" />
                 </>
               ) : (
                 <>
@@ -170,6 +194,29 @@ export const Header = ({ onBecomeCreator }: HeaderProps) => {
                   </SheetTitle>
                 </SheetHeader>
                 <div className="flex flex-col gap-5">
+                  {isConnected && (
+                    <div className="bg-white/5 border border-white/10 rounded-2xl p-5 mb-2 space-y-3">
+                      <div className="flex items-center gap-3">
+                        <div className="h-10 w-10 rounded-full bg-purple-500/20 flex items-center justify-center">
+                          <CheckCircle2 className="h-5 w-5 text-purple-400" />
+                        </div>
+                        <div>
+                          <p className="text-xs font-black text-purple-400">@{walletData.username}</p>
+                          <p className="text-[10px] font-bold text-white/40">{walletData.address}</p>
+                        </div>
+                      </div>
+                      <div className="pt-3 border-t border-white/5 grid grid-cols-2 gap-4">
+                        <div>
+                          <p className="text-[8px] font-black uppercase text-white/30 tracking-widest">TAB Balance</p>
+                          <p className="text-xs font-black text-orange-500">{walletData.tabBalance}</p>
+                        </div>
+                        <div>
+                          <p className="text-[8px] font-black uppercase text-white/30 tracking-widest">XPR Balance</p>
+                          <p className="text-xs font-black text-white">{walletData.xprBalance}</p>
+                        </div>
+                      </div>
+                    </div>
+                  )}
                   <Link to="/" onClick={() => setIsOpen(false)}>
                     <Button 
                       variant="ghost" 
