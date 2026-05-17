@@ -7,7 +7,7 @@ export const StatsBanner = () => {
     { label: "Settlement", value: "Instant & Zero Fee", color: "text-green-400" },
     { label: "Platform", value: "TAB Token Rewards", color: "text-blue-400" },
     { label: "Security", value: "On-Chain Verified", color: "text-orange-400" },
-    { label: "Ecosystem", value: "Global XPR Network Hub", color: "text-purple-400" }
+    { label: "Ecosystem", value: "Global XPR Network", color: "text-purple-400" }
   ];
 
   return (
