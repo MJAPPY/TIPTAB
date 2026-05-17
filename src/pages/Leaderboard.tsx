@@ -2,12 +2,13 @@
 
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
-import { Trophy, ArrowLeft, Zap, Star, Crown, Flame, Medal } from "lucide-react";
+import { Trophy, ArrowLeft, Zap, Star, Crown, Flame, Medal, Users } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Header } from "@/components/tab-platform/Header";
 import { MembershipModal } from "@/components/tab-platform/MembershipModal";
 import { CREATORS } from "@/data/creators";
 
+// Generate mock stats for creators and sort by tip amount
 const LEADERBOARD_DATA = CREATORS.map((creator, index) => ({
   ...creator,
   totalTips: [125000, 98400, 82100, 45000, 32000, 28000, 15000, 12000, 5000][index] || 1000,
@@ -16,8 +17,11 @@ const LEADERBOARD_DATA = CREATORS.map((creator, index) => ({
 
 const Leaderboard = () => {
   const [isMembershipOpen, setIsMembershipOpen] = useState(false);
+  
+  // Display limit for the leaderboard
+  const DISPLAY_LIMIT = 50;
   const topThree = LEADERBOARD_DATA.slice(0, 3);
-  const others = LEADERBOARD_DATA.slice(3);
+  const others = LEADERBOARD_DATA.slice(3, DISPLAY_LIMIT);
 
   return (
     <div className="min-h-screen bg-[#06030e] text-white overflow-x-hidden relative selection:bg-cyan-500/30">
@@ -34,12 +38,26 @@ const Leaderboard = () => {
               TIP <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 via-magenta-500 to-yellow-400">LEADERBOARD</span>
             </h1>
           </div>
-          <p className="text-cyan-300 font-black uppercase tracking-[0.3em] md:tracking-[0.4em] text-[10px] md:text-xs mt-6 drop-shadow-[0_0_10px_rgba(103,232,249,0.4)]">
-            The Global XPR Network Top Earners
-          </p>
+          
+          <div className="mt-8 flex flex-wrap items-center justify-center gap-4">
+            <div className="bg-white/5 border border-white/10 px-6 py-2 rounded-2xl flex items-center gap-3">
+              <Users className="h-4 w-4 text-cyan-400" />
+              <span className="text-[10px] md:text-xs font-black uppercase tracking-widest text-white/60">
+                {LEADERBOARD_DATA.length} Total Participants
+              </span>
+            </div>
+            <div className="bg-orange-500/10 border border-orange-500/20 px-6 py-2 rounded-2xl flex items-center gap-3">
+              <Star className="h-4 w-4 text-orange-500" />
+              <span className="text-[10px] md:text-xs font-black uppercase tracking-widest text-orange-500">
+                Top {DISPLAY_LIMIT} Elite
+              </span>
+            </div>
+          </div>
         </div>
 
+        {/* Podium Section */}
         <div className="flex flex-col md:flex-row items-center md:items-end justify-center gap-8 md:gap-6 mb-24 lg:mb-32">
+          {/* 2nd Place */}
           <div className="w-full max-w-sm md:w-72 order-2 md:order-1 animate-in slide-in-from-bottom-8 duration-700 delay-100">
             <div className="bg-[#120a21]/80 border-2 border-slate-400/50 rounded-[40px] p-6 md:p-8 text-center relative group hover:border-slate-400 transition-all shadow-[0_0_30px_rgba(148,163,184,0.1)]">
               <div className="absolute -top-4 md:-top-6 left-1/2 -translate-x-1/2 bg-slate-300 text-black font-black px-4 py-1 rounded-full text-[10px] md:text-xs uppercase tracking-widest shadow-lg">2nd Place</div>
@@ -59,6 +77,7 @@ const Leaderboard = () => {
             </div>
           </div>
 
+          {/* 1st Place */}
           <div className="w-full max-w-sm md:w-80 order-1 md:order-2 animate-in zoom-in-95 duration-1000 scale-105 md:scale-110">
             <div className="bg-[#1a0f2e]/80 border-4 border-yellow-400/60 rounded-[48px] p-8 md:p-10 text-center relative group hover:border-yellow-400 transition-all shadow-[0_0_60px_rgba(250,204,21,0.2)] md:-translate-y-8 overflow-hidden">
               <div className="absolute top-2 right-2 p-2 md:p-4">
@@ -81,6 +100,7 @@ const Leaderboard = () => {
             </div>
           </div>
 
+          {/* 3rd Place */}
           <div className="w-full max-w-sm md:w-72 order-3 animate-in slide-in-from-bottom-8 duration-700 delay-200">
             <div className="bg-[#120a21]/80 border-2 border-orange-700/50 rounded-[40px] p-6 md:p-8 text-center relative group hover:border-orange-700 transition-all shadow-[0_0_30px_rgba(194,65,12,0.1)]">
               <div className="absolute -top-4 md:-top-6 left-1/2 -translate-x-1/2 bg-orange-600 text-white font-black px-4 py-1 rounded-full text-[10px] md:text-xs uppercase tracking-widest shadow-lg">3rd Place</div>
@@ -101,6 +121,7 @@ const Leaderboard = () => {
           </div>
         </div>
 
+        {/* List Section */}
         <div className="max-w-4xl mx-auto space-y-4">
           <div className="flex items-center justify-between px-6 md:px-8 py-4 text-cyan-200 font-black uppercase tracking-widest text-[9px] md:text-[10px]">
             <div className="flex items-center gap-6 md:gap-12">
@@ -147,9 +168,17 @@ const Leaderboard = () => {
               </div>
             </div>
           ))}
+          
+          {LEADERBOARD_DATA.length > DISPLAY_LIMIT && (
+            <div className="pt-10 text-center">
+              <p className="text-white/20 text-[10px] font-black uppercase tracking-[0.3em]">
+                + {LEADERBOARD_DATA.length - DISPLAY_LIMIT} more participants in the ranking
+              </p>
+            </div>
+          )}
         </div>
 
-        {/* Updated Call to Action Section */}
+        {/* CTA Section */}
         <div className="mt-24 md:mt-32 p-8 md:p-16 rounded-[40px] md:rounded-[60px] bg-gradient-to-r from-magenta-600/30 via-purple-600/30 to-cyan-600/30 border-2 border-white/20 text-center relative overflow-hidden group">
           <div className="absolute top-0 left-0 w-full h-full bg-[url('https://www.transparenttextures.com/patterns/stardust.png')] opacity-10 pointer-events-none" />
           <Star className="h-10 w-10 md:h-12 md:w-12 text-yellow-400 mx-auto mb-6 animate-spin-slow drop-shadow-[0_0_15px_rgba(250,204,21,0.5)]" />
