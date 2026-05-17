@@ -1,7 +1,17 @@
 import { Button } from "@/components/ui/button";
 import { Zap, ArrowRight, UserCheck, Sparkles, Globe, Heart } from "lucide-react";
+import { Creator } from "@/data/creators";
 
-export const Hero = () => {
+interface HeroProps {
+  creators: Creator[];
+}
+
+export const Hero = ({ creators }: HeroProps) => {
+  // Take the first 4 creators for the preview avatars
+  const previewCreators = creators.slice(0, 4);
+  // Calculate a dynamic count (using a base of 10k to maintain the 'scale' vibe)
+  const formattedCount = (10 + (creators.length / 1000)).toFixed(1);
+
   return (
     <section className="relative pt-48 pb-32 overflow-hidden">
       {/* Cinematic Background */}
@@ -38,14 +48,24 @@ export const Hero = () => {
 
             <div className="flex items-center gap-4 pt-4">
               <div className="flex -space-x-3">
-                {[1,2,3,4].map(i => (
-                  <div key={i} className="h-12 w-12 rounded-full border-4 border-[#0a0514] bg-white/10 bg-gradient-to-br from-white/20 to-transparent flex items-center justify-center font-black text-[10px]">
-                    {i}k+
+                {previewCreators.map((creator) => (
+                  <div 
+                    key={creator.id} 
+                    className={`h-12 w-12 rounded-full border-4 border-[#0a0514] ${creator.color} flex items-center justify-center font-black text-[10px] overflow-hidden shadow-xl`}
+                  >
+                    {creator.avatarImage ? (
+                      <img src={creator.avatarImage} alt={creator.name} className="w-full h-full object-cover" />
+                    ) : (
+                      creator.avatar
+                    )}
                   </div>
                 ))}
+                <div className="h-12 w-12 rounded-full border-4 border-[#0a0514] bg-white/10 backdrop-blur-sm flex items-center justify-center font-black text-[10px] text-white/60">
+                  +{creators.length > 4 ? creators.length - 4 : 0}
+                </div>
               </div>
               <p className="text-sm font-bold text-white/30 tracking-wide">
-                Join <span className="text-white">10k+</span> service pros & creators
+                Join <span className="text-white">{formattedCount}k+</span> service pros & creators
               </p>
             </div>
           </div>

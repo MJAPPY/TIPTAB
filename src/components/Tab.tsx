@@ -21,7 +21,12 @@ export const Tab = () => {
     if (!savedUser) return CREATORS;
     
     const localUser = JSON.parse(savedUser) as Creator;
-    return CREATORS.map(c => c.id === localUser.id ? localUser : c);
+    // Check if user is already in CREATORS (by handle or ID)
+    const exists = CREATORS.find(c => c.id === localUser.id);
+    if (exists) {
+      return CREATORS.map(c => c.id === localUser.id ? localUser : c);
+    }
+    return [localUser, ...CREATORS];
   }, []);
 
   return (
@@ -30,7 +35,7 @@ export const Tab = () => {
       <Header onBecomeCreator={() => setIsMembershipOpen(true)} />
       
       <main className="pt-10">
-        <Hero />
+        <Hero creators={displayCreators} />
         <StatsBanner />
         
         <section className="py-12 container mx-auto px-6">
