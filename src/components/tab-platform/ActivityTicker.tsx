@@ -26,15 +26,21 @@ export const ActivityTicker = () => {
   };
 
   return (
-    <div className="fixed top-32 left-0 right-0 z-40 bg-[#0a0514]/60 backdrop-blur-xl border-y border-white/5 h-10 flex items-center overflow-hidden shadow-[0_10px_30px_rgba(0,0,0,0.3)]">
-      {/* Live Indicator Badge */}
-      <div className="relative z-20 flex items-center h-full bg-orange-600/90 px-4 gap-2">
-        <div className="h-2 w-2 rounded-full bg-white animate-pulse" />
-        <span className="text-[9px] font-black uppercase tracking-[0.2em] text-white whitespace-nowrap">Live Feed</span>
-        <div className="absolute top-0 right-0 bottom-0 w-8 bg-gradient-to-r from-[#0a0514]/0 to-transparent translate-x-full" />
+    <div className="fixed top-32 left-0 right-0 z-40 bg-[#0a0514]/40 backdrop-blur-xl border-y border-white/5 h-10 flex items-center overflow-hidden shadow-[0_10px_30px_rgba(0,0,0,0.3)]">
+      {/* Live Indicator Badge with Blended Flame Look */}
+      <div className="relative z-30 flex items-center h-full pl-6 pr-10">
+        <div className="absolute inset-0 bg-orange-600/90 [clip-path:polygon(0%_0%,_100%_0%,_85%_100%,_0%_100%)] shadow-[10px_0_20px_rgba(234,88,12,0.5)]" />
+        <div className="absolute inset-y-0 right-0 w-20 bg-gradient-to-r from-orange-600/90 to-transparent z-10 translate-x-[20%]" />
+        
+        <div className="relative z-20 flex items-center gap-2.5">
+          <div className="h-2 w-2 rounded-full bg-white animate-pulse shadow-[0_0_8px_rgba(255,255,255,0.8)]" />
+          <span className="text-[10px] font-black uppercase tracking-[0.25em] text-white whitespace-nowrap drop-shadow-md">
+            Live Feed
+          </span>
+        </div>
       </div>
 
-      <div className="flex whitespace-nowrap animate-marquee items-center pl-10">
+      <div className="flex whitespace-nowrap animate-marquee items-center pl-4 relative z-10">
         {/* First set of activities */}
         {ACTIVITIES.map((activity, i) => (
           <div key={`a-${i}`} className="flex items-center gap-3 px-10 group cursor-default">
