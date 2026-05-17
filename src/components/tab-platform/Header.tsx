@@ -61,9 +61,9 @@ export const Header = ({ onBecomeCreator }: HeaderProps) => {
   );
 
   return (
-    <header className="fixed top-14 left-0 right-0 z-50 px-3 md:px-6">
-      <div className="container mx-auto max-w-7xl">
-        <div className="border border-white/10 bg-[#0a0514]/90 backdrop-blur-xl rounded-[24px] md:rounded-full px-3 md:px-6 py-2.5 md:py-3 flex items-center justify-between shadow-[0_20px_50px_rgba(0,0,0,0.6)]">
+    <header className="fixed top-[52px] left-0 right-0 z-50 px-2 md:px-4">
+      <div className="mx-auto w-full max-w-[98%] xl:max-w-[1600px]">
+        <div className="border border-white/10 bg-[#0a0514]/85 backdrop-blur-md rounded-2xl md:rounded-full px-3 md:px-8 py-2 md:py-3.5 flex items-center justify-between shadow-[0_20px_60px_rgba(0,0,0,0.7)]">
           
           {/* Logo Section */}
           <Link to="/" className="flex items-center gap-2 md:gap-4 group shrink-0">
@@ -71,58 +71,58 @@ export const Header = ({ onBecomeCreator }: HeaderProps) => {
               <div className="absolute inset-0 bg-orange-500/20 blur-lg rounded-full group-hover:scale-110 transition-transform" />
               <img src="/src/assets/logo.png" alt="TIPTAB Logo" className="h-10 w-10 md:h-14 md:w-14 object-contain relative z-10" />
             </div>
-            <div className="flex flex-col -space-y-1">
-              <span className="text-xl md:text-3xl font-black italic tracking-tighter text-white group-hover:text-[#a855f7] transition-colors duration-300">
+            <div className="flex flex-col -space-y-0.5 md:-space-y-1">
+              <span className="text-lg md:text-3xl font-black italic tracking-tighter text-white group-hover:text-[#a855f7] transition-colors duration-300">
                 TIP<span className="text-orange-500">TAB</span>
               </span>
-              <span className="text-[7px] md:text-[9px] text-muted-foreground hidden xs:inline uppercase tracking-widest font-black opacity-60">
+              <span className="text-[7px] md:text-[10px] text-muted-foreground uppercase tracking-widest font-black opacity-60">
                 Appreciation Hub
               </span>
             </div>
           </Link>
 
-          {/* Desktop Navigation */}
-          <div className="hidden xl:flex items-center gap-2">
+          {/* Desktop Navigation (Centered-ish) */}
+          <div className="hidden xl:flex items-center gap-3 mx-4">
             <NavItems />
           </div>
 
           {/* Right Actions */}
           <div className="flex items-center gap-2 md:gap-4">
-            <Button className="bg-[#a855f7] hover:bg-[#9333ea] text-white flex items-center gap-2 rounded-xl md:rounded-full h-10 md:h-12 px-3 md:px-8 font-black text-xs md:text-sm shadow-xl shadow-purple-500/30 transition-all active:scale-95 group">
-              <Wallet className="h-4 w-4 md:h-5 md:w-5 group-hover:rotate-12 transition-transform" />
-              <span className="hidden sm:inline whitespace-nowrap">Connect WebAuth</span>
-              <span className="sm:hidden font-black uppercase tracking-tighter">Connect</span>
+            <Button className="bg-[#a855f7] hover:bg-[#9333ea] text-white flex items-center gap-2 rounded-xl md:rounded-full h-10 md:h-14 px-3 md:px-10 font-black text-[10px] md:text-base shadow-2xl shadow-purple-500/40 transition-all active:scale-95 group shrink-0">
+              <Wallet className="h-4 w-4 md:h-6 md:w-6 group-hover:rotate-12 transition-transform" />
+              <span className="hidden xs:inline whitespace-nowrap">Connect WebAuth</span>
+              <span className="xs:hidden">Connect</span>
             </Button>
 
             {/* Mobile Menu Trigger */}
             <Sheet open={isOpen} onOpenChange={setIsOpen}>
               <SheetTrigger asChild>
-                <Button variant="ghost" size="icon" className="xl:hidden text-white hover:bg-white/10 h-10 w-10 md:h-12 md:w-12 rounded-xl md:rounded-full border border-white/10">
-                  <Menu className="h-5 w-5" />
+                <Button variant="ghost" size="icon" className="xl:hidden text-white hover:bg-white/10 h-10 w-10 md:h-14 md:w-14 rounded-xl md:rounded-full border border-white/10 shrink-0">
+                  <Menu className="h-5 w-5 md:h-6 md:w-6" />
                 </Button>
               </SheetTrigger>
-              <SheetContent side="right" className="bg-[#0a0514]/95 backdrop-blur-2xl border-white/10 p-6 pt-12 w-[300px]">
-                <SheetHeader className="text-left mb-8">
-                  <SheetTitle className="text-2xl font-black italic text-white">
+              <SheetContent side="right" className="bg-[#0a0514]/98 backdrop-blur-3xl border-white/10 p-8 pt-16 w-[320px]">
+                <SheetHeader className="text-left mb-10">
+                  <SheetTitle className="text-3xl font-black italic text-white tracking-tighter">
                     TIP<span className="text-orange-500">TAB</span>
                   </SheetTitle>
                 </SheetHeader>
-                <div className="flex flex-col gap-4">
+                <div className="flex flex-col gap-5">
                   <Link to="/" onClick={() => setIsOpen(false)}>
                     <Button 
                       variant="ghost" 
-                      className="w-full text-white hover:text-cyan-400 flex items-center justify-start gap-3 font-bold bg-white/5 border border-white/10 rounded-xl h-14 px-5"
+                      className="w-full text-white hover:text-cyan-400 flex items-center justify-start gap-4 font-bold bg-white/5 border border-white/10 rounded-2xl h-16 px-6"
                     >
-                      <MapIcon className="h-5 w-5" />
+                      <MapIcon className="h-6 w-6" />
                       View Map
                     </Button>
                   </Link>
                   <NavItems />
                 </div>
-                <div className="absolute bottom-10 left-6 right-6 text-center space-y-4">
-                   <div className="h-px bg-white/5 w-full" />
-                   <p className="text-[10px] font-black uppercase tracking-[0.2em] text-white/20">
-                    Tipping is Appreciation
+                <div className="absolute bottom-12 left-8 right-8 text-center">
+                   <div className="h-px bg-white/10 w-full mb-6" />
+                   <p className="text-[11px] font-black uppercase tracking-[0.3em] text-white/20">
+                    Network Status: Online
                   </p>
                 </div>
               </SheetContent>
