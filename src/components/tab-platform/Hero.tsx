@@ -62,31 +62,6 @@ export const Hero = () => {
                   className="w-full max-w-[480px] mx-auto drop-shadow-[0_0_50px_rgba(249,115,22,0.4)] animate-delayed-spin cursor-pointer transition-transform duration-700 group-hover:scale-105"
                 />
               </div>
-              
-              {/* Floating elements optimized for a clean glass effect */}
-              <div className="absolute -top-12 -left-16 bg-white/[0.03] backdrop-blur-[32px] border border-white/20 p-6 rounded-[32px] shadow-[0_32px_64px_-16px_rgba(0,0,0,0.6)] animate-float">
-                <div className="flex items-center gap-4">
-                  <div className="h-12 w-12 rounded-2xl bg-orange-500 flex items-center justify-center shadow-lg shadow-orange-500/20">
-                    <Zap className="h-7 w-7 text-white fill-white" />
-                  </div>
-                  <div>
-                    <p className="text-[10px] font-black uppercase tracking-[0.2em] text-white/40 mb-0.5">Recent Tip</p>
-                    <p className="text-2xl font-black text-white">500 TAB</p>
-                  </div>
-                </div>
-              </div>
-
-              <div className="absolute -bottom-4 -right-12 bg-white/[0.03] backdrop-blur-[32px] border border-white/20 p-6 rounded-[32px] shadow-[0_32px_64px_-16px_rgba(0,0,0,0.6)] animate-float-delayed">
-                <div className="flex items-center gap-4">
-                  <div className="h-12 w-12 rounded-2xl bg-purple-500 flex items-center justify-center shadow-lg shadow-purple-500/20">
-                    <Sparkles className="h-7 w-7 text-white fill-white" />
-                  </div>
-                  <div>
-                    <p className="text-[10px] font-black uppercase tracking-[0.2em] text-white/40 mb-0.5">New Creator</p>
-                    <p className="text-2xl font-black text-white">@alex_arts</p>
-                  </div>
-                </div>
-              </div>
             </div>
           </div>
         </div>
@@ -100,17 +75,6 @@ export const Hero = () => {
         .animate-delayed-spin {
           animation: delayed-spin 20s cubic-bezier(0.4, 0, 0.2, 1) infinite;
           animation-delay: 10s;
-        }
-        @keyframes float {
-          0%, 100% { transform: translateY(0) translateX(0); }
-          50% { transform: translateY(-15px) translateX(5px); }
-        }
-        .animate-float {
-          animation: float 6s ease-in-out infinite;
-        }
-        .animate-float-delayed {
-          animation: float 6s ease-in-out infinite;
-          animation-delay: 3s;
         }
       `}</style>
     </section>
