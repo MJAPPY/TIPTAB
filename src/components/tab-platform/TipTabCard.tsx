@@ -97,9 +97,12 @@ export const TipTabCard = ({ creator }: TipTabCardProps) => {
             </div>
           </div>
           <div className="flex flex-col items-end shrink-0">
-             <span className="text-xl font-black italic tracking-tighter bg-gradient-to-b from-slate-50 to-slate-400 bg-clip-text text-transparent">
-              TIP<span className="text-orange-500">TAB</span>
-             </span>
+             <div className="flex items-center gap-2">
+               <img src="/src/assets/logo.png" alt="TAB" className="h-6 w-6 object-contain" />
+               <span className="text-xl font-black italic tracking-tighter bg-gradient-to-b from-slate-50 to-slate-400 bg-clip-text text-transparent">
+                TIP<span className="text-orange-500">TAB</span>
+               </span>
+             </div>
              <div className="mt-1 flex items-center gap-1 px-2 py-0.5 rounded-full bg-slate-500/20 border border-slate-500/30">
                <Heart className="h-3 w-3 text-slate-300 fill-slate-300" />
                <span className="text-[10px] font-black text-slate-300 uppercase tracking-widest">Verified</span>
