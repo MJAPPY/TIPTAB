@@ -1,5 +1,5 @@
-import React, { useState } from "react";
-import { User, AtSign, MapPin, Globe, Twitter, Edit3, Save, Image as ImageIcon } from "lucide-react";
+import React, { useState, useEffect } from "react";
+import { User, AtSign, MapPin, Globe, Twitter, Save, Image as ImageIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -15,8 +15,8 @@ interface ProfileEditorProps {
 }
 
 export const ProfileEditor = ({ initialData, onSave }: ProfileEditorProps) => {
-  const [isEditing, setIsEditing] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
+  const [hasChanged, setHasChanged] = useState(false);
   const [formData, setFormData] = useState({
     name: initialData.name,
     handle: initialData.handle,
@@ -29,11 +29,25 @@ export const ProfileEditor = ({ initialData, onSave }: ProfileEditorProps) => {
 
   const { toast } = useToast();
 
+  // Reset form when initialData changes (e.g. from a different tab)
+  useEffect(() => {
+    setFormData({
+      name: initialData.name,
+      handle: initialData.handle,
+      bio: initialData.bio,
+      location: initialData.location,
+      category: initialData.category,
+      twitter: initialData.twitter || "",
+      website: initialData.website || "",
+    });
+    setHasChanged(false);
+  }, [initialData]);
+
   const handleSave = async () => {
     setIsSaving(true);
     try {
       // Simulate network delay
-      await new Promise((resolve) => setTimeout(resolve, 1000));
+      await new Promise((resolve) => setTimeout(resolve, 800));
       
       const updatedCreator: Creator = {
         ...initialData,
@@ -41,11 +55,11 @@ export const ProfileEditor = ({ initialData, onSave }: ProfileEditorProps) => {
       };
       
       onSave(updatedCreator);
-      setIsEditing(false);
+      setHasChanged(false);
       
       toast({
         title: "Profile Updated",
-        description: "Your changes have been saved to the XPR Network.",
+        description: "Your changes have been saved to your profile.",
       });
     } catch (error) {
       toast({
@@ -61,6 +75,12 @@ export const ProfileEditor = ({ initialData, onSave }: ProfileEditorProps) => {
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { id, value } = e.target;
     setFormData((prev) => ({ ...prev, [id]: value }));
+    setHasChanged(true);
+  };
+
+  const handleCategoryChange = (val: string) => {
+    setFormData((prev) => ({ ...prev, category: val }));
+    setHasChanged(true);
   };
 
   return (
@@ -68,45 +88,19 @@ export const ProfileEditor = ({ initialData, onSave }: ProfileEditorProps) => {
       <CardHeader className="p-8 border-b border-white/10 flex flex-row items-center justify-between">
         <div>
           <CardTitle className="text-2xl font-black">Public Profile</CardTitle>
-          <CardDescription className="text-white/40">Manage how you appear on the global map</CardDescription>
+          <CardDescription className="text-white/40">Update how you appear to others on the global map</CardDescription>
         </div>
-        {!isEditing ? (
-          <Button 
-            variant="secondary" 
-            onClick={() => setIsEditing(true)}
-            className="rounded-xl gap-2 font-bold bg-white/5 border-white/10 hover:bg-white/10"
-          >
-            <Edit3 className="h-4 w-4" /> Edit Profile
-          </Button>
-        ) : (
-          <div className="flex gap-2">
-            <Button 
-              variant="ghost" 
-              onClick={() => {
-                setFormData({
-                  name: initialData.name,
-                  handle: initialData.handle,
-                  bio: initialData.bio,
-                  location: initialData.location,
-                  category: initialData.category,
-                  twitter: initialData.twitter || "",
-                  website: initialData.website || "",
-                });
-                setIsEditing(false);
-              }}
-              className="rounded-xl font-bold text-white/60 hover:text-white"
-            >
-              Cancel
-            </Button>
-            <Button 
-              onClick={handleSave}
-              disabled={isSaving}
-              className="rounded-xl gap-2 font-bold bg-purple-600 hover:bg-purple-500 text-white"
-            >
-              {isSaving ? "Saving..." : <><Save className="h-4 w-4" /> Save Changes</>}
-            </Button>
-          </div>
-        )}
+        <Button 
+          onClick={handleSave}
+          disabled={isSaving || !hasChanged}
+          className={`rounded-xl gap-2 font-bold transition-all h-12 px-6 ${
+            hasChanged 
+              ? "bg-purple-600 hover:bg-purple-500 text-white shadow-lg shadow-purple-500/20" 
+              : "bg-white/5 text-white/20 border-white/5 cursor-not-allowed"
+          }`}
+        >
+          {isSaving ? "Saving..." : <><Save className="h-4 w-4" /> Save Changes</>}
+        </Button>
       </CardHeader>
       <CardContent className="p-8">
         <div className="space-y-8">
@@ -117,7 +111,7 @@ export const ProfileEditor = ({ initialData, onSave }: ProfileEditorProps) => {
             <div className="space-y-2">
               <h4 className="font-bold text-lg">Profile Avatar</h4>
               <p className="text-sm text-white/40">Your avatar is currently generated from your name.</p>
-              <Button variant="outline" size="sm" className="rounded-lg border-white/10 text-white/60 hover:text-white h-9">
+              <Button variant="outline" size="sm" className="rounded-lg border-white/10 text-white/60 hover:text-white h-9 bg-white/5">
                 <ImageIcon className="h-4 w-4 mr-2" /> Change Color
               </Button>
             </div>
@@ -130,10 +124,10 @@ export const ProfileEditor = ({ initialData, onSave }: ProfileEditorProps) => {
                 <User className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-purple-500" />
                 <Input 
                   id="name"
-                  disabled={!isEditing} 
                   value={formData.name}
                   onChange={handleChange}
-                  className="pl-12 bg-white/5 border-white/10 h-14 rounded-2xl focus:ring-purple-500 transition-all" 
+                  placeholder="Enter your name"
+                  className="pl-12 bg-white/5 border-white/10 h-14 rounded-2xl focus:ring-purple-500 focus:bg-white/10 transition-all text-white" 
                 />
               </div>
             </div>
@@ -144,10 +138,10 @@ export const ProfileEditor = ({ initialData, onSave }: ProfileEditorProps) => {
                 <AtSign className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-purple-500" />
                 <Input 
                   id="handle"
-                  disabled={!isEditing} 
                   value={formData.handle}
                   onChange={handleChange}
-                  className="pl-12 bg-white/5 border-white/10 h-14 rounded-2xl focus:ring-purple-500 transition-all" 
+                  placeholder="username"
+                  className="pl-12 bg-white/5 border-white/10 h-14 rounded-2xl focus:ring-purple-500 focus:bg-white/10 transition-all text-white" 
                 />
               </div>
             </div>
@@ -156,11 +150,10 @@ export const ProfileEditor = ({ initialData, onSave }: ProfileEditorProps) => {
               <Label htmlFor="bio" className="text-white/60 font-bold uppercase tracking-widest text-[10px]">Short Bio</Label>
               <Textarea 
                 id="bio"
-                disabled={!isEditing} 
                 value={formData.bio}
                 onChange={handleChange}
                 placeholder="Tell the world what you build..."
-                className="bg-white/5 border-white/10 min-h-[120px] rounded-2xl focus:ring-purple-500 transition-all resize-none p-4" 
+                className="bg-white/5 border-white/10 min-h-[120px] rounded-2xl focus:ring-purple-500 focus:bg-white/10 transition-all resize-none p-4 text-white" 
               />
             </div>
 
@@ -170,10 +163,10 @@ export const ProfileEditor = ({ initialData, onSave }: ProfileEditorProps) => {
                 <MapPin className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-purple-500" />
                 <Input 
                   id="location"
-                  disabled={!isEditing} 
                   value={formData.location}
                   onChange={handleChange}
-                  className="pl-12 bg-white/5 border-white/10 h-14 rounded-2xl focus:ring-purple-500 transition-all" 
+                  placeholder="City, Country"
+                  className="pl-12 bg-white/5 border-white/10 h-14 rounded-2xl focus:ring-purple-500 focus:bg-white/10 transition-all text-white" 
                 />
               </div>
             </div>
@@ -181,16 +174,15 @@ export const ProfileEditor = ({ initialData, onSave }: ProfileEditorProps) => {
             <div className="space-y-2">
               <Label className="text-white/60 font-bold uppercase tracking-widest text-[10px]">Category</Label>
               <Select 
-                disabled={!isEditing} 
                 value={formData.category}
-                onValueChange={(val) => setFormData(prev => ({ ...prev, category: val }))}
+                onValueChange={handleCategoryChange}
               >
-                <SelectTrigger className="bg-white/5 border-white/10 h-14 rounded-2xl focus:ring-purple-500 transition-all">
+                <SelectTrigger className="bg-white/5 border-white/10 h-14 rounded-2xl focus:ring-purple-500 focus:bg-white/10 transition-all text-white">
                   <SelectValue placeholder="Select a category" />
                 </SelectTrigger>
                 <SelectContent className="bg-[#1a102d] border-white/10 text-white rounded-xl">
                   {["Content", "Dev", "Art", "Education", "Gaming", "Music", "Sports", "Service", "Other"].map((cat) => (
-                    <SelectItem key={cat} value={cat} className="focus:bg-purple-500 focus:text-white">
+                    <SelectItem key={cat} value={cat} className="focus:bg-purple-500 focus:text-white cursor-pointer">
                       {cat}
                     </SelectItem>
                   ))}
@@ -204,11 +196,10 @@ export const ProfileEditor = ({ initialData, onSave }: ProfileEditorProps) => {
                 <Twitter className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-purple-500" />
                 <Input 
                   id="twitter"
-                  disabled={!isEditing} 
                   value={formData.twitter}
                   onChange={handleChange}
                   placeholder="https://twitter.com/username"
-                  className="pl-12 bg-white/5 border-white/10 h-14 rounded-2xl focus:ring-purple-500 transition-all" 
+                  className="pl-12 bg-white/5 border-white/10 h-14 rounded-2xl focus:ring-purple-500 focus:bg-white/10 transition-all text-white" 
                 />
               </div>
             </div>
@@ -219,11 +210,10 @@ export const ProfileEditor = ({ initialData, onSave }: ProfileEditorProps) => {
                 <Globe className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-purple-500" />
                 <Input 
                   id="website"
-                  disabled={!isEditing} 
                   value={formData.website}
                   onChange={handleChange}
                   placeholder="https://yourwebsite.com"
-                  className="pl-12 bg-white/5 border-white/10 h-14 rounded-2xl focus:ring-purple-500 transition-all" 
+                  className="pl-12 bg-white/5 border-white/10 h-14 rounded-2xl focus:ring-purple-500 focus:bg-white/10 transition-all text-white" 
                 />
               </div>
             </div>
