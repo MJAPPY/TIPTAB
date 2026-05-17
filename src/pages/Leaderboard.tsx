@@ -46,12 +46,6 @@ const Leaderboard = () => {
                 {LEADERBOARD_DATA.length} Total Participants
               </span>
             </div>
-            <div className="bg-orange-500/10 border border-orange-500/20 px-6 py-2 rounded-2xl flex items-center gap-3">
-              <Star className="h-4 w-4 text-orange-500" />
-              <span className="text-[10px] md:text-xs font-black uppercase tracking-widest text-orange-500">
-                Top {DISPLAY_LIMIT} Elite
-              </span>
-            </div>
           </div>
         </div>
 
