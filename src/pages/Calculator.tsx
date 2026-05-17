@@ -15,25 +15,26 @@ const Calculator = () => {
   const [isMembershipOpen, setIsMembershipOpen] = useState(false);
   const [amount, setAmount] = useState<string>("1000");
   const [fromCurrency, setFromCurrency] = useState("TAB");
-  const [toCurrency, setToCurrency] = useState("USD");
+  const [toCurrency, setToCurrency] = useState("XPR");
   const [result, setResult] = useState<number>(0);
   const [isSyncing, setIsSyncing] = useState(false);
 
-  const rates: Record<string, number> = {
-    TAB: 1,
-    XPR: 1,
-    USD: 0.01,
-    EUR: 0.0092,
-    GBP: 0.0078,
-    AUD: 0.015,
-    HKD: 0.078,
-    CNY: 0.072,
-    JPY: 1.50,
-    CAD: 0.014,
-    SGD: 0.013,
-    CHF: 0.0088,
-    NZD: 0.016,
-  };
+  // Initial realistic-ish rates relative to 1 XPR/TAB
+  const [rates, setRates] = useState<Record<string, number>>({
+    TAB: 1.0000,
+    XPR: 1.0000,
+    USD: 0.00092,
+    EUR: 0.00085,
+    GBP: 0.00072,
+    AUD: 0.0014,
+    HKD: 0.0072,
+    CNY: 0.0066,
+    JPY: 0.14,
+    CAD: 0.0012,
+    SGD: 0.0012,
+    CHF: 0.00081,
+    NZD: 0.0015,
+  });
 
   const symbols: Record<string, string> = {
     TAB: "TAB",
@@ -51,20 +52,42 @@ const Calculator = () => {
     NZD: "NZ$",
   };
 
-  // Sort currencies: USD at top, others alphabetical
+  // Sort currencies: TAB, XPR, USD at top, others alphabetical
   const sortedCurrencies = useMemo(() => {
+    const priority = ["TAB", "XPR", "USD"];
     const keys = Object.keys(rates);
-    const others = keys.filter(k => k !== "USD").sort((a, b) => a.localeCompare(b));
-    return ["USD", ...others];
+    const others = keys
+      .filter(k => !priority.includes(k))
+      .sort((a, b) => a.localeCompare(b));
+    return [...priority, ...others];
   }, [rates]);
+
+  // Simulate live rate fluctuations
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setRates(prev => {
+        const next = { ...prev };
+        // Slightly fluctuate rates by +/- 0.05%
+        Object.keys(next).forEach(key => {
+          if (key !== "TAB" && key !== "XPR") {
+            const fluctuation = 1 + (Math.random() * 0.001 - 0.0005);
+            next[key] = parseFloat((next[key] * fluctuation).toFixed(8));
+          }
+        });
+        return next;
+      });
+    }, 5000);
+    return () => clearInterval(interval);
+  }, []);
 
   useEffect(() => {
     const fromRate = rates[fromCurrency];
     const toRate = rates[toCurrency];
     const numAmount = parseFloat(amount) || 0;
+    // Calculation: (Amount in From) -> Convert to Base (XPR) -> Convert to Target
     const converted = (numAmount / fromRate) * toRate;
     setResult(converted);
-  }, [amount, fromCurrency, toCurrency]);
+  }, [amount, fromCurrency, toCurrency, rates]);
 
   const handleSync = () => {
     setIsSyncing(true);
@@ -83,14 +106,14 @@ const Calculator = () => {
         <div className="max-w-4xl mx-auto space-y-10">
           <div className="text-center space-y-4">
             <div className="inline-flex items-center gap-2 px-4 py-1 rounded-full bg-white/5 border border-white/20 text-[10px] font-black uppercase tracking-[0.2em] text-cyan-300">
-              <Zap className="h-3 w-3 fill-cyan-300" />
-              Real-Time Network Parity
+              <div className="h-1.5 w-1.5 rounded-full bg-cyan-400 animate-pulse" />
+              Live Network Parity
             </div>
             <h1 className="text-4xl md:text-6xl font-black tracking-tighter italic leading-none text-white">
               VALUE <span className="text-transparent bg-clip-text bg-gradient-to-r from-orange-500 to-purple-500">ENGINE</span>
             </h1>
             <p className="text-slate-200 text-lg max-w-xl mx-auto font-medium leading-relaxed">
-              Calculate TAB value across global assets with zero latency.
+              Calculate TAB value across global assets with real-time settlement simulation.
             </p>
           </div>
 
@@ -110,7 +133,7 @@ const Calculator = () => {
                       )}
                     >
                       <RefreshCw className={cn("h-3 w-3", isSyncing && "animate-spin")} />
-                      Refresh Rates
+                      {isSyncing ? "Syncing..." : "Live Rates"}
                     </Button>
                   </div>
                   <div className="group relative flex items-center gap-3 bg-white/[0.03] border border-white/20 rounded-[24px] p-1.5 focus-within:border-orange-500/60 transition-all">
@@ -148,7 +171,7 @@ const Calculator = () => {
                   <div className="flex items-center gap-3 bg-orange-500/10 border border-orange-500/30 rounded-[24px] p-1.5">
                     <div className="flex-1 h-16 rounded-xl flex items-center px-6 text-3xl font-black text-white bg-black/20">
                       <span className="text-orange-500 mr-3 text-2xl drop-shadow-[0_0_8px_rgba(249,115,22,0.4)]">{symbols[toCurrency]}</span>
-                      {result.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                      {result.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 6 })}
                     </div>
                     <Select value={toCurrency} onValueChange={setToCurrency}>
                       <SelectTrigger className="w-[120px] bg-white/5 border-white/10 h-14 rounded-xl font-black text-xl mr-1 text-white">
@@ -166,7 +189,7 @@ const Calculator = () => {
                 <div className="pt-6 border-t border-white/10 flex items-center justify-between text-[10px] font-bold text-slate-200">
                   <div className="flex items-center gap-2">
                     <TrendingUp className="h-3 w-3 text-emerald-400" />
-                    1 {fromCurrency} = {(rates[toCurrency] / rates[fromCurrency]).toFixed(6)} {toCurrency}
+                    1 {fromCurrency} = {(rates[toCurrency] / rates[fromCurrency]).toFixed(8)} {toCurrency}
                   </div>
                   <div className="flex items-center gap-1.5 text-emerald-400 uppercase tracking-widest font-black">
                     <div className="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-pulse" />
@@ -184,8 +207,8 @@ const Calculator = () => {
                 <div className="space-y-5">
                   {[
                     { pair: "TAB / XPR", rate: "1.0000", change: "+0.00%", icon: Zap },
-                    { pair: "TAB / USD", rate: "0.0104", change: "+2.4%", icon: DollarSign },
-                    { pair: "XPR / EUR", rate: "0.0096", change: "-0.2%", icon: TrendingUp }
+                    { pair: "TAB / USD", rate: rates.USD.toFixed(5), change: "+2.4%", icon: DollarSign },
+                    { pair: "XPR / EUR", rate: rates.EUR.toFixed(5), change: "-0.2%", icon: TrendingUp }
                   ].map((item, i) => (
                     <div key={i} className="flex items-center justify-between px-1">
                       <div className="flex items-center gap-3">
