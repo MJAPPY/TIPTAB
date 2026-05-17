@@ -8,7 +8,7 @@ interface HeaderProps {
 
 export const Header = ({ onBecomeCreator }: HeaderProps) => {
   return (
-    <header className="fixed top-0 left-0 right-0 z-50 border-b border-white/10 bg-[#0a0514]/80 backdrop-blur-md px-6 py-4 flex items-center justify-between">
+    <header className="fixed top-10 left-0 right-0 z-50 border-b border-white/10 bg-[#0a0514]/80 backdrop-blur-md px-6 py-4 flex items-center justify-between">
       <div className="flex items-center gap-6">
         <Link to="/" className="flex items-center gap-4">
           <img src="/src/assets/logo.png" alt="TIPTAB Logo" className="h-24 w-24 object-contain" />

@@ -7,6 +7,7 @@ import { FeaturedCreators } from "./tab-platform/FeaturedCreators";
 import { HowItWorks } from "./tab-platform/HowItWorks";
 import { MembershipModal } from "./tab-platform/MembershipModal";
 import { TippingModal } from "./tab-platform/TippingModal";
+import { ActivityTicker } from "./tab-platform/ActivityTicker";
 import { Toaster } from "@/components/ui/toaster";
 import { CREATORS, Creator } from "@/data/creators";
 
@@ -25,9 +26,10 @@ export const Tab = () => {
 
   return (
     <div className="min-h-screen bg-[#0a0514] text-white selection:bg-purple-500/30">
+      <ActivityTicker />
       <Header onBecomeCreator={() => setIsMembershipOpen(true)} />
       
-      <main>
+      <main className="pt-10">
         <Hero />
         <StatsBanner />
         
