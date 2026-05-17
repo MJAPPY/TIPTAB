@@ -149,6 +149,7 @@ const Leaderboard = () => {
           ))}
         </div>
 
+        {/* Updated Call to Action Section */}
         <div className="mt-24 md:mt-32 p-8 md:p-16 rounded-[40px] md:rounded-[60px] bg-gradient-to-r from-magenta-600/30 via-purple-600/30 to-cyan-600/30 border-2 border-white/20 text-center relative overflow-hidden group">
           <div className="absolute top-0 left-0 w-full h-full bg-[url('https://www.transparenttextures.com/patterns/stardust.png')] opacity-10" />
           <Star className="h-10 w-10 md:h-12 md:w-12 text-yellow-400 mx-auto mb-6 animate-spin-slow drop-shadow-[0_0_15px_rgba(250,204,21,0.5)]" />
@@ -158,7 +159,7 @@ const Leaderboard = () => {
           </p>
           <Button 
             onClick={() => setIsMembershipOpen(true)}
-            className="bg-white text-black hover:bg-cyan-400 hover:text-black font-black text-lg md:text-2xl rounded-2xl md:rounded-[24px] h-16 md:h-20 px-8 md:px-12 shadow-[0_0_40px_rgba(255,255,255,0.3)] transition-all active:scale-95"
+            className="bg-white text-black hover:bg-cyan-400 hover:text-black font-black text-lg md:text-2xl rounded-full h-16 md:h-20 px-8 md:px-12 shadow-[0_0_40px_rgba(255,255,255,0.3)] transition-all active:scale-95"
           >
             JOIN THE NETWORK
           </Button>
