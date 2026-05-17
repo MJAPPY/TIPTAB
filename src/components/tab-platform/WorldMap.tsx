@@ -19,7 +19,7 @@ interface WorldMapProps {
 
 export const WorldMap = ({ creators, onSelectCreator }: WorldMapProps) => {
   return (
-    <div className="w-full h-full min-h-[450px] md:min-h-[650px] bg-white/[0.03] rounded-[48px] overflow-hidden border border-white/10 relative group shadow-[inset_0_0_80px_rgba(168,85,247,0.05)]">
+    <div className="w-full h-full min-h-[350px] md:min-h-[480px] bg-white/[0.03] rounded-[48px] overflow-hidden border border-white/10 relative group shadow-[inset_0_0_80px_rgba(168,85,247,0.05)]">
       {/* Decorative background glow */}
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[80%] h-[80%] bg-purple-500/5 blur-[120px] rounded-full pointer-events-none" />
       
@@ -35,7 +35,7 @@ export const WorldMap = ({ creators, onSelectCreator }: WorldMapProps) => {
         <ComposableMap
           projectionConfig={{
             rotate: [-10, 0, 0],
-            scale: 160
+            scale: 140
           }}
           className="w-full h-full relative z-0"
         >
