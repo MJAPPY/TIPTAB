@@ -31,7 +31,7 @@ const Leaderboard = () => {
             BACK TO MAP
           </Button>
         </Link>
-        <div className="flex flex-col items-center">
+        <div className="flex flex-col items-center text-center">
           <div className="flex items-center gap-3">
             <Trophy className="h-10 w-10 text-yellow-400 drop-shadow-[0_0_15px_rgba(250,204,21,0.5)]" />
             <h1 className="text-5xl md:text-7xl font-black italic tracking-tighter leading-none">
@@ -42,7 +42,7 @@ const Leaderboard = () => {
             The XPR Network Top Earners
           </p>
         </div>
-        <div className="w-32" /> {/* Spacer */}
+        <div className="w-32 hidden md:block" /> {/* Spacer */}
       </header>
 
       <main className="container mx-auto px-6 pb-24 relative z-10">
@@ -52,8 +52,13 @@ const Leaderboard = () => {
           <div className="w-full md:w-72 order-2 md:order-1 animate-in slide-in-from-bottom-8 duration-700 delay-100">
             <div className="bg-[#120a21]/80 border-2 border-slate-400/30 rounded-[40px] p-8 text-center relative group hover:border-slate-400 transition-all shadow-[0_0_30px_rgba(148,163,184,0.1)]">
               <div className="absolute -top-6 left-1/2 -translate-x-1/2 bg-slate-400 text-black font-black px-4 py-1 rounded-full text-xs uppercase tracking-widest shadow-lg">2nd Place</div>
-              <div className="h-24 w-24 rounded-3xl mx-auto mb-6 border-4 border-slate-400/50 flex items-center justify-center text-3xl font-black bg-slate-900 overflow-hidden shadow-2xl">
-                {topThree[1].avatarImage ? <img src={topThree[1].avatarImage} className="w-full h-full object-cover" /> : topThree[1].avatar}
+              <div className="h-28 w-28 rounded-3xl mx-auto mb-6 border-4 border-slate-400/50 flex items-center justify-center text-3xl font-black bg-slate-900 overflow-hidden shadow-2xl relative">
+                {topThree[1].avatarImage ? (
+                  <img src={topThree[1].avatarImage} alt="Avatar" className="w-full h-full object-cover" />
+                ) : (
+                  <span className="relative z-10">{topThree[1].avatar}</span>
+                )}
+                <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
               </div>
               <h3 className="text-2xl font-black mb-1">{topThree[1].name}</h3>
               <p className="text-slate-400 font-bold mb-6">@{topThree[1].handle}</p>
@@ -70,8 +75,13 @@ const Leaderboard = () => {
                 <Crown className="h-8 w-8 text-yellow-400 animate-bounce" />
               </div>
               <div className="absolute -top-6 left-1/2 -translate-x-1/2 bg-yellow-400 text-black font-black px-6 py-1.5 rounded-full text-sm uppercase tracking-widest shadow-[0_0_20px_rgba(250,204,21,0.5)]">Champion</div>
-              <div className="h-32 w-32 rounded-[32px] mx-auto mb-8 border-4 border-yellow-400 flex items-center justify-center text-4xl font-black bg-slate-900 overflow-hidden shadow-[0_0_30px_rgba(250,204,21,0.3)]">
-                {topThree[0].avatarImage ? <img src={topThree[0].avatarImage} className="w-full h-full object-cover" /> : topThree[0].avatar}
+              <div className="h-36 w-36 rounded-[32px] mx-auto mb-8 border-4 border-yellow-400 flex items-center justify-center text-4xl font-black bg-slate-900 overflow-hidden shadow-[0_0_40px_rgba(250,204,21,0.3)] relative">
+                {topThree[0].avatarImage ? (
+                  <img src={topThree[0].avatarImage} alt="Avatar" className="w-full h-full object-cover" />
+                ) : (
+                  <span className="relative z-10">{topThree[0].avatar}</span>
+                )}
+                <div className="absolute inset-0 bg-gradient-to-t from-yellow-900/40 to-transparent" />
               </div>
               <h3 className="text-3xl font-black mb-1">{topThree[0].name}</h3>
               <p className="text-yellow-400 font-black mb-8">@{topThree[0].handle}</p>
@@ -85,8 +95,13 @@ const Leaderboard = () => {
           <div className="w-full md:w-72 order-3 animate-in slide-in-from-bottom-8 duration-700 delay-200">
             <div className="bg-[#120a21]/80 border-2 border-orange-700/30 rounded-[40px] p-8 text-center relative group hover:border-orange-700/60 transition-all shadow-[0_0_30px_rgba(194,65,12,0.1)]">
               <div className="absolute -top-6 left-1/2 -translate-x-1/2 bg-orange-700 text-white font-black px-4 py-1 rounded-full text-xs uppercase tracking-widest shadow-lg">3rd Place</div>
-              <div className="h-24 w-24 rounded-3xl mx-auto mb-6 border-4 border-orange-700/50 flex items-center justify-center text-3xl font-black bg-slate-900 overflow-hidden shadow-2xl">
-                {topThree[2].avatarImage ? <img src={topThree[2].avatarImage} className="w-full h-full object-cover" /> : topThree[2].avatar}
+              <div className="h-28 w-28 rounded-3xl mx-auto mb-6 border-4 border-orange-700/50 flex items-center justify-center text-3xl font-black bg-slate-900 overflow-hidden shadow-2xl relative">
+                {topThree[2].avatarImage ? (
+                  <img src={topThree[2].avatarImage} alt="Avatar" className="w-full h-full object-cover" />
+                ) : (
+                  <span className="relative z-10">{topThree[2].avatar}</span>
+                )}
+                <div className="absolute inset-0 bg-gradient-to-t from-orange-950/60 to-transparent" />
               </div>
               <h3 className="text-2xl font-black mb-1">{topThree[2].name}</h3>
               <p className="text-orange-400/60 font-bold mb-6">@{topThree[2].handle}</p>
@@ -105,7 +120,7 @@ const Leaderboard = () => {
               <span>Creator</span>
             </div>
             <div className="flex items-center gap-12">
-              <span>Tips</span>
+              <span className="hidden sm:inline">Tips</span>
               <span className="w-24 text-right">Total TAB</span>
             </div>
           </div>
@@ -118,18 +133,22 @@ const Leaderboard = () => {
               <div className="flex items-center gap-8">
                 <span className="w-8 text-center font-black text-white/20 text-xl group-hover:text-cyan-400 transition-colors">#{i + 4}</span>
                 <div className="flex items-center gap-4">
-                  <div className={`h-14 w-14 rounded-2xl ${creator.color} flex items-center justify-center text-xl font-black border-2 border-white/10 overflow-hidden`}>
-                    {creator.avatarImage ? <img src={creator.avatarImage} className="w-full h-full object-cover" /> : creator.avatar}
+                  <div className={`h-16 w-16 rounded-2xl ${creator.color} flex items-center justify-center text-xl font-black border-2 border-white/10 overflow-hidden relative shadow-lg`}>
+                    {creator.avatarImage ? (
+                      <img src={creator.avatarImage} alt="Avatar" className="w-full h-full object-cover" />
+                    ) : (
+                      <span className="relative z-10">{creator.avatar}</span>
+                    )}
                   </div>
                   <div>
-                    <h4 className="font-black text-lg">{creator.name}</h4>
-                    <p className="text-sm text-white/40 font-bold">@{creator.handle}</p>
+                    <h4 className="font-black text-lg group-hover:text-white transition-colors">{creator.name}</h4>
+                    <p className="text-sm text-white/40 font-bold group-hover:text-cyan-400/60 transition-colors">@{creator.handle}</p>
                   </div>
                 </div>
               </div>
 
               <div className="flex items-center gap-12">
-                <div className="flex items-center gap-2 text-white/40 font-bold">
+                <div className="hidden sm:flex items-center gap-2 text-white/40 font-bold">
                   <Flame className="h-4 w-4 text-orange-500" />
                   {creator.tipCount} tips
                 </div>

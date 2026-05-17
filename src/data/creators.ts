@@ -25,6 +25,7 @@ export const CREATORS: Creator[] = [
     coordinates: [-0.1276, 51.5074],
     category: "Content",
     avatar: "TAB",
+    avatarImage: "https://images.unsplash.com/photo-1633332755192-727a05c4013d?w=400&h=400&fit=crop",
     color: "bg-red-600",
     twitter: "https://twitter.com/tabxpr"
   },
@@ -37,6 +38,7 @@ export const CREATORS: Creator[] = [
     coordinates: [-3.7038, 40.4168],
     category: "Service",
     avatar: "CM",
+    avatarImage: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=400&fit=crop",
     color: "bg-yellow-500"
   },
   {
@@ -48,6 +50,7 @@ export const CREATORS: Creator[] = [
     coordinates: [-123.1207, 49.2827],
     category: "Service",
     avatar: "MC",
+    avatarImage: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=400&h=400&fit=crop",
     color: "bg-emerald-500",
     instagram: "https://instagram.com"
   },
@@ -60,6 +63,7 @@ export const CREATORS: Creator[] = [
     coordinates: [-0.1870, 5.6037],
     category: "Dev",
     avatar: "KM",
+    avatarImage: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=400&h=400&fit=crop",
     color: "bg-blue-600"
   },
   {
@@ -71,6 +75,7 @@ export const CREATORS: Creator[] = [
     coordinates: [144.9631, -37.8136],
     category: "Service",
     avatar: "SJ",
+    avatarImage: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=400&h=400&fit=crop",
     color: "bg-orange-400"
   },
   {
@@ -82,6 +87,7 @@ export const CREATORS: Creator[] = [
     coordinates: [-74.0060, 40.7128],
     category: "Sports",
     avatar: "MW",
+    avatarImage: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=400&h=400&fit=crop",
     color: "bg-sky-600"
   },
   {
@@ -93,6 +99,7 @@ export const CREATORS: Creator[] = [
     coordinates: [9.1900, 45.4642],
     category: "Art",
     avatar: "ER",
+    avatarImage: "https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=400&h=400&fit=crop",
     color: "bg-pink-600"
   },
   {
@@ -104,6 +111,7 @@ export const CREATORS: Creator[] = [
     coordinates: [126.9780, 37.5665],
     category: "Gaming",
     avatar: "DP",
+    avatarImage: "https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?w=400&h=400&fit=crop",
     color: "bg-indigo-600"
   },
   {
@@ -115,6 +123,7 @@ export const CREATORS: Creator[] = [
     coordinates: [-122.3321, 47.6062],
     category: "Service",
     avatar: "LB",
+    avatarImage: "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=400&h=400&fit=crop",
     color: "bg-amber-700"
   }
 ];
