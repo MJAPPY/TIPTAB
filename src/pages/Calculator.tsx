@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import { Header } from "@/components/tab-platform/Header";
 import { MembershipModal } from "@/components/tab-platform/MembershipModal";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
@@ -25,6 +25,14 @@ const Calculator = () => {
     USD: 0.01,
     EUR: 0.0092,
     GBP: 0.0078,
+    AUD: 0.015,
+    HKD: 0.078,
+    CNY: 0.072,
+    JPY: 1.50,
+    CAD: 0.014,
+    SGD: 0.013,
+    CHF: 0.0088,
+    NZD: 0.016,
   };
 
   const symbols: Record<string, string> = {
@@ -33,7 +41,22 @@ const Calculator = () => {
     USD: "$",
     EUR: "€",
     GBP: "£",
+    AUD: "A$",
+    HKD: "HK$",
+    CNY: "¥",
+    JPY: "¥",
+    CAD: "C$",
+    SGD: "S$",
+    CHF: "Fr",
+    NZD: "NZ$",
   };
+
+  // Sort currencies: USD at top, others alphabetical
+  const sortedCurrencies = useMemo(() => {
+    const keys = Object.keys(rates);
+    const others = keys.filter(k => k !== "USD").sort((a, b) => a.localeCompare(b));
+    return ["USD", ...others];
+  }, [rates]);
 
   useEffect(() => {
     const fromRate = rates[fromCurrency];
@@ -103,7 +126,7 @@ const Calculator = () => {
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent className="bg-[#1a102d] border-white/20 text-white rounded-[20px]">
-                        {Object.keys(rates).map(curr => (
+                        {sortedCurrencies.map(curr => (
                           <SelectItem key={curr} value={curr} className="font-black py-2 cursor-pointer">{curr}</SelectItem>
                         ))}
                       </SelectContent>
@@ -132,7 +155,7 @@ const Calculator = () => {
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent className="bg-[#1a102d] border-white/20 text-white rounded-[20px]">
-                        {Object.keys(rates).map(curr => (
+                        {sortedCurrencies.map(curr => (
                           <SelectItem key={curr} value={curr} className="font-black py-2 cursor-pointer">{curr}</SelectItem>
                         ))}
                       </SelectContent>
