@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import { 
   User, 
@@ -18,12 +18,20 @@ import { ProfileEditor } from "@/components/tab-platform/ProfileEditor";
 import { CREATORS } from "@/data/creators";
 
 const Dashboard = () => {
-  // Mock logged in user (using the first creator for demo)
+  // Mock logged in user
   const user = CREATORS[0];
+  const [activeTab, setActiveTab] = useState("overview");
+
+  const navigationItems = [
+    { id: "overview", icon: TrendingUp, label: "Analytics" },
+    { id: "card", icon: CreditCard, label: "My TipTab Card" },
+    { id: "settings", icon: User, label: "Profile Settings" },
+    { id: "payouts", icon: Wallet, label: "Payouts & Wallet" },
+    { id: "account", icon: Settings, label: "Account Prefs" },
+  ];
 
   return (
     <div className="min-h-screen bg-[#0a0514] text-white">
-      {/* Dashboard Header */}
       <header className="border-b border-white/10 bg-[#0a0514]/80 backdrop-blur-md px-6 py-4 sticky top-0 z-50">
         <div className="container mx-auto flex items-center justify-between">
           <div className="flex items-center gap-6">
@@ -60,18 +68,13 @@ const Dashboard = () => {
           
           {/* Sidebar Navigation */}
           <div className="lg:col-span-3 space-y-2">
-            {[
-              { icon: TrendingUp, label: "Analytics", active: true },
-              { icon: CreditCard, label: "My TipTab Card", active: false },
-              { icon: User, label: "Profile Settings", active: false },
-              { icon: Wallet, label: "Payouts & Wallet", active: false },
-              { icon: Settings, label: "Account Prefs", active: false },
-            ].map((item) => (
+            {navigationItems.map((item) => (
               <Button
-                key={item.label}
+                key={item.id}
                 variant="ghost"
+                onClick={() => (item.id === "overview" || item.id === "card" || item.id === "settings") && setActiveTab(item.id)}
                 className={`w-full justify-start h-12 rounded-xl gap-3 px-4 font-bold transition-all ${
-                  item.active ? "bg-purple-500/10 text-purple-400 border border-purple-500/20" : "text-white/60 hover:bg-white/5"
+                  activeTab === item.id ? "bg-purple-500/10 text-purple-400 border border-purple-500/20" : "text-white/60 hover:bg-white/5"
                 }`}
               >
                 <item.icon className="h-5 w-5" />
@@ -95,8 +98,7 @@ const Dashboard = () => {
 
           {/* Main Content Area */}
           <div className="lg:col-span-9 space-y-12">
-            
-            <Tabs defaultValue="overview" className="w-full">
+            <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
               <TabsList className="bg-white/5 border border-white/10 p-1 rounded-2xl h-14 mb-8">
                 <TabsTrigger value="overview" className="rounded-xl px-8 font-bold data-[state=active]:bg-purple-500 data-[state=active]:text-white">Overview</TabsTrigger>
                 <TabsTrigger value="card" className="rounded-xl px-8 font-bold data-[state=active]:bg-purple-500 data-[state=active]:text-white">TipTab Card</TabsTrigger>
