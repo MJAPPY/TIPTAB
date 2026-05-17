@@ -8,7 +8,9 @@ import {
   ArrowLeft, 
   Bell, 
   Wallet,
-  Zap
+  Zap,
+  Share2,
+  Check
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
@@ -16,6 +18,7 @@ import { Tabs, TabsContent } from "@/components/ui/tabs";
 import { TipTabCard } from "@/components/tab-platform/TipTabCard";
 import { ProfileEditor } from "@/components/tab-platform/ProfileEditor";
 import { CREATORS, Creator } from "@/data/creators";
+import { useToast } from "@/hooks/use-toast";
 
 const Dashboard = () => {
   // Initial user state from localStorage or default creator
@@ -25,6 +28,8 @@ const Dashboard = () => {
   });
   
   const [activeTab, setActiveTab] = useState("analytics");
+  const [isCopied, setIsCopied] = useState(false);
+  const { toast } = useToast();
 
   // Persist user changes to localStorage
   useEffect(() => {
@@ -33,6 +38,35 @@ const Dashboard = () => {
 
   const handleUpdateProfile = (updatedData: Creator) => {
     setUser(updatedData);
+  };
+
+  const handleShare = async () => {
+    const shareUrl = `${window.location.origin}/tip/${user.handle}`;
+    const shareData = {
+      title: `Tip ${user.name} on TIPTAB`,
+      text: `Support my work on the XPR Network using TIPTAB!`,
+      url: shareUrl,
+    };
+
+    if (navigator.share) {
+      try {
+        await navigator.share(shareData);
+      } catch (err) {
+        copyToClipboard(shareUrl);
+      }
+    } else {
+      copyToClipboard(shareUrl);
+    }
+  };
+
+  const copyToClipboard = (url: string) => {
+    navigator.clipboard.writeText(url);
+    setIsCopied(true);
+    toast({
+      title: "Link Copied!",
+      description: "Your tipping link has been copied to your clipboard.",
+    });
+    setTimeout(() => setIsCopied(false), 2000);
   };
 
   const navigationItems = [
@@ -108,11 +142,21 @@ const Dashboard = () => {
                 <p className="text-xs text-white/60 mb-4 leading-relaxed">
                   You are a Pro Creator. 0% platform fees active.
                 </p>
-                <Link to={`/tip/${user.handle}`}>
-                  <Button className="w-full bg-orange-500 hover:bg-orange-600 text-white font-bold h-10 rounded-xl text-xs shadow-lg shadow-orange-500/20 transition-all">
-                    View Public Profile
+                <div className="flex flex-col gap-2">
+                  <Link to={`/tip/${user.handle}`} className="w-full">
+                    <Button className="w-full bg-orange-500 hover:bg-orange-600 text-white font-bold h-10 rounded-xl text-xs shadow-lg shadow-orange-500/20 transition-all">
+                      View Public Profile
+                    </Button>
+                  </Link>
+                  <Button 
+                    variant="outline"
+                    onClick={handleShare}
+                    className="w-full bg-white/5 border-white/10 text-white font-bold h-10 rounded-xl text-xs hover:bg-white/10 gap-2"
+                  >
+                    {isCopied ? <Check className="h-3 w-3 text-green-500" /> : <Share2 className="h-3 w-3" />}
+                    {isCopied ? "Copied" : "Share URL"}
                   </Button>
-                </Link>
+                </div>
               </div>
             </div>
           </div>

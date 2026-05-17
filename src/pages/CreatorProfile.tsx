@@ -60,10 +60,29 @@ const CreatorProfile = () => {
     setIsProcessing(false);
   };
 
-  const handleShare = () => {
+  const handleShare = async () => {
+    const shareData = {
+      title: `Support ${creator?.name} on TIPTAB`,
+      text: `Hey! Check out my TIPTAB profile and support my hustle on the XPR Network.`,
+      url: window.location.href,
+    };
+
+    if (navigator.share) {
+      try {
+        await navigator.share(shareData);
+      } catch (err) {
+        // Fallback to clipboard if sharing fails or is cancelled
+        copyToClipboard();
+      }
+    } else {
+      copyToClipboard();
+    }
+  };
+
+  const copyToClipboard = () => {
     navigator.clipboard.writeText(window.location.href);
     setIsCopied(true);
-    toast({ title: "Link Copied!", description: "Share this profile with the world." });
+    toast({ title: "Link Copied!", description: "Profile link has been copied to your clipboard." });
     setTimeout(() => setIsCopied(false), 2000);
   };
 
