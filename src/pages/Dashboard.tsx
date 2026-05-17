@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 import { Link } from "react-router-dom";
 import { 
   User, 
@@ -8,21 +8,18 @@ import {
   ArrowLeft, 
   Bell, 
   Wallet,
-  Zap,
-  Edit3
+  Zap
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { TipTabCard } from "@/components/tab-platform/TipTabCard";
+import { ProfileEditor } from "@/components/tab-platform/ProfileEditor";
 import { CREATORS } from "@/data/creators";
 
 const Dashboard = () => {
   // Mock logged in user (using the first creator for demo)
   const user = CREATORS[0];
-  const [isEditing, setIsEditing] = useState(false);
 
   return (
     <div className="min-h-screen bg-[#0a0514] text-white">
@@ -193,56 +190,7 @@ const Dashboard = () => {
               </TabsContent>
 
               <TabsContent value="settings" className="space-y-8">
-                <Card className="bg-[#130b21] border-white/10 text-white rounded-[32px] overflow-hidden">
-                  <CardHeader className="p-8 border-b border-white/10 flex flex-row items-center justify-between">
-                    <div>
-                      <CardTitle className="text-2xl font-black">Public Profile</CardTitle>
-                      <CardDescription className="text-white/40">Manage how you appear on the global map</CardDescription>
-                    </div>
-                    <Button 
-                      variant="secondary" 
-                      onClick={() => setIsEditing(!isEditing)}
-                      className="rounded-xl gap-2 font-bold bg-white/5 border-white/10"
-                    >
-                      {isEditing ? "Cancel" : <><Edit3 className="h-4 w-4" /> Edit Profile</>}
-                    </Button>
-                  </CardHeader>
-                  <CardContent className="p-8 space-y-6">
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                      <div className="space-y-2">
-                        <Label className="text-white/60 font-bold uppercase tracking-widest text-[10px]">Display Name</Label>
-                        <Input disabled={!isEditing} defaultValue={user.name} className="bg-white/5 border-white/10 h-12 rounded-xl" />
-                      </div>
-                      <div className="space-y-2">
-                        <Label className="text-white/60 font-bold uppercase tracking-widest text-[10px]">Handle</Label>
-                        <div className="relative">
-                          <span className="absolute left-4 top-1/2 -translate-y-1/2 text-purple-500 font-bold">@</span>
-                          <Input disabled={!isEditing} defaultValue={user.handle} className="pl-8 bg-white/5 border-white/10 h-12 rounded-xl" />
-                        </div>
-                      </div>
-                      <div className="space-y-2 md:col-span-2">
-                        <Label className="text-white/60 font-bold uppercase tracking-widest text-[10px]">Bio</Label>
-                        <Input disabled={!isEditing} defaultValue={user.bio} className="bg-white/5 border-white/10 h-12 rounded-xl" />
-                      </div>
-                      <div className="space-y-2">
-                        <Label className="text-white/60 font-bold uppercase tracking-widest text-[10px]">Location</Label>
-                        <Input disabled={!isEditing} defaultValue={user.location} className="bg-white/5 border-white/10 h-12 rounded-xl" />
-                      </div>
-                      <div className="space-y-2">
-                        <Label className="text-white/60 font-bold uppercase tracking-widest text-[10px]">Category</Label>
-                        <Input disabled={!isEditing} defaultValue={user.category} className="bg-white/5 border-white/10 h-12 rounded-xl" />
-                      </div>
-                    </div>
-                    
-                    {isEditing && (
-                      <div className="pt-6 flex justify-end">
-                        <Button className="bg-purple-600 hover:bg-purple-500 text-white font-bold h-12 px-8 rounded-xl">
-                          Save Changes
-                        </Button>
-                      </div>
-                    )}
-                  </CardContent>
-                </Card>
+                <ProfileEditor initialData={user} />
               </TabsContent>
             </Tabs>
           </div>
