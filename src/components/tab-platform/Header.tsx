@@ -8,10 +8,11 @@ import {
   Trophy, 
   Menu,
   Map as MapIcon,
-  Calculator as CalcIcon
+  Calculator as CalcIcon,
+  CheckCircle2
 } from "lucide-react";
 import { Link } from "react-router-dom";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   Sheet,
   SheetContent,
@@ -19,6 +20,7 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
+import { useToast } from "@/hooks/use-toast";
 
 interface HeaderProps {
   onBecomeCreator: () => void;
@@ -26,6 +28,35 @@ interface HeaderProps {
 
 export const Header = ({ onBecomeCreator }: HeaderProps) => {
   const [isOpen, setIsOpen] = useState(false);
+  const [isConnected, setIsConnected] = useState(false);
+  const [walletAddress, setWalletAddress] = useState("");
+  const { toast } = useToast();
+
+  // Load connection state from storage on mount
+  useEffect(() => {
+    const saved = localStorage.getItem("tiptab_wallet_connected");
+    const address = localStorage.getItem("tiptab_wallet_address");
+    if (saved === "true" && address) {
+      setIsConnected(true);
+      setWalletAddress(address);
+    }
+  }, []);
+
+  const handleConnect = () => {
+    if (isConnected) return; // Already connected
+
+    // Simulate connection
+    const mockAddress = "0x71c...4f2a";
+    setIsConnected(true);
+    setWalletAddress(mockAddress);
+    localStorage.setItem("tiptab_wallet_connected", "true");
+    localStorage.setItem("tiptab_wallet_address", mockAddress);
+    
+    toast({
+      title: "Wallet Connected",
+      description: "Successfully connected to WebAuth Protocol.",
+    });
+  };
 
   const NavItems = () => (
     <>
@@ -47,15 +78,17 @@ export const Header = ({ onBecomeCreator }: HeaderProps) => {
           Calculator
         </Button>
       </Link>
-      <Link to="/dashboard" onClick={() => setIsOpen(false)} className="w-full xl:w-auto">
-        <Button 
-          variant="ghost" 
-          className="w-full lg:w-auto text-white hover:text-purple-400 flex items-center justify-start lg:justify-center gap-3 font-bold bg-white/5 border border-white/10 rounded-2xl h-12 px-5"
-        >
-          <LayoutDashboard className="h-4 w-4" />
-          My Dashboard
-        </Button>
-      </Link>
+      {isConnected && (
+        <Link to="/dashboard" onClick={() => setIsOpen(false)} className="w-full xl:w-auto">
+          <Button 
+            variant="ghost" 
+            className="w-full lg:w-auto text-white hover:text-purple-400 flex items-center justify-start lg:justify-center gap-3 font-bold bg-white/5 border border-white/10 rounded-2xl h-12 px-5"
+          >
+            <LayoutDashboard className="h-4 w-4" />
+            My Dashboard
+          </Button>
+        </Link>
+      )}
       <Button 
         variant="outline" 
         onClick={() => {
@@ -98,10 +131,27 @@ export const Header = ({ onBecomeCreator }: HeaderProps) => {
 
           {/* Right Actions */}
           <div className="flex items-center gap-2 md:gap-4">
-            <Button className="bg-[#a855f7] hover:bg-[#9333ea] text-white flex items-center gap-2 rounded-2xl h-10 md:h-14 px-4 md:px-10 font-black text-[10px] md:text-base shadow-2xl shadow-purple-500/40 transition-all active:scale-95 group shrink-0">
-              <Wallet className="h-4 w-4 md:h-6 md:w-6 group-hover:rotate-12 transition-transform" />
-              <span className="hidden xs:inline whitespace-nowrap">Connect WebAuth</span>
-              <span className="xs:hidden">Connect</span>
+            <Button 
+              onClick={handleConnect}
+              className={`flex items-center gap-2 rounded-2xl h-10 md:h-14 px-4 md:px-10 font-black text-[10px] md:text-base transition-all active:scale-95 group shrink-0 ${
+                isConnected 
+                  ? "bg-green-500/10 border border-green-500/20 text-green-400 hover:bg-green-500/20" 
+                  : "bg-[#a855f7] hover:bg-[#9333ea] text-white shadow-2xl shadow-purple-500/40"
+              }`}
+            >
+              {isConnected ? (
+                <>
+                  <CheckCircle2 className="h-4 w-4 md:h-6 md:w-6" />
+                  <span className="hidden xs:inline whitespace-nowrap">{walletAddress}</span>
+                  <span className="xs:hidden">Linked</span>
+                </>
+              ) : (
+                <>
+                  <Wallet className="h-4 w-4 md:h-6 md:w-6 group-hover:rotate-12 transition-transform" />
+                  <span className="hidden xs:inline whitespace-nowrap">Connect WebAuth</span>
+                  <span className="xs:hidden">Connect</span>
+                </>
+              )}
             </Button>
 
             {/* Mobile Menu Trigger */}
@@ -132,7 +182,7 @@ export const Header = ({ onBecomeCreator }: HeaderProps) => {
                 <div className="absolute bottom-12 left-8 right-8 text-center">
                    <div className="h-px bg-white/10 w-full mb-6" />
                    <p className="text-[11px] font-black uppercase tracking-[0.3em] text-white/20">
-                    Network Status: Online
+                    Network Status: {isConnected ? "Active Session" : "Online"}
                   </p>
                 </div>
               </SheetContent>
