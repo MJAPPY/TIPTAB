@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import { Zap, ArrowRight, UserCheck, Sparkles, Globe, Heart } from "lucide-react";
+import { Zap, ArrowRight, UserCheck, Sparkles, Globe, Heart, Rocket } from "lucide-react";
 import { Creator } from "@/data/creators";
 
 interface HeroProps {
@@ -35,7 +35,7 @@ export const Hero = ({ creators }: HeroProps) => {
               Whether you're a delivery pro, a fitness coach, or a digital creator—TIPTAB connects you directly to the people who value your hustle via the <span className="text-purple-400 font-black">XPR Network</span>. Zero fees. Instant TAB rewards.
             </p>
             
-            <div className="flex flex-wrap items-center gap-8 pt-4">
+            <div className="flex flex-wrap items-center gap-6 pt-4">
               <div className="flex items-center gap-3 bg-white/5 px-6 py-3 rounded-2xl border border-white/5">
                 <Zap className="h-5 w-5 text-orange-500 fill-orange-500" />
                 <span className="text-sm font-black uppercase tracking-widest text-white/80">Direct Tipping</span>
@@ -43,6 +43,10 @@ export const Hero = ({ creators }: HeroProps) => {
               <div className="flex items-center gap-3 bg-white/5 px-6 py-3 rounded-2xl border border-white/5">
                 <UserCheck className="h-5 w-5 text-purple-500" />
                 <span className="text-sm font-black uppercase tracking-widest text-white/80">Everyday Hustle</span>
+              </div>
+              <div className="flex items-center gap-3 bg-white/5 px-6 py-3 rounded-2xl border border-white/5">
+                <Rocket className="h-5 w-5 text-cyan-400" />
+                <span className="text-sm font-black uppercase tracking-widest text-white/80">Gig Economy Ready</span>
               </div>
             </div>
 
