@@ -4,7 +4,7 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Plus, Twitter, Globe, X } from "lucide-react";
+import { Plus, Twitter, Globe, X, Instagram, Video } from "lucide-react";
 import { useState } from "react";
 import { Creator } from "@/data/creators";
 import { useToast } from "@/hooks/use-toast";
@@ -69,13 +69,35 @@ export const TippingModal = ({ creator, onClose }: TippingModalProps) => {
               <h3 className="text-2xl font-bold">{creator?.name}</h3>
               <p className="text-purple-500 font-medium">@{creator?.handle}</p>
             </div>
-            <div className="flex gap-2">
-              <Button variant="secondary" size="icon" className="rounded-xl bg-white/5 border border-white/10">
-                 <Twitter className="h-4 w-4" />
-              </Button>
-              <Button variant="secondary" size="icon" className="rounded-xl bg-white/5 border border-white/10">
-                 <Globe className="h-4 w-4" />
-              </Button>
+            <div className="flex flex-wrap gap-2 justify-end">
+              {creator?.twitter && (
+                <Button variant="secondary" size="icon" className="rounded-xl bg-white/5 border border-white/10 hover:bg-white/10" asChild>
+                  <a href={creator.twitter} target="_blank" rel="noopener noreferrer">
+                    <Twitter className="h-4 w-4" />
+                  </a>
+                </Button>
+              )}
+              {creator?.instagram && (
+                <Button variant="secondary" size="icon" className="rounded-xl bg-white/5 border border-white/10 hover:bg-white/10" asChild>
+                  <a href={creator.instagram} target="_blank" rel="noopener noreferrer">
+                    <Instagram className="h-4 w-4" />
+                  </a>
+                </Button>
+              )}
+              {creator?.videoUrl && (
+                <Button variant="secondary" size="icon" className="rounded-xl bg-white/5 border border-white/10 hover:bg-white/10" asChild>
+                  <a href={creator.videoUrl} target="_blank" rel="noopener noreferrer">
+                    <Video className="h-4 w-4" />
+                  </a>
+                </Button>
+              )}
+              {creator?.website && (
+                <Button variant="secondary" size="icon" className="rounded-xl bg-white/5 border border-white/10 hover:bg-white/10" asChild>
+                  <a href={creator.website} target="_blank" rel="noopener noreferrer">
+                    <Globe className="h-4 w-4" />
+                  </a>
+                </Button>
+              )}
             </div>
           </div>
           

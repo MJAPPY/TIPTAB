@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
-import { User, AtSign, MapPin, Globe, Twitter, Save, Image as ImageIcon, Upload, X } from "lucide-react";
+import { User, AtSign, MapPin, Globe, Twitter, Save, Image as ImageIcon, Upload, X, Video, Instagram } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -27,6 +27,8 @@ export const ProfileEditor = ({ initialData, onSave }: ProfileEditorProps) => {
     category: initialData.category,
     twitter: initialData.twitter || "",
     website: initialData.website || "",
+    videoUrl: initialData.videoUrl || "",
+    instagram: initialData.instagram || "",
     avatarImage: initialData.avatarImage || "",
   });
 
@@ -41,6 +43,8 @@ export const ProfileEditor = ({ initialData, onSave }: ProfileEditorProps) => {
       category: initialData.category,
       twitter: initialData.twitter || "",
       website: initialData.website || "",
+      videoUrl: initialData.videoUrl || "",
+      instagram: initialData.instagram || "",
       avatarImage: initialData.avatarImage || "",
     });
     setHasChanged(false);
@@ -61,7 +65,7 @@ export const ProfileEditor = ({ initialData, onSave }: ProfileEditorProps) => {
       
       toast({
         title: "Profile Updated",
-        description: "Your changes, including your avatar, have been saved.",
+        description: "Your social links and profile have been saved.",
       });
     } catch (error) {
       toast({
@@ -256,6 +260,34 @@ export const ProfileEditor = ({ initialData, onSave }: ProfileEditorProps) => {
                   value={formData.twitter}
                   onChange={handleChange}
                   placeholder="https://twitter.com/username"
+                  className="pl-12 bg-white/5 border-white/10 h-14 rounded-2xl focus:ring-purple-500 focus:bg-white/10 transition-all text-white" 
+                />
+              </div>
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="instagram" className="text-white/60 font-bold uppercase tracking-widest text-[10px]">Instagram URL</Label>
+              <div className="relative">
+                <Instagram className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-purple-500" />
+                <Input 
+                  id="instagram"
+                  value={formData.instagram}
+                  onChange={handleChange}
+                  placeholder="https://instagram.com/username"
+                  className="pl-12 bg-white/5 border-white/10 h-14 rounded-2xl focus:ring-purple-500 focus:bg-white/10 transition-all text-white" 
+                />
+              </div>
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="videoUrl" className="text-white/60 font-bold uppercase tracking-widest text-[10px]">Video Channel URL</Label>
+              <div className="relative">
+                <Video className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-purple-500" />
+                <Input 
+                  id="videoUrl"
+                  value={formData.videoUrl}
+                  onChange={handleChange}
+                  placeholder="YouTube or Twitch channel link"
                   className="pl-12 bg-white/5 border-white/10 h-14 rounded-2xl focus:ring-purple-500 focus:bg-white/10 transition-all text-white" 
                 />
               </div>

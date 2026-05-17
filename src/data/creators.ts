@@ -11,6 +11,8 @@ export interface Creator {
   color: string;
   twitter?: string;
   website?: string;
+  videoUrl?: string;
+  instagram?: string;
 }
 
 export const CREATORS: Creator[] = [

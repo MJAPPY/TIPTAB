@@ -1,6 +1,6 @@
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Search, Plus, MapPin, QrCode, Twitter, Globe } from "lucide-react";
+import { Search, Plus, MapPin, QrCode, Twitter, Globe, Instagram, Video } from "lucide-react";
 import { useState, useMemo } from "react";
 import { CREATORS, Creator } from "@/data/creators";
 
@@ -91,7 +91,11 @@ export const FeaturedCreators = ({ onSelectCreator, onAddYourself }: FeaturedCre
             <div className="flex items-start justify-between gap-4 mb-6 relative z-10">
               <div className="flex items-center gap-5">
                 <div className={`h-16 w-16 rounded-2xl ${creator.color} flex items-center justify-center text-2xl font-black border border-white/20 shadow-xl group-hover:scale-110 transition-transform`}>
-                  {creator.avatar}
+                  {creator.avatarImage ? (
+                    <img src={creator.avatarImage} alt="Avatar" className="w-full h-full object-cover" />
+                  ) : (
+                    creator.avatar
+                  )}
                 </div>
                 <div>
                   <h3 className="text-2xl font-bold group-hover:text-purple-400 transition-colors">{creator.name}</h3>
@@ -113,9 +117,11 @@ export const FeaturedCreators = ({ onSelectCreator, onAddYourself }: FeaturedCre
                   <MapPin className="h-4 w-4 text-purple-500" />
                   {creator.location}
                 </div>
-                <div className="flex items-center gap-4">
-                  <Twitter className="h-4 w-4 text-white/40 hover:text-blue-400 transition-colors cursor-pointer" />
-                  <Globe className="h-4 w-4 text-white/40 hover:text-green-400 transition-colors cursor-pointer" />
+                <div className="flex items-center gap-3">
+                  {creator.twitter && <Twitter className="h-4 w-4 text-white/40 hover:text-blue-400 transition-colors" />}
+                  {creator.instagram && <Instagram className="h-4 w-4 text-white/40 hover:text-pink-400 transition-colors" />}
+                  {creator.videoUrl && <Video className="h-4 w-4 text-white/40 hover:text-red-400 transition-colors" />}
+                  {creator.website && <Globe className="h-4 w-4 text-white/40 hover:text-green-400 transition-colors" />}
                 </div>
               </div>
               
