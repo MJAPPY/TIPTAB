@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import { UserPlus, Wallet, LayoutDashboard, Sparkles } from "lucide-react";
+import { UserPlus, Wallet, LayoutDashboard, Sparkles, Trophy } from "lucide-react";
 import { Link } from "react-router-dom";
 
 interface HeaderProps {
@@ -24,6 +24,15 @@ export const Header = ({ onBecomeCreator }: HeaderProps) => {
       </div>
       
       <div className="flex items-center gap-4">
+        <Link to="/leaderboard">
+          <Button 
+            variant="ghost" 
+            className="text-white hover:text-yellow-400 flex items-center gap-2 font-bold bg-white/5 border border-white/10 rounded-xl h-14"
+          >
+            <Trophy className="h-5 w-5" />
+            Hall of Fame
+          </Button>
+        </Link>
         <Link to="/dashboard" className="hidden md:block">
           <Button 
             variant="ghost" 
