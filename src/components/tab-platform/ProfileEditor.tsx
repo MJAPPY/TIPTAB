@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from "react";
-import { User, AtSign, MapPin, Globe, Twitter, Save, Image as ImageIcon } from "lucide-react";
+import React, { useState, useEffect, useRef } from "react";
+import { User, AtSign, MapPin, Globe, Twitter, Save, Image as ImageIcon, Upload, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -17,6 +17,8 @@ interface ProfileEditorProps {
 export const ProfileEditor = ({ initialData, onSave }: ProfileEditorProps) => {
   const [isSaving, setIsSaving] = useState(false);
   const [hasChanged, setHasChanged] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  
   const [formData, setFormData] = useState({
     name: initialData.name,
     handle: initialData.handle,
@@ -25,11 +27,11 @@ export const ProfileEditor = ({ initialData, onSave }: ProfileEditorProps) => {
     category: initialData.category,
     twitter: initialData.twitter || "",
     website: initialData.website || "",
+    avatarImage: initialData.avatarImage || "",
   });
 
   const { toast } = useToast();
 
-  // Reset form when initialData changes (e.g. from a different tab)
   useEffect(() => {
     setFormData({
       name: initialData.name,
@@ -39,6 +41,7 @@ export const ProfileEditor = ({ initialData, onSave }: ProfileEditorProps) => {
       category: initialData.category,
       twitter: initialData.twitter || "",
       website: initialData.website || "",
+      avatarImage: initialData.avatarImage || "",
     });
     setHasChanged(false);
   }, [initialData]);
@@ -46,7 +49,6 @@ export const ProfileEditor = ({ initialData, onSave }: ProfileEditorProps) => {
   const handleSave = async () => {
     setIsSaving(true);
     try {
-      // Simulate network delay
       await new Promise((resolve) => setTimeout(resolve, 800));
       
       const updatedCreator: Creator = {
@@ -59,7 +61,7 @@ export const ProfileEditor = ({ initialData, onSave }: ProfileEditorProps) => {
       
       toast({
         title: "Profile Updated",
-        description: "Your changes have been saved to your profile.",
+        description: "Your changes, including your avatar, have been saved.",
       });
     } catch (error) {
       toast({
@@ -80,6 +82,32 @@ export const ProfileEditor = ({ initialData, onSave }: ProfileEditorProps) => {
 
   const handleCategoryChange = (val: string) => {
     setFormData((prev) => ({ ...prev, category: val }));
+    setHasChanged(true);
+  };
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      if (file.size > 2 * 1024 * 1024) { // 2MB limit
+        toast({
+          title: "File too large",
+          description: "Please choose an image smaller than 2MB.",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setFormData(prev => ({ ...prev, avatarImage: reader.result as string }));
+        setHasChanged(true);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const removeImage = () => {
+    setFormData(prev => ({ ...prev, avatarImage: "" }));
     setHasChanged(true);
   };
 
@@ -105,15 +133,44 @@ export const ProfileEditor = ({ initialData, onSave }: ProfileEditorProps) => {
       <CardContent className="p-8">
         <div className="space-y-8">
           <div className="flex items-center gap-6 pb-8 border-b border-white/5">
-            <div className={`h-24 w-24 rounded-3xl ${initialData.color} flex items-center justify-center text-3xl font-black border-4 border-white/10 shadow-xl`}>
-              {initialData.avatar}
+            <div className="relative group">
+              <div className={`h-24 w-24 rounded-3xl ${initialData.color} flex items-center justify-center text-3xl font-black border-4 border-white/10 shadow-xl overflow-hidden`}>
+                {formData.avatarImage ? (
+                  <img src={formData.avatarImage} alt="Avatar" className="w-full h-full object-cover" />
+                ) : (
+                  initialData.avatar
+                )}
+              </div>
+              {formData.avatarImage && (
+                <button 
+                  onClick={removeImage}
+                  className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-1 shadow-lg hover:bg-red-600 transition-colors"
+                >
+                  <X className="h-3 w-3" />
+                </button>
+              )}
             </div>
+            
             <div className="space-y-2">
               <h4 className="font-bold text-lg">Profile Avatar</h4>
-              <p className="text-sm text-white/40">Your avatar is currently generated from your name.</p>
-              <Button variant="outline" size="sm" className="rounded-lg border-white/10 text-white/60 hover:text-white h-9 bg-white/5">
-                <ImageIcon className="h-4 w-4 mr-2" /> Change Color
-              </Button>
+              <p className="text-sm text-white/40">Upload a custom photo or use your generated initials.</p>
+              <div className="flex gap-2">
+                <input 
+                  type="file" 
+                  ref={fileInputRef} 
+                  className="hidden" 
+                  accept="image/*" 
+                  onChange={handleFileChange} 
+                />
+                <Button 
+                  variant="outline" 
+                  size="sm" 
+                  onClick={() => fileInputRef.current?.click()}
+                  className="rounded-lg border-white/10 text-white/60 hover:text-white h-9 bg-white/5"
+                >
+                  <Upload className="h-4 w-4 mr-2" /> Upload Photo
+                </Button>
+              </div>
             </div>
           </div>
 

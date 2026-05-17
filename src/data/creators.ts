@@ -7,6 +7,7 @@ export interface Creator {
   coordinates: [number, number]; // [longitude, latitude]
   category: string;
   avatar: string;
+  avatarImage?: string; // Base64 or URL
   color: string;
   twitter?: string;
   website?: string;

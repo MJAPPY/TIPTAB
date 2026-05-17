@@ -67,8 +67,12 @@ const Dashboard = () => {
               <div className="absolute top-2 right-2 h-2 w-2 bg-orange-500 rounded-full border-2 border-[#0a0514]" />
             </Button>
             <div className="flex items-center gap-3 bg-white/5 border border-white/10 rounded-full px-4 py-1.5">
-              <div className={`h-6 w-6 rounded-full ${user.color} flex items-center justify-center text-[10px] font-bold`}>
-                {user.avatar}
+              <div className={`h-8 w-8 rounded-full ${user.color} flex items-center justify-center text-[10px] font-bold overflow-hidden border border-white/20`}>
+                {user.avatarImage ? (
+                  <img src={user.avatarImage} alt="Avatar" className="w-full h-full object-cover" />
+                ) : (
+                  user.avatar
+                )}
               </div>
               <span className="text-sm font-bold text-white/80">{user.name}</span>
             </div>

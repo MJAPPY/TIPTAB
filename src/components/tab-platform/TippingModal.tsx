@@ -56,8 +56,12 @@ export const TippingModal = ({ creator, onClose }: TippingModalProps) => {
         </div>
         
         <div className="px-8 pb-8 -mt-12 relative">
-          <div className={`h-24 w-24 rounded-[32px] ${creator?.color} flex items-center justify-center text-3xl font-bold border-4 border-[#130b21] shadow-xl mb-4`}>
-            {creator?.avatar}
+          <div className={`h-24 w-24 rounded-[32px] ${creator?.color} flex items-center justify-center text-3xl font-bold border-4 border-[#130b21] shadow-xl mb-4 overflow-hidden`}>
+            {creator?.avatarImage ? (
+              <img src={creator.avatarImage} alt="Avatar" className="w-full h-full object-cover" />
+            ) : (
+              creator?.avatar
+            )}
           </div>
           
           <div className="flex items-start justify-between mb-6">

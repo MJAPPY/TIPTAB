@@ -87,8 +87,12 @@ export const TipTabCard = ({ creator }: TipTabCardProps) => {
         <div className="relative z-10 flex items-start gap-4 h-24">
           {/* Creator Info - Takes remaining space */}
           <div className="flex items-center gap-3 flex-1 min-w-0">
-            <div className={`h-14 w-14 shrink-0 rounded-2xl ${creator.color} flex items-center justify-center text-xl font-black border-2 border-white/20 shadow-xl`}>
-              {creator.avatar}
+            <div className={`h-14 w-14 shrink-0 rounded-2xl ${creator.color} flex items-center justify-center text-xl font-black border-2 border-white/20 shadow-xl overflow-hidden`}>
+              {creator.avatarImage ? (
+                <img src={creator.avatarImage} alt="Avatar" className="w-full h-full object-cover" />
+              ) : (
+                creator.avatar
+              )}
             </div>
             <div className="min-w-0">
               <h3 className="text-2xl font-black text-white leading-tight break-words">
