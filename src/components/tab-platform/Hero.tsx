@@ -15,7 +15,7 @@ export const Hero = () => {
           </div>
           
           <h1 className="text-5xl md:text-7xl font-black tracking-tight leading-none">
-            Tip Creators with <span className="text-transparent bg-clip-text bg-gradient-to-r from-orange-500 via-pink-500 to-purple-500">$TAB</span>
+            Tip Creators with <span className="text-transparent bg-clip-text bg-gradient-to-r from-orange-500 via-pink-500 to-purple-500">TIPTAB</span>
           </h1>
           
           <p className="text-xl text-white/60 max-w-xl">
@@ -46,12 +46,9 @@ export const Hero = () => {
           {/* Main TAB Chip Image Placeholder */}
           <div className="relative z-10 animate-bounce-slow">
             <img 
-              src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/90265c21d05a59e62dd0e06141ae2cf8-9XfX1XfX1XfX1XfX1XfX1XfX1XfX1X.PNG" 
-              alt="TAB Chip"
+              src="/src/assets/logo.png" 
+              alt="TIPTAB Logo"
               className="w-full max-w-[400px] mx-auto drop-shadow-[0_0_50px_rgba(249,115,22,0.3)]"
-              onError={(e) => {
-                e.currentTarget.src = "https://placeholder.svg?text=TAB+CHIP";
-              }}
             />
           </div>
           
@@ -64,13 +61,3 @@ export const Hero = () => {
     </section>
   );
 };
-
-const styles = `
-@keyframes bounce-slow {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-20px); }
-}
-.animate-bounce-slow {
-  animation: bounce-slow 4s ease-in-out infinite;
-}
-`;

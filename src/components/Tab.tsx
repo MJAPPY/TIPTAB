@@ -40,9 +40,10 @@ export const Tab = () => {
       
       <footer className="py-20 border-t border-white/5 bg-black/20 mt-20">
         <div className="container mx-auto px-6 text-center">
-          <div className="mb-8">
+          <div className="mb-8 flex flex-col items-center gap-4">
+            <img src="/src/assets/logo.png" alt="TIPTAB Logo" className="h-12 w-12 object-contain" />
             <span className="text-3xl font-black italic tracking-tighter">
-              <span className="text-orange-500">TAB</span>
+              TIP<span className="text-orange-500">TAB</span>
             </span>
           </div>
           <p className="text-white/40 max-w-md mx-auto mb-10">
@@ -55,7 +56,7 @@ export const Tab = () => {
             <a href="#" className="hover:text-purple-400 transition-colors">Support</a>
           </div>
           <div className="mt-20 pt-10 border-t border-white/5 text-white/20 text-xs">
-            © {new Date().getFullYear()} TAB Platform. Built on XPR Network.
+            © {new Date().getFullYear()} TIPTAB Platform. Built on XPR Network.
           </div>
         </div>
       </footer>
