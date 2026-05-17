@@ -4,7 +4,7 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Plus, Twitter, Globe, X, Instagram, Video, Zap, ShieldCheck } from "lucide-react";
+import { Twitter, Globe, X, Instagram, Zap, ShieldCheck } from "lucide-react";
 import { useState } from "react";
 import { Creator } from "@/data/creators";
 import { useToast } from "@/hooks/use-toast";
@@ -59,21 +59,13 @@ export const TippingModal = ({ creator, onClose }: TippingModalProps) => {
     <Dialog open={!!creator} onOpenChange={(open) => !open && onClose()}>
       <DialogContent className="bg-[#0d071a]/95 backdrop-blur-[32px] border-white/10 text-white sm:max-w-[460px] rounded-[40px] p-0 overflow-hidden shadow-[0_0_100px_rgba(0,0,0,0.8)] border-t-purple-500/20">
         
-        {/* Dynamic Header Background */}
-        <div className="relative h-32 w-full overflow-hidden">
-          <div className={cn("absolute inset-0 opacity-40", creator.color)} />
+        {/* Optimized Header Background */}
+        <div className="relative h-24 w-full overflow-hidden">
+          <div className={cn("absolute inset-0 opacity-30", creator.color)} />
           <div className="absolute inset-0 bg-gradient-to-t from-[#0d071a] to-transparent" />
-          <Button 
-            variant="ghost" 
-            size="icon" 
-            className="absolute top-6 right-6 text-white/40 hover:text-white hover:bg-white/10 rounded-full z-20"
-            onClick={onClose}
-          >
-            <X className="h-5 w-5" />
-          </Button>
         </div>
         
-        <div className="px-10 pb-10 -mt-14 relative z-10">
+        <div className="px-10 pb-10 -mt-10 relative z-10">
           {/* Avatar Section */}
           <div className="flex items-end justify-between mb-6">
             <div className={cn(
@@ -148,16 +140,16 @@ export const TippingModal = ({ creator, onClose }: TippingModalProps) => {
             
             <div className="relative group">
               <div className="absolute inset-y-0 left-6 flex items-center pointer-events-none">
-                <span className="text-white/20 font-black tracking-widest text-sm uppercase">Custom</span>
+                <span className="text-white/20 font-black tracking-widest text-[10px] uppercase">Custom Amount</span>
               </div>
               <Input 
-                placeholder="0.00" 
+                placeholder="0" 
                 value={tipAmount}
                 onChange={(e) => setTipAmount(e.target.value)}
-                className="bg-white/5 border-white/10 h-16 rounded-3xl text-right text-2xl font-black px-8 focus:ring-orange-500/50 focus:bg-white/10 transition-all"
+                className="bg-white/5 border-white/10 h-16 rounded-3xl text-right text-2xl font-black pl-8 pr-20 focus:ring-orange-500/50 focus:bg-white/10 transition-all border-2"
               />
               <div className="absolute inset-y-0 right-6 flex items-center pointer-events-none">
-                <span className="text-orange-500 font-black ml-2">TAB</span>
+                <span className="text-orange-500 font-black">TAB</span>
               </div>
             </div>
             
