@@ -3,22 +3,22 @@ import { Zap, ShieldCheck, Wallet, Globe, ArrowRight } from "lucide-react";
 export const HowItWorks = () => {
   const steps = [
     {
-      title: "Connect Wallet",
-      desc: "Link your WebAuth wallet to the XPR Network in one click. No complex setups.",
+      title: "Quick Connect",
+      desc: "Link your WebAuth wallet in seconds. It's your digital pocket for all the tips you'll earn.",
       icon: Wallet,
       color: "#00ffff", // Cyan
       glow: "rgba(0, 255, 255, 0.2)"
     },
     {
-      title: "Claim Profile",
-      desc: "Join the global map. Set your category, location, and social links.",
+      title: "Pin Your Spot",
+      desc: "Join the global map. Whether you're a barista in Seattle or a courier in London, let fans find you.",
       icon: Globe,
       color: "#ff00ff", // Pink
       glow: "rgba(255, 0, 255, 0.2)"
     },
     {
-      title: "Receive Tips",
-      desc: "Your fans tip you directly in TAB. 0% fees, instant settlement, pure appreciation.",
+      title: "Earn Directly",
+      desc: "Receive instant TAB tips. No platform cut, no delay—just pure appreciation for your hard work.",
       icon: Zap,
       color: "#39ff14", // Lime
       glow: "rgba(57, 255, 20, 0.2)"
@@ -31,15 +31,14 @@ export const HowItWorks = () => {
       
       <div className="text-center space-y-4 mb-20">
         <h2 className="text-4xl md:text-5xl font-black tracking-tight uppercase">
-          Empowering The <span className="text-orange-500">Unstoppable</span>
+          Empowering The <span className="text-orange-500">Everyday Hustle</span>
         </h2>
         <p className="text-white/40 text-xl max-w-2xl mx-auto font-medium">
-          The most direct way for creators to monetize their passion. Built on the speed of XPR.
+          The most direct way for service workers and gig pros to receive gratitude. Built for speed on XPR.
         </p>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-8 relative">
-        {/* Connector Line (Desktop) */}
         <div className="hidden md:block absolute top-1/2 left-0 w-full h-px bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-y-1/2 -z-10" />
         
         {steps.map((step, i) => (

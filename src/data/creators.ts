@@ -30,26 +30,26 @@ export const CREATORS: Creator[] = [
   },
   {
     id: "2",
-    name: "Priya Sharma",
-    handle: "priyatech",
-    bio: "Blockchain developer building DeFi tools on XPR Network.",
-    location: "Mumbai, India",
-    coordinates: [72.8777, 19.0760],
-    category: "Dev",
-    avatar: "PS",
-    color: "bg-purple-600",
-    twitter: "https://twitter.com"
+    name: "Carlos Mendez",
+    handle: "carlos_delivery",
+    bio: "Express courier and delivery pro. Tipping fuels my route! Support your local gig workers.",
+    location: "Madrid, Spain",
+    coordinates: [-3.7038, 40.4168],
+    category: "Service",
+    avatar: "CM",
+    color: "bg-yellow-500"
   },
   {
     id: "3",
-    name: "Alex Rivera",
-    handle: "alexarts",
-    bio: "Digital artist specializing in 3D animations and NFT collectibles.",
-    location: "Barcelona, Spain",
-    coordinates: [2.1734, 41.3851],
-    category: "Art",
-    avatar: "AR",
-    color: "bg-orange-500"
+    name: "Maya Chen",
+    handle: "mayafit",
+    bio: "Personal trainer and wellness coach. Help me keep the community moving!",
+    location: "Vancouver, Canada",
+    coordinates: [-123.1207, 49.2827],
+    category: "Service",
+    avatar: "MC",
+    color: "bg-emerald-500",
+    instagram: "https://instagram.com"
   },
   {
     id: "4",
@@ -64,14 +64,14 @@ export const CREATORS: Creator[] = [
   },
   {
     id: "5",
-    name: "Sarah Chen",
-    handle: "sarahcodes",
-    bio: "Frontend specialist and tech educator. Helping people learn React and Web3.",
-    location: "Singapore",
-    coordinates: [103.8198, 1.3521],
-    category: "Education",
-    avatar: "SC",
-    color: "bg-emerald-600"
+    name: "Sarah Jenkins",
+    handle: "sarah_serves",
+    bio: "Hospitality professional and latte art enthusiast. Your tips make a world of difference.",
+    location: "Melbourne, Australia",
+    coordinates: [144.9631, -37.8136],
+    category: "Service",
+    avatar: "SJ",
+    color: "bg-orange-400"
   },
   {
     id: "6",
@@ -105,5 +105,16 @@ export const CREATORS: Creator[] = [
     category: "Gaming",
     avatar: "DP",
     color: "bg-indigo-600"
+  },
+  {
+    id: "9",
+    name: "Leo 'The Barista'",
+    handle: "leobrews",
+    bio: "Crafting the perfect cup one bean at a time. Support your local freelance barista.",
+    location: "Seattle, USA",
+    coordinates: [-122.3321, 47.6062],
+    category: "Service",
+    avatar: "LB",
+    color: "bg-amber-700"
   }
 ];
