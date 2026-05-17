@@ -42,7 +42,7 @@ export const Hero = ({ creators }: HeroProps) => {
               </div>
               <div className="flex items-center gap-3 bg-white/5 px-6 py-3 rounded-2xl border border-white/5">
                 <UserCheck className="h-5 w-5 text-purple-500" />
-                <span className="text-sm font-black uppercase tracking-widest text-white/80">XPR Infrastructure</span>
+                <span className="text-sm font-black uppercase tracking-widest text-white/80">Everyday Hustle</span>
               </div>
             </div>
 
