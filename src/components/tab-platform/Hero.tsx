@@ -22,7 +22,7 @@ export const Hero = () => {
             </h1>
             
             <p className="text-2xl text-white/40 max-w-2xl leading-relaxed font-medium">
-              Whether you're a delivery pro, a fitness coach, or a digital creator—TIPTAB connects you directly to the people who value your hustle. Zero fees. Instant TAB rewards.
+              Whether you're a delivery pro, a fitness coach, wait staff, or a digital creator—TIPTAB connects you directly to the people who value your hustle. Zero fees. Instant TAB rewards.
             </p>
             
             <div className="flex flex-wrap items-center gap-8 pt-4">
