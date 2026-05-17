@@ -40,9 +40,9 @@ export const Tab = () => {
       
       <footer className="py-20 border-t border-white/5 bg-black/20 mt-20">
         <div className="container mx-auto px-6 text-center">
-          <div className="mb-8 flex flex-col items-center gap-4">
-            <img src="/src/assets/logo.png" alt="TIPTAB Logo" className="h-12 w-12 object-contain" />
-            <span className="text-3xl font-black italic tracking-tighter">
+          <div className="mb-8 flex flex-col items-center gap-6">
+            <img src="/src/assets/logo.png" alt="TIPTAB Logo" className="h-24 w-24 object-contain" />
+            <span className="text-4xl font-black italic tracking-tighter">
               TIP<span className="text-orange-500">TAB</span>
             </span>
           </div>
