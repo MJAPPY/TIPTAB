@@ -58,6 +58,23 @@ const CreatorProfile = () => {
     setIsProcessing(false);
   };
 
+  const copyToClipboard = (url: string) => {
+    navigator.clipboard.writeText(url).then(() => {
+      setIsCopied(true);
+      toast({ 
+        title: "Link Copied!", 
+        description: "Profile URL has been saved to your clipboard.",
+      });
+      setTimeout(() => setIsCopied(false), 2000);
+    }).catch(() => {
+      toast({
+        title: "Copy Failed",
+        description: "Please copy the URL from your address bar.",
+        variant: "destructive"
+      });
+    });
+  };
+
   const handleShare = async () => {
     const shareUrl = window.location.href;
     const shareData = {
@@ -70,25 +87,12 @@ const CreatorProfile = () => {
       try {
         await navigator.share(shareData);
       } catch (err) {
-        // User cancelled or share failed
-        if (err instanceof Error && err.name !== 'AbortError') {
-          copyToClipboard(shareUrl);
-        }
+        // Fallback to clipboard if sharing is blocked or fails
+        copyToClipboard(shareUrl);
       }
     } else {
       copyToClipboard(shareUrl);
     }
-  };
-
-  const copyToClipboard = (url: string) => {
-    navigator.clipboard.writeText(url).then(() => {
-      setIsCopied(true);
-      toast({ 
-        title: "Link Copied!", 
-        description: "Profile URL has been saved to your clipboard.",
-      });
-      setTimeout(() => setIsCopied(false), 2000);
-    });
   };
 
   if (!creator) return null;
@@ -194,7 +198,7 @@ const CreatorProfile = () => {
                     variant="ghost" 
                     size="icon" 
                     onClick={handleShare}
-                    className="h-12 w-12 rounded-2xl bg-white/5 border border-white/10 hover:bg-white/10 transition-all active:scale-95"
+                    className="h-12 w-12 rounded-2xl bg-white/5 border border-white/10 hover:bg-white/10 transition-all active:scale-95 z-20 relative"
                   >
                     {isCopied ? <Check className="h-5 w-5 text-green-500" /> : <Share2 className="h-5 w-5 text-white/40" />}
                   </Button>
