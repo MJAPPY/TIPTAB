@@ -195,7 +195,7 @@ const Dashboard = () => {
                    <div className="max-w-xs space-y-6">
                       <h3 className="text-3xl font-black leading-tight tracking-tight">Your Digital TipTab Card</h3>
                       <p className="text-white/60 text-lg">
-                        This is your unique creator card. Print it out, put it on your social profiles, or show it on your stream to receive instant tips.
+                        This is your unique creator card. Can be printed as a badge or sticker. Print it out, put it on your social profiles, or show it on your stream to receive instant tips.
                       </p>
                       <div className="space-y-4">
                         <div className="flex items-center gap-3 text-sm text-green-500 font-bold bg-green-500/5 p-3 rounded-xl border border-green-500/10">
