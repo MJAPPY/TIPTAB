@@ -62,47 +62,47 @@ export const Header = ({ onBecomeCreator }: HeaderProps) => {
   );
 
   return (
-    <header className="fixed top-10 left-0 right-0 z-50 px-4 md:px-6">
-      <div className="container mx-auto">
-        <div className="border border-white/10 bg-[#0a0514]/80 backdrop-blur-md rounded-2xl md:rounded-3xl px-4 md:px-6 py-3 md:py-4 flex items-center justify-between shadow-[0_20px_50px_rgba(0,0,0,0.5)]">
+    <header className="fixed top-6 md:top-10 left-0 right-0 z-50 px-2 sm:px-4 md:px-6">
+      <div className="max-w-[1400px] mx-auto">
+        <div className="border border-white/10 bg-[#0a0514]/90 backdrop-blur-md rounded-2xl md:rounded-[32px] px-3 sm:px-4 md:px-6 py-2.5 md:py-4 flex items-center justify-between shadow-[0_20px_50px_rgba(0,0,0,0.6)]">
           
           {/* Logo Section */}
-          <Link to="/" className="flex items-center gap-2 md:gap-4 group">
+          <Link to="/" className="flex items-center gap-2 sm:gap-4 group shrink-0">
             <div className="relative">
               <div className="absolute inset-0 bg-orange-500/20 blur-lg rounded-full group-hover:scale-110 transition-transform" />
-              <img src="/src/assets/logo.png" alt="TIPTAB Logo" className="h-12 w-12 md:h-20 md:w-20 object-contain relative z-10" />
+              <img src="/src/assets/logo.png" alt="TIPTAB Logo" className="h-10 w-10 sm:h-12 sm:w-12 md:h-16 md:w-16 object-contain relative z-10" />
             </div>
-            <div className="flex flex-col -space-y-1">
-              <span className="text-2xl md:text-4xl font-black italic tracking-tighter text-white">
+            <div className="flex flex-col -space-y-0.5 md:-space-y-1">
+              <span className="text-xl sm:text-2xl md:text-3xl font-black italic tracking-tighter text-white">
                 TIP<span className="text-orange-500">TAB</span>
               </span>
-              <span className="text-[9px] md:text-[11px] text-muted-foreground hidden xs:inline uppercase tracking-widest font-black">
+              <span className="text-[8px] md:text-[10px] text-muted-foreground hidden sm:inline uppercase tracking-[0.2em] font-black">
                 Appreciation Hub
               </span>
             </div>
           </Link>
 
           {/* Desktop Navigation */}
-          <div className="hidden lg:flex items-center gap-4">
+          <div className="hidden xl:flex items-center gap-3">
             <NavItems />
           </div>
 
           {/* Right Actions */}
-          <div className="flex items-center gap-2 md:gap-4">
-            <Button className="bg-[#a855f7] hover:bg-[#9333ea] text-white flex items-center gap-2 rounded-xl md:rounded-2xl h-12 md:h-14 px-4 md:px-8 font-black text-xs md:text-lg shadow-xl shadow-purple-500/30 transition-all active:scale-95">
-              <Wallet className="h-4 w-4 md:h-5 md:w-5" />
-              <span className="hidden xs:inline">Connect WebAuth</span>
-              <span className="xs:hidden">Wallet</span>
+          <div className="flex items-center gap-1.5 sm:gap-3 md:gap-4">
+            <Button className="bg-[#a855f7] hover:bg-[#9333ea] text-white flex items-center gap-2 rounded-xl md:rounded-2xl h-10 sm:h-12 md:h-14 px-3 sm:px-6 md:px-8 font-black text-[10px] sm:text-sm md:text-lg shadow-xl shadow-purple-500/30 transition-all active:scale-95 whitespace-nowrap">
+              <Wallet className="h-3.5 w-3.5 sm:h-4 sm:w-4 md:h-5 md:w-5" />
+              <span className="hidden xs:inline-block">Connect WebAuth</span>
+              <span className="xs:hidden">Connect</span>
             </Button>
 
             {/* Mobile Menu Trigger */}
             <Sheet open={isOpen} onOpenChange={setIsOpen}>
               <SheetTrigger asChild>
-                <Button variant="ghost" size="icon" className="lg:hidden text-white hover:bg-white/10 h-12 w-12 rounded-xl border border-white/10">
-                  <Menu className="h-6 w-6" />
+                <Button variant="ghost" size="icon" className="xl:hidden text-white hover:bg-white/10 h-10 w-10 sm:h-12 sm:w-12 rounded-xl border border-white/10 shrink-0">
+                  <Menu className="h-5 w-5 sm:h-6 sm:w-6" />
                 </Button>
               </SheetTrigger>
-              <SheetContent side="right" className="bg-[#0a0514]/95 backdrop-blur-2xl border-white/10 p-6 w-[300px]">
+              <SheetContent side="right" className="bg-[#0a0514]/95 backdrop-blur-2xl border-white/10 p-6 w-[280px] sm:w-[320px]">
                 <SheetHeader className="text-left mb-8">
                   <SheetTitle className="text-2xl font-black italic text-white">
                     TIP<span className="text-orange-500">TAB</span>
