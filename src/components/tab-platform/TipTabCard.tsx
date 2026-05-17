@@ -90,16 +90,16 @@ export const TipTabCard = ({ creator }: TipTabCardProps) => {
               {creator.avatar}
             </div>
             <div className="min-w-0">
-              <h3 className="text-2xl font-black bg-gradient-to-b from-slate-50 to-slate-400 bg-clip-text text-transparent truncate tracking-tight">
+              <h3 className="text-3xl font-black text-white truncate tracking-tight drop-shadow-sm">
                 {creator.name}
               </h3>
               <p className="text-purple-400 font-bold truncate">@{creator.handle}</p>
             </div>
           </div>
           <div className="flex flex-col items-end shrink-0">
-             <div className="flex items-center gap-3">
+             <div className="flex items-center gap-1">
                <img src="/src/assets/logo.png" alt="TAB" className="h-16 w-16 object-contain" />
-               <span className="text-2xl font-black italic tracking-tighter bg-gradient-to-b from-slate-50 to-slate-400 bg-clip-text text-transparent">
+               <span className="text-2xl font-black italic tracking-tighter bg-gradient-to-b from-white to-slate-400 bg-clip-text text-transparent">
                 TIP<span className="text-orange-500">TAB</span>
                </span>
              </div>
