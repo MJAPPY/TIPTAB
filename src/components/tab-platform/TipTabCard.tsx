@@ -57,7 +57,7 @@ export const TipTabCard = ({ creator }: TipTabCardProps) => {
       
       toast({
         title: "Card Downloaded",
-        description: "Your high-resolution TipTab card has been saved.",
+        description: "Your high-resolution silver-edition TipTab card has been saved.",
       });
     } catch (err) {
       toast({
@@ -90,15 +90,19 @@ export const TipTabCard = ({ creator }: TipTabCardProps) => {
               {creator.avatar}
             </div>
             <div className="min-w-0">
-              <h3 className="text-2xl font-black text-white truncate tracking-tight">{creator.name}</h3>
+              <h3 className="text-2xl font-black bg-gradient-to-b from-slate-50 to-slate-400 bg-clip-text text-transparent truncate tracking-tight">
+                {creator.name}
+              </h3>
               <p className="text-purple-400 font-bold truncate">@{creator.handle}</p>
             </div>
           </div>
           <div className="flex flex-col items-end shrink-0">
-             <span className="text-xl font-black italic tracking-tighter text-white">TIP<span className="text-orange-500">TAB</span></span>
-             <div className="mt-1 flex items-center gap-1 px-2 py-0.5 rounded-full bg-orange-500/20 border border-orange-500/30">
-               <Heart className="h-3 w-3 text-orange-500 fill-orange-500" />
-               <span className="text-[10px] font-black text-orange-500 uppercase tracking-widest">Verified</span>
+             <span className="text-xl font-black italic tracking-tighter bg-gradient-to-b from-slate-50 to-slate-400 bg-clip-text text-transparent">
+              TIP<span className="text-orange-500">TAB</span>
+             </span>
+             <div className="mt-1 flex items-center gap-1 px-2 py-0.5 rounded-full bg-slate-500/20 border border-slate-500/30">
+               <Heart className="h-3 w-3 text-slate-300 fill-slate-300" />
+               <span className="text-[10px] font-black text-slate-300 uppercase tracking-widest">Verified</span>
              </div>
           </div>
         </div>
@@ -108,18 +112,18 @@ export const TipTabCard = ({ creator }: TipTabCardProps) => {
           {/* Left Info Column */}
           <div className="space-y-4 flex-1 min-w-0 pb-2">
             <div className="space-y-2">
-              <div className="flex items-center gap-2 text-white/60 text-sm font-medium truncate">
+              <div className="flex items-center gap-2 text-slate-300 text-sm font-medium truncate">
                 <MapPin className="h-4 w-4 text-purple-500 shrink-0" />
                 <span className="truncate">{creator.location}</span>
               </div>
-              <p className="text-white/40 text-sm font-medium leading-tight max-w-[200px]">
+              <p className="text-slate-400 text-sm font-medium leading-tight max-w-[200px]">
                 Scan the QR code to support my work on XPR Network.
               </p>
             </div>
             
-            <div className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-white/5 border border-white/10 w-fit">
-              <ShieldCheck className="h-4 w-4 text-green-500" />
-              <span className="text-[10px] font-black uppercase tracking-widest text-white/80">Fee-Free Tip</span>
+            <div className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-slate-500/10 border border-slate-500/20 w-fit">
+              <ShieldCheck className="h-4 w-4 text-green-400" />
+              <span className="text-[10px] font-black uppercase tracking-widest text-slate-200">Fee-Free Tip</span>
             </div>
           </div>
 
@@ -134,7 +138,7 @@ export const TipTabCard = ({ creator }: TipTabCardProps) => {
               </div>
             </div>
             <div className="text-center space-y-0.5">
-              <p className="text-[10px] font-black uppercase tracking-[0.2em] text-white/30">Scan to Tip</p>
+              <p className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500">Scan to Tip</p>
               <p className="text-xs font-black text-orange-500 tracking-tighter">DIRECT $TAB</p>
             </div>
           </div>
@@ -146,7 +150,7 @@ export const TipTabCard = ({ creator }: TipTabCardProps) => {
         <Button 
           variant="secondary" 
           onClick={handleShare}
-          className="rounded-2xl bg-white/5 border border-white/10 hover:bg-white/10 text-white gap-2.5 h-14 font-bold text-base transition-all"
+          className="rounded-2xl bg-white/5 border border-white/10 hover:bg-white/10 text-slate-100 gap-2.5 h-14 font-bold text-base transition-all"
         >
           {isCopied ? <Check className="h-5 w-5 text-green-500" /> : <Share2 className="h-5 w-5 text-purple-400" />}
           {isCopied ? "Link Copied" : "Share URL"}
@@ -155,7 +159,7 @@ export const TipTabCard = ({ creator }: TipTabCardProps) => {
           variant="secondary" 
           onClick={handleDownload}
           disabled={isDownloading}
-          className="rounded-2xl bg-white/5 border border-white/10 hover:bg-white/10 text-white gap-2.5 h-14 font-bold text-base transition-all"
+          className="rounded-2xl bg-white/5 border border-white/10 hover:bg-white/10 text-slate-100 gap-2.5 h-14 font-bold text-base transition-all"
         >
           {isDownloading ? (
             <div className="h-5 w-5 border-2 border-white/20 border-t-white rounded-full animate-spin" />
