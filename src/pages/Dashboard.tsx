@@ -121,7 +121,7 @@ const Dashboard = () => {
                   </Card>
                   <Card className="bg-[#130b21] border-white/10 text-white rounded-[24px]">
                     <CardHeader className="pb-2">
-                      <CardDescription className="text-white/40 uppercase tracking-widest text-[10px] font-black">Unique Tippers</CardTitle>
+                      <CardDescription className="text-white/40 uppercase tracking-widest text-[10px] font-black">Unique Tippers</CardDescription>
                       <CardTitle className="text-3xl font-black">42</CardTitle>
                     </CardHeader>
                     <CardContent>
