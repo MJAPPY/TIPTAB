@@ -99,7 +99,7 @@ const Calculator = () => {
                       placeholder="0.00"
                     />
                     <Select value={fromCurrency} onValueChange={setFromCurrency}>
-                      <SelectTrigger className="w-[120px] bg-white/5 border-white/10 h-14 rounded-xl font-black text-xl mr-1">
+                      <SelectTrigger className="w-[120px] bg-white/5 border-white/10 h-14 rounded-xl font-black text-xl mr-1 text-white">
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent className="bg-[#1a102d] border-white/20 text-white rounded-[20px]">
@@ -128,7 +128,7 @@ const Calculator = () => {
                       {result.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                     </div>
                     <Select value={toCurrency} onValueChange={setToCurrency}>
-                      <SelectTrigger className="w-[120px] bg-white/5 border-white/10 h-14 rounded-xl font-black text-xl mr-1">
+                      <SelectTrigger className="w-[120px] bg-white/5 border-white/10 h-14 rounded-xl font-black text-xl mr-1 text-white">
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent className="bg-[#1a102d] border-white/20 text-white rounded-[20px]">
