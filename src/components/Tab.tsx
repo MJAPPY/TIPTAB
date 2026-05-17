@@ -4,6 +4,7 @@ import { Hero } from "./tab-platform/Hero";
 import { StatsBanner } from "./tab-platform/Sections";
 import { WorldMap } from "./tab-platform/WorldMap";
 import { FeaturedCreators } from "./tab-platform/FeaturedCreators";
+import { HowItWorks } from "./tab-platform/HowItWorks";
 import { MembershipModal } from "./tab-platform/MembershipModal";
 import { TippingModal } from "./tab-platform/TippingModal";
 import { Toaster } from "@/components/ui/toaster";
@@ -40,6 +41,8 @@ export const Tab = () => {
           </div>
           <WorldMap creators={displayCreators} onSelectCreator={setSelectedCreator} />
         </section>
+
+        <HowItWorks />
 
         <FeaturedCreators 
           creators={displayCreators}
