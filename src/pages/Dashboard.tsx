@@ -43,7 +43,7 @@ const Dashboard = () => {
   const handleShare = async () => {
     const shareUrl = `${window.location.origin}/tip/${user.handle}`;
     const shareData = {
-      title: `Tip ${user.name} on TIPTAB`,
+      title: `Support ${user.name} on TIPTAB`,
       text: `Support my work on the XPR Network using TIPTAB!`,
       url: shareUrl,
     };
@@ -138,9 +138,9 @@ const Dashboard = () => {
             <div className="pt-8">
               <div className="bg-gradient-to-br from-orange-500/10 to-purple-600/10 border border-white/5 rounded-2xl p-6 relative overflow-hidden group">
                 <Zap className="absolute -bottom-4 -right-4 h-24 w-24 text-orange-500/10 rotate-12 group-hover:scale-110 transition-transform" />
-                <h4 className="font-bold text-sm mb-2">Creator Status</h4>
+                <h4 className="font-bold text-sm mb-2">Network Presence</h4>
                 <p className="text-xs text-white/60 mb-4 leading-relaxed">
-                  You are a Pro Creator. 0% platform fees active.
+                  Your profile is live on the global map. This is how supporters find you and send direct tips to your wallet.
                 </p>
                 <div className="flex flex-col gap-2">
                   <Link to={`/tip/${user.handle}`} className="w-full">
