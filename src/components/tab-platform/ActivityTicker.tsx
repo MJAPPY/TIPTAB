@@ -26,7 +26,7 @@ export const ActivityTicker = () => {
   };
 
   return (
-    <div className="fixed top-32 left-0 right-0 z-40 bg-[#0a0514]/40 backdrop-blur-xl border-y border-white/5 h-10 flex items-center overflow-hidden shadow-[0_10px_30px_rgba(0,0,0,0.3)]">
+    <div className="fixed top-0 left-0 right-0 z-[60] bg-[#0a0514]/60 backdrop-blur-xl border-b border-white/5 h-10 flex items-center overflow-hidden shadow-[0_10px_30px_rgba(0,0,0,0.3)]">
       {/* Live Indicator Badge with Enhanced Blend */}
       <div className="relative z-30 flex items-center h-full pl-6 pr-32">
         {/* Main Badge Background with Long Gradient Falloff */}

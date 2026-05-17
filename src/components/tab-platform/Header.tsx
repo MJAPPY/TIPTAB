@@ -28,7 +28,7 @@ export const Header = ({ onBecomeCreator }: HeaderProps) => {
 
   const NavItems = () => (
     <>
-      <Link to="/leaderboard" onClick={() => setIsOpen(false)}>
+      <Link to="/leaderboard" onClick={() => setIsOpen(false)} className="w-full xl:w-auto">
         <Button 
           variant="ghost" 
           className="w-full lg:w-auto text-white hover:text-yellow-400 flex items-center justify-start lg:justify-center gap-3 font-bold bg-white/5 border border-white/10 rounded-xl h-14 px-5"
@@ -37,7 +37,7 @@ export const Header = ({ onBecomeCreator }: HeaderProps) => {
           Tip Leaderboard
         </Button>
       </Link>
-      <Link to="/dashboard" onClick={() => setIsOpen(false)}>
+      <Link to="/dashboard" onClick={() => setIsOpen(false)} className="w-full xl:w-auto">
         <Button 
           variant="ghost" 
           className="w-full lg:w-auto text-white hover:text-purple-400 flex items-center justify-start lg:justify-center gap-3 font-bold bg-white/5 border border-white/10 rounded-xl h-14 px-5"
@@ -61,7 +61,7 @@ export const Header = ({ onBecomeCreator }: HeaderProps) => {
   );
 
   return (
-    <header className="fixed top-6 left-0 right-0 z-50 px-4 md:px-6">
+    <header className="fixed top-14 left-0 right-0 z-50 px-4 md:px-6">
       <div className="container mx-auto">
         <div className="border border-white/10 bg-[#0a0514]/80 backdrop-blur-md rounded-2xl md:rounded-[32px] px-4 md:px-6 py-3 md:py-4 flex items-center justify-between shadow-[0_20px_50px_rgba(0,0,0,0.5)]">
           
@@ -100,7 +100,7 @@ export const Header = ({ onBecomeCreator }: HeaderProps) => {
                   <Menu className="h-5 w-5" />
                 </Button>
               </SheetTrigger>
-              <SheetContent side="right" className="bg-[#0a0514]/95 backdrop-blur-2xl border-white/10 p-6 w-[300px]">
+              <SheetContent side="right" className="bg-[#0a0514]/95 backdrop-blur-2xl border-white/10 p-6 pt-12 w-[300px]">
                 <SheetHeader className="text-left mb-8">
                   <SheetTitle className="text-2xl font-black italic text-white">
                     TIP<span className="text-orange-500">TAB</span>
