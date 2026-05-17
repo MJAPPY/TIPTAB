@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useRef } from "react";
-import { QrCode, MapPin, Share2, Download, Check, ShieldCheck, Heart } from "lucide-react";
+import { QrCode, MapPin, Share2, Download, Check, ShieldCheck } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Creator } from "@/data/creators";
 import { useToast } from "@/hooks/use-toast";
@@ -105,10 +105,6 @@ export const TipTabCard = ({ creator }: TipTabCardProps) => {
                <span className="text-xl font-black italic tracking-tighter text-white">
                 TIP<span className="text-orange-500">TAB</span>
                </span>
-             </div>
-             <div className="mt-1 flex items-center gap-1 px-2 py-0.5 rounded-full bg-slate-500/20 border border-slate-500/30">
-               <Heart className="h-2.5 w-2.5 text-slate-300 fill-slate-300" />
-               <span className="text-[9px] font-black text-slate-300 uppercase tracking-widest">Verified</span>
              </div>
           </div>
         </div>

@@ -89,7 +89,7 @@ const Dashboard = () => {
                 <Zap className="absolute -bottom-4 -right-4 h-24 w-24 text-orange-500/10 rotate-12 group-hover:scale-110 transition-transform" />
                 <h4 className="font-bold text-sm mb-2">Creator Status</h4>
                 <p className="text-xs text-white/60 mb-4 leading-relaxed">
-                  You are a verified Pro Creator. 0% platform fees active.
+                  You are a Pro Creator. 0% platform fees active.
                 </p>
                 <Button className="w-full bg-orange-500 hover:bg-orange-600 text-white font-bold h-10 rounded-xl text-xs shadow-lg shadow-orange-500/20 transition-all">
                   View Public Profile
