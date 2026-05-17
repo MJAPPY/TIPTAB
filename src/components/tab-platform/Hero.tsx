@@ -5,14 +5,14 @@ export const Hero = () => {
   return (
     <section className="relative pt-48 pb-32 overflow-hidden">
       {/* Cinematic Background */}
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[1000px] h-[1000px] bg-purple-600/10 blur-[160px] rounded-full -z-10 animate-pulse" />
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[1000px] h-[1000px] bg-purple-600/10 blur-[160px] rounded-full -z-10" />
       <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-orange-500/5 blur-[120px] rounded-full -z-10" />
       
       <div className="container mx-auto px-6">
         <div className="flex flex-col lg:flex-row items-center justify-between gap-20">
           <div className="flex-1 text-left space-y-10 max-w-3xl">
             <div className="inline-flex items-center gap-3 px-4 py-2 rounded-full bg-white/5 border border-white/10 backdrop-blur-md shadow-2xl">
-              <div className="h-2 w-2 rounded-full bg-green-500 animate-pulse" />
+              <div className="h-2 w-2 rounded-full bg-green-500" />
               <span className="text-white/60 text-xs font-black uppercase tracking-[0.2em]">Network Live on XPR</span>
             </div>
             
@@ -53,7 +53,7 @@ export const Hero = () => {
           <div className="flex-1 relative lg:block hidden">
             <div className="relative z-10 flex items-center justify-center">
               {/* Massive glow behind logo */}
-              <div className="absolute inset-0 bg-orange-500/20 blur-[120px] rounded-full animate-pulse-slow scale-150" />
+              <div className="absolute inset-0 bg-orange-500/10 blur-[120px] rounded-full scale-150" />
               
               <div className="relative group">
                 <img 
@@ -63,9 +63,8 @@ export const Hero = () => {
                 />
               </div>
               
-              {/* Floating elements optimized based on your reference */}
-              <div className="absolute -top-12 -left-16 bg-white/5 backdrop-blur-2xl border border-white/10 p-6 rounded-[32px] shadow-[0_32px_64px_-16px_rgba(0,0,0,0.6)] animate-float overflow-hidden">
-                <div className="absolute bottom-0 left-4 right-12 h-0.5 bg-red-600/60" /> {/* Red accent line */}
+              {/* Floating elements optimized for a clean glass effect */}
+              <div className="absolute -top-12 -left-16 bg-white/[0.03] backdrop-blur-[32px] border border-white/20 p-6 rounded-[32px] shadow-[0_32px_64px_-16px_rgba(0,0,0,0.6)] animate-float">
                 <div className="flex items-center gap-4">
                   <div className="h-12 w-12 rounded-2xl bg-orange-500 flex items-center justify-center shadow-lg shadow-orange-500/20">
                     <Zap className="h-7 w-7 text-white fill-white" />
@@ -77,8 +76,7 @@ export const Hero = () => {
                 </div>
               </div>
 
-              <div className="absolute -bottom-4 -right-12 bg-white/5 backdrop-blur-2xl border border-white/10 p-6 rounded-[32px] shadow-[0_32px_64px_-16px_rgba(0,0,0,0.6)] animate-float-delayed overflow-hidden">
-                <div className="absolute top-0 left-4 right-12 h-0.5 bg-red-600/60" /> {/* Red accent line */}
+              <div className="absolute -bottom-4 -right-12 bg-white/[0.03] backdrop-blur-[32px] border border-white/20 p-6 rounded-[32px] shadow-[0_32px_64px_-16px_rgba(0,0,0,0.6)] animate-float-delayed">
                 <div className="flex items-center gap-4">
                   <div className="h-12 w-12 rounded-2xl bg-purple-500 flex items-center justify-center shadow-lg shadow-purple-500/20">
                     <Sparkles className="h-7 w-7 text-white fill-white" />
@@ -102,13 +100,6 @@ export const Hero = () => {
         .animate-delayed-spin {
           animation: delayed-spin 20s cubic-bezier(0.4, 0, 0.2, 1) infinite;
           animation-delay: 10s;
-        }
-        @keyframes pulse-slow {
-          0%, 100% { opacity: 0.3; transform: scale(1.3); }
-          50% { opacity: 0.6; transform: scale(1.6); }
-        }
-        .animate-pulse-slow {
-          animation: pulse-slow 8s ease-in-out infinite;
         }
         @keyframes float {
           0%, 100% { transform: translateY(0) translateX(0); }
