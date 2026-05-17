@@ -108,7 +108,7 @@ const Dashboard = () => {
                 <p className="text-xs text-white/60 mb-4 leading-relaxed">
                   You are a Pro Creator. 0% platform fees active.
                 </p>
-                <Link to="/">
+                <Link to={`/tip/${user.handle}`}>
                   <Button className="w-full bg-orange-500 hover:bg-orange-600 text-white font-bold h-10 rounded-xl text-xs shadow-lg shadow-orange-500/20 transition-all">
                     View Public Profile
                   </Button>
