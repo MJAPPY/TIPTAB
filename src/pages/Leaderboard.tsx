@@ -35,7 +35,7 @@ const Leaderboard = () => {
           <div className="flex items-center gap-3">
             <Trophy className="h-10 w-10 text-yellow-400 drop-shadow-[0_0_15px_rgba(250,204,21,0.5)]" />
             <h1 className="text-5xl md:text-7xl font-black italic tracking-tighter leading-none">
-              HALL OF <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 via-magenta-500 to-yellow-400">FAME</span>
+              TIP <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 via-magenta-500 to-yellow-400">LEADERBOARD</span>
             </h1>
           </div>
           <p className="text-cyan-400/60 font-black uppercase tracking-[0.4em] text-[10px] mt-4">

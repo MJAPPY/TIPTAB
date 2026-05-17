@@ -30,7 +30,7 @@ export const Header = ({ onBecomeCreator }: HeaderProps) => {
             className="text-white hover:text-yellow-400 flex items-center gap-2 font-bold bg-white/5 border border-white/10 rounded-xl h-14"
           >
             <Trophy className="h-5 w-5" />
-            Hall of Fame
+            Tip Leaderboard
           </Button>
         </Link>
         <Link to="/dashboard" className="hidden md:block">
