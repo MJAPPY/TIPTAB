@@ -1,15 +1,12 @@
-"use client";
-
 import { Button } from "@/components/ui/button";
-import { Zap, ArrowRight, UserCheck, Sparkles, Globe, Heart, Rocket, Plus } from "lucide-react";
+import { Zap, ArrowRight, UserCheck, Sparkles, Globe, Heart, Rocket } from "lucide-react";
 import { Creator } from "@/data/creators";
 
 interface HeroProps {
   creators: Creator[];
-  onJoin: () => void;
 }
 
-export const Hero = ({ creators, onJoin }: HeroProps) => {
+export const Hero = ({ creators }: HeroProps) => {
   // Take the first 4 creators for the preview avatars
   const previewCreators = creators.slice(0, 4);
   // Calculate a dynamic count (using a base of 10k to maintain the 'scale' vibe)
@@ -37,20 +34,6 @@ export const Hero = ({ creators, onJoin }: HeroProps) => {
             <p className="text-xl md:text-2xl text-white/40 max-w-2xl leading-relaxed font-medium">
               Whether you're a delivery pro, a fitness coach, or a digital creator—TIPTAB connects you directly to the people who value your hustle via the <span className="text-purple-400 font-black">XPR Network</span>. Zero fees. Instant TAB rewards.
             </p>
-
-            <div className="pt-4 flex flex-col sm:flex-row items-center gap-4">
-              <Button 
-                onClick={onJoin}
-                className="w-full sm:w-auto h-20 px-10 bg-white text-black hover:bg-purple-500 hover:text-white font-black text-2xl rounded-[32px] shadow-[0_20px_50px_rgba(255,255,255,0.1)] transition-all active:scale-95 group"
-              >
-                <Plus className="mr-3 h-8 w-8 group-hover:rotate-90 transition-transform" />
-                Join the Map
-              </Button>
-              <div className="flex items-center gap-2 text-white/30 text-sm font-bold uppercase tracking-widest px-4">
-                <ArrowRight className="h-4 w-4 animate-bounce-x" />
-                Start Earning TAB
-              </div>
-            </div>
             
             <div className="flex flex-wrap items-center gap-4 md:gap-6 pt-2 md:pt-4">
               <div className="flex items-center gap-3 bg-white/5 px-6 py-3 rounded-2xl border border-white/5">
@@ -115,13 +98,6 @@ export const Hero = ({ creators, onJoin }: HeroProps) => {
         .animate-delayed-spin {
           animation: delayed-spin 20s cubic-bezier(0.4, 0, 0.2, 1) infinite;
           animation-delay: 10s;
-        }
-        @keyframes bounce-x {
-          0%, 100% { transform: translateX(0); }
-          50% { transform: translateX(10px); }
-        }
-        .animate-bounce-x {
-          animation: bounce-x 1s ease-in-out infinite;
         }
       `}</style>
     </section>

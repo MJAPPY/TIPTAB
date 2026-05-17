@@ -36,10 +36,7 @@ export const Tab = () => {
       <ActivityTicker />
       
       <main className="pt-24 md:pt-32">
-        <Hero 
-          creators={displayCreators} 
-          onJoin={() => setIsMembershipOpen(true)} 
-        />
+        <Hero creators={displayCreators} />
         <StatsBanner />
         
         <section className="py-12 container mx-auto px-6">
