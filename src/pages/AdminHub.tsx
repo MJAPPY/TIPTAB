@@ -90,7 +90,7 @@ const AdminHub = () => {
                 <div className="grid grid-cols-2 gap-4">
                   <div className="p-6 rounded-[24px] bg-[#1a112d] border border-white/5 space-y-2">
                     <p className="text-[10px] font-black text-white/40 uppercase tracking-widest">TOTAL MEMBERS</p>
-                    <p className="text-4xl font-black">133</p>
+                    <p className="text-4xl font-black text-white">133</p>
                   </div>
                   <div className="p-6 rounded-[24px] bg-[#1a112d] border border-white/5 space-y-2">
                     <p className="text-[10px] font-black text-white/40 uppercase tracking-widest">WEEKLY GROWTH</p>
@@ -141,10 +141,11 @@ const AdminHub = () => {
                 </div>
                 
                 <div className="pt-4 border-t border-white/5 space-y-4">
-                  <Button className="w-full h-16 rounded-[24px] bg-white text-black hover:bg-white/90 font-black text-sm flex items-center justify-between px-8">
-                    Maintenance Mode <div className="h-2 w-2 rounded-full bg-red-400/30" />
+                  <Button className="w-full h-16 rounded-[24px] bg-red-600/10 border border-red-600/30 text-red-500 hover:bg-red-600/20 font-black text-sm flex items-center justify-between px-8">
+                    Maintenance Mode <div className="h-2 w-2 rounded-full bg-red-500 shadow-[0_0_10px_rgba(239,68,68,0.5)]" />
                   </Button>
-                  <Button className="w-full h-16 rounded-[24px] bg-white text-black hover:bg-white/90 font-black text-sm flex items-center justify-start gap-4 px-8">
+                  <Button className="w-full h-16 rounded-[24px] bg-purple-600/10 border border-purple-600/30 text-purple-400 hover:bg-purple-600/20 font-black text-sm flex items-center justify-start gap-4 px-8">
+                    <Bell className="h-4 w-4" />
                     Broadcast Network Alert
                   </Button>
                 </div>
@@ -158,7 +159,7 @@ const AdminHub = () => {
               <CardHeader className="p-10 border-b border-white/5">
                 <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
                   <div>
-                    <CardTitle className="text-3xl font-black tracking-tight uppercase italic">CREATOR MODERATION</CardTitle>
+                    <CardTitle className="text-3xl font-black tracking-tight uppercase italic text-white">CREATOR MODERATION</CardTitle>
                     <CardDescription className="text-white/40 font-medium">Manage network access and profiles</CardDescription>
                   </div>
                   <div className="relative w-full md:w-80">
@@ -194,7 +195,7 @@ const AdminHub = () => {
                                   {creator.avatar}
                                 </div>
                                 <div>
-                                  <p className="font-black text-base">{creator.name}</p>
+                                  <p className="font-black text-base text-white">{creator.name}</p>
                                   <p className="text-xs text-purple-400 font-bold tracking-wider">@{creator.handle}</p>
                                 </div>
                               </div>
