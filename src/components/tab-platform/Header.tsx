@@ -11,7 +11,9 @@ import {
   Calculator as CalcIcon,
   LogOut,
   User,
-  ChevronDown
+  ChevronDown,
+  RefreshCw,
+  Zap
 } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useState } from "react";
@@ -32,6 +34,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { useToast } from "@/hooks/use-toast";
 import { useXpr } from "@/contexts/XprContext";
+import { cn } from "@/lib/utils";
 
 interface HeaderProps {
   onBecomeCreator: () => void;
@@ -39,7 +42,8 @@ interface HeaderProps {
 
 export const Header = ({ onBecomeCreator }: HeaderProps) => {
   const [isOpen, setIsOpen] = useState(false);
-  const { login, logout, actor, isConnected, isLoading } = useXpr();
+  const [isRefreshing, setIsRefreshing] = useState(false);
+  const { login, logout, actor, balances, isConnected, isLoading, refreshBalances } = useXpr();
   const { toast } = useToast();
 
   const handleConnect = async () => {
@@ -64,6 +68,16 @@ export const Header = ({ onBecomeCreator }: HeaderProps) => {
     toast({
       title: "Disconnected",
       description: "Wallet session cleared.",
+    });
+  };
+
+  const handleRefresh = async () => {
+    setIsRefreshing(true);
+    await refreshBalances();
+    setTimeout(() => setIsRefreshing(false), 800);
+    toast({
+      title: "Balances Updated",
+      description: "Successfully synced with the XPR Network.",
     });
   };
 
@@ -139,6 +153,25 @@ export const Header = ({ onBecomeCreator }: HeaderProps) => {
           </div>
 
           <div className="flex items-center gap-2 md:gap-4">
+            {isConnected && (
+              <div className="hidden md:flex items-center gap-2 bg-white/5 border border-white/10 rounded-2xl px-4 py-2">
+                <div className="flex flex-col items-end pr-3 border-r border-white/10">
+                  <span className="text-[10px] font-black text-orange-500 flex items-center gap-1">
+                    <Zap className="h-2.5 w-2.5 fill-orange-500" /> {Number(balances.tab).toLocaleString()} TAB
+                  </span>
+                  <span className="text-[10px] font-bold text-white/40">{Number(balances.xpr).toLocaleString()} XPR</span>
+                </div>
+                <Button 
+                  variant="ghost" 
+                  size="icon" 
+                  onClick={handleRefresh}
+                  className="h-8 w-8 text-white/20 hover:text-white"
+                >
+                  <RefreshCw className={cn("h-3.5 w-3.5", isRefreshing && "animate-spin")} />
+                </Button>
+              </div>
+            )}
+
             {isConnected ? (
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
@@ -147,18 +180,34 @@ export const Header = ({ onBecomeCreator }: HeaderProps) => {
                   >
                     <div className="flex flex-col items-start -space-y-1 text-left mr-2">
                       <span className="text-[10px] md:text-xs font-black text-purple-400">@{actor}</span>
-                      <span className="text-[8px] md:text-[9px] font-bold text-white/40 uppercase tracking-tighter">XPR Network</span>
+                      <span className="text-[8px] md:text-[9px] font-bold text-white/40 uppercase tracking-tighter">Connected</span>
                     </div>
                     <ChevronDown className="h-4 w-4 text-white/40 group-data-[state=open]:rotate-180 transition-transform" />
                   </Button>
                 </DropdownMenuTrigger>
-                <DropdownMenuContent align="end" className="w-56 bg-[#1a102d] border-white/10 text-white rounded-2xl p-2 mt-2 shadow-2xl">
-                  <DropdownMenuLabel className="text-[10px] font-black uppercase tracking-widest text-white/40 px-3 py-2">Account Actions</DropdownMenuLabel>
+                <DropdownMenuContent align="end" className="w-64 bg-[#1a102d] border-white/10 text-white rounded-2xl p-2 mt-2 shadow-2xl">
+                  <DropdownMenuLabel className="px-3 py-2">
+                    <div className="flex flex-col">
+                      <span className="text-[10px] font-black uppercase tracking-widest text-white/40">Network Account</span>
+                      <span className="text-sm font-black text-purple-400">@{actor}</span>
+                    </div>
+                  </DropdownMenuLabel>
+                  <DropdownMenuSeparator className="bg-white/5" />
+                  <div className="px-3 py-3 space-y-2">
+                    <div className="flex items-center justify-between text-xs font-bold">
+                      <span className="text-white/40">TAB Balance:</span>
+                      <span className="text-orange-500">{Number(balances.tab).toLocaleString()}</span>
+                    </div>
+                    <div className="flex items-center justify-between text-xs font-bold">
+                      <span className="text-white/40">XPR Balance:</span>
+                      <span>{Number(balances.xpr).toLocaleString()}</span>
+                    </div>
+                  </div>
                   <DropdownMenuSeparator className="bg-white/5" />
                   <DropdownMenuItem asChild className="focus:bg-white/5 focus:text-white rounded-xl cursor-pointer">
                     <Link to="/dashboard" className="flex items-center gap-3 px-3 py-2.5">
-                      <User className="h-4 w-4 text-purple-400" />
-                      <span className="font-bold">Creator Dashboard</span>
+                      <LayoutDashboard className="h-4 w-4 text-purple-400" />
+                      <span className="font-bold">Creator Hub</span>
                     </Link>
                   </DropdownMenuItem>
                   <DropdownMenuItem onClick={handleLogout} className="focus:bg-red-500/10 focus:text-red-500 rounded-xl cursor-pointer text-red-400 flex items-center gap-3 px-3 py-2.5">
@@ -200,7 +249,10 @@ export const Header = ({ onBecomeCreator }: HeaderProps) => {
                         </div>
                         <div>
                           <p className="text-xs font-black text-purple-400">@{actor}</p>
-                          <p className="text-[10px] font-bold text-white/40">Verified Session</p>
+                          <div className="flex flex-col">
+                            <span className="text-[9px] font-black text-orange-500">{Number(balances.tab).toLocaleString()} TAB</span>
+                            <span className="text-[9px] font-bold text-white/40">{Number(balances.xpr).toLocaleString()} XPR</span>
+                          </div>
                         </div>
                       </div>
                     </div>
