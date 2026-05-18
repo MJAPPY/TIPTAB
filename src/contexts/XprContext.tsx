@@ -17,22 +17,21 @@ interface XprContextType {
   refreshBalances: () => Promise<void>;
   isConnected: boolean;
   isLoading: boolean;
+  isAdmin: boolean;
 }
 
 const XprContext = createContext<XprContextType | undefined>(undefined);
 
 const ENDPOINT = 'https://proton.greymass.com';
+const APP_IDENTIFIER = 'tabxpr'; // Established as official requestor
 
 export const XprProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [session, setSession] = useState<LinkSession | null>(null);
   const [balances, setBalances] = useState<Balances>({ xpr: '0.00', tab: '0.00' });
   const [isLoading, setIsLoading] = useState(true);
 
-  const appIdentifier = 'tiptab';
-
   const fetchBalances = useCallback(async (account: string) => {
     try {
-      // Fetch XPR balance (eosio.token)
       const xprRes = await fetch(`${ENDPOINT}/v1/chain/get_currency_balance`, {
         method: 'POST',
         body: JSON.stringify({
@@ -43,7 +42,6 @@ export const XprProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       });
       const xprData = await xprRes.json();
       
-      // Fetch TAB balance (tokencreate)
       const tabRes = await fetch(`${ENDPOINT}/v1/chain/get_currency_balance`, {
         method: 'POST',
         body: JSON.stringify({
@@ -71,11 +69,11 @@ export const XprProvider: React.FC<{ children: React.ReactNode }> = ({ children 
           restoreSession: true,
         },
         transportOptions: {
-          requestAccount: appIdentifier,
+          requestAccount: APP_IDENTIFIER,
         },
         selectorOptions: {
-          appName: 'TipTab',
-          appLogo: 'https://tiptab.xyz/logo.png',
+          appName: 'TAB Network',
+          appLogo: 'https://explorer.xprnetwork.org/api/account/tabxpr/avatar',
         },
       });
 
@@ -101,11 +99,11 @@ export const XprProvider: React.FC<{ children: React.ReactNode }> = ({ children 
           endpoints: [ENDPOINT],
         },
         transportOptions: {
-          requestAccount: appIdentifier,
+          requestAccount: APP_IDENTIFIER,
         },
         selectorOptions: {
-          appName: 'TipTab',
-          appLogo: 'https://tiptab.xyz/logo.png',
+          appName: 'TAB Network',
+          appLogo: 'https://explorer.xprnetwork.org/api/account/tabxpr/avatar',
         },
       });
 
@@ -142,6 +140,7 @@ export const XprProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     refreshBalances,
     isConnected: !!session,
     isLoading,
+    isAdmin: session?.auth.actor === 'tabxpr',
   };
 
   return <XprContext.Provider value={value}>{children}</XprContext.Provider>;

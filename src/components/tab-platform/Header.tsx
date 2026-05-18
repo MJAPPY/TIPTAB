@@ -13,7 +13,8 @@ import {
   User,
   ChevronDown,
   RefreshCw,
-  Zap
+  Zap,
+  ShieldCheck
 } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useState } from "react";
@@ -43,7 +44,7 @@ interface HeaderProps {
 export const Header = ({ onBecomeCreator }: HeaderProps) => {
   const [isOpen, setIsOpen] = useState(false);
   const [isRefreshing, setIsRefreshing] = useState(false);
-  const { login, logout, actor, balances, isConnected, isLoading, refreshBalances } = useXpr();
+  const { login, logout, actor, balances, isConnected, isLoading, refreshBalances, isAdmin } = useXpr();
   const { toast } = useToast();
 
   const handleConnect = async () => {
@@ -51,7 +52,7 @@ export const Header = ({ onBecomeCreator }: HeaderProps) => {
       await login();
       toast({
         title: "Wallet Connected",
-        description: "Successfully connected to XPR Network.",
+        description: `Successfully connected as @${actor} via @tabxpr`,
       });
     } catch (error) {
       toast({
@@ -176,11 +177,19 @@ export const Header = ({ onBecomeCreator }: HeaderProps) => {
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <Button 
-                    className="flex items-center gap-2 rounded-2xl h-10 md:h-14 px-4 md:px-8 font-black text-[10px] md:text-sm transition-all active:scale-95 group shrink-0 bg-white/5 border border-white/10 text-white hover:bg-white/10 shadow-xl"
+                    className={cn(
+                      "flex items-center gap-2 rounded-2xl h-10 md:h-14 px-4 md:px-8 font-black text-[10px] md:text-sm transition-all active:scale-95 group shrink-0 bg-white/5 border border-white/10 text-white hover:bg-white/10 shadow-xl",
+                      isAdmin && "border-orange-500/50 bg-orange-500/5"
+                    )}
                   >
                     <div className="flex flex-col items-start -space-y-1 text-left mr-2">
-                      <span className="text-[10px] md:text-xs font-black text-purple-400">@{actor}</span>
-                      <span className="text-[8px] md:text-[9px] font-bold text-white/40 uppercase tracking-tighter">Connected</span>
+                      <div className="flex items-center gap-1">
+                        <span className="text-[10px] md:text-xs font-black text-purple-400">@{actor}</span>
+                        {isAdmin && <ShieldCheck className="h-3 w-3 text-orange-500" />}
+                      </div>
+                      <span className="text-[8px] md:text-[9px] font-bold text-white/40 uppercase tracking-tighter">
+                        {isAdmin ? "Network Admin" : "Connected"}
+                      </span>
                     </div>
                     <ChevronDown className="h-4 w-4 text-white/40 group-data-[state=open]:rotate-180 transition-transform" />
                   </Button>
@@ -242,7 +251,10 @@ export const Header = ({ onBecomeCreator }: HeaderProps) => {
                 </SheetHeader>
                 <div className="flex flex-col gap-5">
                   {isConnected && (
-                    <div className="bg-white/5 border border-white/10 rounded-2xl p-5 mb-2 space-y-3">
+                    <div className={cn(
+                      "bg-white/5 border border-white/10 rounded-2xl p-5 mb-2 space-y-3",
+                      isAdmin && "border-orange-500/30 bg-orange-500/5"
+                    )}>
                       <div className="flex items-center gap-3">
                         <div className="h-10 w-10 rounded-full bg-purple-500/20 flex items-center justify-center">
                           <User className="h-5 w-5 text-purple-400" />
@@ -257,6 +269,7 @@ export const Header = ({ onBecomeCreator }: HeaderProps) => {
                       </div>
                     </div>
                   )}
+                  <NavItems />
                   <Link to="/" onClick={() => setIsOpen(false)}>
                     <Button 
                       variant="ghost" 
@@ -266,7 +279,6 @@ export const Header = ({ onBecomeCreator }: HeaderProps) => {
                       View Map
                     </Button>
                   </Link>
-                  <NavItems />
                   
                   {isConnected && (
                     <Button 
