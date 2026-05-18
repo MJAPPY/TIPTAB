@@ -46,13 +46,13 @@ export const FeaturedCreators = ({ creators, onSelectCreator, onAddYourself }: F
     <section className="py-32 container mx-auto px-6 relative">
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-10 mb-16">
         <div className="space-y-6">
-          <div className="inline-flex items-center gap-2.5 px-4 py-1.5 rounded-full bg-white/5 border border-white/10 text-[10px] font-black uppercase tracking-[0.2em] text-white/50">
+          <div className="inline-flex items-center gap-2.5 px-4 py-1.5 rounded-full bg-white/10 border border-white/20 text-[10px] font-black uppercase tracking-[0.2em] text-white/80">
             <Zap className="h-3 w-3 text-orange-500 fill-orange-500" />
             Verified Network
           </div>
           <h2 className="text-6xl md:text-7xl font-black tracking-tighter leading-[0.85] text-white">
             Discover <br />
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-white via-white to-white/30 italic">Featured Pros</span>
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-white via-white to-white/60 italic">Featured Pros</span>
           </h2>
         </div>
         
@@ -66,14 +66,14 @@ export const FeaturedCreators = ({ creators, onSelectCreator, onAddYourself }: F
       </div>
       
       <div className="space-y-6 mb-16">
-        <div className="flex flex-col lg:flex-row items-center gap-4 bg-white/[0.02] p-3 rounded-[32px] border border-white/10 backdrop-blur-3xl shadow-2xl">
+        <div className="flex flex-col lg:flex-row items-center gap-4 bg-white/[0.05] p-3 rounded-[32px] border border-white/20 backdrop-blur-3xl shadow-2xl">
           <div className="relative flex-1 w-full group">
-            <Search className="absolute left-7 top-1/2 -translate-y-1/2 h-5 w-5 text-white/20 group-focus-within:text-purple-500 transition-colors" />
+            <Search className="absolute left-7 top-1/2 -translate-y-1/2 h-5 w-5 text-white/40 group-focus-within:text-purple-500 transition-colors" />
             <Input 
               placeholder="Search by name, handle, or city..." 
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-16 bg-transparent border-transparent h-16 rounded-[24px] text-xl focus-visible:ring-0 placeholder:text-white/10 text-white font-bold tracking-tight"
+              className="pl-16 bg-transparent border-transparent h-16 rounded-[24px] text-xl focus-visible:ring-0 placeholder:text-white/30 text-white font-bold tracking-tight"
             />
           </div>
           
@@ -86,8 +86,8 @@ export const FeaturedCreators = ({ creators, onSelectCreator, onAddYourself }: F
                 className={cn(
                   "rounded-2xl h-12 px-6 whitespace-nowrap font-black text-[11px] uppercase tracking-[0.15em] transition-all border-2",
                   activeCategory === cat.name 
-                  ? "bg-purple-500/10 border-purple-500/50 text-purple-400 shadow-[0_0_20px_rgba(168,85,247,0.2)]" 
-                  : "bg-white/5 border-transparent text-white/30 hover:text-white hover:bg-white/10"
+                  ? "bg-purple-500/20 border-purple-500/60 text-purple-400 shadow-[0_0_20px_rgba(168,85,247,0.3)]" 
+                  : "bg-white/10 border-transparent text-white/60 hover:text-white hover:bg-white/20"
                 )}
               >
                 {cat.name}
@@ -104,19 +104,19 @@ export const FeaturedCreators = ({ creators, onSelectCreator, onAddYourself }: F
             <div 
               key={creator.id} 
               onClick={() => onSelectCreator(creator)}
-              className="group bg-[#130b21]/40 border border-white/5 rounded-[48px] p-8 hover:border-purple-500/30 hover:bg-[#1a102d]/60 transition-all duration-500 cursor-pointer relative overflow-hidden flex flex-col min-h-[340px] shadow-2xl"
+              className="group bg-[#130b21]/60 border border-white/10 rounded-[48px] p-8 hover:border-purple-500/50 hover:bg-[#1a102d]/80 transition-all duration-500 cursor-pointer relative overflow-hidden flex flex-col min-h-[340px] shadow-2xl"
             >
               {/* Dynamic Neon Glow Overlay */}
               <div 
-                className="absolute -top-24 -right-24 w-64 h-64 blur-[100px] rounded-full opacity-0 group-hover:opacity-20 transition-opacity duration-700 pointer-events-none"
+                className="absolute -top-24 -right-24 w-64 h-64 blur-[100px] rounded-full opacity-0 group-hover:opacity-30 transition-opacity duration-700 pointer-events-none"
                 style={{ backgroundColor: theme.color }}
               />
               
               <div className="flex items-start justify-between gap-6 mb-8 relative z-10">
                 <div className="flex items-center gap-5">
                   <div 
-                    className="h-20 w-20 rounded-[32px] flex items-center justify-center text-2xl font-black border-4 border-white/5 shadow-2xl overflow-hidden bg-black/40 group-hover:scale-105 transition-transform duration-500"
-                    style={{ borderColor: theme.color + '40' }}
+                    className="h-20 w-20 rounded-[32px] flex items-center justify-center text-2xl font-black border-4 border-white/10 shadow-2xl overflow-hidden bg-black/40 group-hover:scale-105 transition-transform duration-500"
+                    style={{ borderColor: theme.color + '60' }}
                   >
                     {creator.avatarImage ? (
                       <img src={creator.avatarImage} alt="Avatar" className="w-full h-full object-cover" />
@@ -126,38 +126,38 @@ export const FeaturedCreators = ({ creators, onSelectCreator, onAddYourself }: F
                   </div>
                   <div className="space-y-1">
                     <h3 className="text-2xl font-black tracking-tighter text-white group-hover:text-purple-400 transition-colors">{creator.name}</h3>
-                    <p className="font-bold text-sm tracking-wide opacity-50">@{creator.handle}</p>
+                    <p className="font-bold text-sm tracking-wide opacity-70 text-white/80">@{creator.handle}</p>
                   </div>
                 </div>
                 
                 <div 
                   className="px-4 py-1.5 rounded-full border-2 text-[10px] font-black uppercase tracking-[0.2em] bg-black/40"
-                  style={{ borderColor: theme.color + '30', color: theme.color }}
+                  style={{ borderColor: theme.color + '50', color: theme.color }}
                 >
                   {creator.category}
                 </div>
               </div>
               
-              <p className="text-white/50 text-lg leading-relaxed mb-8 line-clamp-2 relative z-10 font-medium tracking-tight group-hover:text-white/80 transition-colors">
+              <p className="text-white/70 text-lg leading-relaxed mb-8 line-clamp-2 relative z-10 font-medium tracking-tight group-hover:text-white transition-colors">
                 {creator.bio}
               </p>
               
-              <div className="flex items-center justify-between mt-auto pt-6 border-t border-white/5 relative z-10">
+              <div className="flex items-center justify-between mt-auto pt-6 border-t border-white/10 relative z-10">
                 <div className="flex items-center gap-6">
-                  <div className="flex items-center gap-2.5 text-white/30 text-xs font-black uppercase tracking-widest group-hover:text-white/60 transition-colors">
+                  <div className="flex items-center gap-2.5 text-white/60 text-xs font-black uppercase tracking-widest group-hover:text-white transition-colors">
                     <MapPin className="h-4 w-4" style={{ color: theme.color }} />
                     {creator.location}
                   </div>
                   <div className="flex items-center gap-4">
-                    {creator.twitter && <Twitter className="h-4 w-4 text-white/20 hover:text-white transition-colors" />}
-                    {creator.instagram && <Instagram className="h-4 w-4 text-white/20 hover:text-white transition-colors" />}
-                    {creator.website && <Globe className="h-4 w-4 text-white/20 hover:text-white transition-colors" />}
+                    {creator.twitter && <Twitter className="h-4 w-4 text-white/40 hover:text-white transition-colors" />}
+                    {creator.instagram && <Instagram className="h-4 w-4 text-white/40 hover:text-white transition-colors" />}
+                    {creator.website && <Globe className="h-4 w-4 text-white/40 hover:text-white transition-colors" />}
                   </div>
                 </div>
                 
-                <div className="flex items-center gap-3 bg-white/5 border border-white/10 rounded-2xl px-6 py-3 group-hover:bg-purple-500 group-hover:border-purple-400 transition-all shadow-xl group-hover:shadow-purple-500/20">
-                  <span className="text-[11px] font-black uppercase tracking-[0.2em] text-white/40 group-hover:text-white">Tip Me</span>
-                  <QrCode className="h-4 w-4 text-white/20 group-hover:text-white group-hover:scale-110 transition-all" />
+                <div className="flex items-center gap-3 bg-white/10 border border-white/20 rounded-2xl px-6 py-3 group-hover:bg-purple-500 group-hover:border-purple-400 transition-all shadow-xl group-hover:shadow-purple-500/40">
+                  <span className="text-[11px] font-black uppercase tracking-[0.2em] text-white/70 group-hover:text-white">Tip Me</span>
+                  <QrCode className="h-4 w-4 text-white/40 group-hover:text-white group-hover:scale-110 transition-all" />
                 </div>
               </div>
             </div>

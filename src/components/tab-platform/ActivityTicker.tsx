@@ -26,11 +26,11 @@ export const ActivityTicker = () => {
   };
 
   return (
-    <div className="fixed top-0 left-0 right-0 z-[60] bg-[#0a0514]/60 backdrop-blur-xl border-b border-white/5 h-10 flex items-center overflow-hidden shadow-[0_10px_30px_rgba(0,0,0,0.3)]">
+    <div className="fixed top-0 left-0 right-0 z-[60] bg-[#0a0514]/80 backdrop-blur-xl border-b border-white/10 h-10 flex items-center overflow-hidden shadow-[0_10px_30px_rgba(0,0,0,0.5)]">
       {/* Live Indicator Badge with Enhanced Blend */}
       <div className="relative z-30 flex items-center h-full pl-6 pr-32">
         {/* Main Badge Background with Long Gradient Falloff */}
-        <div className="absolute inset-y-0 left-0 w-full bg-gradient-to-r from-orange-600 via-orange-600 to-transparent opacity-90 shadow-[inset_-20px_0_40px_-20px_rgba(0,0,0,0.5)]" />
+        <div className="absolute inset-y-0 left-0 w-full bg-gradient-to-r from-orange-600 via-orange-600 to-transparent opacity-100 shadow-[inset_-20px_0_40px_-20px_rgba(0,0,0,0.5)]" />
         
         {/* Extra glowing edge blur */}
         <div className="absolute inset-y-0 right-16 w-24 bg-orange-500/20 blur-xl pointer-events-none" />
@@ -50,9 +50,9 @@ export const ActivityTicker = () => {
         {/* First set of activities */}
         {ACTIVITIES.map((activity, i) => (
           <div key={`a-${i}`} className="flex items-center gap-3 px-10 group cursor-default">
-            <div className={`h-1 w-1 rounded-full bg-white/10 group-hover:bg-white/40 transition-colors`} />
+            <div className={`h-1 w-1 rounded-full bg-white/20 group-hover:bg-white/60 transition-colors`} />
             <activity.icon className={`h-3 w-3 ${activity.color} drop-shadow-[0_0_5px_currentColor]`} />
-            <span className="text-[10px] font-black uppercase tracking-[0.15em] text-white/60 group-hover:text-white transition-colors">
+            <span className="text-[10px] font-black uppercase tracking-[0.15em] text-white/80 group-hover:text-white transition-colors">
               {formatText(activity.text, activity.color)}
             </span>
           </div>
@@ -60,9 +60,9 @@ export const ActivityTicker = () => {
         {/* Duplicate set for seamless loop */}
         {ACTIVITIES.map((activity, i) => (
           <div key={`b-${i}`} className="flex items-center gap-3 px-10 group cursor-default">
-            <div className={`h-1 w-1 rounded-full bg-white/10 group-hover:bg-white/40 transition-colors`} />
+            <div className={`h-1 w-1 rounded-full bg-white/20 group-hover:bg-white/60 transition-colors`} />
             <activity.icon className={`h-3 w-3 ${activity.color} drop-shadow-[0_0_5px_currentColor]`} />
-            <span className="text-[10px] font-black uppercase tracking-[0.15em] text-white/60 group-hover:text-white transition-colors">
+            <span className="text-[10px] font-black uppercase tracking-[0.15em] text-white/80 group-hover:text-white transition-colors">
               {formatText(activity.text, activity.color)}
             </span>
           </div>

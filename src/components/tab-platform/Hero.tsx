@@ -21,9 +21,9 @@ export const Hero = ({ creators }: HeroProps) => {
       <div className="container mx-auto px-6">
         <div className="flex flex-col lg:flex-row items-center justify-between gap-12 lg:gap-20">
           <div className="flex-1 text-left space-y-8 md:space-y-10 max-w-3xl">
-            <div className="inline-flex items-center gap-3 px-4 py-2 rounded-full bg-white/5 border border-white/10 backdrop-blur-md shadow-2xl">
+            <div className="inline-flex items-center gap-3 px-4 py-2 rounded-full bg-white/10 border border-white/20 backdrop-blur-md shadow-2xl">
               <Heart className="h-4 w-4 text-purple-500 fill-purple-500" />
-              <span className="text-white/60 text-xs font-black uppercase tracking-[0.2em]">Powered by XPR Network</span>
+              <span className="text-white/90 text-xs font-black uppercase tracking-[0.2em]">Powered by XPR Network</span>
             </div>
             
             <h1 className="text-5xl md:text-8xl font-black tracking-tighter leading-[0.9] text-white">
@@ -31,22 +31,22 @@ export const Hero = ({ creators }: HeroProps) => {
               <span className="text-transparent bg-clip-text bg-gradient-to-r from-orange-400 via-pink-500 to-purple-600">Appreciation Hub</span>
             </h1>
             
-            <p className="text-xl md:text-2xl text-white/40 max-w-2xl leading-relaxed font-medium">
+            <p className="text-xl md:text-2xl text-white/80 max-w-2xl leading-relaxed font-medium">
               Whether you're a delivery pro, a fitness coach, or a digital creator—TIPTAB connects you directly to the people who value your hustle via the <span className="text-purple-400 font-black">XPR Network</span>. Zero fees. Instant TAB rewards.
             </p>
             
             <div className="flex flex-wrap items-center gap-4 md:gap-6 pt-2 md:pt-4">
-              <div className="flex items-center gap-3 bg-white/5 px-6 py-3 rounded-2xl border border-white/5">
+              <div className="flex items-center gap-3 bg-white/10 px-6 py-3 rounded-2xl border border-white/10">
                 <Zap className="h-5 w-5 text-orange-500 fill-orange-500" />
-                <span className="text-sm font-black uppercase tracking-widest text-white/80">Direct Tipping</span>
+                <span className="text-sm font-black uppercase tracking-widest text-white/90">Direct Tipping</span>
               </div>
-              <div className="flex items-center gap-3 bg-white/5 px-6 py-3 rounded-2xl border border-white/5">
+              <div className="flex items-center gap-3 bg-white/10 px-6 py-3 rounded-2xl border border-white/10">
                 <UserCheck className="h-5 w-5 text-purple-500" />
-                <span className="text-sm font-black uppercase tracking-widest text-white/80">Everyday Hustle</span>
+                <span className="text-sm font-black uppercase tracking-widest text-white/90">Everyday Hustle</span>
               </div>
-              <div className="flex items-center gap-3 bg-white/5 px-6 py-3 rounded-2xl border border-white/5">
+              <div className="flex items-center gap-3 bg-white/10 px-6 py-3 rounded-2xl border border-white/10">
                 <Rocket className="h-5 w-5 text-cyan-400" />
-                <span className="text-sm font-black uppercase tracking-widest text-white/80">Gig Economy Ready</span>
+                <span className="text-sm font-black uppercase tracking-widest text-white/90">Gig Economy Ready</span>
               </div>
             </div>
 
@@ -64,11 +64,11 @@ export const Hero = ({ creators }: HeroProps) => {
                     )}
                   </div>
                 ))}
-                <div className="h-12 w-12 rounded-full border-4 border-[#0a0514] bg-white/10 backdrop-blur-sm flex items-center justify-center font-black text-[10px] text-white/60">
+                <div className="h-12 w-12 rounded-full border-4 border-[#0a0514] bg-white/20 backdrop-blur-sm flex items-center justify-center font-black text-[10px] text-white/80">
                   +{creators.length > 4 ? creators.length - 4 : 0}
                 </div>
               </div>
-              <p className="text-sm font-bold text-white/30 tracking-wide">
+              <p className="text-sm font-bold text-white/60 tracking-wide">
                 Join <span className="text-white">{formattedCount}k+</span> pros on the <span className="text-purple-400">XPR Network</span>
               </p>
             </div>
