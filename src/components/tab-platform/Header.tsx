@@ -9,13 +9,12 @@ import {
   Menu,
   Map as MapIcon,
   Calculator as CalcIcon,
-  CheckCircle2,
   LogOut,
   User,
   ChevronDown
 } from "lucide-react";
-import { Link, useNavigate } from "react-router-dom";
-import { useState, useEffect } from "react";
+import { Link } from "react-router-dom";
+import { useState } from "react";
 import {
   Sheet,
   SheetContent,
@@ -32,6 +31,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { useToast } from "@/hooks/use-toast";
+import { useXpr } from "@/contexts/XprContext";
 
 interface HeaderProps {
   onBecomeCreator: () => void;
@@ -39,64 +39,31 @@ interface HeaderProps {
 
 export const Header = ({ onBecomeCreator }: HeaderProps) => {
   const [isOpen, setIsOpen] = useState(false);
-  const [isConnected, setIsConnected] = useState(false);
-  const navigate = useNavigate();
-  const [walletData, setWalletData] = useState({
-    address: "",
-    username: "",
-    tabBalance: "0",
-    xprBalance: "0"
-  });
+  const { login, logout, actor, isConnected, isLoading } = useXpr();
   const { toast } = useToast();
 
-  // Load connection state from storage on mount
-  useEffect(() => {
-    const saved = localStorage.getItem("tiptab_wallet_connected");
-    const data = localStorage.getItem("tiptab_wallet_data");
-    if (saved === "true" && data) {
-      setIsConnected(true);
-      setWalletData(JSON.parse(data));
+  const handleConnect = async () => {
+    try {
+      await login();
+      toast({
+        title: "Wallet Connected",
+        description: "Successfully connected to XPR Network.",
+      });
+    } catch (error) {
+      toast({
+        title: "Connection Failed",
+        description: "Could not connect to WebAuth wallet.",
+        variant: "destructive",
+      });
     }
-  }, []);
-
-  const handleConnect = () => {
-    if (isConnected) return; // Already connected
-
-    // Simulate connection with real XPR-style metadata
-    const mockData = {
-      address: "0x71c...4f2a",
-      username: "cryptopro",
-      tabBalance: "12,500",
-      xprBalance: "45,000"
-    };
-
-    setIsConnected(true);
-    setWalletData(mockData);
-    localStorage.setItem("tiptab_wallet_connected", "true");
-    localStorage.setItem("tiptab_wallet_data", JSON.stringify(mockData));
-    
-    toast({
-      title: "Wallet Connected",
-      description: `Welcome back, @${mockData.username}!`,
-    });
   };
 
-  const handleLogout = () => {
-    setIsConnected(false);
-    setWalletData({
-      address: "",
-      username: "",
-      tabBalance: "0",
-      xprBalance: "0"
-    });
-    localStorage.removeItem("tiptab_wallet_connected");
-    localStorage.removeItem("tiptab_wallet_data");
+  const handleLogout = async () => {
+    await logout();
     setIsOpen(false);
-    navigate("/");
-    
     toast({
       title: "Disconnected",
-      description: "You have been logged out of your wallet.",
+      description: "Wallet session cleared.",
     });
   };
 
@@ -152,7 +119,6 @@ export const Header = ({ onBecomeCreator }: HeaderProps) => {
       <div className="mx-auto w-full max-w-[98%] xl:max-w-[1600px]">
         <div className="border border-white/10 bg-[#0a0514]/85 backdrop-blur-md rounded-[28px] px-3 md:px-8 py-2 md:py-3.5 flex items-center justify-between shadow-[0_20px_60px_rgba(0,0,0,0.7)]">
           
-          {/* Logo Section */}
           <Link to="/" className="flex items-center gap-2 md:gap-4 group shrink-0">
             <div className="relative">
               <div className="absolute inset-0 bg-orange-500/20 blur-lg rounded-full group-hover:scale-110 transition-transform" />
@@ -168,23 +134,11 @@ export const Header = ({ onBecomeCreator }: HeaderProps) => {
             </div>
           </Link>
 
-          {/* Desktop Navigation */}
           <div className="hidden xl:flex items-center gap-3 mx-4">
             <NavItems />
           </div>
 
-          {/* Right Actions */}
           <div className="flex items-center gap-2 md:gap-4">
-            {isConnected ? (
-              <div className="hidden md:flex items-center gap-3 mr-2">
-                <div className="flex flex-col items-end -space-y-1">
-                  <span className="text-[10px] font-black text-orange-500 uppercase tracking-widest">{walletData.tabBalance} TAB</span>
-                  <span className="text-[10px] font-bold text-white/40 uppercase tracking-widest">{walletData.xprBalance} XPR</span>
-                </div>
-                <div className="h-8 w-px bg-white/10" />
-              </div>
-            ) : null}
-
             {isConnected ? (
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
@@ -192,8 +146,8 @@ export const Header = ({ onBecomeCreator }: HeaderProps) => {
                     className="flex items-center gap-2 rounded-2xl h-10 md:h-14 px-4 md:px-8 font-black text-[10px] md:text-sm transition-all active:scale-95 group shrink-0 bg-white/5 border border-white/10 text-white hover:bg-white/10 shadow-xl"
                   >
                     <div className="flex flex-col items-start -space-y-1 text-left mr-2">
-                      <span className="text-[10px] md:text-xs font-black text-purple-400">@{walletData.username}</span>
-                      <span className="text-[8px] md:text-[9px] font-bold text-white/40 uppercase tracking-tighter">{walletData.address}</span>
+                      <span className="text-[10px] md:text-xs font-black text-purple-400">@{actor}</span>
+                      <span className="text-[8px] md:text-[9px] font-bold text-white/40 uppercase tracking-tighter">XPR Network</span>
                     </div>
                     <ChevronDown className="h-4 w-4 text-white/40 group-data-[state=open]:rotate-180 transition-transform" />
                   </Button>
@@ -216,15 +170,15 @@ export const Header = ({ onBecomeCreator }: HeaderProps) => {
             ) : (
               <Button 
                 onClick={handleConnect}
+                disabled={isLoading}
                 className="flex items-center gap-2 rounded-2xl h-10 md:h-14 px-4 md:px-8 font-black text-[10px] md:text-sm transition-all active:scale-95 group shrink-0 bg-[#a855f7] hover:bg-[#9333ea] text-white shadow-2xl shadow-purple-500/40"
               >
                 <Wallet className="h-4 w-4 md:h-6 md:w-6 group-hover:rotate-12 transition-transform" />
-                <span className="hidden xs:inline whitespace-nowrap">Connect WebAuth</span>
+                <span className="hidden xs:inline whitespace-nowrap">{isLoading ? "Restoring..." : "Connect WebAuth"}</span>
                 <span className="xs:hidden">Connect</span>
               </Button>
             )}
 
-            {/* Mobile Menu Trigger */}
             <Sheet open={isOpen} onOpenChange={setIsOpen}>
               <SheetTrigger asChild>
                 <Button variant="ghost" size="icon" className="xl:hidden text-white hover:bg-white/10 h-10 w-10 md:h-14 md:w-14 rounded-2xl border border-white/10 shrink-0">
@@ -242,21 +196,11 @@ export const Header = ({ onBecomeCreator }: HeaderProps) => {
                     <div className="bg-white/5 border border-white/10 rounded-2xl p-5 mb-2 space-y-3">
                       <div className="flex items-center gap-3">
                         <div className="h-10 w-10 rounded-full bg-purple-500/20 flex items-center justify-center">
-                          <CheckCircle2 className="h-5 w-5 text-purple-400" />
+                          <User className="h-5 w-5 text-purple-400" />
                         </div>
                         <div>
-                          <p className="text-xs font-black text-purple-400">@{walletData.username}</p>
-                          <p className="text-[10px] font-bold text-white/40">{walletData.address}</p>
-                        </div>
-                      </div>
-                      <div className="pt-3 border-t border-white/5 grid grid-cols-2 gap-4">
-                        <div>
-                          <p className="text-[8px] font-black uppercase text-white/30 tracking-widest">TAB Balance</p>
-                          <p className="text-xs font-black text-orange-500">{walletData.tabBalance}</p>
-                        </div>
-                        <div>
-                          <p className="text-[8px] font-black uppercase text-white/30 tracking-widest">XPR Balance</p>
-                          <p className="text-xs font-black text-white">{walletData.xprBalance}</p>
+                          <p className="text-xs font-black text-purple-400">@{actor}</p>
+                          <p className="text-[10px] font-bold text-white/40">Verified Session</p>
                         </div>
                       </div>
                     </div>
@@ -282,12 +226,6 @@ export const Header = ({ onBecomeCreator }: HeaderProps) => {
                       Logout Wallet
                     </Button>
                   )}
-                </div>
-                <div className="absolute bottom-12 left-8 right-8 text-center">
-                   <div className="h-px bg-white/10 w-full mb-6" />
-                   <p className="text-[11px] font-black uppercase tracking-[0.3em] text-white/20">
-                    Network Status: {isConnected ? "Active Session" : "Online"}
-                  </p>
                 </div>
               </SheetContent>
             </Sheet>

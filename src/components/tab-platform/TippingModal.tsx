@@ -1,14 +1,17 @@
+"use client";
+
 import {
   Dialog,
   DialogContent,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Twitter, Globe, X, Instagram, Zap, ShieldCheck } from "lucide-react";
+import { Twitter, Globe, Instagram, Zap, ShieldCheck } from "lucide-react";
 import { useState } from "react";
 import { Creator } from "@/data/creators";
 import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
+import { useXpr } from "@/contexts/XprContext";
 
 interface TippingModalProps {
   creator: Creator | null;
@@ -19,6 +22,7 @@ export const TippingModal = ({ creator, onClose }: TippingModalProps) => {
   const [tipAmount, setTipAmount] = useState<string>("100");
   const [isProcessing, setIsProcessing] = useState(false);
   const { toast } = useToast();
+  const { session, actor, login } = useXpr();
 
   const handleSendTip = async () => {
     if (!tipAmount || isNaN(Number(tipAmount)) || Number(tipAmount) <= 0) {
@@ -30,20 +34,43 @@ export const TippingModal = ({ creator, onClose }: TippingModalProps) => {
       return;
     }
 
+    if (!session) {
+      toast({
+        title: "Connection Required",
+        description: "Please connect your wallet to send a tip.",
+      });
+      await login();
+      return;
+    }
+
     setIsProcessing(true);
     try {
-      // Simulate XPR Network transaction
-      await new Promise(resolve => setTimeout(resolve, 2000));
+      const actions = [{
+        account: 'xtokens', // Standard for XPR network tokens
+        name: 'transfer',
+        authorization: [{
+          actor: actor!,
+          permission: session.auth.permission,
+        }],
+        data: {
+          from: actor,
+          to: creator?.handle, // Tipping by handle as recipient
+          quantity: `${parseFloat(tipAmount).toFixed(6)} TAB`,
+          memo: 'Tipped via TipTab',
+        },
+      }];
+
+      await session.transact({ actions }, { broadcast: true });
       
       toast({
         title: "Tip Sent Successfully!",
-        description: `You've sent ${tipAmount} TAB to ${creator?.name}. appreciation delivered!`,
+        description: `You've sent ${tipAmount} TAB to ${creator?.name}. Appreciation delivered!`,
       });
       onClose();
-    } catch (error) {
+    } catch (error: any) {
       toast({ 
         title: "Transaction failed", 
-        description: "Please check your connection and try again.", 
+        description: error.message || "Please check your connection and try again.", 
         variant: "destructive" 
       });
     } finally {
@@ -59,14 +86,12 @@ export const TippingModal = ({ creator, onClose }: TippingModalProps) => {
     <Dialog open={!!creator} onOpenChange={(open) => !open && onClose()}>
       <DialogContent className="bg-[#0d071a]/95 backdrop-blur-[32px] border-white/10 text-white sm:max-w-[460px] rounded-[40px] p-0 overflow-hidden shadow-[0_0_100px_rgba(0,0,0,0.8)] border-t-purple-500/20">
         
-        {/* Optimized Header Background */}
         <div className="relative h-24 w-full overflow-hidden">
           <div className={cn("absolute inset-0 opacity-30", creator.color)} />
           <div className="absolute inset-0 bg-gradient-to-t from-[#0d071a] to-transparent" />
         </div>
         
         <div className="px-10 pb-10 -mt-10 relative z-10">
-          {/* Avatar Section */}
           <div className="flex items-end justify-between mb-6">
             <div className={cn(
               "h-28 w-28 rounded-[36px] flex items-center justify-center text-4xl font-black border-[6px] border-[#0d071a] shadow-2xl overflow-hidden",

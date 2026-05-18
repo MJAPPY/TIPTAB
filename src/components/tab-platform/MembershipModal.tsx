@@ -9,7 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Zap, ShieldCheck, CheckCircle2, Wallet, ArrowRight, Sparkles } from "lucide-react";
 import { useState } from "react";
 import { useToast } from "@/hooks/use-toast";
-import { cn } from "@/lib/utils";
+import { useXpr } from "@/contexts/XprContext";
 
 interface MembershipModalProps {
   isOpen: boolean;
@@ -22,26 +22,52 @@ export const MembershipModal = ({ isOpen, onOpenChange }: MembershipModalProps) 
   const [step, setStep] = useState<OnboardingStep>("intro");
   const [isProcessing, setIsProcessing] = useState(false);
   const { toast } = useToast();
+  const { session, actor, login } = useXpr();
 
-  const handleNextStep = () => {
-    if (step === "intro") setStep("payment");
+  const handleNextStep = async () => {
+    if (step === "intro") {
+      if (!session) {
+        try {
+          await login();
+        } catch (err) {
+          return; // Login failed
+        }
+      }
+      setStep("payment");
+    }
   };
 
   const handleJoin = async () => {
+    if (!session || !actor) return;
+    
     setIsProcessing(true);
     try {
-      // Simulate XPR Network transaction
-      await new Promise(resolve => setTimeout(resolve, 2500));
+      const actions = [{
+        account: 'xtokens',
+        name: 'transfer',
+        authorization: [{
+          actor: actor,
+          permission: session.auth.permission,
+        }],
+        data: {
+          from: actor,
+          to: 'tabxpr', // Network fee destination
+          quantity: '2500.000000 TAB',
+          memo: 'TipTab Membership Activation',
+        },
+      }];
+
+      await session.transact({ actions }, { broadcast: true });
       
       setStep("success");
       toast({
         title: "Transaction Successful!",
         description: "Welcome to the TIPTAB creator network.",
       });
-    } catch (error) {
+    } catch (error: any) {
       toast({
         title: "Transaction Failed",
-        description: "Please check your WebAuth wallet and try again.",
+        description: error.message || "Please check your WebAuth wallet and try again.",
         variant: "destructive"
       });
     } finally {
@@ -51,7 +77,6 @@ export const MembershipModal = ({ isOpen, onOpenChange }: MembershipModalProps) 
 
   const handleClose = () => {
     onOpenChange(false);
-    // Reset after a delay so the closing animation finishes
     setTimeout(() => setStep("intro"), 300);
   };
 
@@ -59,7 +84,6 @@ export const MembershipModal = ({ isOpen, onOpenChange }: MembershipModalProps) 
     <Dialog open={isOpen} onOpenChange={(open) => !open && handleClose()}>
       <DialogContent className="bg-[#130b21] border-white/10 text-white sm:max-w-[480px] rounded-[40px] p-0 overflow-hidden shadow-[0_0_100px_rgba(0,0,0,0.8)]">
         
-        {/* Progress Bar */}
         <div className="absolute top-0 left-0 right-0 h-1 bg-white/5">
           <div 
             className="h-full bg-gradient-to-r from-orange-500 to-purple-500 transition-all duration-500"
@@ -104,7 +128,7 @@ export const MembershipModal = ({ isOpen, onOpenChange }: MembershipModalProps) 
                 onClick={handleNextStep}
                 className="w-full h-16 bg-white text-black hover:bg-white/90 font-black text-xl rounded-2xl shadow-xl transition-all group"
               >
-                Continue to Payment <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
+                {session ? "Continue to Payment" : "Connect Wallet to Start"} <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
               </Button>
             </div>
           )}
@@ -126,7 +150,7 @@ export const MembershipModal = ({ isOpen, onOpenChange }: MembershipModalProps) 
               <div className="bg-white/5 border border-white/10 rounded-3xl p-8 text-center relative overflow-hidden">
                 <div className="absolute top-0 right-0 p-4">
                   <div className="px-3 py-1 rounded-full bg-orange-500/20 border border-orange-500/30 text-orange-500 text-[10px] font-black uppercase tracking-widest">
-                    Best Value
+                    Standard Fee
                   </div>
                 </div>
                 <p className="text-white/40 font-bold uppercase tracking-widest text-xs mb-2">Membership Fee</p>
@@ -134,7 +158,6 @@ export const MembershipModal = ({ isOpen, onOpenChange }: MembershipModalProps) 
                   <span className="text-6xl font-black tracking-tighter">2,500</span>
                   <span className="text-2xl font-bold text-orange-500">TAB</span>
                 </div>
-                <p className="mt-4 text-sm text-white/40 italic">approx. 25.00 USD</p>
               </div>
 
               <div className="space-y-4">
@@ -142,7 +165,7 @@ export const MembershipModal = ({ isOpen, onOpenChange }: MembershipModalProps) 
                   <Wallet className="h-5 w-5 text-purple-400" />
                   <div className="flex-1">
                     <p className="text-sm font-bold">WebAuth Wallet Connected</p>
-                    <p className="text-xs text-white/40 font-mono">0x71...4F2a</p>
+                    <p className="text-xs text-white/40 font-mono">@{actor}</p>
                   </div>
                   <CheckCircle2 className="h-5 w-5 text-green-500" />
                 </div>
@@ -169,7 +192,6 @@ export const MembershipModal = ({ isOpen, onOpenChange }: MembershipModalProps) 
                 <div className="mx-auto h-32 w-32 rounded-[40px] bg-green-500 flex items-center justify-center shadow-[0_0_50px_rgba(34,197,94,0.4)]">
                   <CheckCircle2 className="h-16 w-16 text-white" />
                 </div>
-                {/* Decorative particles */}
                 <div className="absolute top-0 left-1/2 -translate-x-1/2 w-48 h-48 bg-green-500/20 blur-3xl -z-10" />
               </div>
 
@@ -182,7 +204,7 @@ export const MembershipModal = ({ isOpen, onOpenChange }: MembershipModalProps) 
 
               <div className="flex flex-col gap-3">
                 <Button 
-                  onClick={() => window.location.href = "/dashboard"}
+                  onClick={() => (window.location.href = "/dashboard")}
                   className="h-14 bg-white text-black font-black text-lg rounded-2xl"
                 >
                   Go to Creator Hub
