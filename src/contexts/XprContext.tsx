@@ -12,7 +12,7 @@ interface XprContextType {
   session: LinkSession | null;
   actor: string | null;
   balances: Balances;
-  login: () => Promise<void>;
+  login: () => Promise<LinkSession | null>;
   logout: () => Promise<void>;
   refreshBalances: () => Promise<void>;
   isConnected: boolean;
@@ -110,7 +110,9 @@ export const XprProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       if (newSession) {
         setSession(newSession);
         await fetchBalances(newSession.auth.actor);
+        return newSession;
       }
+      return null;
     } catch (error) {
       console.error('Login failed:', error);
       throw error;

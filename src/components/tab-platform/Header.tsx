@@ -52,11 +52,13 @@ export const Header = ({ onBecomeCreator }: HeaderProps) => {
 
   const handleConnect = async () => {
     try {
-      await login();
-      toast({
-        title: "Wallet Connected",
-        description: `Successfully connected as @${actor}`,
-      });
+      const session = await login();
+      if (session) {
+        toast({
+          title: "Wallet Connected",
+          description: `Successfully connected as @${session.auth.actor} via @tabxpr`,
+        });
+      }
     } catch (error) {
       toast({
         title: "Connection Failed",
