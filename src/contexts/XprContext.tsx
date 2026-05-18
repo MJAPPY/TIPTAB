@@ -1,3 +1,5 @@
+"use client";
+
 import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import ProtonWebSDK, { LinkSession } from '@proton/web-sdk';
 
@@ -30,7 +32,7 @@ export const XprProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
   const fetchBalances = useCallback(async (account: string) => {
     try {
-      // Fetch XPR balance
+      // Fetch XPR balance (eosio.token)
       const xprRes = await fetch(`${ENDPOINT}/v1/chain/get_currency_balance`, {
         method: 'POST',
         body: JSON.stringify({
@@ -41,11 +43,11 @@ export const XprProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       });
       const xprData = await xprRes.json();
       
-      // Fetch TAB balance
+      // Fetch TAB balance (tokencreate)
       const tabRes = await fetch(`${ENDPOINT}/v1/chain/get_currency_balance`, {
         method: 'POST',
         body: JSON.stringify({
-          code: 'xtokens',
+          code: 'tokencreate',
           account: account,
           symbol: 'TAB'
         })

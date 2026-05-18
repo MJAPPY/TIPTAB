@@ -46,7 +46,7 @@ export const TippingModal = ({ creator, onClose }: TippingModalProps) => {
     setIsProcessing(true);
     try {
       const actions = [{
-        account: 'xtokens', // Standard for XPR network tokens
+        account: 'tokencreate', // Correct TAB token contract
         name: 'transfer',
         authorization: [{
           actor: actor!,
@@ -54,7 +54,7 @@ export const TippingModal = ({ creator, onClose }: TippingModalProps) => {
         }],
         data: {
           from: actor,
-          to: creator?.handle, // Tipping by handle as recipient
+          to: creator?.handle, 
           quantity: `${parseFloat(tipAmount).toFixed(6)} TAB`,
           memo: 'Tipped via TipTab',
         },

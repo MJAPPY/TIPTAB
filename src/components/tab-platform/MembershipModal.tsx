@@ -1,3 +1,5 @@
+"use client";
+
 import {
   Dialog,
   DialogContent,
@@ -43,7 +45,7 @@ export const MembershipModal = ({ isOpen, onOpenChange }: MembershipModalProps) 
     setIsProcessing(true);
     try {
       const actions = [{
-        account: 'xtokens',
+        account: 'tokencreate', // Correct TAB token contract
         name: 'transfer',
         authorization: [{
           actor: actor,
