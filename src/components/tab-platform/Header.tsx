@@ -14,7 +14,8 @@ import {
   ChevronDown,
   RefreshCw,
   Zap,
-  ShieldCheck
+  ShieldCheck,
+  ShieldAlert
 } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useState } from "react";
@@ -213,6 +214,14 @@ export const Header = ({ onBecomeCreator }: HeaderProps) => {
                     </div>
                   </div>
                   <DropdownMenuSeparator className="bg-white/5" />
+                  {isAdmin && (
+                    <DropdownMenuItem asChild className="focus:bg-orange-500/10 focus:text-orange-500 rounded-xl cursor-pointer">
+                      <Link to="/admin" className="flex items-center gap-3 px-3 py-2.5">
+                        <ShieldAlert className="h-4 w-4 text-orange-500" />
+                        <span className="font-bold">Admin Hub</span>
+                      </Link>
+                    </DropdownMenuItem>
+                  )}
                   <DropdownMenuItem asChild className="focus:bg-white/5 focus:text-white rounded-xl cursor-pointer">
                     <Link to="/dashboard" className="flex items-center gap-3 px-3 py-2.5">
                       <LayoutDashboard className="h-4 w-4 text-purple-400" />
@@ -268,6 +277,17 @@ export const Header = ({ onBecomeCreator }: HeaderProps) => {
                         </div>
                       </div>
                     </div>
+                  )}
+                  {isAdmin && (
+                    <Link to="/admin" onClick={() => setIsOpen(false)}>
+                      <Button 
+                        variant="ghost" 
+                        className="w-full text-orange-500 hover:bg-orange-500/10 flex items-center justify-start gap-4 font-bold bg-orange-500/5 border border-orange-500/20 rounded-2xl h-16 px-6"
+                      >
+                        <ShieldAlert className="h-6 w-6" />
+                        Admin Hub
+                      </Button>
+                    </Link>
                   )}
                   <NavItems />
                   <Link to="/" onClick={() => setIsOpen(false)}>

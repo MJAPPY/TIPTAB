@@ -8,6 +8,7 @@ import Dashboard from "./pages/Dashboard";
 import Leaderboard from "./pages/Leaderboard";
 import CreatorProfile from "./pages/CreatorProfile";
 import Calculator from "./pages/Calculator";
+import AdminHub from "./pages/AdminHub";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -23,6 +24,7 @@ const App = () => (
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/leaderboard" element={<Leaderboard />} />
           <Route path="/calculator" element={<Calculator />} />
+          <Route path="/admin" element={<AdminHub />} />
           <Route path="/tip/:handle" element={<CreatorProfile />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
