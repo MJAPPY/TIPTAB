@@ -26,6 +26,7 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { TipTabCard } from "@/components/tab-platform/TipTabCard";
 import { ProfileEditor } from "@/components/tab-platform/ProfileEditor";
+import { Header } from "@/components/tab-platform/Header";
 import { CREATORS, Creator } from "@/data/creators";
 import { useToast } from "@/hooks/use-toast";
 import { useXpr } from "@/contexts/XprContext";
@@ -166,7 +167,7 @@ const Dashboard = () => {
         <div className="absolute inset-0 bg-gradient-to-b from-purple-600/10 to-transparent -z-10" />
         <img src="/src/assets/logo.png" alt="TIPTAB" className="h-24 w-24 mb-8 drop-shadow-[0_0_30px_rgba(168,85,247,0.4)]" />
         <h1 className="text-4xl font-black mb-4 tracking-tighter italic">AUTHENTICATION REQUIRED</h1>
-        <p className="text-white/80 max-w-sm mb-10 font-medium">Please connect your WebAuth wallet to access your creator dashboard and manage your earnings.</p>
+        <p className="text-white/60 max-w-sm mb-10 font-medium">Please connect your WebAuth wallet to access your creator dashboard and manage your earnings.</p>
         <Button 
           onClick={login}
           className="h-16 px-10 bg-[#a855f7] hover:bg-[#9333ea] rounded-2xl font-black text-xl shadow-2xl shadow-purple-500/20 gap-3"
@@ -174,7 +175,7 @@ const Dashboard = () => {
           <Zap className="h-6 w-6 fill-white" />
           Connect WebAuth
         </Button>
-        <Link to="/" className="mt-8 text-white/60 hover:text-white transition-colors flex items-center gap-2 font-bold text-sm">
+        <Link to="/" className="mt-8 text-white/40 hover:text-white transition-colors flex items-center gap-2 font-bold text-sm">
           <ArrowLeft className="h-4 w-4" /> Back to Map
         </Link>
       </div>
@@ -199,38 +200,9 @@ const Dashboard = () => {
 
   return (
     <div className="min-h-screen bg-[#0a0514] text-white">
-      <header className="border-b border-white/10 bg-[#0a0514]/80 backdrop-blur-md px-6 py-4 sticky top-0 z-50">
-        <div className="container mx-auto flex items-center justify-between">
-          <div className="flex items-center gap-6">
-            <Link to="/" className="flex items-center gap-2 text-white/80 hover:text-white transition-colors">
-              <ArrowLeft className="h-5 w-5" />
-              <span className="font-bold">Map</span>
-            </Link>
-            <div className="h-6 w-px bg-white/20 hidden md:block" />
-            <div className="flex items-center gap-2">
-              <img src="/src/assets/logo.png" alt="TIPTAB" className="h-8 w-8 object-contain" />
-              <span className="text-xl font-black italic tracking-tighter">
-                CREATOR<span className="text-orange-500">HUB</span>
-              </span>
-            </div>
-          </div>
-          
-          <div className="flex items-center gap-4">
-            <div className="flex items-center gap-3 bg-white/10 border border-white/20 rounded-full px-4 py-1.5">
-              <div className={cn("h-8 w-8 rounded-full flex items-center justify-center text-[10px] font-bold overflow-hidden border border-white/20", user.color)}>
-                {user.avatarImage ? (
-                  <img src={user.avatarImage} alt="Avatar" className="w-full h-full object-cover" />
-                ) : (
-                  user.avatar
-                )}
-              </div>
-              <span className="text-sm font-black text-purple-400">@{actor}</span>
-            </div>
-          </div>
-        </div>
-      </header>
+      <Header />
 
-      <main className="container mx-auto px-6 py-12">
+      <main className="container mx-auto px-6 py-12 pt-36">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12">
           
           {/* Sidebar Navigation */}
@@ -242,7 +214,7 @@ const Dashboard = () => {
                 onClick={() => setActiveTab(item.id)}
                 className={`w-full justify-start h-12 rounded-xl gap-3 px-4 font-bold transition-all ${
                   activeTab === item.id 
-                    ? "bg-purple-500/10 text-purple-400 border border-purple-500/20 shadow-[0_0_20px_rgba(168,85,247,0.1)]" 
+                    ? "bg-purple-500/20 text-purple-400 border border-purple-500/30 shadow-[0_0_20px_rgba(168,85,247,0.1)]" 
                     : "text-white/80 hover:bg-white/10 border border-transparent"
                 }`}
               >
@@ -252,7 +224,7 @@ const Dashboard = () => {
             ))}
             
             <div className="pt-8">
-              <div className="bg-gradient-to-br from-orange-500/10 to-purple-600/10 border border-white/10 rounded-2xl p-6 relative overflow-hidden group">
+              <div className="bg-gradient-to-br from-orange-500/20 to-purple-600/20 border border-white/10 rounded-2xl p-6 relative overflow-hidden group">
                 <Zap className="absolute -bottom-4 -right-4 h-24 w-24 text-orange-500/10 rotate-12 group-hover:scale-110 transition-transform" />
                 <h4 className="font-black text-sm mb-2 uppercase tracking-widest">Live Link</h4>
                 <p className="text-xs text-white/70 mb-4 leading-relaxed font-medium">
@@ -267,7 +239,7 @@ const Dashboard = () => {
                   <Button 
                     variant="outline"
                     onClick={handleShare}
-                    className="w-full bg-white/5 border-white/10 text-white font-bold h-10 rounded-xl text-xs hover:bg-white/10 gap-2"
+                    className="w-full bg-white/10 border-white/20 text-white font-bold h-10 rounded-xl text-xs hover:bg-white/10 gap-2"
                   >
                     {isCopied ? <Check className="h-3 w-3 text-green-500" /> : <Share2 className="h-3 w-3" />}
                     {isCopied ? "Copied" : "Share URL"}
@@ -286,7 +258,7 @@ const Dashboard = () => {
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                   <Card className="bg-[#130b21] border-white/10 text-white rounded-[24px] overflow-hidden group">
                     <CardHeader className="pb-2">
-                      <CardDescription className="text-white/80 uppercase tracking-widest text-[10px] font-black">Settled TAB</CardDescription>
+                      <CardDescription className="text-white/70 uppercase tracking-widest text-[10px] font-black">Settled TAB</CardDescription>
                       <CardTitle className="text-3xl font-black group-hover:text-orange-500 transition-colors">
                         {Number(balances.tab).toLocaleString()} <span className="text-orange-500 text-sm">TAB</span>
                       </CardTitle>
@@ -299,7 +271,7 @@ const Dashboard = () => {
                   </Card>
                   <Card className="bg-[#130b21] border-white/10 text-white rounded-[24px] overflow-hidden group">
                     <CardHeader className="pb-2">
-                      <CardDescription className="text-white/80 uppercase tracking-widest text-[10px] font-black">XPR Balance</CardDescription>
+                      <CardDescription className="text-white/70 uppercase tracking-widest text-[10px] font-black">XPR Balance</CardDescription>
                       <CardTitle className="text-3xl font-black group-hover:text-purple-500 transition-colors">
                         {Number(balances.xpr).toLocaleString()} <span className="text-purple-500 text-sm">XPR</span>
                       </CardTitle>
@@ -312,7 +284,7 @@ const Dashboard = () => {
                   </Card>
                   <Card className="bg-[#130b21] border-white/10 text-white rounded-[24px] overflow-hidden group">
                     <CardHeader className="pb-2">
-                      <CardDescription className="text-white/80 uppercase tracking-widest text-[10px] font-black">Network ID</CardDescription>
+                      <CardDescription className="text-white/70 uppercase tracking-widest text-[10px] font-black">Network ID</CardDescription>
                       <CardTitle className="text-3xl font-black group-hover:text-orange-500 transition-colors italic">@{actor}</CardTitle>
                     </CardHeader>
                     <CardContent>
@@ -327,13 +299,13 @@ const Dashboard = () => {
                   <div className="absolute top-0 right-0 w-32 h-32 bg-purple-500/10 blur-[60px] rounded-full" />
                   <div className="flex items-center justify-between mb-8 relative z-10">
                     <h3 className="text-xl font-black italic tracking-tighter uppercase">Recent Appreciation</h3>
-                    <Button variant="ghost" onClick={handleManualRefresh} className="text-white/80 hover:text-white gap-2">
+                    <Button variant="ghost" onClick={handleManualRefresh} className="text-white/70 hover:text-white gap-2">
                       <RefreshCw className={cn("h-4 w-4", isRefreshing && "animate-spin")} /> Refresh
                     </Button>
                   </div>
                   <div className="space-y-4 relative z-10">
                     <div className="text-center py-12 border-2 border-dashed border-white/10 rounded-3xl">
-                      <p className="text-white/60 font-bold italic">No recent tipping activity detected on-chain.</p>
+                      <p className="text-white/40 font-bold italic">No recent tipping activity detected on-chain.</p>
                     </div>
                   </div>
                 </div>

@@ -26,6 +26,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useXpr } from "@/contexts/XprContext";
+import { Header } from "@/components/tab-platform/Header";
 import { CREATORS, Creator } from "@/data/creators";
 import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
@@ -79,32 +80,9 @@ const AdminHub = () => {
 
   return (
     <div className="min-h-screen bg-[#06030e] text-white">
-      {/* Admin Top Bar */}
-      <nav className="border-b border-white/10 bg-[#0d071a]/80 backdrop-blur-xl px-6 py-4 sticky top-0 z-[100]">
-        <div className="container mx-auto flex items-center justify-between">
-          <div className="flex items-center gap-6">
-            <Link to="/" className="flex items-center gap-2 text-white/40 hover:text-white transition-colors">
-              <ArrowLeft className="h-4 w-4" />
-              <span className="text-xs font-black uppercase tracking-widest">Exit Admin Mode</span>
-            </Link>
-            <div className="h-4 w-px bg-white/10" />
-            <div className="flex items-center gap-2">
-              <ShieldAlert className="h-5 w-5 text-orange-500" />
-              <span className="text-xl font-black italic tracking-tighter">
-                ADMIN<span className="text-orange-500">CONTROL</span>
-              </span>
-            </div>
-          </div>
-          <div className="flex items-center gap-4">
-            <div className="bg-orange-500/10 border border-orange-500/30 rounded-full px-4 py-1.5 flex items-center gap-2">
-              <div className="h-2 w-2 rounded-full bg-orange-500 animate-pulse" />
-              <span className="text-[10px] font-black uppercase tracking-[0.2em] text-orange-500">Live Authority: @{actor}</span>
-            </div>
-          </div>
-        </div>
-      </nav>
+      <Header />
 
-      <main className="container mx-auto px-6 py-12">
+      <main className="container mx-auto px-6 py-12 pt-36">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
           
           {/* Left Column: Stats & Settings */}
