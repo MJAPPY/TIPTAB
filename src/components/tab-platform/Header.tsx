@@ -87,35 +87,44 @@ export const Header = ({ onBecomeCreator }: HeaderProps) => {
     });
   };
 
-  const isDashboardOrAdmin = location.pathname.includes('/dashboard') || location.pathname.includes('/admin');
+  const isDashboardOrAdmin = location.pathname.includes('/admin') || location.pathname.includes('/dashboard');
 
-  const NavItems = () => (
+  const NavItems = ({ isMobile = false }) => (
     <>
-      <Link to="/leaderboard" onClick={() => setIsOpen(false)} className="w-full xl:w-auto">
+      <Link to="/leaderboard" onClick={() => setIsOpen(false)} className={cn(isMobile ? "w-full" : "xl:w-auto")}>
         <Button 
           variant="ghost" 
-          className="w-full lg:w-auto text-slate-200 hover:text-yellow-400 flex items-center justify-start lg:justify-center gap-3 font-bold bg-white/5 border border-white/10 rounded-2xl h-12 px-5"
+          className={cn(
+            "w-full text-slate-200 hover:text-yellow-400 flex items-center gap-3 font-bold bg-white/5 border border-white/10 rounded-2xl px-5 transition-all",
+            isMobile ? "h-15 justify-start text-sm" : "lg:w-auto lg:justify-center h-12"
+          )}
         >
-          <Trophy className="h-4 w-4" />
+          <Trophy className={cn(isMobile ? "h-5 w-5" : "h-4 w-4")} />
           Leaderboard
         </Button>
       </Link>
-      <Link to="/calculator" onClick={() => setIsOpen(false)} className="w-full xl:w-auto">
+      <Link to="/calculator" onClick={() => setIsOpen(false)} className={cn(isMobile ? "w-full" : "xl:w-auto")}>
         <Button 
           variant="ghost" 
-          className="w-full lg:w-auto text-slate-200 hover:text-cyan-400 flex items-center justify-start lg:justify-center gap-3 font-bold bg-white/5 border border-white/10 rounded-2xl h-12 px-5"
+          className={cn(
+            "w-full text-slate-200 hover:text-cyan-400 flex items-center gap-3 font-bold bg-white/5 border border-white/10 rounded-2xl px-5 transition-all",
+            isMobile ? "h-15 justify-start text-sm" : "lg:w-auto lg:justify-center h-12"
+          )}
         >
-          <CalcIcon className="h-4 w-4" />
+          <CalcIcon className={cn(isMobile ? "h-5 w-5" : "h-4 w-4")} />
           Calculator
         </Button>
       </Link>
       {isConnected && (
-        <Link to="/dashboard" onClick={() => setIsOpen(false)} className="w-full xl:w-auto">
+        <Link to="/dashboard" onClick={() => setIsOpen(false)} className={cn(isMobile ? "w-full" : "xl:w-auto")}>
           <Button 
             variant="ghost" 
-            className="w-full lg:w-auto text-slate-200 hover:text-purple-400 flex items-center justify-start lg:justify-center gap-3 font-bold bg-white/5 border border-white/10 rounded-2xl h-12 px-5"
+            className={cn(
+              "w-full text-slate-200 hover:text-purple-400 flex items-center gap-3 font-bold bg-white/5 border border-white/10 rounded-2xl px-5 transition-all",
+              isMobile ? "h-15 justify-start text-sm" : "lg:w-auto lg:justify-center h-12"
+            )}
           >
-            <LayoutDashboard className="h-4 w-4" />
+            <LayoutDashboard className={cn(isMobile ? "h-5 w-5" : "h-4 w-4")} />
             My Dashboard
           </Button>
         </Link>
@@ -127,9 +136,12 @@ export const Header = ({ onBecomeCreator }: HeaderProps) => {
             onBecomeCreator();
             setIsOpen(false);
           }}
-          className="w-full lg:w-auto border-orange-500/50 bg-orange-500/10 text-orange-400 hover:bg-orange-500 hover:text-white flex items-center justify-start lg:justify-center gap-3 font-black rounded-2xl h-12 px-5 transition-all shadow-[0_0_20px_rgba(249,115,22,0.15)]"
+          className={cn(
+            "w-full border-orange-500/50 bg-orange-500/10 text-orange-400 hover:bg-orange-500 hover:text-white flex items-center gap-3 font-black rounded-2xl px-5 transition-all shadow-[0_0_20px_rgba(249,115,22,0.15)]",
+            isMobile ? "h-15 justify-start text-sm" : "lg:w-auto lg:justify-center h-12"
+          )}
         >
-          <Sparkles className="h-4 w-4" />
+          <Sparkles className={cn(isMobile ? "h-5 w-5" : "h-4 w-4")} />
           Become a Creator
         </Button>
       )}
@@ -298,7 +310,7 @@ export const Header = ({ onBecomeCreator }: HeaderProps) => {
                     TIP<span className="text-orange-500">TAB</span>
                   </SheetTitle>
                 </SheetHeader>
-                <div className="flex flex-col gap-5">
+                <div className="flex flex-col gap-4">
                   {isConnected && (
                     <div className={cn(
                       "bg-white/5 border border-white/10 rounded-2xl p-5 mb-2 space-y-3",
@@ -308,8 +320,8 @@ export const Header = ({ onBecomeCreator }: HeaderProps) => {
                         <div className="h-10 w-10 rounded-full bg-purple-500/20 flex items-center justify-center">
                           <User className="h-5 w-5 text-purple-400" />
                         </div>
-                        <div>
-                          <p className="text-xs font-black text-purple-400">@{actor}</p>
+                        <div className="min-w-0">
+                          <p className="text-xs font-black text-purple-400 truncate">@{actor}</p>
                           <div className="flex flex-col">
                             <span className="text-[9px] font-black text-orange-500">{Number(balances.tab).toLocaleString()} TAB</span>
                             <span className="text-[9px] font-bold text-slate-400">{Number(balances.xpr).toLocaleString()} XPR</span>
@@ -318,24 +330,27 @@ export const Header = ({ onBecomeCreator }: HeaderProps) => {
                       </div>
                     </div>
                   )}
+
                   {isAdmin && (
-                    <Link to="/admin" onClick={() => setIsOpen(false)}>
+                    <Link to="/admin" onClick={() => setIsOpen(false)} className="w-full">
                       <Button 
                         variant="ghost" 
-                        className="w-full text-orange-500 hover:bg-orange-500/10 flex items-center justify-start gap-4 font-bold bg-orange-500/5 border border-orange-500/20 rounded-2xl h-16 px-6"
+                        className="w-full text-orange-500 hover:bg-orange-500/10 flex items-center justify-start gap-4 font-bold bg-orange-500/5 border border-orange-500/20 rounded-2xl h-15 px-6"
                       >
-                        <ShieldAlert className="h-6 w-6" />
+                        <ShieldAlert className="h-5 w-5" />
                         Admin Hub
                       </Button>
                     </Link>
                   )}
-                  <NavItems />
-                  <Link to="/" onClick={() => setIsOpen(false)}>
+
+                  <NavItems isMobile={true} />
+
+                  <Link to="/" onClick={() => setIsOpen(false)} className="w-full">
                     <Button 
                       variant="ghost" 
-                      className="w-full text-slate-200 hover:text-cyan-400 flex items-center justify-start gap-4 font-bold bg-white/5 border border-white/10 rounded-2xl h-16 px-6"
+                      className="w-full text-slate-200 hover:text-cyan-400 flex items-center justify-start gap-4 font-bold bg-white/5 border border-white/10 rounded-2xl h-15 px-6"
                     >
-                      <MapIcon className="h-6 w-6" />
+                      <MapIcon className="h-5 w-5" />
                       View Map
                     </Button>
                   </Link>
@@ -344,9 +359,9 @@ export const Header = ({ onBecomeCreator }: HeaderProps) => {
                     <Button 
                       variant="ghost" 
                       onClick={handleLogout}
-                      className="w-full text-red-400 hover:text-red-500 hover:bg-red-500/10 flex items-center justify-start gap-4 font-bold border border-red-500/20 rounded-2xl h-16 px-6 mt-4 transition-all"
+                      className="w-full text-red-400 hover:text-red-500 hover:bg-red-500/10 flex items-center justify-start gap-4 font-bold border border-red-500/20 rounded-2xl h-15 px-6 mt-4 transition-all"
                     >
-                      <LogOut className="h-6 w-6" />
+                      <LogOut className="h-5 w-5" />
                       Logout Wallet
                     </Button>
                   )}
