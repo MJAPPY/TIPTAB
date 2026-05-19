@@ -26,26 +26,29 @@ export const MembershipModal = ({ isOpen, onOpenChange }: MembershipModalProps) 
   const { toast } = useToast();
   const { session, actor, login, isConnected, setIsMember, isMember } = useXpr();
 
-  // Safeguard: If the user is on the payment step but disconnects, move them back to intro
+  // Reset step when modal closes
   useEffect(() => {
-    if (step === "payment" && !isConnected) {
-      setStep("intro");
+    if (!isOpen) {
+      setTimeout(() => setStep("intro"), 300);
     }
-  }, [isConnected, step]);
+  }, [isOpen]);
 
   const handleNextStep = async () => {
     if (step === "intro") {
       if (!isConnected) {
         try {
           const newSession = await login();
-          if (!newSession) return; // User closed the wallet selector without connecting
+          // If login was successful, immediately move to payment step
+          if (newSession) {
+            setStep("payment");
+          }
         } catch (err) {
-          console.error("Login aborted:", err);
-          return;
+          console.error("Login aborted or failed:", err);
         }
+      } else {
+        // If already connected, just move to payment
+        setStep("payment");
       }
-      // Only proceed to payment if we are now connected
-      setStep("payment");
     }
   };
 
@@ -101,8 +104,6 @@ export const MembershipModal = ({ isOpen, onOpenChange }: MembershipModalProps) 
 
   const handleClose = () => {
     onOpenChange(false);
-    // Reset to intro step when modal closes for next time
-    setTimeout(() => setStep("intro"), 300);
   };
 
   return (
