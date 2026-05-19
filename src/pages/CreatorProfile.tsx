@@ -12,8 +12,7 @@ import {
   ShieldCheck, 
   Share2,
   Check,
-  Wallet,
-  CreditCard
+  Wallet
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -64,17 +63,6 @@ const CreatorProfile = () => {
     } catch (err) {
       console.error("Login failed", err);
     }
-  };
-
-  const handleGuestPay = (method: string) => {
-    setIsProcessing(true);
-    setTimeout(() => {
-      setIsProcessing(false);
-      toast({
-        title: `${method} Successful`,
-        description: `Successfully tipped ${tipAmount} TAB to ${creator?.name}.`,
-      });
-    }, 1000);
   };
 
   const handleSendTip = async () => {
@@ -331,45 +319,13 @@ const CreatorProfile = () => {
                         </div>
                       </Button>
                     ) : (
-                      <div className="space-y-4">
-                        <Button 
-                          onClick={handleConnect}
-                          className="w-full h-20 bg-[#a855f7] hover:bg-[#9333ea] text-white font-black text-2xl rounded-[32px] shadow-xl transition-all active:scale-95 flex items-center justify-center gap-3"
-                        >
-                          <Wallet className="h-8 w-8" />
-                          Connect Wallet
-                        </Button>
-                        
-                        <div className="flex items-center gap-4">
-                          <div className="h-px bg-white/10 flex-1" />
-                          <span className="text-[10px] font-black text-white/30 uppercase tracking-widest">Or Pay Instantly</span>
-                          <div className="h-px bg-white/10 flex-1" />
-                        </div>
-
-                        <div className="grid grid-cols-2 gap-3">
-                          <Button 
-                            onClick={() => handleGuestPay("Apple Pay")}
-                            disabled={isProcessing}
-                            className="h-16 rounded-2xl bg-white text-black hover:bg-white/90 font-black flex items-center justify-center gap-2"
-                          >
-                            <img src="https://upload.wikimedia.org/wikipedia/commons/b/b0/Apple_Pay_logo.svg" alt="Apple Pay" className="h-6" />
-                          </Button>
-                          <Button 
-                            onClick={() => handleGuestPay("Google Pay")}
-                            disabled={isProcessing}
-                            className="h-16 rounded-2xl bg-white text-black hover:bg-white/90 font-black flex items-center justify-center gap-2"
-                          >
-                            <img src="https://upload.wikimedia.org/wikipedia/commons/f/f2/Google_Pay_Logo.svg" alt="Google Pay" className="h-6" />
-                          </Button>
-                          <Button 
-                            onClick={() => handleGuestPay("Credit Card")}
-                            disabled={isProcessing}
-                            className="col-span-2 h-16 rounded-2xl bg-white/5 border border-white/20 hover:bg-white/10 text-white font-black flex items-center justify-center gap-3"
-                          >
-                            <CreditCard className="h-5 w-5" /> Pay with Card
-                          </Button>
-                        </div>
-                      </div>
+                      <Button 
+                        onClick={handleConnect}
+                        className="w-full h-24 bg-[#a855f7] hover:bg-[#9333ea] text-white font-black text-2xl rounded-[32px] shadow-xl transition-all active:scale-95 flex items-center justify-center gap-3"
+                      >
+                        <Wallet className="h-8 w-8" />
+                        Connect to Tip
+                      </Button>
                     )}
                   </div>
 
