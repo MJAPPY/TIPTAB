@@ -12,6 +12,7 @@ import { Creator } from "@/data/creators";
 import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
 import { useXpr } from "@/contexts/XprContext";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 interface TippingModalProps {
   creator: Creator | null;
@@ -20,6 +21,7 @@ interface TippingModalProps {
 
 export const TippingModal = ({ creator, onClose }: TippingModalProps) => {
   const [tipAmount, setTipAmount] = useState<string>("50");
+  const [asset, setAsset] = useState<"TAB" | "XPR">("TAB");
   const [isProcessing, setIsProcessing] = useState(false);
   const { toast } = useToast();
   const { session, actor, login, isConnected, recordTip } = useXpr();
@@ -27,7 +29,8 @@ export const TippingModal = ({ creator, onClose }: TippingModalProps) => {
   const formatValue = (val: string) => {
     const numericValue = parseFloat(val);
     if (isNaN(numericValue)) return "0";
-    return Math.floor(numericValue).toString();
+    if (asset === "TAB") return Math.floor(numericValue).toString();
+    return numericValue.toFixed(4);
   };
 
   const handleConnect = async () => {
@@ -41,11 +44,11 @@ export const TippingModal = ({ creator, onClose }: TippingModalProps) => {
   const handleSendTip = async () => {
     if (!session || !actor || !creator) return;
     
-    const amountNum = Math.floor(parseFloat(tipAmount));
+    const amountNum = parseFloat(tipAmount);
     if (isNaN(amountNum) || amountNum <= 0) {
       toast({ 
         title: "Invalid amount", 
-        description: "Please enter a valid TAB amount.", 
+        description: `Please enter a valid ${asset} amount.`, 
         variant: "destructive" 
       });
       return;
@@ -54,11 +57,12 @@ export const TippingModal = ({ creator, onClose }: TippingModalProps) => {
     setIsProcessing(true);
     try {
       const recipient = creator.handle.replace(/^@/, "").toLowerCase().trim();
-      const quantityString = `${amountNum} TAB`;
+      const contract = asset === "TAB" ? "tokencreate" : "eosio.token";
+      const quantityString = asset === "TAB" ? `${Math.floor(amountNum)} TAB` : `${amountNum.toFixed(4)} XPR`;
       const permission = session.auth.permission || 'active';
 
       const transferAction = {
-        account: 'tokencreate', 
+        account: contract, 
         name: 'transfer',
         authorization: [{
           actor: actor,
@@ -74,8 +78,10 @@ export const TippingModal = ({ creator, onClose }: TippingModalProps) => {
 
       await session.transact({ actions: [transferAction] }, { broadcast: true });
       
-      // Update data sync for tips sent
-      recordTip(amountNum);
+      // Update data sync for tips sent (Currently tracking TAB only in stats)
+      if (asset === "TAB") {
+        recordTip(Math.floor(amountNum));
+      }
 
       toast({
         title: "Tip Sent Successfully!",
@@ -96,7 +102,7 @@ export const TippingModal = ({ creator, onClose }: TippingModalProps) => {
 
   if (!creator) return null;
 
-  const quickAmounts = ["50", "100", "500", "1000"];
+  const quickAmounts = asset === "TAB" ? ["50", "100", "500", "1000"] : ["100", "500", "1000", "5000"];
 
   return (
     <Dialog open={!!creator} onOpenChange={(open) => !open && onClose()}>
@@ -144,29 +150,40 @@ export const TippingModal = ({ creator, onClose }: TippingModalProps) => {
           
           <div className="space-y-6">
             <div className="flex items-center justify-between">
-              <span className="text-xs font-black uppercase tracking-[0.2em] text-white/30">Select Amount</span>
+              <span className="text-xs font-black uppercase tracking-[0.2em] text-white/30">Select Amount & Asset</span>
               <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-green-500/10 border border-green-500/20">
                 <ShieldCheck className="h-3 w-3 text-green-400" />
                 <span className="text-[10px] font-black uppercase tracking-widest text-green-400">Secure Tip</span>
               </div>
             </div>
-            
-            <div className="grid grid-cols-4 gap-3">
-              {quickAmounts.map(amount => (
-                <Button
-                  key={amount}
-                  variant="ghost"
-                  onClick={() => setTipAmount(formatValue(amount))}
-                  className={cn(
-                    "h-12 rounded-2xl border-2 font-black transition-all",
-                    parseFloat(tipAmount) === parseFloat(amount) 
-                      ? "border-orange-500 bg-orange-500/10 text-orange-500 shadow-[0_0_20px_rgba(249,115,22,0.2)]" 
-                      : "bg-white/5 border-transparent hover:bg-purple-500/10 text-white/60 hover:text-purple-400"
-                  )}
-                >
-                  {amount}
-                </Button>
-              ))}
+
+            <div className="flex gap-3">
+              <div className="grid grid-cols-4 gap-3 flex-1">
+                {quickAmounts.map(amount => (
+                  <Button
+                    key={amount}
+                    variant="ghost"
+                    onClick={() => setTipAmount(formatValue(amount))}
+                    className={cn(
+                      "h-12 rounded-2xl border-2 font-black transition-all",
+                      parseFloat(tipAmount) === parseFloat(amount) 
+                        ? "border-orange-500 bg-orange-500/10 text-orange-500 shadow-[0_0_20px_rgba(249,115,22,0.2)]" 
+                        : "bg-white/5 border-transparent hover:bg-purple-500/10 text-white/60 hover:text-purple-400"
+                    )}
+                  >
+                    {amount}
+                  </Button>
+                ))}
+              </div>
+              <Select value={asset} onValueChange={(val: "TAB" | "XPR") => setAsset(val)}>
+                <SelectTrigger className="w-[100px] h-12 bg-white/5 border-2 border-white/10 rounded-2xl font-black text-xs text-white">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent className="bg-[#1a102d] border-white/20 text-white rounded-xl">
+                  <SelectItem value="TAB" className="font-black py-2 cursor-pointer">TAB</SelectItem>
+                  <SelectItem value="XPR" className="font-black py-2 cursor-pointer">XPR</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
             
             <div className="relative group">
@@ -178,10 +195,10 @@ export const TippingModal = ({ creator, onClose }: TippingModalProps) => {
                 value={tipAmount}
                 onChange={(e) => setTipAmount(e.target.value)}
                 onBlur={(e) => setTipAmount(formatValue(e.target.value))}
-                className="bg-white/5 border-white/10 h-16 rounded-3xl text-right text-2xl font-black pl-8 pr-20 focus:ring-purple-500/50 focus:bg-white/10 transition-all border-2"
+                className="bg-white/5 border-white/10 h-16 rounded-3xl text-right text-2xl font-black pl-8 pr-24 focus:ring-purple-500/50 focus:bg-white/10 transition-all border-2"
               />
               <div className="absolute inset-y-0 right-6 flex items-center pointer-events-none">
-                <span className="text-orange-500 font-black">TAB</span>
+                <span className={cn("font-black", asset === "TAB" ? "text-orange-500" : "text-purple-400")}>{asset}</span>
               </div>
             </div>
             

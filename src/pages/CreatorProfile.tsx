@@ -16,6 +16,7 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { CREATORS, Creator } from "@/data/creators";
 import { Header } from "@/components/tab-platform/Header";
 import { MembershipModal } from "@/components/tab-platform/MembershipModal";
@@ -31,6 +32,7 @@ const CreatorProfile = () => {
   
   const [creator, setCreator] = useState<Creator | null>(null);
   const [tipAmount, setTipAmount] = useState("50");
+  const [asset, setAsset] = useState<"TAB" | "XPR">("TAB");
   const [isProcessing, setIsProcessing] = useState(false);
   const [isMembershipOpen, setIsMembershipOpen] = useState(false);
   const [isCopied, setIsCopied] = useState(false);
@@ -58,7 +60,8 @@ const CreatorProfile = () => {
   const formatValue = (val: string) => {
     const numericValue = parseFloat(val);
     if (isNaN(numericValue)) return "0";
-    return Math.floor(numericValue).toString();
+    if (asset === "TAB") return Math.floor(numericValue).toString();
+    return numericValue.toFixed(4);
   };
 
   const handleConnect = async () => {
@@ -72,11 +75,11 @@ const CreatorProfile = () => {
   const handleSendTip = async () => {
     if (!session || !actor) return;
     
-    const amountNum = Math.floor(parseFloat(tipAmount));
+    const amountNum = parseFloat(tipAmount);
     if (isNaN(amountNum) || amountNum <= 0) {
       toast({ 
         title: "Invalid amount", 
-        description: "Please enter a valid TAB amount.", 
+        description: `Please enter a valid ${asset} amount.`, 
         variant: "destructive" 
       });
       return;
@@ -85,10 +88,11 @@ const CreatorProfile = () => {
     setIsProcessing(true);
     try {
       const recipient = creator?.handle.replace(/^@/, "").toLowerCase().trim();
-      const quantityString = `${amountNum} TAB`;
+      const contract = asset === "TAB" ? "tokencreate" : "eosio.token";
+      const quantityString = asset === "TAB" ? `${Math.floor(amountNum)} TAB` : `${amountNum.toFixed(4)} XPR`;
 
       const actions = [{
-        account: 'tokencreate', 
+        account: contract, 
         name: 'transfer',
         authorization: [{
           actor: actor,
@@ -104,8 +108,10 @@ const CreatorProfile = () => {
 
       await session.transact({ actions }, { broadcast: true });
       
-      // Update data sync for tips sent
-      recordTip(amountNum);
+      // Update data sync for tips sent (Currently tracking TAB only)
+      if (asset === "TAB") {
+        recordTip(Math.floor(amountNum));
+      }
 
       toast({
         title: "Tip Sent!",
@@ -154,6 +160,8 @@ const CreatorProfile = () => {
       </div>
     );
   }
+
+  const quickAmounts = asset === "TAB" ? ["50", "100", "500", "1000"] : ["100", "500", "1000", "5000"];
 
   return (
     <div className="min-h-screen bg-[#0a0514] text-white selection:bg-purple-500/30">
@@ -221,20 +229,31 @@ const CreatorProfile = () => {
                 </div>
 
                 <div className="space-y-8">
-                  <div className="grid grid-cols-4 gap-3">
-                    {["50", "100", "500", "1000"].map(amount => (
-                      <Button
-                        key={amount}
-                        variant="ghost"
-                        onClick={() => setTipAmount(formatValue(amount))}
-                        className={cn(
-                          "h-14 rounded-2xl border-2 font-black text-lg",
-                          parseFloat(tipAmount) === parseFloat(amount) ? "border-orange-500 bg-orange-500/10 text-orange-500" : "bg-white/5 border-transparent text-white/60"
-                        )}
-                      >
-                        {amount}
-                      </Button>
-                    ))}
+                  <div className="flex gap-3">
+                    <div className="grid grid-cols-4 gap-3 flex-1">
+                      {quickAmounts.map(amount => (
+                        <Button
+                          key={amount}
+                          variant="ghost"
+                          onClick={() => setTipAmount(formatValue(amount))}
+                          className={cn(
+                            "h-14 rounded-2xl border-2 font-black text-lg",
+                            parseFloat(tipAmount) === parseFloat(amount) ? "border-orange-500 bg-orange-500/10 text-orange-500" : "bg-white/5 border-transparent text-white/60"
+                          )}
+                        >
+                          {amount}
+                        </Button>
+                      ))}
+                    </div>
+                    <Select value={asset} onValueChange={(val: "TAB" | "XPR") => setAsset(val)}>
+                      <SelectTrigger className="w-[90px] h-14 bg-white/5 border-2 border-white/10 rounded-2xl font-black text-xs text-white">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent className="bg-[#1a102d] border-white/20 text-white rounded-xl">
+                        <SelectItem value="TAB" className="font-black py-2 cursor-pointer">TAB</SelectItem>
+                        <SelectItem value="XPR" className="font-black py-2 cursor-pointer">XPR</SelectItem>
+                      </SelectContent>
+                    </Select>
                   </div>
 
                   <div className="relative group">
@@ -246,7 +265,7 @@ const CreatorProfile = () => {
                       className="bg-white/5 border-white/10 h-20 rounded-[32px] text-right text-3xl font-black pl-8 pr-24 focus:ring-orange-500/50 border-2"
                     />
                     <div className="absolute inset-y-0 right-8 flex items-center pointer-events-none">
-                      <span className="text-orange-500 font-black text-xl">TAB</span>
+                      <span className={cn("font-black text-xl", asset === "TAB" ? "text-orange-500" : "text-purple-400")}>{asset}</span>
                     </div>
                   </div>
 
