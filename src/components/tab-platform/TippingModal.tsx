@@ -46,7 +46,7 @@ export const TippingModal = ({ creator, onClose }: TippingModalProps) => {
     setIsProcessing(true);
     try {
       const actions = [{
-        account: 'tokencreate', // Correct TAB token contract
+        account: 'tokencreate', 
         name: 'transfer',
         authorization: [{
           actor: actor!,
@@ -55,7 +55,7 @@ export const TippingModal = ({ creator, onClose }: TippingModalProps) => {
         data: {
           from: actor,
           to: creator?.handle, 
-          quantity: `${parseFloat(tipAmount).toFixed(8)} TAB`, // Corrected to 8 decimals for TAB
+          quantity: `${parseFloat(tipAmount).toFixed(4)} TAB`, // Corrected to 4 decimals for TAB
           memo: 'Tipped via TipTab',
         },
       }];
