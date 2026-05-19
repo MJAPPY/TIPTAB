@@ -13,7 +13,9 @@ import {
   Heart,
   Settings as SettingsIcon,
   ChevronRight,
-  HandCoins
+  HandCoins,
+  ShoppingCart,
+  ExternalLink
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
@@ -41,6 +43,8 @@ const Dashboard = () => {
   const [transferRecipient, setTransferRecipient] = useState("");
   const [transferSymbol, setTransferSymbol] = useState("TAB");
   const [isSending, setIsSending] = useState(false);
+
+  const alcorUrl = "https://alcor.exchange/v/xpr/swap?input=xpr-eosio.token&output=tab-tokencreate";
 
   const formatPrecision = (val: string) => {
     const num = parseFloat(val);
@@ -131,7 +135,6 @@ const Dashboard = () => {
       items.splice(1, 0, { id: "card", icon: CreditCard, label: "Card" });
     }
     
-    // Everyone (Creator or Supporter) gets profile settings
     items.push({ id: "settings", icon: UserIcon, label: "Profile" });
     
     return items;
@@ -145,7 +148,7 @@ const Dashboard = () => {
       <div className="absolute top-0 left-0 w-full h-[600px] bg-gradient-to-b from-purple-900/10 to-transparent -z-10" />
       <div className="absolute top-48 left-1/4 w-[600px] h-[600px] bg-magenta-500/5 blur-[180px] rounded-full -z-10 animate-pulse" />
       
-      <main className="container mx-auto px-4 md:px-6 py-8 pt-32 sm:pt-44 relative z-10">
+      <main className="container mx-auto px-4 md:px-6 py-8 pt-32 sm:pt-44 relative z-10 pb-24">
         <div className="flex flex-col xl:flex-row xl:items-end justify-between gap-8 mb-12 sm:mb-16">
           <div className="space-y-3 sm:space-y-4">
              <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/5 border border-white/10 text-[9px] font-black uppercase tracking-[0.2em] text-slate-400">
@@ -184,7 +187,7 @@ const Dashboard = () => {
               <TabsContent value="analytics" className="space-y-6 sm:space-y-10 mt-0 animate-in fade-in slide-in-from-bottom-4 duration-500">
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
                   {/* Liquid TAB Card */}
-                  <Card className="bg-[#130b21]/60 border-white/10 text-white rounded-[32px] sm:rounded-[40px] p-6 sm:p-10 shadow-2xl relative overflow-hidden group hover:border-orange-500/30 transition-all flex flex-col h-[240px] sm:h-[300px]">
+                  <Card className="bg-[#130b21]/60 border-white/10 text-white rounded-[32px] sm:rounded-[40px] p-6 sm:p-10 shadow-2xl relative overflow-hidden group hover:border-orange-500/30 transition-all flex flex-col h-[280px] sm:h-[340px]">
                     <div className="absolute -top-12 -right-12 w-32 h-32 bg-orange-500/10 blur-3xl rounded-full group-hover:bg-orange-500/20 transition-all" />
                     <CardHeader className="p-0">
                       <div className="flex items-center justify-between">
@@ -201,15 +204,27 @@ const Dashboard = () => {
                         </span>
                         <span className="text-sm sm:text-xl font-black text-orange-500 italic uppercase">TAB</span>
                       </div>
-                      <div className="mt-auto pt-4 flex items-center gap-2 text-green-400 text-[8px] sm:text-[10px] font-black uppercase tracking-widest">
-                        <ShieldCheck className="h-3 w-3" />
-                        Network Live
+                      <div className="mt-auto pt-4 flex flex-col sm:flex-row items-center justify-between gap-4">
+                        <div className="flex items-center gap-2 text-green-400 text-[8px] sm:text-[10px] font-black uppercase tracking-widest shrink-0">
+                          <ShieldCheck className="h-3 w-3" />
+                          Network Live
+                        </div>
+                        <Button 
+                          asChild
+                          variant="outline"
+                          className="w-full sm:w-auto h-9 sm:h-10 px-4 rounded-xl border-orange-500/30 bg-orange-500/10 text-orange-400 hover:bg-orange-500 hover:text-white font-black text-[10px] uppercase tracking-widest gap-2"
+                        >
+                          <a href={alcorUrl} target="_blank" rel="noopener noreferrer">
+                            <ShoppingCart className="h-3.5 w-3.5" />
+                            Get TAB
+                          </a>
+                        </Button>
                       </div>
                     </CardContent>
                   </Card>
 
                   {/* Liquid XPR Card */}
-                  <Card className="bg-[#130b21]/60 border-white/10 text-white rounded-[32px] sm:rounded-[40px] p-6 sm:p-10 shadow-2xl relative overflow-hidden group hover:border-purple-500/30 transition-all flex flex-col h-[240px] sm:h-[300px]">
+                  <Card className="bg-[#130b21]/60 border-white/10 text-white rounded-[32px] sm:rounded-[40px] p-6 sm:p-10 shadow-2xl relative overflow-hidden group hover:border-purple-500/30 transition-all flex flex-col h-[280px] sm:h-[340px]">
                     <div className="absolute -top-12 -right-12 w-32 h-32 bg-purple-500/10 blur-3xl rounded-full group-hover:bg-purple-500/20 transition-all" />
                     <CardHeader className="p-0">
                       <CardDescription className="text-slate-400 font-black uppercase tracking-[0.2em] text-[9px] sm:text-[10px]">Liquid XPR</CardDescription>
@@ -221,14 +236,26 @@ const Dashboard = () => {
                         </span>
                         <span className="text-sm sm:text-xl font-black text-purple-400 italic uppercase">XPR</span>
                       </div>
-                      <div className="mt-auto pt-4 h-1.5 w-full bg-white/5 rounded-full overflow-hidden">
-                        <div className="h-full bg-purple-500 w-[65%] rounded-full shadow-[0_0_15px_rgba(168,85,247,0.5)]" />
+                      <div className="mt-auto pt-4 flex flex-col sm:flex-row items-center justify-between gap-4">
+                        <div className="w-full sm:w-24 h-1.5 bg-white/5 rounded-full overflow-hidden shrink-0">
+                          <div className="h-full bg-purple-500 w-[65%] rounded-full" />
+                        </div>
+                        <Button 
+                          asChild
+                          variant="outline"
+                          className="w-full sm:w-auto h-9 sm:h-10 px-4 rounded-xl border-purple-500/30 bg-purple-500/10 text-purple-400 hover:bg-purple-500 hover:text-white font-black text-[10px] uppercase tracking-widest gap-2"
+                        >
+                          <a href={alcorUrl} target="_blank" rel="noopener noreferrer">
+                            <ExternalLink className="h-3.5 w-3.5" />
+                            Get XPR
+                          </a>
+                        </Button>
                       </div>
                     </CardContent>
                   </Card>
 
                   {/* Tips Sent Card */}
-                  <Card className="bg-[#130b21]/60 border-white/10 text-white rounded-[32px] sm:rounded-[40px] p-6 sm:p-10 shadow-2xl relative overflow-hidden group hover:border-pink-500/30 transition-all flex flex-col h-[240px] sm:h-[300px]">
+                  <Card className="bg-[#130b21]/60 border-white/10 text-white rounded-[32px] sm:rounded-[40px] p-6 sm:p-10 shadow-2xl relative overflow-hidden group hover:border-pink-500/30 transition-all flex flex-col h-[280px] sm:h-[340px]">
                     <div className="absolute -top-12 -right-12 w-32 h-32 bg-pink-500/10 blur-3xl rounded-full group-hover:bg-pink-500/20 transition-all" />
                     <CardHeader className="p-0">
                       <CardDescription className="text-slate-400 font-black uppercase tracking-[0.2em] text-[9px] sm:text-[10px]">Tips Sent</CardDescription>
@@ -295,20 +322,32 @@ const Dashboard = () => {
                         </div>
                       </div>
 
-                      <Button 
-                        onClick={handleTransfer} 
-                        disabled={isSending} 
-                        className="w-full h-16 sm:h-24 bg-white text-black hover:bg-purple-500 hover:text-white font-black text-lg sm:text-2xl rounded-2xl sm:rounded-[32px] shadow-2xl shadow-white/5 transition-all active:scale-[0.98]"
-                      >
-                        {isSending ? (
-                          <div className="flex items-center gap-3">
-                            <div className="h-5 w-5 sm:h-8 sm:w-8 border-2 sm:border-4 border-black/20 border-t-black rounded-full animate-spin" />
-                            <span>SENDING...</span>
-                          </div>
-                        ) : (
-                          "Execute Transfer"
-                        )}
-                      </Button>
+                      <div className="space-y-4">
+                        <Button 
+                          onClick={handleTransfer} 
+                          disabled={isSending} 
+                          className="w-full h-16 sm:h-24 bg-white text-black hover:bg-purple-500 hover:text-white font-black text-lg sm:text-2xl rounded-2xl sm:rounded-[32px] shadow-2xl shadow-white/5 transition-all active:scale-[0.98]"
+                        >
+                          {isSending ? (
+                            <div className="flex items-center gap-3">
+                              <div className="h-5 w-5 sm:h-8 sm:w-8 border-2 sm:border-4 border-black/20 border-t-black rounded-full animate-spin" />
+                              <span>SENDING...</span>
+                            </div>
+                          ) : (
+                            "Execute Transfer"
+                          )}
+                        </Button>
+                        <Button 
+                          asChild
+                          variant="ghost"
+                          className="w-full h-12 rounded-xl text-white/40 hover:text-orange-500 font-bold text-xs uppercase tracking-widest gap-2"
+                        >
+                          <a href={alcorUrl} target="_blank" rel="noopener noreferrer">
+                            <ShoppingCart className="h-4 w-4" />
+                            Need more funds? Buy on Alcor
+                          </a>
+                        </Button>
+                      </div>
                     </div>
                   </Card>
                 </div>
