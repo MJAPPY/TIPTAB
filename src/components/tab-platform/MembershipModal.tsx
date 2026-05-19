@@ -24,15 +24,15 @@ export const MembershipModal = ({ isOpen, onOpenChange }: MembershipModalProps) 
   const [step, setStep] = useState<OnboardingStep>("intro");
   const [isProcessing, setIsProcessing] = useState(false);
   const { toast } = useToast();
-  const { session, actor, login } = useXpr();
+  const { session, actor, login, isConnected } = useXpr();
 
   const handleNextStep = async () => {
     if (step === "intro") {
-      if (!session) {
+      if (!isConnected) {
         try {
           await login();
         } catch (err) {
-          return; // Login failed
+          return;
         }
       }
       setStep("payment");
@@ -45,7 +45,7 @@ export const MembershipModal = ({ isOpen, onOpenChange }: MembershipModalProps) 
     setIsProcessing(true);
     try {
       const actions = [{
-        account: 'eosio.token', // Standard XPR token contract
+        account: 'eosio.token', 
         name: 'transfer',
         authorization: [{
           actor: actor,
@@ -53,8 +53,8 @@ export const MembershipModal = ({ isOpen, onOpenChange }: MembershipModalProps) 
         }],
         data: {
           from: actor,
-          to: 'tiptab', // Updated destination to @tiptab
-          quantity: '2500.0000 XPR', // Exactly 4 decimals for XPR
+          to: 'tiptab', 
+          quantity: '2500.0000 XPR',
           memo: 'TipTab Membership Activation',
         },
       }];
@@ -130,7 +130,7 @@ export const MembershipModal = ({ isOpen, onOpenChange }: MembershipModalProps) 
                 onClick={handleNextStep}
                 className="w-full h-20 bg-white text-black hover:bg-orange-500 hover:text-white font-black text-2xl rounded-3xl shadow-[0_20px_40px_rgba(255,255,255,0.1)] transition-all group active:scale-95"
               >
-                {session ? "Continue to Payment" : "Connect Wallet"} <ArrowRight className="ml-3 h-6 w-6 group-hover:translate-x-2 transition-transform" />
+                {isConnected ? "Continue to Payment" : "Connect Wallet"} <ArrowRight className="ml-3 h-6 w-6 group-hover:translate-x-2 transition-transform" />
               </Button>
             </div>
           )}

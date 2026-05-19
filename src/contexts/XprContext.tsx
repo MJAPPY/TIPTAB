@@ -23,7 +23,7 @@ interface XprContextType {
 const XprContext = createContext<XprContextType | undefined>(undefined);
 
 const ENDPOINT = 'https://proton.greymass.com';
-const APP_IDENTIFIER = 'tiptab'; // Updated to @tiptab
+const APP_IDENTIFIER = 'tiptab';
 
 export const XprProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [session, setSession] = useState<LinkSession | null>(null);
@@ -70,10 +70,14 @@ export const XprProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         },
         transportOptions: {
           requestAccount: APP_IDENTIFIER,
+          backoff: 1000,
         },
         selectorOptions: {
-          appName: 'TAB Network',
-          appLogo: 'https://explorer.xprnetwork.org/api/account/tiptab/avatar',
+          appName: 'TIP TAB',
+          customStyleOptions: {
+            modalBackgroundColor: '#0a0514',
+            logoBackgroundColor: '#0a0514',
+          }
         },
       });
 
@@ -102,7 +106,7 @@ export const XprProvider: React.FC<{ children: React.ReactNode }> = ({ children 
           requestAccount: APP_IDENTIFIER,
         },
         selectorOptions: {
-          appName: 'TAB Network',
+          appName: 'TIP TAB',
           appLogo: 'https://explorer.xprnetwork.org/api/account/tiptab/avatar',
         },
       });
@@ -142,7 +146,7 @@ export const XprProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     refreshBalances,
     isConnected: !!session,
     isLoading,
-    isAdmin: session?.auth.actor === 'tiptab', // tiptab is the platform admin
+    isAdmin: session?.auth.actor === 'tiptab',
   };
 
   return <XprContext.Provider value={value}>{children}</XprContext.Provider>;

@@ -6,7 +6,7 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Twitter, Globe, Instagram, Zap, ShieldCheck } from "lucide-react";
+import { Twitter, Globe, Instagram, Zap, ShieldCheck, Wallet } from "lucide-react";
 import { useState } from "react";
 import { Creator } from "@/data/creators";
 import { useToast } from "@/hooks/use-toast";
@@ -22,13 +22,24 @@ export const TippingModal = ({ creator, onClose }: TippingModalProps) => {
   const [tipAmount, setTipAmount] = useState<string>("100");
   const [isProcessing, setIsProcessing] = useState(false);
   const { toast } = useToast();
-  const { session, actor, login } = useXpr();
+  const { session, actor, login, isConnected } = useXpr();
+
+  const handleConnect = async () => {
+    try {
+      await login();
+      toast({ title: "Connected", description: "You can now send your tip." });
+    } catch (err) {
+      console.error("Login failed", err);
+    }
+  };
 
   const handleSendTip = async () => {
+    if (!session || !actor) return;
+    
     if (!tipAmount || isNaN(Number(tipAmount)) || Number(tipAmount) <= 0) {
       toast({ 
         title: "Invalid amount", 
-        description: "Please enter a valid TAB amount to send.", 
+        description: "Please enter a valid TAB amount.", 
         variant: "destructive" 
       });
       return;
@@ -36,31 +47,15 @@ export const TippingModal = ({ creator, onClose }: TippingModalProps) => {
 
     setIsProcessing(true);
     try {
-      // Handle immediate login if not connected
-      let activeSession = session;
-      if (!activeSession) {
-        toast({
-          title: "Connecting Wallet",
-          description: "Please approve the connection in WebAuth.",
-        });
-        activeSession = await login();
-      }
-
-      if (!activeSession) {
-        setIsProcessing(false);
-        return;
-      }
-
-      // Sanitize the recipient handle (remove @ if present)
       const recipient = creator?.handle.replace(/^@/, "").toLowerCase().trim();
-      const sender = activeSession.auth.actor;
+      const sender = actor;
 
       const actions = [{
         account: 'tokencreate', 
         name: 'transfer',
         authorization: [{
           actor: sender,
-          permission: activeSession.auth.permission,
+          permission: session.auth.permission,
         }],
         data: {
           from: sender,
@@ -70,7 +65,7 @@ export const TippingModal = ({ creator, onClose }: TippingModalProps) => {
         },
       }];
 
-      await activeSession.transact({ actions }, { broadcast: true });
+      await session.transact({ actions }, { broadcast: true });
       
       toast({
         title: "Tip Sent Successfully!",
@@ -189,26 +184,35 @@ export const TippingModal = ({ creator, onClose }: TippingModalProps) => {
               </div>
             </div>
             
-            <Button 
-              onClick={handleSendTip}
-              disabled={isProcessing}
-              className="w-full h-20 bg-gradient-to-r from-orange-500 to-purple-600 hover:from-orange-600 hover:to-purple-700 text-white font-black text-2xl rounded-3xl shadow-[0_20px_40px_-10px_rgba(249,115,22,0.3)] mt-2 transition-all active:scale-[0.98] group overflow-hidden"
-            >
-              <div className="relative z-10 flex items-center justify-center gap-3">
-                {isProcessing ? (
-                  <>
-                    <div className="h-6 w-6 border-4 border-white/20 border-t-white rounded-full animate-spin" />
-                    <span>Processing...</span>
-                  </>
-                ) : (
-                  <>
-                    <span>Send Tip</span>
-                    <Zap className="h-6 w-6 fill-white group-hover:scale-110 transition-transform" />
-                  </>
-                )}
-              </div>
-              <div className="absolute inset-0 bg-white/10 translate-y-full group-hover:translate-y-0 transition-transform duration-500" />
-            </Button>
+            {isConnected ? (
+              <Button 
+                onClick={handleSendTip}
+                disabled={isProcessing}
+                className="w-full h-20 bg-gradient-to-r from-orange-500 to-purple-600 hover:from-orange-600 hover:to-purple-700 text-white font-black text-2xl rounded-3xl shadow-[0_20px_40px_-10px_rgba(249,115,22,0.3)] mt-2 transition-all active:scale-[0.98] group overflow-hidden"
+              >
+                <div className="relative z-10 flex items-center justify-center gap-3">
+                  {isProcessing ? (
+                    <>
+                      <div className="h-8 w-8 border-4 border-white/20 border-t-white rounded-full animate-spin" />
+                      <span>Processing...</span>
+                    </>
+                  ) : (
+                    <>
+                      <span>Send Tip</span>
+                      <Zap className="h-6 w-6 fill-white group-hover:scale-110 transition-transform" />
+                    </>
+                  )}
+                </div>
+              </Button>
+            ) : (
+              <Button 
+                onClick={handleConnect}
+                className="w-full h-20 bg-purple-600 hover:bg-purple-700 text-white font-black text-xl rounded-3xl shadow-xl transition-all active:scale-95 flex items-center justify-center gap-3"
+              >
+                <Wallet className="h-6 w-6" />
+                Connect to Tip
+              </Button>
+            )}
             
             <p className="text-[10px] text-center text-white/20 uppercase tracking-[0.3em] pt-2 font-black">
               Processed via XPR Network • Instant
