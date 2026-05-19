@@ -163,7 +163,7 @@ export const Header = ({ onBecomeCreator }: HeaderProps) => {
           )}
         >
           <Sparkles className={cn(isMobile ? "h-5 w-5" : "h-4 w-4")} />
-          Become a Creator
+          Join as Creator
         </Button>
       )}
     </>
@@ -317,15 +317,6 @@ export const Header = ({ onBecomeCreator }: HeaderProps) => {
               </DropdownMenu>
             ) : (
               <div className="flex items-center gap-2">
-                {onBecomeCreator && (
-                  <Button 
-                    onClick={onBecomeCreator}
-                    className="hidden sm:flex items-center gap-2 rounded-xl sm:rounded-2xl h-10 sm:h-16 px-6 font-black text-[10px] sm:text-base transition-all bg-orange-500 hover:bg-orange-600 text-white shadow-xl"
-                  >
-                    <Sparkles className="h-4 w-4" />
-                    Join as Creator
-                  </Button>
-                )}
                 <Button 
                   onClick={handleConnect}
                   disabled={isLoading}
