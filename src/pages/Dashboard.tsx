@@ -45,6 +45,7 @@ const Dashboard = () => {
   const [isSending, setIsSending] = useState(false);
 
   const alcorUrl = "https://alcor.exchange/v/xpr/swap?input=xpr-eosio.token&output=tab-tokencreate";
+  const metalPayUrl = "https://onramp.metalpay.com/buy/xpr";
 
   const formatPrecision = (val: string) => {
     const num = parseFloat(val);
@@ -236,18 +237,25 @@ const Dashboard = () => {
                         </span>
                         <span className="text-sm sm:text-xl font-black text-purple-400 italic uppercase">XPR</span>
                       </div>
-                      <div className="mt-auto pt-4 flex flex-col sm:flex-row items-center justify-between gap-4">
-                        <div className="w-full sm:w-24 h-1.5 bg-white/5 rounded-full overflow-hidden shrink-0">
-                          <div className="h-full bg-purple-500 w-[65%] rounded-full" />
-                        </div>
+                      <div className="mt-auto pt-4 flex flex-col sm:flex-row items-center justify-between gap-2 sm:gap-4">
                         <Button 
                           asChild
                           variant="outline"
-                          className="w-full sm:w-auto h-9 sm:h-10 px-4 rounded-xl border-purple-500/30 bg-purple-500/10 text-purple-400 hover:bg-purple-500 hover:text-white font-black text-[10px] uppercase tracking-widest gap-2"
+                          className="w-full sm:flex-1 h-9 sm:h-10 px-4 rounded-xl border-purple-500/30 bg-purple-500/10 text-purple-400 hover:bg-purple-500 hover:text-white font-black text-[9px] sm:text-[10px] uppercase tracking-widest gap-2"
                         >
                           <a href={alcorUrl} target="_blank" rel="noopener noreferrer">
                             <ExternalLink className="h-3.5 w-3.5" />
-                            Get XPR
+                            Alcor DEX
+                          </a>
+                        </Button>
+                        <Button 
+                          asChild
+                          variant="outline"
+                          className="w-full sm:flex-1 h-9 sm:h-10 px-4 rounded-xl border-cyan-500/30 bg-cyan-500/10 text-cyan-400 hover:bg-cyan-500 hover:text-white font-black text-[9px] sm:text-[10px] uppercase tracking-widest gap-2"
+                        >
+                          <a href={metalPayUrl} target="_blank" rel="noopener noreferrer">
+                            <CreditCard className="h-3.5 w-3.5" />
+                            Card Buy
                           </a>
                         </Button>
                       </div>
@@ -337,16 +345,29 @@ const Dashboard = () => {
                             "Execute Transfer"
                           )}
                         </Button>
-                        <Button 
-                          asChild
-                          variant="ghost"
-                          className="w-full h-12 rounded-xl text-white/40 hover:text-orange-500 font-bold text-xs uppercase tracking-widest gap-2"
-                        >
-                          <a href={alcorUrl} target="_blank" rel="noopener noreferrer">
-                            <ShoppingCart className="h-4 w-4" />
-                            Need more funds? Buy on Alcor
-                          </a>
-                        </Button>
+                        <div className="flex flex-col sm:flex-row items-center justify-center gap-2 sm:gap-6 pt-2">
+                          <Button 
+                            asChild
+                            variant="ghost"
+                            className="h-10 rounded-xl text-white/40 hover:text-orange-500 font-bold text-xs uppercase tracking-widest gap-2"
+                          >
+                            <a href={alcorUrl} target="_blank" rel="noopener noreferrer">
+                              <ShoppingCart className="h-4 w-4" />
+                              Buy on Alcor
+                            </a>
+                          </Button>
+                          <div className="hidden sm:block h-4 w-px bg-white/10" />
+                          <Button 
+                            asChild
+                            variant="ghost"
+                            className="h-10 rounded-xl text-white/40 hover:text-cyan-400 font-bold text-xs uppercase tracking-widest gap-2"
+                          >
+                            <a href={metalPayUrl} target="_blank" rel="noopener noreferrer">
+                              <CreditCard className="h-4 w-4" />
+                              Buy with Card
+                            </a>
+                          </Button>
+                        </div>
                       </div>
                     </div>
                   </Card>

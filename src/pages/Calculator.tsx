@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Calculator as CalcIcon, RefreshCw, Zap, TrendingUp, DollarSign, ArrowRightLeft, Info, ArrowUpRight, ShoppingCart, ExternalLink } from "lucide-react";
+import { Calculator as CalcIcon, RefreshCw, Zap, TrendingUp, DollarSign, ArrowRightLeft, Info, ArrowUpRight, ShoppingCart, ExternalLink, CreditCard } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const Calculator = () => {
@@ -128,6 +128,7 @@ const Calculator = () => {
   };
 
   const buyTabLink = "https://alcor.exchange/v/xpr/swap?input=xpr-eosio.token&output=tab-tokencreate";
+  const metalPayLink = "https://onramp.metalpay.com/buy/xpr";
   const explorerLink = "https://explorer.xprnetwork.org/tokens/TAB-proton-tokencreate";
 
   return (
@@ -286,15 +287,26 @@ const Calculator = () => {
                     </a>
                   </Button>
                   
-                  <Button 
-                    asChild
-                    className="w-full bg-orange-500 hover:bg-orange-600 text-white font-black h-10 md:h-12 rounded-xl transition-all text-[11px] md:text-sm"
-                  >
-                    <a href={buyTabLink} target="_blank" rel="noopener noreferrer">
-                      <ShoppingCart className="mr-2 h-3.5 w-3.5 md:h-4 md:w-4" />
-                      Trade on Alcor
-                    </a>
-                  </Button>
+                  <div className="grid grid-cols-2 gap-3">
+                    <Button 
+                      asChild
+                      className="bg-orange-500 hover:bg-orange-600 text-white font-black h-10 md:h-12 rounded-xl transition-all text-[10px] md:text-sm"
+                    >
+                      <a href={buyTabLink} target="_blank" rel="noopener noreferrer">
+                        <ShoppingCart className="mr-2 h-3.5 w-3.5" />
+                        Alcor DEX
+                      </a>
+                    </Button>
+                    <Button 
+                      asChild
+                      className="bg-cyan-500 hover:bg-cyan-600 text-white font-black h-10 md:h-12 rounded-xl transition-all text-[10px] md:text-sm"
+                    >
+                      <a href={metalPayLink} target="_blank" rel="noopener noreferrer">
+                        <CreditCard className="mr-2 h-3.5 w-3.5" />
+                        Card Buy
+                      </a>
+                    </Button>
+                  </div>
                 </div>
               </div>
             </div>
