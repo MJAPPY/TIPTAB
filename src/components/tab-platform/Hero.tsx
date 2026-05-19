@@ -42,7 +42,7 @@ export const Hero = ({ creators, onJoin }: HeroProps) => {
               {!isMember && (
                 <Button 
                   onClick={onJoin}
-                  className="w-full sm:w-auto h-16 md:h-20 px-10 md:px-14 bg-white text-black hover:bg-orange-500 hover:text-white rounded-[24px] md:rounded-[32px] font-black text-xl md:text-2xl shadow-[0_20px_50px_rgba(255,255,255,0.1)] transition-all group active:scale-95"
+                  className="w-full sm:w-auto h-16 md:h-20 px-10 md:px-14 bg-white text-black hover:bg-orange-500 hover:text-white rounded-[24px] md:rounded-[32px] font-black text-xl md:text-2xl shadow-[0_20px_50px_rgba(255,255,255,0.1)] transition-all group active:scale-95 animate-shimmer-silver"
                 >
                   Join the Network <ArrowRight className="ml-3 h-6 w-6 group-hover:translate-x-2 transition-transform" />
                 </Button>
