@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { Header } from "@/components/tab-platform/Header";
 import { MembershipModal } from "@/components/tab-platform/MembershipModal";
 import { 
@@ -16,10 +17,13 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
+import { useXpr } from "@/contexts/XprContext";
 import { cn } from "@/lib/utils";
 
 const Docs = () => {
   const [isMembershipOpen, setIsMembershipOpen] = useState(false);
+  const { isMember, isConnected } = useXpr();
+  const navigate = useNavigate();
 
   const sections = [
     {
@@ -47,9 +51,9 @@ const Docs = () => {
       icon: ShieldCheck,
       content: "Any service worker, professional, or digital creator can join the map. There is a yearly network activation fee of 2,500 XPR to prevent spam and maintain network quality.",
       items: [
-        "Click 'Join The Map' or 'Become a Creator'.",
-        "Pay the yearly activation fee.",
-        "Set up your public profile and download your unique TipTab card."
+        "Connect your WebAuth wallet to authenticate your account.",
+        "Pay the 2,500 XPR yearly activation fee.",
+        "Set your city in the Dashboard to appear on the global map."
       ]
     }
   ];
@@ -68,6 +72,14 @@ const Docs = () => {
       a: "Once you are a member, go to your Dashboard > Profile. Enter your city in the location field. Our geocoder will automatically place your pin on the global map."
     }
   ];
+
+  const handleCtaClick = () => {
+    if (isMember) {
+      navigate("/dashboard");
+    } else {
+      setIsMembershipOpen(true);
+    }
+  };
 
   return (
     <div className="min-h-screen bg-[#0a0514] text-white selection:bg-purple-500/30">
@@ -139,10 +151,10 @@ const Docs = () => {
               Start receiving tips directly to your wallet. No middleman, no fees, just pure appreciation.
             </p>
             <Button 
-              onClick={() => setIsMembershipOpen(true)}
+              onClick={handleCtaClick}
               className="h-20 px-12 bg-white text-black hover:bg-orange-500 hover:text-white rounded-[32px] font-black text-2xl transition-all shadow-2xl active:scale-95"
             >
-              Get Started Now <ArrowRight className="ml-3 h-6 w-6" />
+              {isMember ? "Go to Dashboard" : "Get Started Now"} <ArrowRight className="ml-3 h-6 w-6" />
             </Button>
           </div>
         </div>
