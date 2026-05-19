@@ -29,7 +29,8 @@ import {
   Users,
   BarChart3,
   TrendingUp,
-  Cpu
+  Cpu,
+  Coins
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
@@ -199,82 +200,87 @@ const AdminHub = () => {
           
           <div className="lg:col-span-4 space-y-8">
             
-            <Card className="bg-[#0d071a] border-[3px] border-slate-400/30 rounded-[40px] overflow-hidden shadow-[0_0_100px_rgba(0,0,0,0.8),inset_0_0_20px_rgba(255,255,255,0.05)] relative group ring-1 ring-white/20">
+            <Card className="bg-[#0d071a] border-[4px] border-slate-300/40 rounded-[40px] overflow-hidden shadow-[0_0_100px_rgba(0,0,0,0.8),inset_0_0_40px_rgba(255,255,255,0.05)] relative group ring-2 ring-white/10">
               {/* Silver Shimmer Effect */}
-              <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-white/[0.03] to-transparent pointer-events-none" />
+              <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-white/[0.05] to-transparent pointer-events-none" />
               
               {/* Animated Background Gradients */}
-              <div className="absolute top-0 right-0 w-64 h-64 bg-purple-600/10 blur-[100px] rounded-full group-hover:bg-purple-600/20 transition-all duration-700" />
-              <div className="absolute bottom-0 left-0 w-48 h-48 bg-orange-600/10 blur-[80px] rounded-full group-hover:bg-orange-600/20 transition-all duration-700" />
+              <div className="absolute top-0 right-0 w-64 h-64 bg-purple-600/15 blur-[100px] rounded-full group-hover:bg-purple-600/25 transition-all duration-700" />
+              <div className="absolute bottom-0 left-0 w-48 h-48 bg-orange-600/15 blur-[80px] rounded-full group-hover:bg-orange-600/25 transition-all duration-700" />
               
               <CardHeader className="p-8 md:p-10 pb-4 relative z-10">
                 <div className="flex items-center justify-between mb-2">
-                  <CardTitle className="text-2xl font-black italic tracking-tighter flex items-center gap-3 text-white">
-                    <Activity className="h-6 w-6 text-purple-500 animate-pulse" /> PLATFORM VITALS
+                  <CardTitle className="text-2xl md:text-3xl font-black italic tracking-tighter flex items-center gap-3 text-white drop-shadow-lg">
+                    <Activity className="h-7 w-7 text-purple-500 animate-pulse" /> TIPTAB VITALS
                   </CardTitle>
-                  <div className="flex items-center gap-2 px-3 py-1 rounded-full bg-green-500/10 border border-green-500/20 shadow-[0_0_15px_rgba(34,197,94,0.15)]">
-                    <span className="relative flex h-2 w-2">
+                  <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-green-500/20 border border-green-500/40 shadow-[0_0_20px_rgba(34,197,94,0.3)]">
+                    <span className="relative flex h-2.5 w-2.5">
                       <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
-                      <span className="relative inline-flex rounded-full h-2 w-2 bg-green-500"></span>
+                      <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-green-500"></span>
                     </span>
-                    <span className="text-[9px] font-black uppercase tracking-[0.2em] text-green-400">Network Live</span>
+                    <span className="text-[10px] font-black uppercase tracking-[0.25em] text-green-400">Live</span>
                   </div>
                 </div>
               </CardHeader>
 
               <CardContent className="p-8 md:p-10 pt-2 space-y-10 relative z-10">
                 <div className="grid grid-cols-2 gap-6">
-                  <div className="space-y-2 group/stat">
+                  <div className="space-y-3 group/stat">
                     <div className="flex items-center gap-2">
-                      <Users className="h-3 w-3 text-slate-300" />
-                      <p className="text-[9px] font-black text-slate-300 uppercase tracking-[0.3em]">Total Registered</p>
+                      <Users className="h-3.5 w-3.5 text-white" />
+                      <p className="text-[10px] font-black text-white uppercase tracking-[0.3em]">Total Registered</p>
                     </div>
                     <div className="relative">
                       <p className="text-4xl md:text-5xl font-black text-white tracking-tighter leading-none group-hover/stat:text-purple-400 transition-colors">1,284</p>
-                      <div className="flex items-center gap-1.5 text-[10px] font-black text-green-400 mt-2 bg-green-500/10 w-fit px-2 py-0.5 rounded">
+                      <div className="flex items-center gap-1.5 text-[11px] font-black text-green-400 mt-2 bg-green-500/20 w-fit px-2.5 py-1 rounded-lg border border-green-500/20">
                         <ArrowUpRight className="h-3 w-3" /> +14%
                       </div>
                     </div>
                   </div>
-                  <div className="space-y-2 group/stat">
+                  <div className="space-y-3 group/stat">
                     <div className="flex items-center gap-2">
-                      <Cpu className="h-3 w-3 text-slate-300" />
-                      <p className="text-[9px] font-black text-slate-300 uppercase tracking-[0.3em]">Active Live</p>
+                      <Cpu className="h-3.5 w-3.5 text-white" />
+                      <p className="text-[10px] font-black text-white uppercase tracking-[0.3em]">Active Live</p>
                     </div>
                     <div className="relative">
                       <p className="text-4xl md:text-5xl font-black text-purple-400 tracking-tighter leading-none group-hover/stat:text-white transition-colors">42</p>
-                      <p className="text-[10px] font-bold text-white/40 mt-2 uppercase tracking-widest italic">Current Nodes</p>
+                      <p className="text-[10px] font-black text-white/40 mt-2 uppercase tracking-widest italic">Global Nodes</p>
                     </div>
                   </div>
                 </div>
 
-                <div className="space-y-5">
+                <div className="space-y-5 bg-white/5 p-6 rounded-[32px] border border-white/10 shadow-inner">
                   <div className="flex items-center justify-between">
                     <div className="space-y-1">
                       <p className="text-[10px] font-black text-orange-500 uppercase tracking-[0.4em]">24H Network Volume</p>
-                      <p className="text-3xl font-black text-white tracking-tighter italic">124.5k <span className="text-orange-500 text-lg">TAB</span></p>
+                      <p className="text-4xl font-black text-white tracking-tighter italic">124.5k <span className="text-orange-500 text-lg">TAB</span></p>
                     </div>
-                    <div className="h-14 w-14 rounded-2xl bg-orange-500/10 border-2 border-slate-400/40 flex items-center justify-center shadow-[0_0_20px_rgba(249,115,22,0.1)]">
+                    <div className="h-14 w-14 rounded-2xl bg-orange-500/20 border-2 border-white/10 flex items-center justify-center shadow-[0_0_30px_rgba(249,115,22,0.2)]">
                       <TrendingUp className="h-7 w-7 text-orange-500" />
                     </div>
                   </div>
-                  <div className="relative h-3 w-full bg-white/5 rounded-full overflow-hidden border border-white/10 p-0.5">
-                    <div className="h-full bg-gradient-to-r from-orange-600 via-orange-400 to-white w-[65%] rounded-full shadow-[0_0_15px_rgba(249,115,22,0.6)] animate-shimmer" />
+                  <div className="relative h-4 w-full bg-black/40 rounded-full overflow-hidden border border-white/10 p-0.5">
+                    <div className="h-full bg-gradient-to-r from-orange-600 via-orange-400 to-white w-[65%] rounded-full shadow-[0_0_20px_rgba(249,115,22,0.8)] animate-shimmer" />
                   </div>
-                  <div className="flex justify-between text-[9px] font-black uppercase tracking-widest text-slate-300">
-                    <span>Peak Load: 85%</span>
-                    <span>Next Sync: 12:00 UTC</span>
+                  <div className="flex justify-end text-[10px] font-black uppercase tracking-widest text-white/40">
+                    <span>Sync: 12:00 UTC</span>
                   </div>
                 </div>
 
-                <div className="grid grid-cols-2 gap-3 pt-6 border-t border-white/10">
-                  <div className="bg-white/5 p-4 rounded-3xl border border-slate-400/20 group/mini hover:bg-white/10 transition-all">
-                    <span className="text-[8px] font-black text-slate-300 uppercase tracking-[0.2em] block mb-1">Avg Tip</span>
-                    <span className="text-lg font-black text-white group-hover/mini:text-orange-400 transition-colors">142 TAB</span>
+                <div className="grid grid-cols-1 gap-3 pt-6 border-t border-white/10">
+                  <div className="bg-gradient-to-r from-purple-500/10 to-transparent p-5 rounded-3xl border border-white/10 group/mini hover:border-purple-500/40 transition-all flex items-center justify-between">
+                    <div>
+                      <span className="text-[9px] font-black text-white uppercase tracking-[0.3em] block mb-1">Total TAB Sent</span>
+                      <span className="text-2xl font-black text-white group-hover/mini:text-purple-400 transition-colors italic">8.4M</span>
+                    </div>
+                    <Zap className="h-6 w-6 text-orange-500 fill-orange-500" />
                   </div>
-                  <div className="bg-white/5 p-4 rounded-3xl border border-slate-400/20 group/mini hover:bg-white/10 transition-all">
-                    <span className="text-[8px] font-black text-slate-300 uppercase tracking-[0.2em] block mb-1">Settlement</span>
-                    <span className="text-lg font-black text-emerald-400 group-hover/mini:text-white transition-colors uppercase">Instant</span>
+                  <div className="bg-gradient-to-r from-cyan-500/10 to-transparent p-5 rounded-3xl border border-white/10 group/mini hover:border-cyan-500/40 transition-all flex items-center justify-between">
+                    <div>
+                      <span className="text-[9px] font-black text-white uppercase tracking-[0.3em] block mb-1">Total XPR Sent</span>
+                      <span className="text-2xl font-black text-white group-hover/mini:text-cyan-400 transition-colors italic">2.1M</span>
+                    </div>
+                    <Coins className="h-6 w-6 text-cyan-400" />
                   </div>
                 </div>
               </CardContent>
