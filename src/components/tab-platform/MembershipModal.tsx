@@ -26,7 +26,7 @@ export const MembershipModal = ({ isOpen, onOpenChange }: MembershipModalProps) 
   const { toast } = useToast();
   const { session, actor, login, isConnected, setIsMember, isMember } = useXpr();
 
-  // Smart Step Management: Skip intro if already connected or auto-advance on login
+  // Smart Step Management: Initialize based on connection status when opened
   useEffect(() => {
     if (isOpen) {
       if (isConnected) {
@@ -44,8 +44,11 @@ export const MembershipModal = ({ isOpen, onOpenChange }: MembershipModalProps) 
   const handleNextStep = async () => {
     if (!isConnected) {
       try {
-        await login();
-        // The useEffect hook above will handle setStep("payment") automatically once isConnected is true
+        const newSession = await login();
+        // Explicitly advance to payment if login was successful
+        if (newSession) {
+          setStep("payment");
+        }
       } catch (err) {
         console.error("Login failed or cancelled", err);
       }
