@@ -4,9 +4,10 @@ import { Creator } from "@/data/creators";
 
 interface HeroProps {
   creators: Creator[];
+  onJoin?: () => void;
 }
 
-export const Hero = ({ creators }: HeroProps) => {
+export const Hero = ({ creators, onJoin }: HeroProps) => {
   // Take the first 4 creators for the preview avatars
   const previewCreators = creators.slice(0, 4);
   // Calculate a dynamic count (using a base of 10k to maintain the 'scale' vibe)
@@ -34,43 +35,44 @@ export const Hero = ({ creators }: HeroProps) => {
             <p className="text-xl md:text-2xl text-white/80 max-w-2xl leading-relaxed font-medium">
               Whether you're a delivery pro, a fitness coach, or a digital creator—TIPTAB connects you directly to the people who value your hustle via the <span className="text-purple-400 font-black">XPR Network</span>. Zero fees. Instant TAB rewards.
             </p>
-            
-            <div className="flex flex-wrap items-center gap-4 md:gap-6 pt-2 md:pt-4">
-              <div className="flex items-center gap-3 bg-white/10 px-6 py-3 rounded-2xl border border-white/10">
-                <Zap className="h-5 w-5 text-orange-500 fill-orange-500" />
-                <span className="text-sm font-black uppercase tracking-widest text-white/90">Direct Tipping</span>
-              </div>
-              <div className="flex items-center gap-3 bg-white/10 px-6 py-3 rounded-2xl border border-white/10">
-                <UserCheck className="h-5 w-5 text-purple-500" />
-                <span className="text-sm font-black uppercase tracking-widest text-white/90">Everyday Hustle</span>
-              </div>
-              <div className="flex items-center gap-3 bg-white/10 px-6 py-3 rounded-2xl border border-white/10">
-                <Rocket className="h-5 w-5 text-cyan-400" />
-                <span className="text-sm font-black uppercase tracking-widest text-white/90">Gig Economy Ready</span>
+
+            <div className="flex flex-col sm:flex-row items-center gap-4 pt-4">
+              <Button 
+                onClick={onJoin}
+                className="w-full sm:w-auto h-16 md:h-20 px-10 md:px-14 bg-white text-black hover:bg-orange-500 hover:text-white rounded-[24px] md:rounded-[32px] font-black text-xl md:text-2xl shadow-[0_20px_50px_rgba(255,255,255,0.1)] transition-all group active:scale-95"
+              >
+                Join the Network <ArrowRight className="ml-3 h-6 w-6 group-hover:translate-x-2 transition-transform" />
+              </Button>
+              <div className="flex items-center gap-4 px-6">
+                <div className="flex -space-x-3">
+                  {previewCreators.map((creator) => (
+                    <div 
+                      key={creator.id} 
+                      className={`h-10 w-10 md:h-12 md:w-12 rounded-full border-4 border-[#0a0514] ${creator.color} flex items-center justify-center font-black text-[10px] overflow-hidden shadow-xl`}
+                    >
+                      {creator.avatarImage ? (
+                        <img src={creator.avatarImage} alt={creator.name} className="w-full h-full object-cover" />
+                      ) : (
+                        creator.avatar
+                      )}
+                    </div>
+                  ))}
+                </div>
+                <p className="text-xs font-bold text-white/40 tracking-wide">
+                  Join <span className="text-white/80">{formattedCount}k+</span> pros
+                </p>
               </div>
             </div>
-
-            <div className="flex items-center gap-4 pt-4">
-              <div className="flex -space-x-3">
-                {previewCreators.map((creator) => (
-                  <div 
-                    key={creator.id} 
-                    className={`h-12 w-12 rounded-full border-4 border-[#0a0514] ${creator.color} flex items-center justify-center font-black text-[10px] overflow-hidden shadow-xl`}
-                  >
-                    {creator.avatarImage ? (
-                      <img src={creator.avatarImage} alt={creator.name} className="w-full h-full object-cover" />
-                    ) : (
-                      creator.avatar
-                    )}
-                  </div>
-                ))}
-                <div className="h-12 w-12 rounded-full border-4 border-[#0a0514] bg-white/20 backdrop-blur-sm flex items-center justify-center font-black text-[10px] text-white/80">
-                  +{creators.length > 4 ? creators.length - 4 : 0}
-                </div>
+            
+            <div className="flex flex-wrap items-center gap-4 md:gap-6 pt-4">
+              <div className="flex items-center gap-3 bg-white/5 px-6 py-3 rounded-2xl border border-white/5">
+                <Zap className="h-5 w-5 text-orange-500 fill-orange-500" />
+                <span className="text-[10px] font-black uppercase tracking-widest text-white/60">Direct Tipping</span>
               </div>
-              <p className="text-sm font-bold text-white/60 tracking-wide">
-                Join <span className="text-white">{formattedCount}k+</span> pros on the <span className="text-purple-400">XPR Network</span>
-              </p>
+              <div className="flex items-center gap-3 bg-white/5 px-6 py-3 rounded-2xl border border-white/5">
+                <UserCheck className="h-5 w-5 text-purple-500" />
+                <span className="text-[10px] font-black uppercase tracking-widest text-white/60">Everyday Hustle</span>
+              </div>
             </div>
           </div>
           

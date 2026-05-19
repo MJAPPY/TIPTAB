@@ -120,14 +120,14 @@ export const Header = ({ onBecomeCreator }: HeaderProps) => {
           </Button>
         </Link>
       )}
-      {!isConnected && onBecomeCreator && (
+      {onBecomeCreator && (
         <Button 
           variant="outline" 
           onClick={() => {
             onBecomeCreator();
             setIsOpen(false);
           }}
-          className="w-full lg:w-auto border-orange-500/50 bg-orange-500/5 text-orange-500 hover:bg-orange-500 hover:text-white flex items-center justify-start lg:justify-center gap-3 font-black rounded-2xl h-12 px-5 transition-all"
+          className="w-full lg:w-auto border-orange-500/50 bg-orange-500/10 text-orange-500 hover:bg-orange-500 hover:text-white flex items-center justify-start lg:justify-center gap-3 font-black rounded-2xl h-12 px-5 transition-all shadow-[0_0_20px_rgba(249,115,22,0.15)]"
         >
           <Sparkles className="h-4 w-4" />
           Become a Creator
