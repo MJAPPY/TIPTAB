@@ -10,28 +10,32 @@ import { useToast } from "@/hooks/use-toast";
 import { Creator } from "@/data/creators";
 import { cn } from "@/lib/utils";
 
-// Expanded Mock Geocoder including Aruba and more global hubs
+// Expanded Mock Geocoder with more global hubs
 const CITY_COORDINATES: Record<string, [number, number]> = {
-  "London": [-0.1276, 51.5074],
-  "New York": [-74.0060, 40.7128],
-  "Madrid": [-3.7038, 40.4168],
-  "Vancouver": [-123.1207, 49.2827],
-  "Accra": [-0.1870, 5.6037],
-  "Melbourne": [144.9631, -37.8136],
-  "Milan": [9.1900, 45.4642],
-  "Seoul": [126.9780, 37.5665],
-  "Seattle": [-122.3321, 47.6062],
-  "Tokyo": [139.6503, 35.6762],
-  "Paris": [2.3522, 48.8566],
-  "Dubai": [55.2708, 25.2048],
-  "Berlin": [13.4050, 52.5200],
-  "Sydney": [151.2093, -33.8688],
-  "Singapore": [103.8198, 1.3521],
-  "Aruba": [-69.9683, 12.5211],
-  "Miami": [-80.1918, 25.7617],
-  "Lagos": [3.3792, 6.5244],
-  "Toronto": [-79.3832, 43.6532],
-  "Los Angeles": [-118.2437, 34.0522],
+  "london": [-0.1276, 51.5074],
+  "new york": [-74.0060, 40.7128],
+  "madrid": [-3.7038, 40.4168],
+  "vancouver": [-123.1207, 49.2827],
+  "accra": [-0.1870, 5.6037],
+  "melbourne": [144.9631, -37.8136],
+  "milan": [9.1900, 45.4642],
+  "seoul": [126.9780, 37.5665],
+  "seattle": [-122.3321, 47.6062],
+  "tokyo": [139.6503, 35.6762],
+  "paris": [2.3522, 48.8566],
+  "dubai": [55.2708, 25.2048],
+  "berlin": [13.4050, 52.5200],
+  "sydney": [151.2093, -33.8688],
+  "singapore": [103.8198, 1.3521],
+  "aruba": [-69.9683, 12.5211],
+  "miami": [-80.1918, 25.7617],
+  "lagos": [3.3792, 6.5244],
+  "toronto": [-79.3832, 43.6532],
+  "los angeles": [-118.2437, 34.0522],
+  "perth": [115.8605, -31.9505],
+  "hong kong": [114.1694, 22.3193],
+  "amsterdam": [4.8952, 52.3702],
+  "san francisco": [-122.4194, 37.7749],
 };
 
 interface ProfileEditorProps {
@@ -79,9 +83,9 @@ export const ProfileEditor = ({ initialData, onSave }: ProfileEditorProps) => {
     setHasChanged(false);
   }, [initialData]);
 
-  // Check if typed city is in our geocoding list for instant feedback
+  // Check if typed city is in our geocoding list for instant feedback (Case-Insensitive)
   useEffect(() => {
-    const typedLocation = formData.location.split(',')[0].trim();
+    const typedLocation = formData.location.split(',')[0].trim().toLowerCase();
     setIsCityRecognized(!!CITY_COORDINATES[typedLocation]);
   }, [formData.location]);
 
@@ -128,7 +132,7 @@ export const ProfileEditor = ({ initialData, onSave }: ProfileEditorProps) => {
       await new Promise((resolve) => setTimeout(resolve, 800));
       
       let finalCoordinates = formData.coordinates;
-      const typedLocation = formData.location.split(',')[0].trim();
+      const typedLocation = formData.location.split(',')[0].trim().toLowerCase();
       
       // If recognized city, use the mock coordinates
       if (CITY_COORDINATES[typedLocation]) {
