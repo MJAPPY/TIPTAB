@@ -52,7 +52,7 @@ export const TipTabCard = ({ creator }: TipTabCardProps) => {
       });
       
       const link = document.createElement('a');
-      link.download = `TipTab-${creator.handle}.png`;
+      link.download = `TipTab-Silver-${creator.handle}.png`;
       link.href = dataUrl;
       link.click();
       
@@ -73,17 +73,20 @@ export const TipTabCard = ({ creator }: TipTabCardProps) => {
 
   return (
     <div className="group relative w-full max-w-[460px] mx-auto">
-      {/* Main Card Container */}
+      {/* Main Card Container with Silver Metallic Theme */}
       <div 
         ref={cardRef}
-        className="w-full aspect-[1.5/1] bg-[#0a0514] rounded-[48px] p-8 border border-white/10 shadow-[0_32px_64px_-16px_rgba(0,0,0,0.6)] relative overflow-hidden flex flex-col justify-between"
+        className="w-full aspect-[1.5/1] bg-[#0a0514] rounded-[48px] p-8 border border-slate-400/30 shadow-[0_32px_64px_-16px_rgba(0,0,0,0.8)] relative overflow-hidden flex flex-col justify-between"
       >
         
-        {/* Dynamic Background Glows */}
-        <div className="absolute top-0 right-0 w-full h-full bg-gradient-to-br from-purple-600/10 via-transparent to-orange-500/10 pointer-events-none" />
-        <div className="absolute -top-32 -right-32 w-80 h-80 bg-purple-500/20 blur-[100px] rounded-full" />
-        <div className="absolute -bottom-32 -left-32 w-80 h-80 bg-orange-500/10 blur-[100px] rounded-full" />
+        {/* Sleek Metallic Gradients */}
+        <div className="absolute inset-0 bg-gradient-to-br from-slate-200/5 via-transparent to-slate-400/10 pointer-events-none" />
+        <div className="absolute -top-32 -right-32 w-80 h-80 bg-slate-300/10 blur-[120px] rounded-full" />
+        <div className="absolute -bottom-32 -left-32 w-80 h-80 bg-slate-100/5 blur-[100px] rounded-full" />
         
+        {/* Silver Edge Glow */}
+        <div className="absolute inset-0 ring-1 ring-inset ring-slate-400/20 rounded-[48px] pointer-events-none" />
+
         {/* Header Section */}
         <div className="relative z-10 flex items-start gap-4 h-24">
           {/* Creator Info */}
@@ -96,17 +99,17 @@ export const TipTabCard = ({ creator }: TipTabCardProps) => {
               )}
             </div>
             <div className="min-w-0">
-              <h3 className="text-2xl font-black text-white leading-tight break-words">
+              <h3 className="text-2xl font-black text-white leading-tight break-words tracking-tight">
                 {creator.name}
               </h3>
-              <p className="text-purple-400 font-bold text-sm">@{creator.handle}</p>
+              <p className="text-slate-400 font-bold text-sm tracking-tight">@{creator.handle}</p>
             </div>
           </div>
 
-          {/* Branding */}
+          {/* Branding with Silver/Orange Mix */}
           <div className="flex flex-col items-end shrink-0 pt-1">
              <div className="flex items-center gap-1 -mr-2">
-               <img src="/src/assets/logo.png" alt="TAB" className="h-16 w-16 object-contain" />
+               <img src="/src/assets/logo.png" alt="TAB" className="h-16 w-16 object-contain drop-shadow-[0_0_15px_rgba(255,255,255,0.1)]" />
                <span className="text-xl font-black italic tracking-tighter text-white">
                 TIP<span className="text-orange-500">TAB</span>
                </span>
@@ -119,26 +122,27 @@ export const TipTabCard = ({ creator }: TipTabCardProps) => {
           {/* Left Info Column */}
           <div className="space-y-4 flex-1 min-w-0 pb-1">
             <div className="space-y-1.5">
-              <div className="flex items-center gap-2 text-slate-300 text-[13px] font-bold">
-                <MapPin className="h-3.5 w-3.5 text-purple-500 shrink-0" />
+              <div className="flex items-center gap-2 text-slate-200 text-[13px] font-bold">
+                <MapPin className="h-3.5 w-3.5 text-slate-400 shrink-0" />
                 <span className="truncate">{creator.location}</span>
               </div>
-              <p className="text-slate-400 text-[11px] font-medium leading-tight max-w-[180px]">
-                Direct TAB tipping on the XPR Network.
+              <p className="text-slate-400 text-[11px] font-medium leading-tight max-w-[180px] tracking-wide">
+                Direct TAB tipping on the <span className="text-slate-200 font-bold italic">XPR Network</span>.
               </p>
             </div>
             
-            <div className="flex items-center gap-2 px-2.5 py-1 rounded-lg bg-green-500/10 border border-green-500/20 w-fit">
-              <ShieldCheck className="h-3.5 w-3.5 text-green-400" />
-              <span className="text-[9px] font-black uppercase tracking-widest text-green-400">Zero Fees</span>
+            <div className="flex items-center gap-2 px-2.5 py-1 rounded-lg bg-white/5 border border-slate-400/20 w-fit">
+              <ShieldCheck className="h-3.5 w-3.5 text-slate-300" />
+              <span className="text-[9px] font-black uppercase tracking-[0.2em] text-slate-300">Silver Tier Verified</span>
             </div>
           </div>
 
           {/* Right QR Column */}
           <div className="flex flex-col items-center gap-2.5 shrink-0">
             <div className="relative">
-              <div className="absolute inset-[-8px] bg-white/20 blur-xl rounded-full" />
-              <div className="relative bg-white p-3 rounded-[24px] shadow-2xl">
+              {/* Outer Silver Glow */}
+              <div className="absolute inset-[-12px] bg-slate-300/10 blur-2xl rounded-full" />
+              <div className="relative bg-white p-3 rounded-[24px] shadow-[0_15px_40px_rgba(0,0,0,0.5)] border-2 border-slate-300">
                 <div className="h-24 w-24 bg-white flex items-center justify-center rounded-xl overflow-hidden">
                   <QRCodeSVG 
                     value={tippingUrl}
@@ -158,11 +162,11 @@ export const TipTabCard = ({ creator }: TipTabCardProps) => {
               </div>
             </div>
             <div className="text-center space-y-0.5">
-              <p className="text-[11px] font-black uppercase tracking-[0.15em] text-white bg-orange-500 px-3 py-1 rounded-full shadow-lg shadow-orange-500/20">
-                Scan to Tip Me
+              <p className="text-[11px] font-black uppercase tracking-[0.15em] text-white bg-gradient-to-r from-orange-500 to-orange-600 px-4 py-1.5 rounded-full shadow-lg shadow-orange-500/20 border border-white/10">
+                SCAN TO TIP
               </p>
-              <p className="text-[10px] font-black text-white/40 tracking-widest uppercase pt-1">
-                XPR Network
+              <p className="text-[9px] font-black text-slate-500 tracking-[0.3em] uppercase pt-1.5">
+                XPR PLATFORM
               </p>
             </div>
           </div>
@@ -174,21 +178,21 @@ export const TipTabCard = ({ creator }: TipTabCardProps) => {
         <Button 
           variant="secondary" 
           onClick={handleShare}
-          className="rounded-2xl bg-white/5 border border-white/10 hover:bg-white/10 text-slate-100 gap-2.5 h-14 font-bold text-base transition-all"
+          className="rounded-2xl bg-white/5 border border-white/10 hover:bg-white/10 text-slate-100 gap-2.5 h-14 font-bold text-base transition-all group"
         >
-          {isCopied ? <Check className="h-5 w-5 text-green-500" /> : <Share2 className="h-5 w-5 text-purple-400" />}
+          {isCopied ? <Check className="h-5 w-5 text-green-500" /> : <Share2 className="h-5 w-5 text-slate-400 group-hover:text-white transition-colors" />}
           {isCopied ? "Link Copied" : "Share URL"}
         </Button>
         <Button 
           variant="secondary" 
           onClick={handleDownload}
           disabled={isDownloading}
-          className="rounded-2xl bg-white/5 border border-white/10 hover:bg-white/10 text-slate-100 gap-2.5 h-14 font-bold text-base transition-all"
+          className="rounded-2xl bg-white/5 border border-white/10 hover:bg-white/10 text-slate-100 gap-2.5 h-14 font-bold text-base transition-all group"
         >
           {isDownloading ? (
             <div className="h-5 w-5 border-2 border-white/20 border-t-white rounded-full animate-spin" />
           ) : (
-            <Download className="h-5 w-5 text-orange-400" />
+            <Download className="h-5 w-5 text-slate-400 group-hover:text-white transition-colors" />
           )}
           {isDownloading ? "Saving..." : "Download Card"}
         </Button>
