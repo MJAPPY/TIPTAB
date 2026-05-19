@@ -19,15 +19,15 @@ interface TippingModalProps {
 }
 
 export const TippingModal = ({ creator, onClose }: TippingModalProps) => {
-  const [tipAmount, setTipAmount] = useState<string>("50.0000");
+  const [tipAmount, setTipAmount] = useState<string>("50.00000000");
   const [isProcessing, setIsProcessing] = useState(false);
   const { toast } = useToast();
   const { session, actor, login, isConnected } = useXpr();
 
   const formatValue = (val: string) => {
     const numericValue = parseFloat(val);
-    if (isNaN(numericValue)) return "0.0000";
-    return numericValue.toFixed(4);
+    if (isNaN(numericValue)) return "0.00000000";
+    return numericValue.toFixed(8);
   };
 
   const handleConnect = async () => {
@@ -54,10 +54,9 @@ export const TippingModal = ({ creator, onClose }: TippingModalProps) => {
     setIsProcessing(true);
     try {
       const recipient = creator.handle.replace(/^@/, "").toLowerCase().trim();
-      const quantityString = `${amountNum.toFixed(4)} TAB`;
+      const quantityString = `${amountNum.toFixed(8)} TAB`;
       const permission = session.auth.permission || 'active';
 
-      // CLEAN JSON POJO - No hidden prototype pollution
       const transferAction = {
         account: 'tokencreate', 
         name: 'transfer',
@@ -84,7 +83,7 @@ export const TippingModal = ({ creator, onClose }: TippingModalProps) => {
       console.error("Transact error:", error);
       toast({ 
         title: "Transaction failed", 
-        description: error.message || "Precision mismatch or network error.", 
+        description: error.message || "Network error. Please try again.", 
         variant: "destructive" 
       });
     } finally {
@@ -172,7 +171,7 @@ export const TippingModal = ({ creator, onClose }: TippingModalProps) => {
                 <span className="text-white/20 font-black tracking-widest text-[10px] uppercase">Custom Amount</span>
               </div>
               <Input 
-                placeholder="0.0000" 
+                placeholder="0.00000000" 
                 value={tipAmount}
                 onChange={(e) => setTipAmount(e.target.value)}
                 onBlur={(e) => setTipAmount(formatValue(e.target.value))}
