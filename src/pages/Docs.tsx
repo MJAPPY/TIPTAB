@@ -45,10 +45,10 @@ const Docs = () => {
     {
       title: "Becoming a Creator",
       icon: ShieldCheck,
-      content: "Any service worker, professional, or digital creator can join the map. There is a one-time network activation fee of 2,500 XPR to prevent spam and maintain network quality.",
+      content: "Any service worker, professional, or digital creator can join the map. There is a yearly network activation fee of 2,500 XPR to prevent spam and maintain network quality.",
       items: [
         "Click 'Join The Map' or 'Become a Creator'.",
-        "Pay the one-time activation fee.",
+        "Pay the yearly activation fee.",
         "Set up your public profile and download your unique TipTab card."
       ]
     }
@@ -61,7 +61,7 @@ const Docs = () => {
     },
     {
       q: "Are there any hidden fees?",
-      a: "No. TIPTAB takes 0% from tips. The only cost is the one-time network activation fee for creators and standard XPR Network resource usage (which is usually free for end-users via WebAuth)."
+      a: "No. TIPTAB takes 0% from tips. The only cost is the yearly network activation fee for creators and standard XPR Network resource usage (which is usually free for end-users via WebAuth)."
     },
     {
       q: "How do I get my location on the map?",
