@@ -19,7 +19,7 @@ import {
   ShieldAlert,
   ArrowLeft
 } from "lucide-react";
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useState } from "react";
 import {
   Sheet,
@@ -50,6 +50,7 @@ export const Header = ({ onBecomeCreator }: HeaderProps) => {
   const { login, logout, actor, balances, isConnected, isLoading, refreshBalances, isAdmin, isMember, userProfile } = useXpr();
   const { toast } = useToast();
   const location = useLocation();
+  const navigate = useNavigate();
 
   const handleConnect = async () => {
     try {
@@ -88,11 +89,19 @@ export const Header = ({ onBecomeCreator }: HeaderProps) => {
     });
   };
 
+  const handleHomeClick = (e: React.MouseEvent) => {
+    if (location.pathname === "/") {
+      e.preventDefault();
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+    setIsOpen(false);
+  };
+
   const isDashboardOrAdmin = location.pathname.includes('/admin') || location.pathname.includes('/dashboard');
 
   const NavItems = ({ isMobile = false }) => (
     <>
-      <Link to="/" onClick={() => setIsOpen(false)} className={cn(isMobile ? "w-full" : "xl:w-auto")}>
+      <Link to="/" onClick={handleHomeClick} className={cn(isMobile ? "w-full" : "xl:w-auto")}>
         <Button 
           variant="ghost" 
           className={cn(
@@ -169,7 +178,7 @@ export const Header = ({ onBecomeCreator }: HeaderProps) => {
           <div className="flex items-center gap-2 sm:gap-4 shrink-0">
             {location.pathname === '/admin' ? (
               <div className="flex items-center gap-1.5 sm:gap-4">
-                <Link to="/" className="flex items-center gap-1 sm:gap-2 text-white/40 hover:text-white transition-colors">
+                <Link to="/" onClick={handleHomeClick} className="flex items-center gap-1 sm:gap-2 text-white/40 hover:text-white transition-colors">
                   <ArrowLeft className="h-4 w-4" />
                   <span className="hidden xs:inline text-[8px] sm:text-xs font-black uppercase tracking-widest text-slate-300">Exit</span>
                 </Link>
@@ -183,7 +192,7 @@ export const Header = ({ onBecomeCreator }: HeaderProps) => {
               </div>
             ) : location.pathname === '/dashboard' ? (
               <div className="flex items-center gap-1.5 sm:gap-4">
-                <Link to="/" className="flex items-center gap-1 sm:gap-2 text-white/40 hover:text-white transition-colors">
+                <Link to="/" onClick={handleHomeClick} className="flex items-center gap-1 sm:gap-2 text-white/40 hover:text-white transition-colors">
                   <ArrowLeft className="h-4 w-4 sm:h-5 sm:w-5" />
                   <span className="hidden xs:inline font-bold text-[10px] sm:text-base text-slate-300">Map</span>
                 </Link>
@@ -196,7 +205,7 @@ export const Header = ({ onBecomeCreator }: HeaderProps) => {
                 </div>
               </div>
             ) : (
-              <Link to="/" className="flex items-center gap-1.5 sm:gap-4 group shrink-0">
+              <Link to="/" onClick={handleHomeClick} className="flex items-center gap-1.5 sm:gap-4 group shrink-0">
                 <div className="relative">
                   <div className="absolute inset-0 bg-orange-500/20 blur-lg rounded-full group-hover:scale-110 transition-transform" />
                   <img src="/src/assets/logo.png" alt="TIPTAB Logo" className="h-7 w-7 sm:h-14 sm:w-14 object-contain relative z-10" />
