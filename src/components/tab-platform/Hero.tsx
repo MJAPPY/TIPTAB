@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import { Zap, ArrowRight, UserCheck, Sparkles, Globe, Heart, Rocket } from "lucide-react";
+import { Zap, ArrowRight, UserCheck, Sparkles, Globe, Heart, Rocket, Car } from "lucide-react";
 import { Creator } from "@/data/creators";
 import { useXpr } from "@/contexts/XprContext";
 
@@ -40,12 +40,17 @@ export const Hero = ({ creators, onJoin }: HeroProps) => {
 
             <div className="flex flex-col sm:flex-row items-center gap-4 pt-4">
               {!isMember && (
-                <Button 
-                  onClick={onJoin}
-                  className="w-full sm:w-auto h-16 md:h-20 px-10 md:px-14 bg-white text-black hover:bg-orange-600 hover:text-purple-200 rounded-[24px] md:rounded-[32px] font-black text-xl md:text-2xl shadow-[0_20px_50px_rgba(255,255,255,0.1)] transition-all group active:scale-95 animate-shimmer-silver"
-                >
-                  Join the Network <ArrowRight className="ml-3 h-6 w-6 group-hover:translate-x-2 transition-transform" />
-                </Button>
+                <div className="flex flex-col gap-2 w-full sm:w-auto">
+                  <Button 
+                    onClick={onJoin}
+                    className="w-full h-16 md:h-20 px-10 md:px-14 bg-white text-black hover:bg-orange-600 hover:text-purple-200 rounded-[24px] md:rounded-[32px] font-black text-xl md:text-2xl shadow-[0_20px_50px_rgba(255,255,255,0.1)] transition-all group active:scale-95 animate-shimmer-silver"
+                  >
+                    Join the Network <ArrowRight className="ml-3 h-6 w-6 group-hover:translate-x-2 transition-transform" />
+                  </Button>
+                  <p className="text-[10px] md:text-xs font-bold text-white/30 italic px-2">
+                    *wallet connection required to join
+                  </p>
+                </div>
               )}
               <div className="flex items-center gap-4 px-6">
                 <div className="flex -space-x-3">
@@ -76,6 +81,10 @@ export const Hero = ({ creators, onJoin }: HeroProps) => {
               <div className="flex items-center gap-3 bg-white/5 px-6 py-3 rounded-2xl border border-white/5">
                 <UserCheck className="h-5 w-5 text-purple-500" />
                 <span className="text-[10px] font-black uppercase tracking-widest text-white/60">Everyday Hustle</span>
+              </div>
+              <div className="flex items-center gap-3 bg-white/5 px-6 py-3 rounded-2xl border border-white/5 group hover:border-green-500/30 transition-colors">
+                <Car className="h-5 w-5 text-green-500 drop-shadow-[0_0_8px_rgba(34,197,94,0.4)]" />
+                <span className="text-[10px] font-black uppercase tracking-widest text-white/60 group-hover:text-green-400 transition-colors">Gig Economy Ready</span>
               </div>
             </div>
           </div>
