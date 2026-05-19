@@ -19,17 +19,12 @@ import {
   UserX,
   History,
   FileText,
-  AlertTriangle,
-  Calendar,
-  Clock,
   UserMinus,
   ArrowUpRight,
   ArrowDownLeft,
   HandCoins,
   Users,
-  BarChart3,
   TrendingUp,
-  Cpu,
   Coins
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -84,11 +79,21 @@ const MOCK_TRANSACTIONS: Record<string, any[]> = {
 };
 
 const AdminHub = () => {
-  const { isAdmin, isConnected, isMaintenanceMode, setMaintenanceMode, broadcastAlert, networkAlert, membershipFee, updateMembershipFee } = useXpr();
+  const { 
+    isAdmin, 
+    isConnected, 
+    isMaintenanceMode, 
+    setMaintenanceMode, 
+    broadcastAlert, 
+    networkAlert, 
+    membershipFee, 
+    updateMembershipFee 
+  } = useXpr();
+  
   const navigate = useNavigate();
   const { toast } = useToast();
   
-  const [localFee, setLocalFee] = useState(membershipFee);
+  const [localFee, setLocalFee] = useState(membershipFee || "2500");
   const [searchQuery, setSearchQuery] = useState("");
   const [alertMessage, setAlertMessage] = useState("");
   const [isAlertModalOpen, setIsAlertModalOpen] = useState(false);
@@ -97,6 +102,13 @@ const AdminHub = () => {
   const [selectedCreator, setSelectedCreator] = useState<Creator | null>(null);
   const [moderatedCreators, setModeratedCreators] = useState<Creator[]>(CREATORS);
   const [bannedHandles, setBannedHandles] = useState<string[]>([]);
+
+  // Sync local fee state when the context fee changes (e.g., after a successful update)
+  useEffect(() => {
+    if (membershipFee) {
+      setLocalFee(membershipFee);
+    }
+  }, [membershipFee]);
 
   useEffect(() => {
     if (!isConnected || !isAdmin) {
@@ -109,15 +121,20 @@ const AdminHub = () => {
     }
   }, [isAdmin, isConnected, navigate, toast]);
 
-  useEffect(() => {
-    setLocalFee(membershipFee);
-  }, [membershipFee]);
-
   const handleUpdateFee = () => {
+    if (!localFee || isNaN(parseFloat(localFee))) {
+      toast({
+        title: "Invalid Amount",
+        description: "Please enter a numeric fee value.",
+        variant: "destructive"
+      });
+      return;
+    }
+
     updateMembershipFee(localFee);
     toast({
       title: "Fee Updated",
-      description: `Membership fee set to ${localFee} XPR globally.`,
+      description: `Global membership fee is now ${localFee} XPR.`,
     });
   };
 
@@ -201,7 +218,6 @@ const AdminHub = () => {
           <div className="lg:col-span-4 space-y-6">
             
             <Card className="bg-[#0d071a] border-[4px] border-slate-300/40 rounded-[40px] overflow-hidden shadow-[0_0_80px_rgba(0,0,0,0.8)] relative group ring-2 ring-white/10">
-              {/* Silver Shimmer Effect */}
               <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-white/[0.05] to-transparent pointer-events-none" />
               
               <CardHeader className="p-6 md:p-8 pb-2 relative z-10">
@@ -538,7 +554,7 @@ const AdminHub = () => {
                   <div className="space-y-2 pt-1 flex-1">
                     <div className="flex items-center justify-between">
                       <h4 className="font-black text-xl text-white tracking-tight">{log.event}</h4>
-                      <div className="flex items-center gap-4 text-[11px] font-black uppercase tracking-[0.2em] text-white/20">
+                      <div className="flex items-center gap-4 text-[10px] font-black uppercase tracking-[0.2em] text-white/20">
                         <div className="flex items-center gap-2"><Calendar className="h-3.5 w-3.5" /> {log.date}</div>
                         <div className="flex items-center gap-2"><Clock className="h-3.5 w-3.5" /> {log.time}</div>
                       </div>
