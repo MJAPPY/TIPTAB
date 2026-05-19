@@ -36,11 +36,11 @@ import {
 } from "@/components/ui/dialog";
 
 const AdminHub = () => {
-  const { isAdmin, isConnected, isMaintenanceMode, setMaintenanceMode, broadcastAlert, networkAlert } = useXpr();
+  const { isAdmin, isConnected, isMaintenanceMode, setMaintenanceMode, broadcastAlert, networkAlert, membershipFee, updateMembershipFee } = useXpr();
   const navigate = useNavigate();
   const { toast } = useToast();
   
-  const [membershipFee, setMembershipFee] = useState("2500");
+  const [localFee, setLocalFee] = useState(membershipFee);
   const [searchQuery, setSearchQuery] = useState("");
   const [alertMessage, setAlertMessage] = useState("");
   const [isAlertModalOpen, setIsAlertModalOpen] = useState(false);
@@ -58,10 +58,15 @@ const AdminHub = () => {
     }
   }, [isAdmin, isConnected, navigate, toast]);
 
+  useEffect(() => {
+    setLocalFee(membershipFee);
+  }, [membershipFee]);
+
   const handleUpdateFee = () => {
+    updateMembershipFee(localFee);
     toast({
       title: "Fee Updated",
-      description: `Membership fee set to ${membershipFee} XPR.`,
+      description: `Membership fee set to ${localFee} XPR globally.`,
     });
   };
 
@@ -161,8 +166,8 @@ const AdminHub = () => {
                   <div className="flex flex-col sm:flex-row gap-3 md:gap-4">
                     <Input 
                       type="number" 
-                      value={membershipFee} 
-                      onChange={(e) => setMembershipFee(e.target.value)}
+                      value={localFee} 
+                      onChange={(e) => setLocalFee(e.target.value)}
                       className="bg-[#1a112d] border-white/10 rounded-2xl font-black text-lg md:text-xl h-14 md:h-16 px-6 focus:ring-orange-500/50 text-white"
                     />
                     <Button 

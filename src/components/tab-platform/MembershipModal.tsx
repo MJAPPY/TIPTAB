@@ -24,7 +24,7 @@ export const MembershipModal = ({ isOpen, onOpenChange }: MembershipModalProps) 
   const [step, setStep] = useState<OnboardingStep>("intro");
   const [isProcessing, setIsProcessing] = useState(false);
   const { toast } = useToast();
-  const { session, actor, login, isConnected, setIsMember, isMember } = useXpr();
+  const { session, actor, login, isConnected, setIsMember, isMember, membershipFee } = useXpr();
 
   // Reset or initialize step whenever the modal opens
   useEffect(() => {
@@ -67,6 +67,7 @@ export const MembershipModal = ({ isOpen, onOpenChange }: MembershipModalProps) 
     setIsProcessing(true);
     try {
       const permission = session.auth.permission || 'active';
+      const formattedFee = `${parseFloat(membershipFee).toFixed(4)} XPR`;
       
       const membershipAction = {
         account: 'eosio.token', 
@@ -78,7 +79,7 @@ export const MembershipModal = ({ isOpen, onOpenChange }: MembershipModalProps) 
         data: {
           from: actor,
           to: 'tiptab', 
-          quantity: '2500.0000 XPR',
+          quantity: formattedFee,
           memo: isMember ? 'TipTab Yearly Membership Renewal' : 'TipTab Membership Activation',
         },
       };
@@ -193,7 +194,7 @@ export const MembershipModal = ({ isOpen, onOpenChange }: MembershipModalProps) 
                 </div>
                 <p className="text-white/40 font-black uppercase tracking-[0.3em] text-[10px] mb-3 group-hover:text-purple-400 transition-colors">Total Activation Amount</p>
                 <div className="flex items-center justify-center gap-4">
-                  <span className="text-7xl font-black tracking-tighter drop-shadow-[0_0_20px_rgba(255,255,255,0.2)] group-hover:text-purple-100 transition-colors">2,500</span>
+                  <span className="text-7xl font-black tracking-tighter drop-shadow-[0_0_20px_rgba(255,255,255,0.2)] group-hover:text-purple-100 transition-colors">{Number(membershipFee).toLocaleString()}</span>
                   <span className="text-3xl font-black text-orange-500 italic group-hover:text-purple-400 transition-colors">XPR</span>
                 </div>
               </div>

@@ -30,6 +30,8 @@ interface XprContextType {
   setMaintenanceMode: (status: boolean) => void;
   networkAlert: string | null;
   broadcastAlert: (message: string | null) => void;
+  membershipFee: string;
+  updateMembershipFee: (fee: string) => void;
 }
 
 const XprContext = createContext<XprContextType | undefined>(undefined);
@@ -57,6 +59,13 @@ export const XprProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     return null;
   });
   
+  const [membershipFee, setMembershipFee] = useState(() => {
+    if (typeof window !== "undefined") {
+      return localStorage.getItem("tiptab_membership_fee") || "2500";
+    }
+    return "2500";
+  });
+
   const [isMaintenanceMode, setIsMaintenanceMode] = useState(() => {
     if (typeof window !== "undefined") {
       return localStorage.getItem("tiptab_maintenance") === "true";
@@ -67,6 +76,11 @@ export const XprProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const setMaintenanceMode = (status: boolean) => {
     setIsMaintenanceMode(status);
     localStorage.setItem("tiptab_maintenance", status.toString());
+  };
+
+  const updateMembershipFee = (fee: string) => {
+    setMembershipFee(fee);
+    localStorage.setItem("tiptab_membership_fee", fee);
   };
 
   const broadcastAlert = (message: string | null) => {
@@ -279,7 +293,9 @@ export const XprProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     isMaintenanceMode,
     setMaintenanceMode,
     networkAlert,
-    broadcastAlert
+    broadcastAlert,
+    membershipFee,
+    updateMembershipFee
   };
 
   return <XprContext.Provider value={value}>{children}</XprContext.Provider>;
