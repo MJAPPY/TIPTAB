@@ -27,7 +27,7 @@ export const MembershipModal = ({ isOpen, onOpenChange }: MembershipModalProps) 
   const { toast } = useToast();
   const { session, actor, login, isConnected, setIsMember, isMember, userProfile } = useXpr();
 
-  // Reset or initialize step whenever the modal opens
+  // 1. Initial Step Selection: When modal opens, check connection status
   useEffect(() => {
     if (isOpen) {
       if (isConnected) {
@@ -36,10 +36,11 @@ export const MembershipModal = ({ isOpen, onOpenChange }: MembershipModalProps) 
         setStep("intro");
       }
     }
-  }, [isOpen]);
+  }, [isOpen, isConnected]);
 
-  // GUARANTEED TRANSITION: As soon as a connection is detected while the modal is open, 
-  // we force the payment screen to show.
+  // 2. Real-time Connection Watchdog:
+  // If the modal is open and we detect a connection while on an earlier step,
+  // we force the transition to the payment screen immediately.
   useEffect(() => {
     if (isOpen && isConnected && (step === "intro" || step === "connect")) {
       setStep("payment");
@@ -56,8 +57,11 @@ export const MembershipModal = ({ isOpen, onOpenChange }: MembershipModalProps) 
 
   const handleConnect = async () => {
     try {
-      await login();
-      // The useEffect watcher will handle the transition once the session is set
+      // login() returns the session, allowing us to act immediately
+      const newSession = await login();
+      if (newSession) {
+        setStep("payment");
+      }
     } catch (err) {
       console.error("Login failed", err);
     }
@@ -114,6 +118,7 @@ export const MembershipModal = ({ isOpen, onOpenChange }: MembershipModalProps) 
 
   const handleClose = () => {
     onOpenChange(false);
+    // Reset step after a short delay so the transition back isn't visible
     setTimeout(() => setStep("intro"), 300);
   };
 
@@ -176,7 +181,7 @@ export const MembershipModal = ({ isOpen, onOpenChange }: MembershipModalProps) 
             </div>
           )}
 
-          {/* Step 2: Connect Wallet (Only shown if not connected) */}
+          {/* Step 2: Connect Wallet Screen */}
           {step === "connect" && (
             <div className="space-y-10 animate-in fade-in slide-in-from-right-4 duration-500">
               <div className="space-y-2">
@@ -210,7 +215,7 @@ export const MembershipModal = ({ isOpen, onOpenChange }: MembershipModalProps) 
             </div>
           )}
 
-          {/* Step 3: Network Activation (Payment) */}
+          {/* Step 3: Network Activation (Payment Screen) */}
           {step === "payment" && isConnected && (
             <div className="space-y-10 animate-in fade-in slide-in-from-right-4 duration-500">
               <div className="space-y-4">
