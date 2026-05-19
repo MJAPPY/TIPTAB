@@ -30,7 +30,7 @@ const CreatorProfile = () => {
   const { session, actor, login, isConnected } = useXpr();
   
   const [creator, setCreator] = useState<Creator | null>(null);
-  const [tipAmount, setTipAmount] = useState("100");
+  const [tipAmount, setTipAmount] = useState("100.0000");
   const [isProcessing, setIsProcessing] = useState(false);
   const [isMembershipOpen, setIsMembershipOpen] = useState(false);
   const [isCopied, setIsCopied] = useState(false);
@@ -57,6 +57,12 @@ const CreatorProfile = () => {
     }
   }, [handle, navigate]);
 
+  const formatValue = (val: string) => {
+    const numericValue = parseFloat(val);
+    if (isNaN(numericValue)) return "0.0000";
+    return numericValue.toFixed(4);
+  };
+
   const handleConnect = async () => {
     try {
       await login();
@@ -69,7 +75,7 @@ const CreatorProfile = () => {
     if (!session || !actor) return;
     
     const amountNum = parseFloat(tipAmount);
-    if (!tipAmount || isNaN(amountNum) || amountNum <= 0) {
+    if (isNaN(amountNum) || amountNum <= 0) {
       toast({ 
         title: "Invalid amount", 
         description: "Please enter a valid TAB amount.", 
@@ -81,22 +87,21 @@ const CreatorProfile = () => {
     setIsProcessing(true);
     try {
       const recipient = creator?.handle.replace(/^@/, "").toLowerCase().trim();
-      const sender = actor;
-
-      // Force exactly 4 decimal places as a string: X.XXXX TAB
-      const formattedQuantity = amountNum.toFixed(4) + " TAB";
+      
+      // Construct the exact asset string required by the contract
+      const quantityString = `${amountNum.toFixed(4)} TAB`;
 
       const actions = [{
         account: 'tokencreate', 
         name: 'transfer',
         authorization: [{
-          actor: sender,
+          actor: actor,
           permission: session.auth.permission,
         }],
         data: {
-          from: sender,
+          from: actor,
           to: recipient, 
-          quantity: formattedQuantity,
+          quantity: quantityString,
           memo: 'Tipped via TipTab Profile',
         },
       }];
@@ -105,7 +110,7 @@ const CreatorProfile = () => {
       
       toast({
         title: "Tip Sent!",
-        description: `Successfully sent ${tipAmount} TAB to ${creator?.name}.`,
+        description: `Successfully sent ${quantityString} to ${creator?.name}.`,
       });
     } catch (error: any) {
       console.error("Tipping error:", error);
@@ -276,10 +281,10 @@ const CreatorProfile = () => {
                       <Button
                         key={amount}
                         variant="ghost"
-                        onClick={() => setTipAmount(amount)}
+                        onClick={() => setTipAmount(formatValue(amount))}
                         className={cn(
                           "h-14 rounded-2xl border-2 font-black transition-all text-lg",
-                          tipAmount === amount 
+                          parseFloat(tipAmount) === parseFloat(amount) 
                             ? "border-orange-500 bg-orange-500/10 text-orange-500 shadow-[0_0_30px_rgba(249,115,22,0.2)]" 
                             : "bg-white/5 border-transparent hover:bg-white/10 text-white/60"
                         )}
@@ -294,9 +299,10 @@ const CreatorProfile = () => {
                       <span className="text-white/20 font-black tracking-widest text-[10px] uppercase">Custom Tip</span>
                     </div>
                     <Input 
-                      placeholder="0" 
+                      placeholder="0.0000" 
                       value={tipAmount}
                       onChange={(e) => setTipAmount(e.target.value)}
+                      onBlur={(e) => setTipAmount(formatValue(e.target.value))}
                       className="bg-white/5 border-white/10 h-20 rounded-[32px] text-right text-3xl font-black pl-8 pr-24 focus:ring-orange-500/50 focus:bg-white/10 transition-all border-2"
                     />
                     <div className="absolute inset-y-0 right-8 flex items-center pointer-events-none">
