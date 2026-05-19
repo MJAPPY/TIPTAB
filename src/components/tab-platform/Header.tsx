@@ -222,11 +222,9 @@ export const Header = ({ onBecomeCreator }: HeaderProps) => {
             )}
           </div>
 
-          {!isDashboardOrAdmin && (
-            <div className="hidden xl:flex items-center gap-3 mx-4 relative z-10">
-              <NavItems />
-            </div>
-          )}
+          <div className="hidden xl:flex items-center gap-3 mx-4 relative z-10">
+            <NavItems />
+          </div>
 
           <div className="flex items-center gap-1.5 sm:gap-4 relative z-10">
             {isConnected && (
@@ -307,6 +305,12 @@ export const Header = ({ onBecomeCreator }: HeaderProps) => {
                     <Link to="/dashboard" className="flex items-center gap-3 px-3 py-2.5">
                       <LayoutDashboard className="h-4 w-4 text-purple-400" />
                       <span className="font-bold text-slate-200">{isMember ? "Creator Hub" : "Supporter Hub"}</span>
+                    </Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem asChild className="focus:bg-yellow-500/15 focus:text-yellow-400 rounded-xl cursor-pointer">
+                    <Link to="/leaderboard" className="flex items-center gap-3 px-3 py-2.5">
+                      <Trophy className="h-4 w-4 text-yellow-400" />
+                      <span className="font-bold text-slate-200">Leaderboard</span>
                     </Link>
                   </DropdownMenuItem>
                   <DropdownMenuItem onClick={handleLogout} className="focus:bg-red-500/10 focus:text-red-500 rounded-xl cursor-pointer text-red-400 flex items-center gap-3 px-3 py-2.5">
