@@ -159,8 +159,10 @@ const Dashboard = () => {
     
     if (isMember) {
       items.splice(1, 0, { id: "card", icon: CreditCard, label: "Card" });
-      items.push({ id: "settings", icon: UserIcon, label: "Profile" });
     }
+    
+    // Everyone (Creator or Supporter) gets profile settings
+    items.push({ id: "settings", icon: UserIcon, label: "Profile" });
     
     return items;
   }, [isMember]);
@@ -341,24 +343,26 @@ const Dashboard = () => {
               </TabsContent>
 
               {isMember && (
-                <>
-                  <TabsContent value="card" className="mt-0 animate-in zoom-in-95 duration-500">
-                    <div className="max-w-xl mx-auto px-2">
-                      <div className="text-center mb-8 sm:mb-10 space-y-2">
-                        <h2 className="text-2xl sm:text-3xl font-black italic tracking-tighter text-slate-100">Your Network Pass</h2>
-                        <p className="text-slate-400 font-medium text-xs sm:text-base">Share this card anywhere to receive zero-fee tips.</p>
-                      </div>
-                      <TipTabCard creator={user} />
+                <TabsContent value="card" className="mt-0 animate-in zoom-in-95 duration-500">
+                  <div className="max-w-xl mx-auto px-2">
+                    <div className="text-center mb-8 sm:mb-10 space-y-2">
+                      <h2 className="text-2xl sm:text-3xl font-black italic tracking-tighter text-slate-100">Your Network Pass</h2>
+                      <p className="text-slate-400 font-medium text-xs sm:text-base">Share this card anywhere to receive zero-fee tips.</p>
                     </div>
-                  </TabsContent>
-
-                  <TabsContent value="settings" className="mt-0 animate-in fade-in slide-in-from-bottom-4 duration-500">
-                    <div className="max-w-4xl mx-auto px-2">
-                      <ProfileEditor initialData={user} onSave={handleUpdateProfile} />
-                    </div>
-                  </TabsContent>
-                </>
+                    <TipTabCard creator={user} />
+                  </div>
+                </TabsContent>
               )}
+
+              <TabsContent value="settings" className="mt-0 animate-in fade-in slide-in-from-bottom-4 duration-500">
+                <div className="max-w-4xl mx-auto px-2">
+                  <div className="mb-8 space-y-1">
+                    <h2 className="text-2xl sm:text-3xl font-black italic tracking-tighter text-slate-100">Account Settings</h2>
+                    <p className="text-slate-400 font-medium text-sm sm:text-base">Manage your identity and discovery on the network.</p>
+                  </div>
+                  <ProfileEditor initialData={user} onSave={handleUpdateProfile} />
+                </div>
+              </TabsContent>
             </Tabs>
           </div>
         </div>
