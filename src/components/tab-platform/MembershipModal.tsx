@@ -9,7 +9,7 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Zap, ShieldCheck, CheckCircle2, Wallet, ArrowRight, Sparkles } from "lucide-react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { useXpr } from "@/contexts/XprContext";
 
@@ -26,15 +26,25 @@ export const MembershipModal = ({ isOpen, onOpenChange }: MembershipModalProps) 
   const { toast } = useToast();
   const { session, actor, login, isConnected, setIsMember } = useXpr();
 
+  // Safeguard: If the user is on the payment step but disconnects, move them back to intro
+  useEffect(() => {
+    if (step === "payment" && !isConnected) {
+      setStep("intro");
+    }
+  }, [isConnected, step]);
+
   const handleNextStep = async () => {
     if (step === "intro") {
       if (!isConnected) {
         try {
-          await login();
+          const newSession = await login();
+          if (!newSession) return; // User closed the wallet selector without connecting
         } catch (err) {
+          console.error("Login aborted:", err);
           return;
         }
       }
+      // Only proceed to payment if we are now connected
       setStep("payment");
     }
   };
@@ -87,6 +97,7 @@ export const MembershipModal = ({ isOpen, onOpenChange }: MembershipModalProps) 
 
   const handleClose = () => {
     onOpenChange(false);
+    // Reset to intro step when modal closes for next time
     setTimeout(() => setStep("intro"), 300);
   };
 
@@ -136,14 +147,14 @@ export const MembershipModal = ({ isOpen, onOpenChange }: MembershipModalProps) 
 
               <Button 
                 onClick={handleNextStep}
-                className="w-full h-20 bg-white text-black hover:bg-orange-500 hover:text-white font-black text-2xl rounded-3xl shadow-[0_20px_40px_rgba(255,255,255,0.1)] transition-all group active:scale-95 animate-shimmer"
+                className="w-full h-20 bg-white text-black hover:bg-orange-500 hover:text-white font-black text-2xl rounded-3xl shadow-[0_20px_40px_rgba(255,255,255,0.1)] transition-all group active:scale-95 animate-shimmer-silver"
               >
                 {isConnected ? "Continue to Payment" : "Connect WebAuth"} <ArrowRight className="ml-3 h-6 w-6 group-hover:translate-x-2 transition-transform" />
               </Button>
             </div>
           )}
 
-          {step === "payment" && (
+          {step === "payment" && isConnected && (
             <div className="space-y-10 animate-in fade-in slide-in-from-right-4 duration-500">
               <div className="space-y-2">
                 <Button variant="ghost" onClick={() => setStep("intro")} className="text-white/60 hover:text-white -ml-4 font-black tracking-widest uppercase text-xs">
