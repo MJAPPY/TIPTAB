@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
-import { User, AtSign, MapPin, Globe, Twitter, Save, Image as ImageIcon, Upload, X, Video, Instagram } from "lucide-react";
+import { User, AtSign, MapPin, Globe, Twitter, Save, Image as ImageIcon, Upload, X, Video, Instagram, Crosshair } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -9,6 +9,25 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { useToast } from "@/hooks/use-toast";
 import { Creator } from "@/data/creators";
 
+// Mock Geocoder for major hubs to ensure the map updates for common entries
+const CITY_COORDINATES: Record<string, [number, number]> = {
+  "London": [-0.1276, 51.5074],
+  "New York": [-74.0060, 40.7128],
+  "Madrid": [-3.7038, 40.4168],
+  "Vancouver": [-123.1207, 49.2827],
+  "Accra": [-0.1870, 5.6037],
+  "Melbourne": [144.9631, -37.8136],
+  "Milan": [9.1900, 45.4642],
+  "Seoul": [126.9780, 37.5665],
+  "Seattle": [-122.3321, 47.6062],
+  "Tokyo": [139.6503, 35.6762],
+  "Paris": [2.3522, 48.8566],
+  "Dubai": [55.2708, 25.2048],
+  "Berlin": [13.4050, 52.5200],
+  "Sydney": [151.2093, -33.8688],
+  "Singapore": [103.8198, 1.3521],
+};
+
 interface ProfileEditorProps {
   initialData: Creator;
   onSave: (updatedData: Creator) => void;
@@ -17,6 +36,7 @@ interface ProfileEditorProps {
 export const ProfileEditor = ({ initialData, onSave }: ProfileEditorProps) => {
   const [isSaving, setIsSaving] = useState(false);
   const [hasChanged, setHasChanged] = useState(false);
+  const [isLocating, setIsLocating] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   
   const [formData, setFormData] = useState({
@@ -24,6 +44,7 @@ export const ProfileEditor = ({ initialData, onSave }: ProfileEditorProps) => {
     handle: initialData.handle,
     bio: initialData.bio,
     location: initialData.location,
+    coordinates: initialData.coordinates,
     category: initialData.category,
     twitter: initialData.twitter || "",
     website: initialData.website || "",
@@ -40,6 +61,7 @@ export const ProfileEditor = ({ initialData, onSave }: ProfileEditorProps) => {
       handle: initialData.handle,
       bio: initialData.bio,
       location: initialData.location,
+      coordinates: initialData.coordinates,
       category: initialData.category,
       twitter: initialData.twitter || "",
       website: initialData.website || "",
@@ -50,14 +72,60 @@ export const ProfileEditor = ({ initialData, onSave }: ProfileEditorProps) => {
     setHasChanged(false);
   }, [initialData]);
 
+  const handleLocateMe = () => {
+    setIsLocating(true);
+    if (!navigator.geolocation) {
+      toast({
+        title: "Geolocation Unsupported",
+        description: "Your browser doesn't support automatic location.",
+        variant: "destructive"
+      });
+      setIsLocating(false);
+      return;
+    }
+
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        const { longitude, latitude } = position.coords;
+        setFormData(prev => ({
+          ...prev,
+          coordinates: [longitude, latitude]
+        }));
+        setHasChanged(true);
+        setIsLocating(false);
+        toast({
+          title: "Location Pinned!",
+          description: "Your exact coordinates have been captured for the map."
+        });
+      },
+      (error) => {
+        toast({
+          title: "Location Denied",
+          description: "Please enable location permissions or type your city manually.",
+          variant: "destructive"
+        });
+        setIsLocating(false);
+      }
+    );
+  };
+
   const handleSave = async () => {
     setIsSaving(true);
     try {
       await new Promise((resolve) => setTimeout(resolve, 800));
       
+      // Smart Geocoding Check: If they typed a city we know but didn't use GPS
+      let finalCoordinates = formData.coordinates;
+      const typedLocation = formData.location.split(',')[0].trim();
+      
+      if (CITY_COORDINATES[typedLocation] && formData.coordinates === initialData.coordinates) {
+        finalCoordinates = CITY_COORDINATES[typedLocation];
+      }
+      
       const updatedCreator: Creator = {
         ...initialData,
         ...formData,
+        coordinates: finalCoordinates
       };
       
       onSave(updatedCreator);
@@ -65,7 +133,7 @@ export const ProfileEditor = ({ initialData, onSave }: ProfileEditorProps) => {
       
       toast({
         title: "Profile Updated",
-        description: "Your social links and profile have been saved.",
+        description: "Your map pin and profile details have been synchronized.",
       });
     } catch (error) {
       toast({
@@ -92,15 +160,6 @@ export const ProfileEditor = ({ initialData, onSave }: ProfileEditorProps) => {
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
-      if (file.size > 2 * 1024 * 1024) { // 2MB limit
-        toast({
-          title: "File too large",
-          description: "Please choose an image smaller than 2MB.",
-          variant: "destructive",
-        });
-        return;
-      }
-
       const reader = new FileReader();
       reader.onloadend = () => {
         setFormData(prev => ({ ...prev, avatarImage: reader.result as string }));
@@ -220,15 +279,26 @@ export const ProfileEditor = ({ initialData, onSave }: ProfileEditorProps) => {
 
             <div className="space-y-2">
               <Label htmlFor="location" className="text-white/60 font-bold uppercase tracking-widest text-[10px]">Location</Label>
-              <div className="relative">
-                <MapPin className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-purple-500" />
-                <Input 
-                  id="location"
-                  value={formData.location}
-                  onChange={handleChange}
-                  placeholder="City, Country"
-                  className="pl-12 bg-white/5 border-white/10 h-14 rounded-2xl focus:ring-purple-500 focus:bg-white/10 transition-all text-white" 
-                />
+              <div className="flex gap-2">
+                <div className="relative flex-1">
+                  <MapPin className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-purple-500" />
+                  <Input 
+                    id="location"
+                    value={formData.location}
+                    onChange={handleChange}
+                    placeholder="City, Country"
+                    className="pl-12 bg-white/5 border-white/10 h-14 rounded-2xl focus:ring-purple-500 focus:bg-white/10 transition-all text-white" 
+                  />
+                </div>
+                <Button 
+                  onClick={handleLocateMe}
+                  disabled={isLocating}
+                  variant="outline"
+                  className="h-14 w-14 shrink-0 rounded-2xl bg-white/5 border-white/10 hover:border-purple-500/50 hover:bg-purple-500/10 transition-all"
+                  title="Pin my current location"
+                >
+                  <Crosshair className={cn("h-5 w-5 text-purple-400", isLocating && "animate-spin")} />
+                </Button>
               </div>
             </div>
 
