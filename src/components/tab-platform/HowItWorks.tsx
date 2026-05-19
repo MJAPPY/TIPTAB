@@ -26,10 +26,10 @@ export const HowItWorks = () => {
   ];
 
   return (
-    <section className="py-32 container mx-auto px-6 relative overflow-hidden">
+    <section className="py-20 container mx-auto px-6 relative overflow-hidden">
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full h-full bg-purple-600/[0.02] blur-[150px] -z-10" />
       
-      <div className="text-center space-y-4 mb-20">
+      <div className="text-center space-y-4 mb-16">
         <h2 className="text-4xl md:text-5xl font-black tracking-tight uppercase">
           Empowering The <span className="text-orange-500">Everyday Hustle</span>
         </h2>

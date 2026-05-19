@@ -43,8 +43,8 @@ export const FeaturedCreators = ({ creators, onSelectCreator, onAddYourself }: F
   };
 
   return (
-    <section className="py-32 container mx-auto px-6 relative">
-      <div className="flex flex-col md:flex-row md:items-end justify-between gap-10 mb-16">
+    <section className="py-20 container mx-auto px-6 relative">
+      <div className="flex flex-col md:flex-row md:items-end justify-between gap-10 mb-12">
         <div className="space-y-6">
           <div className="inline-flex items-center gap-2.5 px-4 py-1.5 rounded-full bg-white/10 border border-white/20 text-[10px] font-black uppercase tracking-[0.2em] text-white/80">
             <Zap className="h-3 w-3 text-orange-500 fill-orange-500" />
@@ -65,7 +65,7 @@ export const FeaturedCreators = ({ creators, onSelectCreator, onAddYourself }: F
         </Button>
       </div>
       
-      <div className="space-y-6 mb-16">
+      <div className="space-y-6 mb-12">
         <div className="flex flex-col lg:flex-row items-center gap-4 bg-white/[0.05] p-3 rounded-[32px] border border-white/20 backdrop-blur-3xl shadow-2xl">
           <div className="relative flex-1 w-full group">
             <Search className="absolute left-7 top-1/2 -translate-y-1/2 h-5 w-5 text-white/40 group-focus-within:text-purple-500 transition-colors" />
