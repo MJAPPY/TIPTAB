@@ -8,6 +8,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
 import { Creator } from "@/data/creators";
+import { cn } from "@/lib/utils";
 
 // Mock Geocoder for major hubs to ensure the map updates for common entries
 const CITY_COORDINATES: Record<string, [number, number]> = {
