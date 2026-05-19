@@ -6,7 +6,8 @@ import { Trophy, ArrowLeft, Zap, Star, Crown, Flame, Medal, Users, Heart } from 
 import { Button } from "@/components/ui/button";
 import { Header } from "@/components/tab-platform/Header";
 import { MembershipModal } from "@/components/tab-platform/MembershipModal";
-import { CREATORS } from "@/data/creators";
+import { CREATORS, Creator } from "@/data/creators";
+import { useXpr } from "@/contexts/XprContext";
 import { cn } from "@/lib/utils";
 
 // Generate mock stats for creators
@@ -18,25 +19,44 @@ const CREATOR_LEADERBOARD = CREATORS.map((creator, index) => ({
 })).sort((a, b) => b.totalValue - a.totalValue);
 
 // Generate mock stats for supporters
-const SUPPORTER_LEADERBOARD = [
-  { id: "s1", name: "WhaleShark", handle: "whaleshark", avatar: "WS", color: "bg-blue-600", totalValue: 540000, activityCount: 1240, label: "Total Sent" },
-  { id: "s2", name: "EarlyAdopter", handle: "early", avatar: "EA", color: "bg-purple-600", totalValue: 215000, activityCount: 890, label: "Total Sent" },
-  { id: "s3", name: "Tab Fanatic", handle: "fanatic", avatar: "TF", color: "bg-orange-500", totalValue: 185000, activityCount: 650, label: "Total Sent" },
-  { id: "s4", name: "CryptoKing", handle: "cking", avatar: "CK", color: "bg-emerald-600", totalValue: 92000, activityCount: 420, label: "Total Sent" },
-  { id: "s5", name: "XPR Warrior", handle: "warrior", avatar: "XW", color: "bg-red-600", totalValue: 75000, activityCount: 310, label: "Total Sent" },
-  { id: "s6", name: "TipBot 3000", handle: "tipbot", avatar: "TB", color: "bg-cyan-600", totalValue: 45000, activityCount: 2100, label: "Total Sent" },
-  { id: "s7", name: "Metal Head", handle: "metal", avatar: "MH", color: "bg-slate-700", totalValue: 32000, activityCount: 150, label: "Total Sent" },
-  { id: "s8", name: "Proton Pack", handle: "pack", avatar: "PP", color: "bg-indigo-600", totalValue: 28000, activityCount: 120, label: "Total Sent" },
-  { id: "s9", name: "Node Runner", handle: "runner", avatar: "NR", color: "bg-yellow-600", totalValue: 15000, activityCount: 85, label: "Total Sent" },
-].sort((a, b) => b.totalValue - a.totalValue);
+const MOCK_SUPPORTERS = [
+  { id: "s1", name: "WhaleShark", handle: "whaleshark", avatar: "WS", color: "bg-blue-600", totalValue: 540000, activityCount: 1240, label: "Total Sent", location: "Dubai, UAE" },
+  { id: "s2", name: "EarlyAdopter", handle: "early", avatar: "EA", color: "bg-purple-600", totalValue: 215000, activityCount: 890, label: "Total Sent", location: "London, UK" },
+  { id: "s3", name: "Tab Fanatic", handle: "fanatic", avatar: "TF", color: "bg-orange-500", totalValue: 185000, activityCount: 650, label: "Total Sent", location: "Austin, USA" },
+  { id: "s4", name: "CryptoKing", handle: "cking", avatar: "CK", color: "bg-emerald-600", totalValue: 92000, activityCount: 420, label: "Total Sent", location: "Seoul, KR" },
+  { id: "s5", name: "XPR Warrior", handle: "warrior", avatar: "XW", color: "bg-red-600", totalValue: 75000, activityCount: 310, label: "Total Sent", location: "Tokyo, JP" },
+];
 
 const Leaderboard = () => {
   const [isMembershipOpen, setIsMembershipOpen] = useState(false);
   const [activeTab, setActiveTab] = useState<"creators" | "supporters">("creators");
+  const { actor, isMember } = useXpr();
   
   const currentData = useMemo(() => {
-    return activeTab === "creators" ? CREATOR_LEADERBOARD : SUPPORTER_LEADERBOARD;
-  }, [activeTab]);
+    if (activeTab === "creators") return CREATOR_LEADERBOARD;
+
+    // Build Supporter list and include current user if they are a Supporter
+    const savedUser = localStorage.getItem("tiptab_user_profile");
+    let combinedSupporters = [...MOCK_SUPPORTERS];
+
+    if (savedUser && !isMember) {
+      const localUser = JSON.parse(savedUser) as Creator;
+      combinedSupporters.push({
+        id: localUser.id,
+        name: localUser.name,
+        handle: localUser.handle,
+        avatar: localUser.avatar,
+        avatarImage: localUser.avatarImage,
+        color: localUser.color,
+        totalValue: 0, // Mock value for display
+        activityCount: 0,
+        label: "Total Sent",
+        location: localUser.location
+      });
+    }
+
+    return combinedSupporters.sort((a, b) => b.totalValue - a.totalValue);
+  }, [activeTab, isMember]);
 
   const DISPLAY_LIMIT = 50;
   const topThree = currentData.slice(0, 3);
@@ -185,6 +205,7 @@ const Leaderboard = () => {
                   <div className="max-w-[100px] sm:max-w-none">
                     <h4 className="font-black text-sm md:text-lg group-hover:text-white transition-colors truncate">{participant.name}</h4>
                     <p className="text-xs md:text-sm text-white/70 font-bold group-hover:text-cyan-300 transition-colors truncate">@{participant.handle}</p>
+                    <p className="text-[9px] text-slate-500 font-bold mt-0.5">{participant.location}</p>
                   </div>
                 </div>
               </div>

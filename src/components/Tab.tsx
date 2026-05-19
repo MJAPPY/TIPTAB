@@ -11,24 +11,33 @@ import { TippingModal } from "./tab-platform/TippingModal";
 import { ActivityTicker } from "./tab-platform/ActivityTicker";
 import { Toaster } from "@/components/ui/toaster";
 import { CREATORS, Creator } from "@/data/creators";
+import { useXpr } from "@/contexts/XprContext";
 
 export const Tab = () => {
   const [isMembershipOpen, setIsMembershipOpen] = useState(false);
   const [selectedCreator, setSelectedCreator] = useState<Creator | null>(null);
+  const { actor } = useXpr();
 
-  // Sync local user profile updates to the display list
+  // Sync local user profile updates to the display list (Map is for Creators only)
   const displayCreators = useMemo(() => {
     const savedUser = localStorage.getItem("tiptab_user_profile");
     if (!savedUser) return CREATORS;
     
     const localUser = JSON.parse(savedUser) as Creator;
-    // Check if user is already in CREATORS (by handle or ID)
+    
+    // Check if this specific actor has a membership activation record
+    const membershipKey = `tiptab_membership_${actor}`;
+    const isLocalUserMember = localStorage.getItem(membershipKey) === 'true';
+
+    // Only add to the map/featured list if they are a member
+    if (!isLocalUserMember) return CREATORS;
+
     const exists = CREATORS.find(c => c.id === localUser.id);
     if (exists) {
       return CREATORS.map(c => c.id === localUser.id ? localUser : c);
     }
     return [localUser, ...CREATORS];
-  }, []);
+  }, [actor]);
 
   return (
     <div className="min-h-screen bg-[#0a0514] text-white selection:bg-purple-500/30">
