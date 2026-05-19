@@ -21,7 +21,8 @@ import {
   FileText,
   AlertTriangle,
   Calendar,
-  Clock
+  Clock,
+  UserMinus
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
@@ -72,7 +73,7 @@ const AdminHub = () => {
   const [isAlertModalOpen, setIsAlertModalOpen] = useState(false);
   const [isAuditModalOpen, setIsAuditModalOpen] = useState(false);
   const [selectedCreator, setSelectedCreator] = useState<Creator | null>(null);
-  const [moderatedCreators] = useState<Creator[]>(CREATORS);
+  const [moderatedCreators, setModeratedCreators] = useState<Creator[]>(CREATORS);
   const [bannedHandles, setBannedHandles] = useState<string[]>([]);
 
   useEffect(() => {
@@ -138,6 +139,15 @@ const AdminHub = () => {
     }
   };
 
+  const handleTerminate = (handle: string) => {
+    setModeratedCreators(prev => prev.filter(c => c.handle !== handle));
+    toast({
+      title: "Account Terminated",
+      description: `@${handle} has been permanently deleted from the directory.`,
+      variant: "destructive"
+    });
+  };
+
   const openAuditLogs = (creator: Creator) => {
     setSelectedCreator(creator);
     setIsAuditModalOpen(true);
@@ -173,7 +183,7 @@ const AdminHub = () => {
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div className="p-5 md:p-6 rounded-[20px] md:rounded-[24px] bg-[#1a112d] border border-white/5 space-y-1">
                     <p className="text-[9px] md:text-[10px] font-black text-white/40 uppercase tracking-widest">TOTAL MEMBERS</p>
-                    <p className="text-3xl md:text-4xl font-black text-white">133</p>
+                    <p className="text-3xl md:text-4xl font-black text-white">{moderatedCreators.length}</p>
                   </div>
                   <div className="p-5 md:p-6 rounded-[20px] md:rounded-[24px] bg-[#1a112d] border border-white/5 space-y-1">
                     <p className="text-[9px] md:text-[10px] font-black text-white/40 uppercase tracking-widest">WEEKLY GROWTH</p>
@@ -392,11 +402,11 @@ const AdminHub = () => {
                                       <span className="font-bold text-sm">Reset Profile</span>
                                     </DropdownMenuItem>
                                     <DropdownMenuItem 
-                                      onClick={() => toggleBan(creator.handle)}
+                                      onClick={() => handleTerminate(creator.handle)}
                                       className="focus:bg-red-500/15 focus:text-red-400 rounded-xl cursor-pointer px-3 py-2.5 gap-3"
                                     >
-                                      <AlertTriangle className="h-4 w-4" />
-                                      <span className="font-bold text-sm">{isBanned ? "Unban Account" : "Terminate Account"}</span>
+                                      <UserMinus className="h-4 w-4" />
+                                      <span className="font-bold text-sm">Terminate Account</span>
                                     </DropdownMenuItem>
                                   </DropdownMenuContent>
                                 </DropdownMenu>
