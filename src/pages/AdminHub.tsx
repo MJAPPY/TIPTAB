@@ -468,7 +468,10 @@ const AdminHub = () => {
           </ScrollArea>
 
           <div className="p-8 bg-white/[0.02] border-t border-white/5 flex justify-end">
-            <Button onClick={() => setIsAuditModalOpen(false)} variant="outline" className="rounded-xl border-white/10 hover:bg-white/5 font-black uppercase tracking-widest text-xs px-8">
+            <Button 
+              onClick={() => setIsAuditModalOpen(false)} 
+              className="rounded-xl bg-purple-600 hover:bg-purple-700 text-white font-black uppercase tracking-widest text-xs px-8 h-12 shadow-lg shadow-purple-500/20"
+            >
               Close Audit
             </Button>
           </div>
