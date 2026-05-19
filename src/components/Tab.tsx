@@ -80,7 +80,7 @@ export const Tab = () => {
             Empowering the global workforce through direct, fee-free tipping on the <span className="text-purple-400">XPR Network</span>. Join the future of appreciation.
           </p>
           <div className="flex justify-center gap-10 text-white/60 font-bold">
-            <a href="#" className="hover:text-purple-400 transition-colors">Documentation</a>
+            <Link to="/docs" className="hover:text-purple-400 transition-colors">Documentation</Link>
             <a 
               href="https://x.com/tabtokenxpr" 
               target="_blank" 
@@ -97,7 +97,7 @@ export const Tab = () => {
             >
               Snipverse
             </a>
-            <a href="#" className="hover:text-purple-400 transition-colors">Support</a>
+            <Link to="/docs" className="hover:text-purple-400 transition-colors">Support</Link>
           </div>
           <div className="mt-20 pt-10 border-t border-white/5 text-white/20 text-xs font-black uppercase tracking-[0.3em]">
             © {new Date().getFullYear()} TIPTAB Platform. SECURED BY XPR NETWORK.
