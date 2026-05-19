@@ -26,29 +26,31 @@ export const MembershipModal = ({ isOpen, onOpenChange }: MembershipModalProps) 
   const { toast } = useToast();
   const { session, actor, login, isConnected, setIsMember, isMember } = useXpr();
 
-  // Reset step when modal closes
+  // Smart Step Management: Skip intro if already connected or auto-advance on login
   useEffect(() => {
-    if (!isOpen) {
-      setTimeout(() => setStep("intro"), 300);
+    if (isOpen) {
+      if (isConnected) {
+        setStep("payment");
+      } else {
+        setStep("intro");
+      }
+    } else {
+      // Reset step with delay to avoid flicker during close animation
+      const timer = setTimeout(() => setStep("intro"), 300);
+      return () => clearTimeout(timer);
     }
-  }, [isOpen]);
+  }, [isOpen, isConnected]);
 
   const handleNextStep = async () => {
-    if (step === "intro") {
-      if (!isConnected) {
-        try {
-          const newSession = await login();
-          // If login was successful, immediately move to payment step
-          if (newSession) {
-            setStep("payment");
-          }
-        } catch (err) {
-          console.error("Login aborted or failed:", err);
-        }
-      } else {
-        // If already connected, just move to payment
-        setStep("payment");
+    if (!isConnected) {
+      try {
+        await login();
+        // The useEffect hook above will handle setStep("payment") automatically once isConnected is true
+      } catch (err) {
+        console.error("Login failed or cancelled", err);
       }
+    } else {
+      setStep("payment");
     }
   };
 
@@ -76,7 +78,6 @@ export const MembershipModal = ({ isOpen, onOpenChange }: MembershipModalProps) 
 
       await session.transact({ actions: [membershipAction] }, { broadcast: true });
       
-      // Update membership status with activation date
       const now = new Date().toISOString();
       const membershipKey = `tiptab_membership_${actor}`;
       const membershipDateKey = `tiptab_membership_date_${actor}`;
@@ -94,7 +95,7 @@ export const MembershipModal = ({ isOpen, onOpenChange }: MembershipModalProps) 
       console.error("Transact error:", error);
       toast({
         title: "Transaction Failed",
-        description: error.message || "Please check your WebAuth wallet and try again.",
+        description: error.message || "Please check your balance and try again.",
         variant: "destructive"
       });
     } finally {
