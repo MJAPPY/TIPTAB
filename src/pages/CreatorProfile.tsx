@@ -11,7 +11,8 @@ import {
   MapPin, 
   ShieldCheck, 
   Share2,
-  Check
+  Check,
+  Wallet
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -26,7 +27,7 @@ const CreatorProfile = () => {
   const { handle } = useParams<{ handle: string }>();
   const navigate = useNavigate();
   const { toast } = useToast();
-  const { session, actor, login } = useXpr();
+  const { session, actor, login, isConnected } = useXpr();
   
   const [creator, setCreator] = useState<Creator | null>(null);
   const [tipAmount, setTipAmount] = useState("100");
@@ -56,7 +57,17 @@ const CreatorProfile = () => {
     }
   }, [handle, navigate]);
 
+  const handleConnect = async () => {
+    try {
+      await login();
+    } catch (err) {
+      console.error("Login failed", err);
+    }
+  };
+
   const handleSendTip = async () => {
+    if (!session || !actor) return;
+    
     if (!tipAmount || isNaN(Number(tipAmount)) || Number(tipAmount) <= 0) {
       toast({ 
         title: "Invalid amount", 
@@ -68,29 +79,15 @@ const CreatorProfile = () => {
 
     setIsProcessing(true);
     try {
-      let activeSession = session;
-      if (!activeSession) {
-        toast({
-          title: "Connecting Wallet",
-          description: "Please connect to send appreciation.",
-        });
-        activeSession = await login();
-      }
-
-      if (!activeSession) {
-        setIsProcessing(false);
-        return;
-      }
-
       const recipient = creator?.handle.replace(/^@/, "").toLowerCase().trim();
-      const sender = activeSession.auth.actor;
+      const sender = actor;
 
       const actions = [{
         account: 'tokencreate', 
         name: 'transfer',
         authorization: [{
           actor: sender,
-          permission: activeSession.auth.permission,
+          permission: session.auth.permission,
         }],
         data: {
           from: sender,
@@ -100,7 +97,7 @@ const CreatorProfile = () => {
         },
       }];
 
-      await activeSession.transact({ actions }, { broadcast: true });
+      await session.transact({ actions }, { broadcast: true });
       
       toast({
         title: "Tip Sent!",
@@ -303,22 +300,32 @@ const CreatorProfile = () => {
                     </div>
                   </div>
 
-                  <Button 
-                    onClick={handleSendTip}
-                    disabled={isProcessing}
-                    className="w-full h-24 bg-gradient-to-r from-orange-500 to-purple-600 hover:from-orange-600 hover:to-purple-700 text-white font-black text-2xl rounded-[32px] shadow-[0_20px_40px_-10px_rgba(249,115,22,0.4)] transition-all active:scale-[0.98] group overflow-hidden"
-                  >
-                    <div className="relative z-10 flex items-center justify-center gap-4">
-                      {isProcessing ? (
-                        <div className="h-8 w-8 border-4 border-white/20 border-t-white rounded-full animate-spin" />
-                      ) : (
-                        <>
-                          <span>Send Appreciation</span>
-                          <Zap className="h-8 w-8 fill-white group-hover:scale-110 transition-transform" />
-                        </>
-                      )}
-                    </div>
-                  </Button>
+                  {isConnected ? (
+                    <Button 
+                      onClick={handleSendTip}
+                      disabled={isProcessing}
+                      className="w-full h-24 bg-gradient-to-r from-orange-500 to-purple-600 hover:from-orange-600 hover:to-purple-700 text-white font-black text-2xl rounded-[32px] shadow-[0_20px_40px_-10px_rgba(249,115,22,0.4)] transition-all active:scale-[0.98] group overflow-hidden"
+                    >
+                      <div className="relative z-10 flex items-center justify-center gap-4">
+                        {isProcessing ? (
+                          <div className="h-8 w-8 border-4 border-white/20 border-t-white rounded-full animate-spin" />
+                        ) : (
+                          <>
+                            <span>Send Appreciation</span>
+                            <Zap className="h-8 w-8 fill-white group-hover:scale-110 transition-transform" />
+                          </>
+                        )}
+                      </div>
+                    </Button>
+                  ) : (
+                    <Button 
+                      onClick={handleConnect}
+                      className="w-full h-24 bg-[#a855f7] hover:bg-[#9333ea] text-white font-black text-2xl rounded-[32px] shadow-xl transition-all active:scale-95 flex items-center justify-center gap-3"
+                    >
+                      <Wallet className="h-8 w-8" />
+                      Connect to Tip
+                    </Button>
+                  )}
 
                   <div className="flex items-center justify-center gap-6 pt-4">
                     <div className="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-white/20">

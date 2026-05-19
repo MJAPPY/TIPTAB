@@ -19,7 +19,7 @@ interface TippingModalProps {
 }
 
 export const TippingModal = ({ creator, onClose }: TippingModalProps) => {
-  const [tipAmount, setTipAmount] = useState<string>("100");
+  const [tipAmount, setTipAmount] = useState<string>("50");
   const [isProcessing, setIsProcessing] = useState(false);
   const { toast } = useToast();
   const { session, actor, login, isConnected } = useXpr();
@@ -27,7 +27,6 @@ export const TippingModal = ({ creator, onClose }: TippingModalProps) => {
   const handleConnect = async () => {
     try {
       await login();
-      toast({ title: "Connected", description: "You can now send your tip." });
     } catch (err) {
       console.error("Login failed", err);
     }
@@ -207,7 +206,7 @@ export const TippingModal = ({ creator, onClose }: TippingModalProps) => {
             ) : (
               <Button 
                 onClick={handleConnect}
-                className="w-full h-20 bg-purple-600 hover:bg-purple-700 text-white font-black text-xl rounded-3xl shadow-xl transition-all active:scale-95 flex items-center justify-center gap-3"
+                className="w-full h-20 bg-[#a855f7] hover:bg-[#9333ea] text-white font-black text-xl md:text-2xl rounded-3xl shadow-xl transition-all active:scale-95 flex items-center justify-center gap-3"
               >
                 <Wallet className="h-6 w-6" />
                 Connect to Tip
