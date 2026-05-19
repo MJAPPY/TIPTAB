@@ -6,7 +6,7 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Twitter, Globe, Instagram, Zap, ShieldCheck, Wallet } from "lucide-react";
+import { Twitter, Globe, Instagram, Zap, ShieldCheck, Wallet, CreditCard } from "lucide-react";
 import { useState } from "react";
 import { Creator } from "@/data/creators";
 import { useToast } from "@/hooks/use-toast";
@@ -30,6 +30,19 @@ export const TippingModal = ({ creator, onClose }: TippingModalProps) => {
     } catch (err) {
       console.error("Login failed", err);
     }
+  };
+
+  const handleGuestPay = (method: string) => {
+    setIsProcessing(true);
+    // Simulate fiat-to-crypto gateway (e.g. Stripe/MoonPay)
+    setTimeout(() => {
+      setIsProcessing(false);
+      toast({
+        title: `${method} Initiated`,
+        description: `Processing your ${tipAmount} TAB tip for ${creator?.name}...`,
+      });
+      // In a real app, this would open a Stripe Checkout or MoonPay widget
+    }, 1000);
   };
 
   const handleSendTip = async () => {
@@ -137,16 +150,12 @@ export const TippingModal = ({ creator, onClose }: TippingModalProps) => {
             </div>
           </div>
           
-          <p className="text-white/60 text-sm leading-relaxed mb-8 font-medium">
-            {creator.bio}
-          </p>
-          
           <div className="space-y-6">
             <div className="flex items-center justify-between">
               <span className="text-xs font-black uppercase tracking-[0.2em] text-white/30">Select Amount</span>
               <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-green-500/10 border border-green-500/20">
                 <ShieldCheck className="h-3 w-3 text-green-400" />
-                <span className="text-[10px] font-black uppercase tracking-widest text-green-400">Zero Fee</span>
+                <span className="text-[10px] font-black uppercase tracking-widest text-green-400">Secure Tip</span>
               </div>
             </div>
             
@@ -183,38 +192,73 @@ export const TippingModal = ({ creator, onClose }: TippingModalProps) => {
               </div>
             </div>
             
-            {isConnected ? (
-              <Button 
-                onClick={handleSendTip}
-                disabled={isProcessing}
-                className="w-full h-20 bg-gradient-to-r from-orange-500 to-purple-600 hover:from-orange-600 hover:to-purple-700 text-white font-black text-2xl rounded-3xl shadow-[0_20px_40px_-10px_rgba(249,115,22,0.3)] mt-2 transition-all active:scale-[0.98] group overflow-hidden"
-              >
-                <div className="relative z-10 flex items-center justify-center gap-3">
-                  {isProcessing ? (
-                    <>
-                      <div className="h-8 w-8 border-4 border-white/20 border-t-white rounded-full animate-spin" />
-                      <span>Processing...</span>
-                    </>
-                  ) : (
-                    <>
-                      <span>Send Tip</span>
-                      <Zap className="h-6 w-6 fill-white group-hover:scale-110 transition-transform" />
-                    </>
-                  )}
+            <div className="space-y-3">
+              {isConnected ? (
+                <Button 
+                  onClick={handleSendTip}
+                  disabled={isProcessing}
+                  className="w-full h-20 bg-gradient-to-r from-orange-500 to-purple-600 hover:from-orange-600 hover:to-purple-700 text-white font-black text-2xl rounded-3xl shadow-[0_20px_40px_-10px_rgba(249,115,22,0.3)] mt-2 transition-all active:scale-[0.98] group overflow-hidden"
+                >
+                  <div className="relative z-10 flex items-center justify-center gap-3">
+                    {isProcessing ? (
+                      <>
+                        <div className="h-8 w-8 border-4 border-white/20 border-t-white rounded-full animate-spin" />
+                        <span>Processing...</span>
+                      </>
+                    ) : (
+                      <>
+                        <span>Send Tip</span>
+                        <Zap className="h-6 w-6 fill-white group-hover:scale-110 transition-transform" />
+                      </>
+                    )}
+                  </div>
+                </Button>
+              ) : (
+                <div className="space-y-4">
+                  <Button 
+                    onClick={handleConnect}
+                    disabled={isProcessing}
+                    className="w-full h-20 bg-[#a855f7] hover:bg-[#9333ea] text-white font-black text-xl md:text-2xl rounded-3xl shadow-xl transition-all active:scale-95 flex items-center justify-center gap-3"
+                  >
+                    <Wallet className="h-6 w-6" />
+                    Connect Wallet
+                  </Button>
+                  
+                  <div className="flex items-center gap-4">
+                    <div className="h-px bg-white/10 flex-1" />
+                    <span className="text-[10px] font-black text-white/30 uppercase tracking-widest">Or Pay Instantly</span>
+                    <div className="h-px bg-white/10 flex-1" />
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-3">
+                    <Button 
+                      onClick={() => handleGuestPay("Apple Pay")}
+                      disabled={isProcessing}
+                      className="h-16 rounded-2xl bg-white text-black hover:bg-white/90 font-black flex items-center justify-center gap-2"
+                    >
+                      <img src="https://upload.wikimedia.org/wikipedia/commons/b/b0/Apple_Pay_logo.svg" alt="Apple Pay" className="h-6" />
+                    </Button>
+                    <Button 
+                      onClick={() => handleGuestPay("Google Pay")}
+                      disabled={isProcessing}
+                      className="h-16 rounded-2xl bg-white text-black hover:bg-white/90 font-black flex items-center justify-center gap-2"
+                    >
+                      <img src="https://upload.wikimedia.org/wikipedia/commons/f/f2/Google_Pay_Logo.svg" alt="Google Pay" className="h-6" />
+                    </Button>
+                    <Button 
+                      onClick={() => handleGuestPay("Credit Card")}
+                      disabled={isProcessing}
+                      className="col-span-2 h-16 rounded-2xl bg-white/5 border border-white/20 hover:bg-white/10 text-white font-black flex items-center justify-center gap-3"
+                    >
+                      <CreditCard className="h-5 w-5" /> Pay with Card
+                    </Button>
+                  </div>
                 </div>
-              </Button>
-            ) : (
-              <Button 
-                onClick={handleConnect}
-                className="w-full h-20 bg-[#a855f7] hover:bg-[#9333ea] text-white font-black text-xl md:text-2xl rounded-3xl shadow-xl transition-all active:scale-95 flex items-center justify-center gap-3"
-              >
-                <Wallet className="h-6 w-6" />
-                Connect to Tip
-              </Button>
-            )}
+              )}
+            </div>
             
             <p className="text-[10px] text-center text-white/20 uppercase tracking-[0.3em] pt-2 font-black">
-              Processed via XPR Network • Instant
+              Zero Fees for Creators • Instant Settlement
             </p>
           </div>
         </div>
