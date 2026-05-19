@@ -89,7 +89,14 @@ export const Tab = () => {
             >
               Twitter
             </a>
-            <a href="#" className="hover:text-purple-400 transition-colors">Telegram</a>
+            <a 
+              href="https://snipverse.com/tabxpr" 
+              target="_blank" 
+              rel="noopener noreferrer" 
+              className="hover:text-purple-400 transition-colors"
+            >
+              Snipverse
+            </a>
             <a href="#" className="hover:text-purple-400 transition-colors">Support</a>
           </div>
           <div className="mt-20 pt-10 border-t border-white/5 text-white/20 text-xs font-black uppercase tracking-[0.3em]">
