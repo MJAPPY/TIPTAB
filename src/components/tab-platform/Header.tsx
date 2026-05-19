@@ -199,7 +199,7 @@ export const Header = ({ onBecomeCreator }: HeaderProps) => {
                   <span className="hidden xs:inline font-bold text-[10px] sm:text-base text-slate-300">Map</span>
                 </Link>
                 <div className="h-6 w-px bg-white/10" />
-                <div className="flex items-center gap-1 sm:gap-2">
+                <div className="flex items-center gap-1.5 sm:gap-2">
                   <img src="/src/assets/logo.png" alt="TIPTAB" className="h-5 w-5 sm:h-8 sm:w-8 object-contain" />
                   <span className="text-xs sm:text-xl font-black italic tracking-tighter text-slate-100">
                     {isMember ? "CREATOR" : "SUPPORTER"}<span className="text-orange-500">HUB</span>
@@ -389,7 +389,7 @@ export const Header = ({ onBecomeCreator }: HeaderProps) => {
                     >
                       <LogOut className="h-5 w-5" />
                       Logout Wallet
-                    </param>
+                    </Button>
                   )}
                 </div>
               </SheetContent>
