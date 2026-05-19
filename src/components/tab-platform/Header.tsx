@@ -173,9 +173,11 @@ export const Header = ({ onBecomeCreator }: HeaderProps) => {
   return (
     <header className="fixed top-[52px] left-0 right-0 z-50 px-2 sm:px-6">
       <div className="mx-auto w-full max-w-[98%] xl:max-w-[1600px]">
-        <div className="border border-white/10 bg-[#0a0514]/85 backdrop-blur-md rounded-[20px] sm:rounded-[28px] px-2 sm:px-6 py-2 md:py-3.5 flex items-center justify-between shadow-[0_20px_60px_rgba(0,0,0,0.7)] overflow-hidden">
+        <div className="border border-purple-500/20 bg-[#0a0514]/90 backdrop-blur-md rounded-[20px] sm:rounded-[28px] px-2 sm:px-6 py-2 md:py-3.5 flex items-center justify-between shadow-[0_0_40px_rgba(168,85,247,0.15),0_20px_60px_rgba(0,0,0,0.7)] overflow-hidden relative">
+          {/* Subtle background glow overlay */}
+          <div className="absolute inset-0 bg-gradient-to-r from-purple-500/5 via-transparent to-orange-500/5 pointer-events-none" />
           
-          <div className="flex items-center gap-2 sm:gap-4 shrink-0">
+          <div className="flex items-center gap-2 sm:gap-4 shrink-0 relative z-10">
             {location.pathname === '/admin' ? (
               <div className="flex items-center gap-1.5 sm:gap-4">
                 <Link to="/" onClick={handleHomeClick} className="flex items-center gap-1 sm:gap-2 text-white/40 hover:text-purple-400 transition-colors">
@@ -207,7 +209,7 @@ export const Header = ({ onBecomeCreator }: HeaderProps) => {
             ) : (
               <Link to="/" onClick={handleHomeClick} className="flex items-center gap-1.5 sm:gap-4 group shrink-0">
                 <div className="relative">
-                  <div className="absolute inset-0 bg-orange-500/20 blur-lg rounded-full group-hover:scale-110 transition-transform" />
+                  <div className="absolute inset-0 bg-purple-500/20 blur-lg rounded-full group-hover:scale-110 transition-transform" />
                   <img src="/src/assets/logo.png" alt="TIPTAB Logo" className="h-7 w-7 sm:h-14 sm:w-14 object-contain relative z-10" />
                 </div>
                 <div className="flex flex-col -space-y-0.5 md:-space-y-1">
@@ -223,12 +225,12 @@ export const Header = ({ onBecomeCreator }: HeaderProps) => {
           </div>
 
           {!isDashboardOrAdmin && (
-            <div className="hidden xl:flex items-center gap-3 mx-4">
+            <div className="hidden xl:flex items-center gap-3 mx-4 relative z-10">
               <NavItems />
             </div>
           )}
 
-          <div className="flex items-center gap-1.5 sm:gap-4">
+          <div className="flex items-center gap-1.5 sm:gap-4 relative z-10">
             {isConnected && (
               <div className="flex items-center gap-1 sm:gap-2 bg-white/5 border border-white/10 rounded-xl sm:rounded-2xl p-1 px-1.5 sm:px-4 h-10 sm:h-16 shrink-0">
                 <div className="flex flex-col items-end pr-1 sm:pr-4 border-r border-white/10 py-0.5 sm:py-1">
