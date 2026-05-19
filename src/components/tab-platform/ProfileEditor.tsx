@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
-import { User, AtSign, MapPin, Globe, Twitter, Save, Image as ImageIcon, Upload, X, Video, Instagram, Crosshair } from "lucide-react";
+import { User, AtSign, MapPin, Globe, Twitter, Save, Image as ImageIcon, Upload, X, Video, Instagram, Crosshair, CheckCircle2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -10,7 +10,7 @@ import { useToast } from "@/hooks/use-toast";
 import { Creator } from "@/data/creators";
 import { cn } from "@/lib/utils";
 
-// Mock Geocoder for major hubs to ensure the map updates for common entries
+// Expanded Mock Geocoder including Aruba and more global hubs
 const CITY_COORDINATES: Record<string, [number, number]> = {
   "London": [-0.1276, 51.5074],
   "New York": [-74.0060, 40.7128],
@@ -27,6 +27,11 @@ const CITY_COORDINATES: Record<string, [number, number]> = {
   "Berlin": [13.4050, 52.5200],
   "Sydney": [151.2093, -33.8688],
   "Singapore": [103.8198, 1.3521],
+  "Aruba": [-69.9683, 12.5211],
+  "Miami": [-80.1918, 25.7617],
+  "Lagos": [3.3792, 6.5244],
+  "Toronto": [-79.3832, 43.6532],
+  "Los Angeles": [-118.2437, 34.0522],
 };
 
 interface ProfileEditorProps {
@@ -38,6 +43,7 @@ export const ProfileEditor = ({ initialData, onSave }: ProfileEditorProps) => {
   const [isSaving, setIsSaving] = useState(false);
   const [hasChanged, setHasChanged] = useState(false);
   const [isLocating, setIsLocating] = useState(false);
+  const [isCityRecognized, setIsCityRecognized] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   
   const [formData, setFormData] = useState({
@@ -73,6 +79,12 @@ export const ProfileEditor = ({ initialData, onSave }: ProfileEditorProps) => {
     setHasChanged(false);
   }, [initialData]);
 
+  // Check if typed city is in our geocoding list for instant feedback
+  useEffect(() => {
+    const typedLocation = formData.location.split(',')[0].trim();
+    setIsCityRecognized(!!CITY_COORDINATES[typedLocation]);
+  }, [formData.location]);
+
   const handleLocateMe = () => {
     setIsLocating(true);
     if (!navigator.geolocation) {
@@ -102,7 +114,7 @@ export const ProfileEditor = ({ initialData, onSave }: ProfileEditorProps) => {
       (error) => {
         toast({
           title: "Location Denied",
-          description: "Please enable location permissions or type your city manually.",
+          description: "Please enable location permissions in your browser or type your city manually.",
           variant: "destructive"
         });
         setIsLocating(false);
@@ -115,11 +127,11 @@ export const ProfileEditor = ({ initialData, onSave }: ProfileEditorProps) => {
     try {
       await new Promise((resolve) => setTimeout(resolve, 800));
       
-      // Smart Geocoding Check: If they typed a city we know but didn't use GPS
       let finalCoordinates = formData.coordinates;
       const typedLocation = formData.location.split(',')[0].trim();
       
-      if (CITY_COORDINATES[typedLocation] && formData.coordinates === initialData.coordinates) {
+      // If recognized city, use the mock coordinates
+      if (CITY_COORDINATES[typedLocation]) {
         finalCoordinates = CITY_COORDINATES[typedLocation];
       }
       
@@ -134,7 +146,7 @@ export const ProfileEditor = ({ initialData, onSave }: ProfileEditorProps) => {
       
       toast({
         title: "Profile Updated",
-        description: "Your map pin and profile details have been synchronized.",
+        description: `Map pin set to ${formData.location}.`,
       });
     } catch (error) {
       toast({
@@ -185,11 +197,12 @@ export const ProfileEditor = ({ initialData, onSave }: ProfileEditorProps) => {
         <Button 
           onClick={handleSave}
           disabled={isSaving || !hasChanged}
-          className={`rounded-xl gap-2 font-bold transition-all h-12 px-6 ${
+          className={cn(
+            "rounded-xl gap-2 font-bold transition-all h-12 px-6",
             hasChanged 
               ? "bg-purple-600 hover:bg-purple-500 text-white shadow-lg shadow-purple-500/20" 
               : "bg-white/5 text-white/20 border-white/5 cursor-not-allowed"
-          }`}
+          )}
         >
           {isSaving ? "Saving..." : <><Save className="h-4 w-4" /> Save Changes</>}
         </Button>
@@ -198,7 +211,7 @@ export const ProfileEditor = ({ initialData, onSave }: ProfileEditorProps) => {
         <div className="space-y-8">
           <div className="flex items-center gap-6 pb-8 border-b border-white/5">
             <div className="relative group">
-              <div className={`h-24 w-24 rounded-3xl ${initialData.color} flex items-center justify-center text-3xl font-black border-4 border-white/10 shadow-xl overflow-hidden`}>
+              <div className={cn("h-24 w-24 rounded-3xl flex items-center justify-center text-3xl font-black border-4 border-white/10 shadow-xl overflow-hidden", initialData.color)}>
                 {formData.avatarImage ? (
                   <img src={formData.avatarImage} alt="Avatar" className="w-full h-full object-cover" />
                 ) : (
@@ -279,7 +292,14 @@ export const ProfileEditor = ({ initialData, onSave }: ProfileEditorProps) => {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="location" className="text-white/60 font-bold uppercase tracking-widest text-[10px]">Location</Label>
+              <div className="flex items-center justify-between">
+                <Label htmlFor="location" className="text-white/60 font-bold uppercase tracking-widest text-[10px]">Location</Label>
+                {isCityRecognized && (
+                  <div className="flex items-center gap-1.5 text-[9px] font-black text-green-400 uppercase tracking-widest animate-in fade-in slide-in-from-right-2">
+                    <CheckCircle2 className="h-3 w-3" /> Map Ready
+                  </div>
+                )}
+              </div>
               <div className="flex gap-2">
                 <div className="relative flex-1">
                   <MapPin className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-purple-500" />
@@ -288,7 +308,10 @@ export const ProfileEditor = ({ initialData, onSave }: ProfileEditorProps) => {
                     value={formData.location}
                     onChange={handleChange}
                     placeholder="City, Country"
-                    className="pl-12 bg-white/5 border-white/10 h-14 rounded-2xl focus:ring-purple-500 focus:bg-white/10 transition-all text-white" 
+                    className={cn(
+                      "pl-12 bg-white/5 border-white/10 h-14 rounded-2xl focus:ring-purple-500 focus:bg-white/10 transition-all text-white",
+                      isCityRecognized && "border-green-500/30"
+                    )} 
                   />
                 </div>
                 <Button 
