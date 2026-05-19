@@ -214,9 +214,9 @@ const Dashboard = () => {
               <TabsContent value="analytics" className="space-y-6 sm:space-y-10 mt-0 animate-in fade-in slide-in-from-bottom-4 duration-500">
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
                   {/* Liquid TAB Card */}
-                  <Card className="bg-[#130b21]/60 border-white/10 text-white rounded-[32px] sm:rounded-[40px] p-6 sm:p-10 shadow-2xl relative overflow-hidden group hover:border-orange-500/30 transition-all flex flex-col min-h-[220px] sm:min-h-[280px]">
+                  <Card className="bg-[#130b21]/60 border-white/10 text-white rounded-[32px] sm:rounded-[40px] p-6 sm:p-10 shadow-2xl relative overflow-hidden group hover:border-orange-500/30 transition-all flex flex-col h-[240px] sm:h-[300px]">
                     <div className="absolute -top-12 -right-12 w-32 h-32 bg-orange-500/10 blur-3xl rounded-full group-hover:bg-orange-500/20 transition-all" />
-                    <CardHeader className="p-0 mb-auto">
+                    <CardHeader className="p-0">
                       <div className="flex items-center justify-between">
                         <CardDescription className="text-slate-400 font-black uppercase tracking-[0.2em] text-[9px] sm:text-[10px]">Liquid TAB</CardDescription>
                         <Button variant="ghost" size="icon" onClick={handleManualRefresh} className="h-8 w-8 sm:h-10 sm:w-10 rounded-xl bg-white/5 text-white/30 hover:text-white transition-all">
@@ -224,14 +224,14 @@ const Dashboard = () => {
                         </Button>
                       </div>
                     </CardHeader>
-                    <CardContent className="p-0 mt-4 sm:mt-6">
-                      <div className="flex flex-col items-start gap-1">
-                        <span className="text-4xl sm:text-6xl md:text-7xl font-black tracking-tighter text-slate-100 break-all">
+                    <CardContent className="p-0 mt-4 sm:mt-6 flex flex-col flex-1">
+                      <div className="flex flex-col items-start gap-1 flex-1">
+                        <span className="text-4xl sm:text-6xl md:text-7xl font-black tracking-tighter text-slate-100 break-all leading-none">
                           {Number(balances.tab).toLocaleString()}
                         </span>
                         <span className="text-sm sm:text-xl font-black text-orange-500 italic uppercase">TAB</span>
                       </div>
-                      <div className="mt-8 sm:mt-10 flex items-center gap-2 text-green-400 text-[8px] sm:text-[10px] font-black uppercase tracking-widest">
+                      <div className="mt-auto pt-4 flex items-center gap-2 text-green-400 text-[8px] sm:text-[10px] font-black uppercase tracking-widest">
                         <ShieldCheck className="h-3 w-3" />
                         Network Live
                       </div>
@@ -239,36 +239,36 @@ const Dashboard = () => {
                   </Card>
 
                   {/* Liquid XPR Card */}
-                  <Card className="bg-[#130b21]/60 border-white/10 text-white rounded-[32px] sm:rounded-[40px] p-6 sm:p-10 shadow-2xl relative overflow-hidden group hover:border-purple-500/30 transition-all flex flex-col min-h-[220px] sm:min-h-[280px]">
+                  <Card className="bg-[#130b21]/60 border-white/10 text-white rounded-[32px] sm:rounded-[40px] p-6 sm:p-10 shadow-2xl relative overflow-hidden group hover:border-purple-500/30 transition-all flex flex-col h-[240px] sm:h-[300px]">
                     <div className="absolute -top-12 -right-12 w-32 h-32 bg-purple-500/10 blur-3xl rounded-full group-hover:bg-purple-500/20 transition-all" />
-                    <CardHeader className="p-0 mb-auto">
+                    <CardHeader className="p-0">
                       <CardDescription className="text-slate-400 font-black uppercase tracking-[0.2em] text-[9px] sm:text-[10px]">Liquid XPR</CardDescription>
                     </CardHeader>
-                    <CardContent className="p-0 mt-4 sm:mt-6">
-                      <div className="flex flex-col items-start gap-1">
+                    <CardContent className="p-0 mt-4 sm:mt-6 flex flex-col flex-1">
+                      <div className="flex flex-col items-start gap-1 flex-1">
                         <span className="text-3xl sm:text-5xl md:text-6xl font-black tracking-tighter text-slate-100 break-all leading-none">
                           {Number(balances.xpr).toLocaleString(undefined, { minimumFractionDigits: 4, maximumFractionDigits: 4 })}
                         </span>
                         <span className="text-sm sm:text-xl font-black text-purple-400 italic uppercase">XPR</span>
                       </div>
-                      <div className="mt-8 sm:mt-10 h-1.5 w-full bg-white/5 rounded-full overflow-hidden">
+                      <div className="mt-auto pt-4 h-1.5 w-full bg-white/5 rounded-full overflow-hidden">
                         <div className="h-full bg-purple-500 w-[65%] rounded-full shadow-[0_0_15px_rgba(168,85,247,0.5)]" />
                       </div>
                     </CardContent>
                   </Card>
 
                   {/* Tips Sent Card */}
-                  <Card className="bg-[#130b21]/60 border-white/10 text-white rounded-[32px] sm:rounded-[40px] p-6 sm:p-10 shadow-2xl relative overflow-hidden group hover:border-pink-500/30 transition-all flex flex-col min-h-[220px] sm:min-h-[280px]">
+                  <Card className="bg-[#130b21]/60 border-white/10 text-white rounded-[32px] sm:rounded-[40px] p-6 sm:p-10 shadow-2xl relative overflow-hidden group hover:border-pink-500/30 transition-all flex flex-col h-[240px] sm:h-[300px]">
                     <div className="absolute -top-12 -right-12 w-32 h-32 bg-pink-500/10 blur-3xl rounded-full group-hover:bg-pink-500/20 transition-all" />
-                    <CardHeader className="p-0 mb-auto">
+                    <CardHeader className="p-0">
                       <CardDescription className="text-slate-400 font-black uppercase tracking-[0.2em] text-[9px] sm:text-[10px]">Tips Sent</CardDescription>
                     </CardHeader>
-                    <CardContent className="p-0 mt-4 sm:mt-6">
-                      <div className="flex flex-col items-start gap-1">
-                        <span className="text-4xl sm:text-6xl md:text-7xl font-black tracking-tighter text-slate-100">0</span>
+                    <CardContent className="p-0 mt-4 sm:mt-6 flex flex-col flex-1">
+                      <div className="flex flex-col items-start gap-1 flex-1">
+                        <span className="text-4xl sm:text-6xl md:text-7xl font-black tracking-tighter text-slate-100 leading-none">0</span>
                         <span className="text-sm sm:text-xl font-black text-pink-500 italic uppercase">TAB</span>
                       </div>
-                      <div className="mt-8 sm:mt-10 flex items-center gap-2 text-pink-400 text-[8px] sm:text-[10px] font-black uppercase tracking-widest">
+                      <div className="mt-auto pt-4 flex items-center gap-2 text-pink-400 text-[8px] sm:text-[10px] font-black uppercase tracking-widest">
                         <Heart className="h-3 w-3" />
                         Community Impact
                       </div>
