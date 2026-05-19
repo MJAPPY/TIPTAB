@@ -39,12 +39,10 @@ const CreatorProfile = () => {
     if (!handle) return;
     const cleanHandle = handle.replace(/^@/, "").toLowerCase().trim();
     
-    // Check main data
     const found = CREATORS.find(c => c.handle.toLowerCase() === cleanHandle);
     if (found) {
       setCreator(found);
     } else {
-      // Check local storage for self-profile
       const savedUser = localStorage.getItem("tiptab_user_profile");
       if (savedUser) {
         const localUser = JSON.parse(savedUser) as Creator;
@@ -87,8 +85,6 @@ const CreatorProfile = () => {
     setIsProcessing(true);
     try {
       const recipient = creator?.handle.replace(/^@/, "").toLowerCase().trim();
-      
-      // Construct the exact asset string required by the contract
       const quantityString = `${amountNum.toFixed(4)} TAB`;
 
       const actions = [{
@@ -116,7 +112,7 @@ const CreatorProfile = () => {
       console.error("Tipping error:", error);
       toast({
         title: "Transaction Failed",
-        description: error.message || "Precision mismatch or wallet error.",
+        description: error.message || "Please check your balance and try again.",
         variant: "destructive"
       });
     } finally {
@@ -127,27 +123,16 @@ const CreatorProfile = () => {
   const copyToClipboard = (url: string) => {
     navigator.clipboard.writeText(url).then(() => {
       setIsCopied(true);
-      toast({ 
-        title: "Link Copied!", 
-        description: "Profile URL saved to clipboard.",
-      });
+      toast({ title: "Link Copied!", description: "Profile URL saved to clipboard." });
       setTimeout(() => setIsCopied(false), 2000);
     }).catch(() => {
-      toast({
-        title: "Copy Failed",
-        description: "Please copy the URL from your address bar.",
-        variant: "destructive"
-      });
+      toast({ title: "Copy Failed", description: "Please copy the URL from your address bar.", variant: "destructive" });
     });
   };
 
   const handleShare = async () => {
     const shareUrl = window.location.href;
-    const shareData = {
-      title: `Support ${creator?.name} on TIPTAB`,
-      text: `Check out ${creator?.name}'s profile on TIPTAB and support them using the XPR Network!`,
-      url: shareUrl,
-    };
+    const shareData = { title: `Support ${creator?.name} on TIPTAB`, url: shareUrl };
 
     if (navigator.share) {
       try {
@@ -175,12 +160,10 @@ const CreatorProfile = () => {
       <div className="relative h-[40vh] md:h-[50vh] w-full overflow-hidden">
         <div className={cn("absolute inset-0 opacity-40 blur-[100px]", creator.color)} />
         <div className="absolute inset-0 bg-gradient-to-t from-[#0a0514] via-[#0a0514]/40 to-transparent" />
-        <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')] opacity-10" />
       </div>
 
       <main className="container mx-auto px-6 -mt-32 relative z-10 pb-24">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12">
-          
           <div className="lg:col-span-7 space-y-8">
             <div className="flex flex-col md:flex-row items-center md:items-end gap-8">
               <div className={cn(
@@ -192,7 +175,6 @@ const CreatorProfile = () => {
                 ) : (
                   creator.avatar
                 )}
-                <div className="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity" />
               </div>
               
               <div className="text-center md:text-left space-y-2 pb-4">
@@ -211,9 +193,7 @@ const CreatorProfile = () => {
             <div className="bg-white/[0.03] border border-white/10 rounded-[40px] p-8 md:p-12 space-y-8">
               <div className="space-y-4">
                 <h3 className="text-xs font-black uppercase tracking-[0.3em] text-white/30">About</h3>
-                <p className="text-xl md:text-2xl text-white/80 leading-relaxed font-medium">
-                  {creator.bio}
-                </p>
+                <p className="text-xl md:text-2xl text-white/80 leading-relaxed font-medium">{creator.bio}</p>
               </div>
 
               <div className="flex flex-wrap gap-8">
@@ -224,36 +204,6 @@ const CreatorProfile = () => {
                     {creator.location}
                   </div>
                 </div>
-                <div className="space-y-2">
-                  <h3 className="text-xs font-black uppercase tracking-[0.3em] text-white/30">Network</h3>
-                  <div className="flex items-center gap-2 text-lg font-bold text-white/60">
-                    <Zap className="h-5 w-5 text-orange-500" />
-                    XPR Network
-                  </div>
-                </div>
-              </div>
-
-              <div className="pt-8 border-t border-white/5 flex gap-4">
-                {creator.twitter && (
-                  <Button variant="outline" size="icon" className="h-14 w-14 rounded-2xl bg-white/5 border-white/10 hover:border-purple-500/50 hover:bg-purple-500/10" asChild>
-                    <a href={creator.twitter} target="_blank" rel="noopener noreferrer"><Twitter className="h-6 w-6" /></a>
-                  </Button>
-                )}
-                {creator.instagram && (
-                  <Button variant="outline" size="icon" className="h-14 w-14 rounded-2xl bg-white/5 border-white/10 hover:border-purple-500/50 hover:bg-purple-500/10" asChild>
-                    <a href={creator.instagram} target="_blank" rel="noopener noreferrer"><Instagram className="h-4 w-4" /></a>
-                  </Button>
-                )}
-                {creator.videoUrl && (
-                  <Button variant="outline" size="icon" className="h-14 w-14 rounded-2xl bg-white/5 border-white/10 hover:border-purple-500/50 hover:bg-purple-500/10" asChild>
-                    <a href={creator.videoUrl} target="_blank" rel="noopener noreferrer"><Video className="h-6 w-6" /></a>
-                  </Button>
-                )}
-                {creator.website && (
-                  <Button variant="outline" size="icon" className="h-14 w-14 rounded-2xl bg-white/5 border-white/10 hover:border-purple-500/50 hover:bg-purple-500/10" asChild>
-                    <a href={creator.website} target="_blank" rel="noopener noreferrer"><Globe className="h-6 w-6" /></a>
-                  </Button>
-                )}
               </div>
             </div>
           </div>
@@ -261,16 +211,9 @@ const CreatorProfile = () => {
           <div className="lg:col-span-5">
             <div className="sticky top-40 space-y-6">
               <div className="bg-[#130b21] border border-white/10 rounded-[48px] p-10 shadow-[0_30px_60px_-15px_rgba(0,0,0,0.5)] relative overflow-hidden">
-                <div className="absolute top-0 right-0 w-32 h-32 bg-orange-500/5 blur-[60px] rounded-full" />
-                
                 <div className="flex items-center justify-between mb-10">
                   <h2 className="text-3xl font-black tracking-tight">Support <br /> {creator.name.split(' ')[0]}</h2>
-                  <Button 
-                    variant="ghost" 
-                    size="icon" 
-                    onClick={handleShare}
-                    className="h-12 w-12 rounded-2xl bg-white/5 border border-white/10 hover:bg-white/10 transition-all active:scale-95 z-20 relative"
-                  >
+                  <Button variant="ghost" size="icon" onClick={handleShare} className="h-12 w-12 rounded-2xl bg-white/5 border border-white/10 hover:bg-white/10">
                     {isCopied ? <Check className="h-5 w-5 text-green-500" /> : <Share2 className="h-5 w-5 text-white/40" />}
                   </Button>
                 </div>
@@ -283,10 +226,8 @@ const CreatorProfile = () => {
                         variant="ghost"
                         onClick={() => setTipAmount(formatValue(amount))}
                         className={cn(
-                          "h-14 rounded-2xl border-2 font-black transition-all text-lg",
-                          parseFloat(tipAmount) === parseFloat(amount) 
-                            ? "border-orange-500 bg-orange-500/10 text-orange-500 shadow-[0_0_30px_rgba(249,115,22,0.2)]" 
-                            : "bg-white/5 border-transparent hover:bg-white/10 text-white/60"
+                          "h-14 rounded-2xl border-2 font-black text-lg",
+                          parseFloat(tipAmount) === parseFloat(amount) ? "border-orange-500 bg-orange-500/10 text-orange-500" : "bg-white/5 border-transparent text-white/60"
                         )}
                       >
                         {amount}
@@ -295,15 +236,12 @@ const CreatorProfile = () => {
                   </div>
 
                   <div className="relative group">
-                    <div className="absolute inset-y-0 left-8 flex items-center pointer-events-none">
-                      <span className="text-white/20 font-black tracking-widest text-[10px] uppercase">Custom Tip</span>
-                    </div>
                     <Input 
                       placeholder="0.0000" 
                       value={tipAmount}
                       onChange={(e) => setTipAmount(e.target.value)}
                       onBlur={(e) => setTipAmount(formatValue(e.target.value))}
-                      className="bg-white/5 border-white/10 h-20 rounded-[32px] text-right text-3xl font-black pl-8 pr-24 focus:ring-orange-500/50 focus:bg-white/10 transition-all border-2"
+                      className="bg-white/5 border-white/10 h-20 rounded-[32px] text-right text-3xl font-black pl-8 pr-24 focus:ring-orange-500/50 border-2"
                     />
                     <div className="absolute inset-y-0 right-8 flex items-center pointer-events-none">
                       <span className="text-orange-500 font-black text-xl">TAB</span>
@@ -312,48 +250,16 @@ const CreatorProfile = () => {
 
                   <div className="space-y-4">
                     {isConnected ? (
-                      <Button 
-                        onClick={handleSendTip}
-                        disabled={isProcessing}
-                        className="w-full h-24 bg-gradient-to-r from-orange-500 to-purple-600 hover:from-orange-600 hover:to-purple-700 text-white font-black text-2xl rounded-[32px] shadow-[0_20px_40px_-10px_rgba(249,115,22,0.4)] transition-all active:scale-[0.98] group overflow-hidden"
-                      >
-                        <div className="relative z-10 flex items-center justify-center gap-4">
-                          {isProcessing ? (
-                            <div className="h-8 w-8 border-4 border-white/20 border-t-white rounded-full animate-spin" />
-                          ) : (
-                            <>
-                              <span>Send Appreciation</span>
-                              <Zap className="h-8 w-8 fill-white group-hover:scale-110 transition-transform" />
-                            </>
-                          )}
-                        </div>
+                      <Button onClick={handleSendTip} disabled={isProcessing} className="w-full h-24 bg-gradient-to-r from-orange-500 to-purple-600 text-white font-black text-2xl rounded-[32px] shadow-xl">
+                        {isProcessing ? "Processing..." : "Send Appreciation"}
                       </Button>
                     ) : (
-                      <Button 
-                        onClick={handleConnect}
-                        className="w-full h-24 bg-[#a855f7] hover:bg-[#9333ea] text-white font-black text-2xl rounded-[32px] shadow-xl transition-all active:scale-95 flex items-center justify-center gap-3"
-                      >
-                        <Wallet className="h-8 w-8" />
+                      <Button onClick={handleConnect} className="w-full h-24 bg-[#a855f7] text-white font-black text-2xl rounded-[32px] shadow-xl">
                         Connect to Tip
                       </Button>
                     )}
                   </div>
-
-                  <div className="flex items-center justify-center gap-6 pt-4">
-                    <div className="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-white/20">
-                      <ShieldCheck className="h-3.5 w-3.5" /> Zero Fees
-                    </div>
-                    <div className="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-white/20">
-                      <Zap className="h-3.5 w-3.5" /> Instant
-                    </div>
-                  </div>
                 </div>
-              </div>
-
-              <div className="bg-white/5 border border-white/10 rounded-[32px] p-8 text-center">
-                <p className="text-white/40 text-sm font-medium">
-                  Payments are secured by the XPR Network. 100% of your tip goes directly to the creator.
-                </p>
               </div>
             </div>
           </div>
