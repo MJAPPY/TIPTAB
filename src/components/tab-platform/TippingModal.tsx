@@ -35,7 +35,8 @@ export const TippingModal = ({ creator, onClose }: TippingModalProps) => {
   const handleSendTip = async () => {
     if (!session || !actor) return;
     
-    if (!tipAmount || isNaN(Number(tipAmount)) || Number(tipAmount) <= 0) {
+    const amountNum = parseFloat(tipAmount);
+    if (!tipAmount || isNaN(amountNum) || amountNum <= 0) {
       toast({ 
         title: "Invalid amount", 
         description: "Please enter a valid TAB amount.", 
@@ -49,8 +50,8 @@ export const TippingModal = ({ creator, onClose }: TippingModalProps) => {
       const recipient = creator?.handle.replace(/^@/, "").toLowerCase().trim();
       const sender = actor;
 
-      // Corrected: TAB token uses 4 decimals as per network requirements
-      const TAB_PRECISION = 4;
+      // Force exactly 4 decimal places as a string: X.XXXX TAB
+      const formattedQuantity = amountNum.toFixed(4) + " TAB";
 
       const actions = [{
         account: 'tokencreate', 
@@ -62,7 +63,7 @@ export const TippingModal = ({ creator, onClose }: TippingModalProps) => {
         data: {
           from: sender,
           to: recipient, 
-          quantity: `${parseFloat(tipAmount).toFixed(TAB_PRECISION)} TAB`,
+          quantity: formattedQuantity,
           memo: 'Tipped via TipTab Map',
         },
       }];

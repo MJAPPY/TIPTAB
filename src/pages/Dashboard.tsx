@@ -90,16 +90,18 @@ const Dashboard = () => {
 
   const handleTransfer = async () => {
     if (!session || !actor) return;
-    if (!transferAmount || !transferRecipient) {
-      toast({ title: "Missing Fields", description: "Please enter amount and recipient.", variant: "destructive" });
+    const amountNum = parseFloat(transferAmount);
+    if (!transferAmount || isNaN(amountNum) || amountNum <= 0 || !transferRecipient) {
+      toast({ title: "Invalid Input", description: "Please enter a valid amount and recipient.", variant: "destructive" });
       return;
     }
 
     setIsSending(true);
     try {
       const contract = transferSymbol === "TAB" ? "tokencreate" : "eosio.token";
-      // Fixed: Both XPR and TAB use 4 decimals as per the exact format requirement
-      const precision = 4;
+      
+      // Force exactly 4 decimal places for the network string
+      const formattedQuantity = amountNum.toFixed(4) + " " + transferSymbol;
       
       const actions = [{
         account: contract,
@@ -111,7 +113,7 @@ const Dashboard = () => {
         data: {
           from: actor,
           to: transferRecipient.toLowerCase().trim(),
-          quantity: `${parseFloat(transferAmount).toFixed(precision)} ${transferSymbol}`,
+          quantity: formattedQuantity,
           memo: 'Sent from TIP TAB Dashboard',
         },
       }];
