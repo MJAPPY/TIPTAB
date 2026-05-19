@@ -53,13 +53,12 @@ export const TippingModal = ({ creator, onClose }: TippingModalProps) => {
 
     setIsProcessing(true);
     try {
-      // Clean handle to get the actual XPR account name
       const recipient = creator.handle.replace(/^@/, "").toLowerCase().trim();
       const quantityString = `${amountNum.toFixed(4)} TAB`;
       const permission = session.auth.permission || 'active';
 
       const transferAction = {
-        account: 'tokencreate', // Correct contract name for TAB on XPR Network
+        account: 'tokencreate', 
         name: 'transfer',
         authorization: [{
           actor: actor,

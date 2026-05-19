@@ -47,7 +47,7 @@ export const MembershipModal = ({ isOpen, onOpenChange }: MembershipModalProps) 
       const permission = session.auth.permission || 'active';
       
       const membershipAction = {
-        account: 'eosio.token', // System contract for XPR
+        account: 'eosio.token', 
         name: 'transfer',
         authorization: [{
           actor: actor,
