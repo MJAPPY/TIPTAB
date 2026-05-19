@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
-import { User, AtSign, MapPin, Globe, Twitter, Save, Image as ImageIcon, Upload, X, Video, Instagram, Crosshair, CheckCircle2 } from "lucide-react";
+import { User, AtSign, MapPin, Globe, Twitter, Save, Image as ImageIcon, Upload, X, Video, Instagram, CheckCircle2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -10,7 +10,7 @@ import { useToast } from "@/hooks/use-toast";
 import { Creator } from "@/data/creators";
 import { cn } from "@/lib/utils";
 
-// Expanded Mock Geocoder with more global hubs
+// Expanded Mock Geocoder - The sole source for map placement
 const CITY_COORDINATES: Record<string, [number, number]> = {
   "london": [-0.1276, 51.5074],
   "new york": [-74.0060, 40.7128],
@@ -36,6 +36,8 @@ const CITY_COORDINATES: Record<string, [number, number]> = {
   "hong kong": [114.1694, 22.3193],
   "amsterdam": [4.8952, 52.3702],
   "san francisco": [-122.4194, 37.7749],
+  "brisbane": [153.0251, -27.4698],
+  "adelaide": [138.6007, -34.9285],
 };
 
 interface ProfileEditorProps {
@@ -46,7 +48,6 @@ interface ProfileEditorProps {
 export const ProfileEditor = ({ initialData, onSave }: ProfileEditorProps) => {
   const [isSaving, setIsSaving] = useState(false);
   const [hasChanged, setHasChanged] = useState(false);
-  const [isLocating, setIsLocating] = useState(false);
   const [isCityRecognized, setIsCityRecognized] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   
@@ -89,43 +90,6 @@ export const ProfileEditor = ({ initialData, onSave }: ProfileEditorProps) => {
     setIsCityRecognized(!!CITY_COORDINATES[typedLocation]);
   }, [formData.location]);
 
-  const handleLocateMe = () => {
-    setIsLocating(true);
-    if (!navigator.geolocation) {
-      toast({
-        title: "Geolocation Unsupported",
-        description: "Your browser doesn't support automatic location.",
-        variant: "destructive"
-      });
-      setIsLocating(false);
-      return;
-    }
-
-    navigator.geolocation.getCurrentPosition(
-      (position) => {
-        const { longitude, latitude } = position.coords;
-        setFormData(prev => ({
-          ...prev,
-          coordinates: [longitude, latitude]
-        }));
-        setHasChanged(true);
-        setIsLocating(false);
-        toast({
-          title: "Location Pinned!",
-          description: "Your exact coordinates have been captured for the map."
-        });
-      },
-      (error) => {
-        toast({
-          title: "Location Denied",
-          description: "Please enable location permissions in your browser or type your city manually.",
-          variant: "destructive"
-        });
-        setIsLocating(false);
-      }
-    );
-  };
-
   const handleSave = async () => {
     setIsSaving(true);
     try {
@@ -134,7 +98,7 @@ export const ProfileEditor = ({ initialData, onSave }: ProfileEditorProps) => {
       let finalCoordinates = formData.coordinates;
       const typedLocation = formData.location.split(',')[0].trim().toLowerCase();
       
-      // If recognized city, use the mock coordinates
+      // Update coordinates based on recognized typed city
       if (CITY_COORDINATES[typedLocation]) {
         finalCoordinates = CITY_COORDINATES[typedLocation];
       }
@@ -150,7 +114,7 @@ export const ProfileEditor = ({ initialData, onSave }: ProfileEditorProps) => {
       
       toast({
         title: "Profile Updated",
-        description: `Map pin set to ${formData.location}.`,
+        description: `Location saved as ${formData.location}. Map pin updated.`,
       });
     } catch (error) {
       toast({
@@ -295,39 +259,31 @@ export const ProfileEditor = ({ initialData, onSave }: ProfileEditorProps) => {
               />
             </div>
 
-            <div className="space-y-2">
-              <div className="flex items-center justify-between">
-                <Label htmlFor="location" className="text-white/60 font-bold uppercase tracking-widest text-[10px]">Location</Label>
+            <div className="space-y-2 md:col-span-2">
+              <div className="flex items-center justify-between mb-1">
+                <Label htmlFor="location" className="text-white/60 font-bold uppercase tracking-widest text-[10px]">Location (Typed City Determines Map Placement)</Label>
                 {isCityRecognized && (
                   <div className="flex items-center gap-1.5 text-[9px] font-black text-green-400 uppercase tracking-widest animate-in fade-in slide-in-from-right-2">
                     <CheckCircle2 className="h-3 w-3" /> Map Ready
                   </div>
                 )}
               </div>
-              <div className="flex gap-2">
-                <div className="relative flex-1">
-                  <MapPin className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-purple-500" />
-                  <Input 
-                    id="location"
-                    value={formData.location}
-                    onChange={handleChange}
-                    placeholder="City, Country"
-                    className={cn(
-                      "pl-12 bg-white/5 border-white/10 h-14 rounded-2xl focus:ring-purple-500 focus:bg-white/10 transition-all text-white",
-                      isCityRecognized && "border-green-500/30"
-                    )} 
-                  />
-                </div>
-                <Button 
-                  onClick={handleLocateMe}
-                  disabled={isLocating}
-                  variant="outline"
-                  className="h-14 w-14 shrink-0 rounded-2xl bg-white/5 border-white/10 hover:border-purple-500/50 hover:bg-purple-500/10 transition-all"
-                  title="Pin my current location"
-                >
-                  <Crosshair className={cn("h-5 w-5 text-purple-400", isLocating && "animate-spin")} />
-                </Button>
+              <div className="relative">
+                <MapPin className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-purple-500" />
+                <Input 
+                  id="location"
+                  value={formData.location}
+                  onChange={handleChange}
+                  placeholder="e.g. London, Perth, or New York"
+                  className={cn(
+                    "pl-12 bg-white/5 border-white/10 h-14 rounded-2xl focus:ring-purple-500 focus:bg-white/10 transition-all text-white",
+                    isCityRecognized && "border-green-500/30"
+                  )} 
+                />
               </div>
+              <p className="text-[10px] text-white/30 font-bold italic mt-2 px-1">
+                Note: GPS is disabled for privacy. Simply type your city to pin your spot on the world map.
+              </p>
             </div>
 
             <div className="space-y-2">
