@@ -6,7 +6,7 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Twitter, Globe, Instagram, Zap, ShieldCheck, Wallet, CreditCard } from "lucide-react";
+import { Twitter, Globe, Instagram, Zap, ShieldCheck, Wallet, CreditCard, ArrowRightLeft } from "lucide-react";
 import { useState } from "react";
 import { Creator } from "@/data/creators";
 import { useToast } from "@/hooks/use-toast";
@@ -19,7 +19,7 @@ interface TippingModalProps {
 }
 
 export const TippingModal = ({ creator, onClose }: TippingModalProps) => {
-  const [tipAmount, setTipAmount] = useState<string>("50");
+  const [tipAmount, setTipAmount] = useState<string>("100");
   const [isProcessing, setIsProcessing] = useState(false);
   const { toast } = useToast();
   const { session, actor, login, isConnected } = useXpr();
@@ -34,71 +34,44 @@ export const TippingModal = ({ creator, onClose }: TippingModalProps) => {
 
   const handleGuestPay = (method: string) => {
     setIsProcessing(true);
-    // Simulate fiat-to-crypto gateway (e.g. Stripe/MoonPay)
+    // Simulation of a Fiat-to-TAB bridge
     setTimeout(() => {
       setIsProcessing(false);
       toast({
-        title: `${method} Initiated`,
-        description: `Processing your ${tipAmount} TAB tip for ${creator?.name}...`,
+        title: `${method} Bridge Active`,
+        description: `Preparing to convert fiat to TAB for @${creator?.handle}...`,
       });
-      // In a real app, this would open a Stripe Checkout or MoonPay widget
+      // In a live app, this would open MoonPay/Stripe widget
     }, 1000);
   };
 
   const handleSendTip = async () => {
     if (!session || !actor) return;
-    
-    if (!tipAmount || isNaN(Number(tipAmount)) || Number(tipAmount) <= 0) {
-      toast({ 
-        title: "Invalid amount", 
-        description: "Please enter a valid TAB amount.", 
-        variant: "destructive" 
-      });
-      return;
-    }
-
     setIsProcessing(true);
     try {
       const recipient = creator?.handle.replace(/^@/, "").toLowerCase().trim();
-      const sender = actor;
-
       const actions = [{
         account: 'tokencreate', 
         name: 'transfer',
-        authorization: [{
-          actor: sender,
-          permission: session.auth.permission,
-        }],
+        authorization: [{ actor: actor, permission: session.auth.permission }],
         data: {
-          from: sender,
+          from: actor,
           to: recipient, 
           quantity: `${parseFloat(tipAmount).toFixed(4)} TAB`,
           memo: 'Tipped via TipTab Map',
         },
       }];
-
       await session.transact({ actions }, { broadcast: true });
-      
-      toast({
-        title: "Tip Sent Successfully!",
-        description: `You've sent ${tipAmount} TAB to ${creator?.name}.`,
-      });
+      toast({ title: "Tip Sent!", description: `Sent ${tipAmount} TAB to ${creator?.name}.` });
       onClose();
     } catch (error: any) {
-      console.error("Tipping error:", error);
-      toast({ 
-        title: "Transaction failed", 
-        description: error.message || "Please check your wallet and try again.", 
-        variant: "destructive" 
-      });
+      toast({ title: "Failed", description: error.message, variant: "destructive" });
     } finally {
       setIsProcessing(false);
     }
   };
 
   if (!creator) return null;
-
-  const amounts = ["50", "100", "500", "1000"];
 
   return (
     <Dialog open={!!creator} onOpenChange={(open) => !open && onClose()}>
@@ -111,33 +84,17 @@ export const TippingModal = ({ creator, onClose }: TippingModalProps) => {
         
         <div className="px-10 pb-10 -mt-10 relative z-10">
           <div className="flex items-end justify-between mb-6">
-            <div className={cn(
-              "h-28 w-28 rounded-[36px] flex items-center justify-center text-4xl font-black border-[6px] border-[#0d071a] shadow-2xl overflow-hidden",
-              creator.color
-            )}>
-              {creator.avatarImage ? (
-                <img src={creator.avatarImage} alt={creator.name} className="w-full h-full object-cover" />
-              ) : (
-                creator.avatar
-              )}
+            <div className={cn("h-28 w-28 rounded-[36px] flex items-center justify-center text-4xl font-black border-[6px] border-[#0d071a] shadow-2xl overflow-hidden", creator.color)}>
+              {creator.avatarImage ? <img src={creator.avatarImage} alt={creator.name} className="w-full h-full object-cover" /> : creator.avatar}
             </div>
             
             <div className="flex gap-2 mb-2">
-              {creator.twitter && (
-                <Button variant="outline" size="icon" className="rounded-xl bg-white/5 border-white/10 hover:border-white/30 h-10 w-10" asChild>
-                  <a href={creator.twitter} target="_blank" rel="noopener noreferrer"><Twitter className="h-4 w-4" /></a>
-                </Button>
-              )}
-              {creator.instagram && (
-                <Button variant="outline" size="icon" className="rounded-xl bg-white/5 border-white/10 hover:border-white/30 h-10 w-10" asChild>
-                  <a href={creator.instagram} target="_blank" rel="noopener noreferrer"><Instagram className="h-4 w-4" /></a>
-                </Button>
-              )}
-              {creator.website && (
-                <Button variant="outline" size="icon" className="rounded-xl bg-white/5 border-white/10 hover:border-white/30 h-10 w-10" asChild>
-                  <a href={creator.website} target="_blank" rel="noopener noreferrer"><Globe className="h-4 w-4" /></a>
-                </Button>
-              )}
+              <Button variant="outline" size="icon" className="rounded-xl bg-white/5 border-white/10 h-10 w-10" asChild>
+                <a href={creator.twitter} target="_blank" rel="noopener noreferrer"><Twitter className="h-4 w-4" /></a>
+              </Button>
+              <Button variant="outline" size="icon" className="rounded-xl bg-white/5 border-white/10 h-10 w-10" asChild>
+                <a href={creator.website} target="_blank" rel="noopener noreferrer"><Globe className="h-4 w-4" /></a>
+              </Button>
             </div>
           </div>
           
@@ -152,34 +109,16 @@ export const TippingModal = ({ creator, onClose }: TippingModalProps) => {
           
           <div className="space-y-6">
             <div className="flex items-center justify-between">
-              <span className="text-xs font-black uppercase tracking-[0.2em] text-white/30">Select Amount</span>
+              <span className="text-xs font-black uppercase tracking-[0.2em] text-white/30">Support Amount</span>
               <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-green-500/10 border border-green-500/20">
                 <ShieldCheck className="h-3 w-3 text-green-400" />
-                <span className="text-[10px] font-black uppercase tracking-widest text-green-400">Secure Tip</span>
+                <span className="text-[10px] font-black uppercase tracking-widest text-green-400">Secure Settlement</span>
               </div>
-            </div>
-            
-            <div className="grid grid-cols-4 gap-3">
-              {amounts.map(amount => (
-                <Button
-                  key={amount}
-                  variant="ghost"
-                  onClick={() => setTipAmount(amount)}
-                  className={cn(
-                    "h-12 rounded-2xl border-2 font-black transition-all",
-                    tipAmount === amount 
-                      ? "border-orange-500 bg-orange-500/10 text-orange-500 shadow-[0_0_20px_rgba(249,115,22,0.2)]" 
-                      : "bg-white/5 border-transparent hover:bg-white/10 text-white/60 hover:text-white"
-                  )}
-                >
-                  {amount}
-                </Button>
-              ))}
             </div>
             
             <div className="relative group">
               <div className="absolute inset-y-0 left-6 flex items-center pointer-events-none">
-                <span className="text-white/20 font-black tracking-widest text-[10px] uppercase">Custom Amount</span>
+                <span className="text-white/20 font-black tracking-widest text-[10px] uppercase">Custom Tip</span>
               </div>
               <Input 
                 placeholder="0" 
@@ -200,17 +139,7 @@ export const TippingModal = ({ creator, onClose }: TippingModalProps) => {
                   className="w-full h-20 bg-gradient-to-r from-orange-500 to-purple-600 hover:from-orange-600 hover:to-purple-700 text-white font-black text-2xl rounded-3xl shadow-[0_20px_40px_-10px_rgba(249,115,22,0.3)] mt-2 transition-all active:scale-[0.98] group overflow-hidden"
                 >
                   <div className="relative z-10 flex items-center justify-center gap-3">
-                    {isProcessing ? (
-                      <>
-                        <div className="h-8 w-8 border-4 border-white/20 border-t-white rounded-full animate-spin" />
-                        <span>Processing...</span>
-                      </>
-                    ) : (
-                      <>
-                        <span>Send Tip</span>
-                        <Zap className="h-6 w-6 fill-white group-hover:scale-110 transition-transform" />
-                      </>
-                    )}
+                    {isProcessing ? <div className="h-8 w-8 border-4 border-white/20 border-t-white rounded-full animate-spin" /> : <><span>Send Tip</span><Zap className="h-6 w-6 fill-white" /></>}
                   </div>
                 </Button>
               ) : (
@@ -221,44 +150,37 @@ export const TippingModal = ({ creator, onClose }: TippingModalProps) => {
                     className="w-full h-20 bg-[#a855f7] hover:bg-[#9333ea] text-white font-black text-xl md:text-2xl rounded-3xl shadow-xl transition-all active:scale-95 flex items-center justify-center gap-3"
                   >
                     <Wallet className="h-6 w-6" />
-                    Connect Wallet
+                    Connect WebAuth Wallet
                   </Button>
                   
                   <div className="flex items-center gap-4">
                     <div className="h-px bg-white/10 flex-1" />
-                    <span className="text-[10px] font-black text-white/30 uppercase tracking-widest">Or Pay Instantly</span>
+                    <span className="text-[10px] font-black text-white/30 uppercase tracking-widest">No Wallet? Buy & Send</span>
                     <div className="h-px bg-white/10 flex-1" />
                   </div>
 
                   <div className="grid grid-cols-2 gap-3">
-                    <Button 
-                      onClick={() => handleGuestPay("Apple Pay")}
-                      disabled={isProcessing}
-                      className="h-16 rounded-2xl bg-white text-black hover:bg-white/90 font-black flex items-center justify-center gap-2"
-                    >
+                    <Button onClick={() => handleGuestPay("Apple Pay")} className="h-16 rounded-2xl bg-white text-black hover:bg-white/90 font-black flex items-center justify-center gap-2">
                       <img src="https://upload.wikimedia.org/wikipedia/commons/b/b0/Apple_Pay_logo.svg" alt="Apple Pay" className="h-6" />
                     </Button>
-                    <Button 
-                      onClick={() => handleGuestPay("Google Pay")}
-                      disabled={isProcessing}
-                      className="h-16 rounded-2xl bg-white text-black hover:bg-white/90 font-black flex items-center justify-center gap-2"
-                    >
+                    <Button onClick={() => handleGuestPay("Google Pay")} className="h-16 rounded-2xl bg-white text-black hover:bg-white/90 font-black flex items-center justify-center gap-2">
                       <img src="https://upload.wikimedia.org/wikipedia/commons/f/f2/Google_Pay_Logo.svg" alt="Google Pay" className="h-6" />
                     </Button>
-                    <Button 
-                      onClick={() => handleGuestPay("Credit Card")}
-                      disabled={isProcessing}
-                      className="col-span-2 h-16 rounded-2xl bg-white/5 border border-white/20 hover:bg-white/10 text-white font-black flex items-center justify-center gap-3"
-                    >
-                      <CreditCard className="h-5 w-5" /> Pay with Card
+                    <Button onClick={() => handleGuestPay("Credit Card")} className="col-span-2 h-16 rounded-2xl bg-white/5 border border-white/20 hover:bg-white/10 text-white font-black flex items-center justify-center gap-3">
+                      <CreditCard className="h-5 w-5" /> Quick Pay with Card
                     </Button>
+                  </div>
+                  
+                  <div className="flex items-center justify-center gap-2 text-[9px] font-black text-white/20 uppercase tracking-[0.2em] pt-2">
+                    <ArrowRightLeft className="h-3 w-3" />
+                    Fiat-to-Token Bridge Enabled
                   </div>
                 </div>
               )}
             </div>
             
             <p className="text-[10px] text-center text-white/20 uppercase tracking-[0.3em] pt-2 font-black">
-              Zero Fees for Creators • Instant Settlement
+              Verified Creator • 100% Direct Settlement
             </p>
           </div>
         </div>
