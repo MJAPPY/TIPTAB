@@ -27,7 +27,9 @@ import {
   ArrowDownLeft,
   HandCoins,
   Users,
-  BarChart3
+  BarChart3,
+  TrendingUp,
+  Cpu
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
@@ -193,101 +195,121 @@ const AdminHub = () => {
       <Header />
 
       <main className="container mx-auto px-4 md:px-6 py-12 pt-36 md:pt-44">
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 md:gap-10 items-start">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 md:gap-12 items-start">
           
-          <div className="lg:col-span-4 space-y-6">
+          <div className="lg:col-span-4 space-y-8">
             
-            <Card className="bg-[#120a21] border-white/5 rounded-[28px] md:rounded-[32px] overflow-hidden shadow-2xl">
-              <CardHeader className="p-6 md:p-8 pb-4">
-                <CardTitle className="text-lg md:text-xl font-black flex items-center justify-between tracking-tight text-white">
-                  <div className="flex items-center gap-3">
-                    <Activity className="h-5 w-5 text-purple-400" /> PLATFORM VITALS
+            <Card className="bg-[#0d071a] border-white/10 rounded-[40px] overflow-hidden shadow-[0_0_100px_rgba(0,0,0,0.8)] relative group">
+              {/* Animated Background Gradients */}
+              <div className="absolute top-0 right-0 w-64 h-64 bg-purple-600/10 blur-[100px] rounded-full group-hover:bg-purple-600/20 transition-all duration-700" />
+              <div className="absolute bottom-0 left-0 w-48 h-48 bg-orange-600/10 blur-[80px] rounded-full group-hover:bg-orange-600/20 transition-all duration-700" />
+              
+              <CardHeader className="p-8 md:p-10 pb-4 relative z-10">
+                <div className="flex items-center justify-between mb-2">
+                  <CardTitle className="text-2xl font-black italic tracking-tighter flex items-center gap-3 text-white">
+                    <Activity className="h-6 w-6 text-purple-500 animate-pulse" /> PLATFORM VITALS
+                  </CardTitle>
+                  <div className="flex items-center gap-2 px-3 py-1 rounded-full bg-green-500/10 border border-green-500/20 shadow-[0_0_15px_rgba(34,197,94,0.15)]">
+                    <span className="relative flex h-2 w-2">
+                      <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
+                      <span className="relative inline-flex rounded-full h-2 w-2 bg-green-500"></span>
+                    </span>
+                    <span className="text-[9px] font-black uppercase tracking-[0.2em] text-green-400">Network Live</span>
                   </div>
-                  <div className="flex items-center gap-1.5 text-[9px] font-black text-green-500 uppercase tracking-widest bg-green-500/5 px-2 py-0.5 rounded border border-green-500/10">
-                    <div className="h-1 w-1 rounded-full bg-green-500 animate-pulse" /> Live
-                  </div>
-                </CardTitle>
+                </div>
               </CardHeader>
-              <CardContent className="p-6 md:p-8 pt-2 space-y-6">
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="p-4 rounded-[20px] bg-white/[0.03] border border-white/5 space-y-1">
-                    <p className="text-[8px] font-black text-white/30 uppercase tracking-widest">Total Registered</p>
-                    <p className="text-2xl font-black text-white">1,284</p>
-                    <div className="flex items-center gap-1 text-[8px] font-bold text-green-400">
-                      <ArrowUpRight className="h-2.5 w-2.5" /> +14%
+
+              <CardContent className="p-8 md:p-10 pt-2 space-y-10 relative z-10">
+                <div className="grid grid-cols-2 gap-6">
+                  <div className="space-y-2 group/stat">
+                    <div className="flex items-center gap-2">
+                      <Users className="h-3 w-3 text-white/30" />
+                      <p className="text-[9px] font-black text-white/30 uppercase tracking-[0.3em]">Total Registered</p>
+                    </div>
+                    <div className="relative">
+                      <p className="text-4xl md:text-5xl font-black text-white tracking-tighter leading-none group-hover/stat:text-purple-400 transition-colors">1,284</p>
+                      <div className="flex items-center gap-1.5 text-[10px] font-black text-green-400 mt-2 bg-green-500/10 w-fit px-2 py-0.5 rounded">
+                        <ArrowUpRight className="h-3 w-3" /> +14%
+                      </div>
                     </div>
                   </div>
-                  <div className="p-4 rounded-[20px] bg-white/[0.03] border border-white/5 space-y-1">
-                    <p className="text-[8px] font-black text-white/30 uppercase tracking-widest">Active Live</p>
-                    <p className="text-2xl font-black text-purple-400">42</p>
-                    <div className="flex items-center gap-1 text-[8px] font-bold text-white/20">
-                      Current Sessions
+                  <div className="space-y-2 group/stat">
+                    <div className="flex items-center gap-2">
+                      <Cpu className="h-3 w-3 text-white/30" />
+                      <p className="text-[9px] font-black text-white/30 uppercase tracking-[0.3em]">Active Live</p>
+                    </div>
+                    <div className="relative">
+                      <p className="text-4xl md:text-5xl font-black text-purple-400 tracking-tighter leading-none group-hover/stat:text-white transition-colors">42</p>
+                      <p className="text-[10px] font-bold text-white/20 mt-2 uppercase tracking-widest italic">Current Nodes</p>
                     </div>
                   </div>
                 </div>
 
-                <div className="p-5 rounded-[24px] bg-gradient-to-br from-orange-500/10 to-transparent border border-orange-500/10 space-y-3">
+                <div className="space-y-5">
                   <div className="flex items-center justify-between">
-                    <p className="text-[9px] font-black text-orange-500 uppercase tracking-widest">24H Network Volume</p>
-                    <BarChart3 className="h-4 w-4 text-orange-500/40" />
+                    <div className="space-y-1">
+                      <p className="text-[10px] font-black text-orange-500 uppercase tracking-[0.4em]">24H Network Volume</p>
+                      <p className="text-3xl font-black text-white tracking-tighter italic">124.5k <span className="text-orange-500 text-lg">TAB</span></p>
+                    </div>
+                    <div className="h-14 w-14 rounded-2xl bg-orange-500/10 border border-orange-500/20 flex items-center justify-center shadow-[0_0_20px_rgba(249,115,22,0.1)]">
+                      <TrendingUp className="h-7 w-7 text-orange-500" />
+                    </div>
                   </div>
-                  <div className="flex items-baseline gap-2">
-                    <p className="text-3xl font-black text-white">124.5k</p>
-                    <p className="text-xs font-black text-orange-500 italic">TAB</p>
+                  <div className="relative h-3 w-full bg-white/5 rounded-full overflow-hidden border border-white/5 p-0.5">
+                    <div className="h-full bg-gradient-to-r from-orange-600 via-orange-400 to-white w-[65%] rounded-full shadow-[0_0_15px_rgba(249,115,22,0.6)] animate-shimmer" />
                   </div>
-                  <div className="w-full h-1.5 bg-black/40 rounded-full overflow-hidden">
-                    <div className="h-full bg-orange-500 w-[65%] rounded-full shadow-[0_0_15px_rgba(249,115,22,0.5)]" />
+                  <div className="flex justify-between text-[9px] font-black uppercase tracking-widest text-white/20">
+                    <span>Peak Load: 85%</span>
+                    <span>Next Sync: 12:00 UTC</span>
                   </div>
-                  <p className="text-[9px] font-bold text-white/20 italic">Peak activity: 18:00 UTC</p>
                 </div>
 
-                <div className="flex items-center justify-between px-2 pt-2">
-                  <div className="flex flex-col">
-                    <span className="text-[9px] font-black text-white/30 uppercase">Avg Tip Size</span>
-                    <span className="text-sm font-black text-white">142 TAB</span>
+                <div className="grid grid-cols-2 gap-2 pt-6 border-t border-white/5">
+                  <div className="bg-white/5 p-4 rounded-3xl border border-white/5 group/mini hover:bg-white/10 transition-all">
+                    <span className="text-[8px] font-black text-white/20 uppercase tracking-[0.2em] block mb-1">Avg Tip</span>
+                    <span className="text-lg font-black text-white group-hover/mini:text-orange-400 transition-colors">142 TAB</span>
                   </div>
-                  <div className="h-8 w-px bg-white/5" />
-                  <div className="flex flex-col text-right">
-                    <span className="text-[9px] font-black text-white/30 uppercase">Settlement Time</span>
-                    <span className="text-sm font-black text-emerald-400">Instant</span>
+                  <div className="bg-white/5 p-4 rounded-3xl border border-white/5 group/mini hover:bg-white/10 transition-all">
+                    <span className="text-[8px] font-black text-white/20 uppercase tracking-[0.2em] block mb-1">Settlement</span>
+                    <span className="text-lg font-black text-emerald-400 group-hover/mini:text-white transition-colors uppercase">Instant</span>
                   </div>
                 </div>
               </CardContent>
             </Card>
 
-            <Card className="bg-[#120a21] border-white/5 rounded-[28px] md:rounded-[32px] overflow-hidden shadow-2xl">
-              <CardHeader className="p-6 md:p-8 pb-2">
-                <CardTitle className="text-lg md:text-xl font-black flex items-center gap-3 tracking-tight text-white">
-                  <Settings className="h-5 w-5 text-orange-400" /> NETWORK CONFIG
+            <Card className="bg-[#120a21] border-white/5 rounded-[40px] overflow-hidden shadow-2xl">
+              <CardHeader className="p-8 md:p-10 pb-2">
+                <CardTitle className="text-xl font-black flex items-center gap-3 tracking-tight text-white uppercase italic">
+                  <Settings className="h-5 w-5 text-orange-400" /> Network Config
                 </CardTitle>
-                <CardDescription className="text-white/40 font-medium text-xs md:text-sm">Global platform parameters</CardDescription>
+                <CardDescription className="text-white/40 font-medium text-xs md:text-sm">Manage global node parameters</CardDescription>
               </CardHeader>
-              <CardContent className="p-6 md:p-8 space-y-8">
+              <CardContent className="p-8 md:p-10 space-y-8">
                 <div className="space-y-4">
                   <Label className="text-[10px] font-black uppercase tracking-widest text-white/40">MEMBERSHIP FEE (XPR)</Label>
-                  <div className="flex flex-col sm:flex-row gap-3 md:gap-4">
+                  <div className="flex flex-col sm:flex-row gap-4">
                     <Input 
                       type="number" 
                       value={localFee} 
                       onChange={(e) => setLocalFee(e.target.value)}
-                      className="bg-[#1a112d] border-white/10 rounded-2xl font-black text-lg md:text-xl h-14 md:h-16 px-6 focus:ring-orange-500/50 text-white"
+                      className="bg-[#1a112d] border-white/10 rounded-2xl font-black text-xl h-16 px-6 focus:ring-orange-500/50 text-white"
                     />
                     <Button 
                       onClick={handleUpdateFee} 
-                      className="bg-orange-500 hover:bg-orange-600 rounded-2xl px-8 h-14 md:h-16 font-black text-base md:text-lg shadow-lg shadow-orange-500/20 text-white"
+                      className="bg-orange-500 hover:bg-orange-600 rounded-2xl px-8 h-16 font-black text-lg shadow-lg shadow-orange-500/20 text-white"
                     >
                       Update
                     </Button>
                   </div>
                 </div>
                 
-                <div className="pt-4 border-t border-white/5 space-y-3">
+                <div className="pt-4 border-t border-white/5 space-y-4">
                   <Button 
                     onClick={toggleMaintenance}
                     className={cn(
-                      "w-full h-14 md:h-16 rounded-[20px] md:rounded-[24px] border font-black text-xs md:text-sm flex items-center justify-between px-6 md:px-8 transition-all",
+                      "w-full h-16 rounded-[28px] border font-black text-sm flex items-center justify-between px-8 transition-all",
                       isMaintenanceMode 
-                        ? "bg-red-500 text-white border-red-600 hover:bg-red-600" 
+                        ? "bg-red-500 text-white border-red-600 hover:bg-red-600 shadow-[0_0_30px_rgba(239,68,68,0.3)]" 
                         : "bg-red-500/10 border-red-500/20 text-red-500 hover:bg-red-500/20"
                     )}
                   >
@@ -299,8 +321,8 @@ const AdminHub = () => {
 
                   <Dialog open={isAlertModalOpen} onOpenChange={setIsAlertModalOpen}>
                     <DialogTrigger asChild>
-                      <Button className="w-full h-14 md:h-16 rounded-[20px] md:rounded-[24px] bg-purple-500/10 border border-purple-500/20 text-purple-300 hover:bg-purple-500/20 font-black text-xs md:text-sm flex items-center justify-start gap-4 px-6 md:px-8">
-                        <Bell className="h-4 w-4" />
+                      <Button className="w-full h-16 rounded-[28px] bg-purple-500/10 border border-purple-500/20 text-purple-300 hover:bg-purple-500/20 font-black text-sm flex items-center justify-start gap-4 px-8">
+                        <Bell className="h-5 w-5" />
                         Broadcast Network Alert
                       </Button>
                     </DialogTrigger>
@@ -335,9 +357,9 @@ const AdminHub = () => {
                     <Button 
                       onClick={clearAlert}
                       variant="ghost"
-                      className="w-full h-14 md:h-16 rounded-[20px] md:rounded-[24px] bg-red-500/5 border border-red-500/20 text-red-500 hover:bg-red-500/10 font-black text-xs md:text-sm flex items-center justify-start gap-4 px-6 md:px-8"
+                      className="w-full h-16 rounded-[28px] bg-red-500/5 border border-red-500/20 text-red-500 hover:bg-red-500/10 font-black text-sm flex items-center justify-start gap-4 px-8"
                     >
-                      <X className="h-4 w-4" />
+                      <X className="h-5 w-5" />
                       Clear Current Alert
                     </Button>
                   )}
@@ -347,122 +369,122 @@ const AdminHub = () => {
           </div>
 
           <div className="lg:col-span-8">
-            <Card className="bg-[#120a21] border-white/5 rounded-[32px] md:rounded-[40px] overflow-hidden shadow-2xl min-h-[600px] lg:min-h-[840px]">
-              <CardHeader className="p-6 md:p-10 border-b border-white/5">
-                <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
+            <Card className="bg-[#0d071a] border-white/10 rounded-[48px] overflow-hidden shadow-2xl min-h-[600px] lg:min-h-[840px]">
+              <CardHeader className="p-8 md:p-12 border-b border-white/5">
+                <div className="flex flex-col md:flex-row md:items-center justify-between gap-8">
                   <div>
-                    <CardTitle className="text-2xl md:text-3xl font-black tracking-tight uppercase italic text-white">MODERATION</CardTitle>
-                    <CardDescription className="text-white/40 font-medium text-xs md:text-sm">Manage network access</CardDescription>
+                    <CardTitle className="text-3xl font-black tracking-tight uppercase italic text-white">Network Moderation</CardTitle>
+                    <CardDescription className="text-white/40 font-medium text-sm">Review and manage participant status</CardDescription>
                   </div>
-                  <div className="relative w-full md:w-80">
-                    <Search className="absolute left-5 top-1/2 -translate-y-1/2 h-4 w-4 text-white/30" />
+                  <div className="relative w-full md:w-96">
+                    <Search className="absolute left-6 top-1/2 -translate-y-1/2 h-5 w-5 text-white/30" />
                     <Input 
                       placeholder="Search handles..." 
                       value={searchQuery}
                       onChange={(e) => setSearchQuery(e.target.value)}
-                      className="pl-14 bg-[#1a112d] border-white/10 rounded-2xl h-12 md:h-14 focus:ring-purple-500/50 text-white text-sm"
+                      className="pl-16 bg-[#1a112d] border-white/10 rounded-2xl h-14 focus:ring-purple-500/50 text-white text-base"
                     />
                   </div>
                 </div>
               </CardHeader>
               <CardContent className="p-0">
                 <div className="overflow-x-auto no-scrollbar">
-                  <table className="w-full min-w-[600px]">
-                    <thead className="bg-white/[0.02]">
+                  <table className="w-full min-w-[700px]">
+                    <thead className="bg-white/[0.03]">
                       <tr>
-                        <th className="px-6 md:px-10 py-5 text-left text-[9px] md:text-[10px] font-black uppercase tracking-widest text-white/30">Creator</th>
-                        <th className="px-6 md:px-10 py-5 text-left text-[9px] md:text-[10px] font-black uppercase tracking-widest text-white/30">Category</th>
-                        <th className="px-6 md:px-10 py-5 text-left text-[9px] md:text-[10px] font-black uppercase tracking-widest text-white/30">Status</th>
-                        <th className="px-6 md:px-10 py-5 text-right text-[9px] md:text-[10px] font-black uppercase tracking-widest text-white/30">Actions</th>
+                        <th className="px-10 py-6 text-left text-[10px] font-black uppercase tracking-widest text-white/30">Creator Profile</th>
+                        <th className="px-10 py-6 text-left text-[10px] font-black uppercase tracking-widest text-white/30">Category</th>
+                        <th className="px-10 py-6 text-left text-[10px] font-black uppercase tracking-widest text-white/30">Node Status</th>
+                        <th className="px-10 py-6 text-right text-[10px] font-black uppercase tracking-widest text-white/30">Control</th>
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-white/5">
                       {filteredCreators.map((creator) => {
                         const isBanned = bannedHandles.includes(creator.handle);
                         return (
-                          <tr key={creator.id} className="group hover:bg-white/[0.01] transition-colors">
-                            <td className="px-6 md:px-10 py-6 md:py-8">
-                              <div className="flex items-center gap-4">
-                                <div className={cn("h-10 w-10 md:h-12 md:w-12 rounded-xl flex items-center justify-center text-[10px] md:text-xs font-black border border-white/10 text-white shrink-0", creator.color)}>
+                          <tr key={creator.id} className="group hover:bg-white/[0.02] transition-colors">
+                            <td className="px-10 py-8">
+                              <div className="flex items-center gap-5">
+                                <div className={cn("h-14 w-14 rounded-2xl flex items-center justify-center text-sm font-black border-2 border-white/10 text-white shrink-0 shadow-lg", creator.color)}>
                                   {creator.avatar}
                                 </div>
                                 <div className="min-w-0">
-                                  <p className="font-black text-sm md:text-base text-white truncate">{creator.name}</p>
-                                  <p className="text-[10px] md:text-xs text-purple-400 font-bold tracking-wider truncate">@{creator.handle}</p>
+                                  <p className="font-black text-lg text-white truncate">{creator.name}</p>
+                                  <p className="text-xs text-purple-400 font-bold tracking-wider truncate">@{creator.handle}</p>
                                 </div>
                               </div>
                             </td>
-                            <td className="px-6 md:px-10 py-6 md:py-8">
-                              <span className="px-3 py-1 rounded-full bg-white/5 border border-white/5 text-[9px] font-black uppercase tracking-widest text-white/60">
+                            <td className="px-10 py-8">
+                              <span className="px-4 py-1.5 rounded-full bg-white/5 border border-white/10 text-[10px] font-black uppercase tracking-widest text-white/60 group-hover:text-purple-300 group-hover:border-purple-500/30 transition-all">
                                 {creator.category}
                               </span>
                             </td>
-                            <td className="px-6 md:px-10 py-6 md:py-8">
+                            <td className="px-10 py-8">
                               <div className="flex items-center gap-2">
                                 {isBanned ? (
-                                  <div className="flex items-center gap-1.5 text-red-500 bg-red-500/5 px-2.5 py-1 rounded-lg border border-red-500/10 font-black text-[9px] uppercase">
-                                    <Lock className="h-2.5 w-2.5" /> Banned
+                                  <div className="flex items-center gap-2 text-red-500 bg-red-500/10 px-3 py-1.5 rounded-xl border border-red-500/20 font-black text-[10px] uppercase tracking-widest">
+                                    <Lock className="h-3 w-3" /> Terminated
                                   </div>
                                 ) : (
-                                  <div className="flex items-center gap-1.5 text-green-500 bg-green-500/5 px-2.5 py-1 rounded-lg border border-green-500/10 font-black text-[9px] uppercase">
-                                    <CheckCircle2 className="h-2.5 w-2.5" /> Active
+                                  <div className="flex items-center gap-2 text-green-500 bg-green-500/10 px-3 py-1.5 rounded-xl border border-green-500/20 font-black text-[10px] uppercase tracking-widest">
+                                    <CheckCircle2 className="h-3 w-3" /> Verified
                                   </div>
                                 )}
                               </div>
                             </td>
-                            <td className="px-6 md:px-10 py-6 md:py-8 text-right">
-                              <div className="flex items-center justify-end gap-2 md:gap-3">
+                            <td className="px-10 py-8 text-right">
+                              <div className="flex items-center justify-end gap-3">
                                 <Button 
                                   variant="ghost" 
                                   size="icon" 
                                   onClick={() => toggleBan(creator.handle)}
                                   className={cn(
-                                    "h-10 w-10 md:h-11 md:w-11 rounded-xl transition-all border border-white/5",
+                                    "h-12 w-12 rounded-xl transition-all border border-white/10",
                                     isBanned 
-                                      ? "bg-green-500/5 text-green-500 hover:bg-green-500/10" 
-                                      : "bg-red-500/5 text-red-500 hover:bg-red-500/10"
+                                      ? "bg-green-500/10 text-green-500 hover:bg-green-500/20" 
+                                      : "bg-red-500/10 text-red-500 hover:bg-red-500/20"
                                   )}
                                 >
-                                  {isBanned ? <Unlock className="h-4 w-4 md:h-5 md:w-5" /> : <Ban className="h-4 w-4 md:h-5 md:w-5" />}
+                                  {isBanned ? <Unlock className="h-5 w-5" /> : <Ban className="h-5 w-5" />}
                                 </Button>
                                 
                                 <DropdownMenu>
                                   <DropdownMenuTrigger asChild>
-                                    <Button variant="ghost" size="icon" className="h-10 w-10 md:h-11 md:w-11 rounded-xl bg-white/5 text-white/30 border border-white/5 hover:text-white hover:bg-white/10">
-                                      <MoreVertical className="h-4 w-4 md:h-5 md:w-5" />
+                                    <Button variant="ghost" size="icon" className="h-12 w-12 rounded-xl bg-white/5 text-white/30 border border-white/10 hover:text-white hover:bg-white/15">
+                                      <MoreVertical className="h-5 w-5" />
                                     </Button>
                                   </DropdownMenuTrigger>
-                                  <DropdownMenuContent align="end" className="w-56 bg-[#1a102d]/95 backdrop-blur-xl border-white/10 text-white rounded-2xl p-2 mt-2 shadow-2xl">
-                                    <DropdownMenuLabel className="text-[10px] font-black uppercase tracking-widest text-white/40 px-3 py-2">Account Actions</DropdownMenuLabel>
-                                    <DropdownMenuSeparator className="bg-white/5" />
+                                  <DropdownMenuContent align="end" className="w-64 bg-[#1a102d]/98 backdrop-blur-xl border-white/20 text-white rounded-[24px] p-2.5 mt-3 shadow-2xl">
+                                    <DropdownMenuLabel className="text-[10px] font-black uppercase tracking-[0.2em] text-white/40 px-4 py-3">Advanced Admin</DropdownMenuLabel>
+                                    <DropdownMenuSeparator className="bg-white/10" />
                                     <DropdownMenuItem 
                                       onClick={() => openTransactionHistory(creator)}
-                                      className="focus:bg-purple-500/15 focus:text-purple-400 rounded-xl cursor-pointer px-3 py-2.5 gap-3"
+                                      className="focus:bg-purple-500/20 focus:text-purple-400 rounded-xl cursor-pointer px-4 py-3 gap-4"
                                     >
-                                      <History className="h-4 w-4" />
-                                      <span className="font-bold text-sm">View History</span>
+                                      <History className="h-5 w-5" />
+                                      <span className="font-black text-sm uppercase tracking-tight">View History</span>
                                     </DropdownMenuItem>
                                     <DropdownMenuItem 
                                       onClick={() => openAuditLogs(creator)}
-                                      className="focus:bg-purple-500/15 focus:text-purple-400 rounded-xl cursor-pointer px-3 py-2.5 gap-3"
+                                      className="focus:bg-purple-500/20 focus:text-purple-400 rounded-xl cursor-pointer px-4 py-3 gap-4"
                                     >
-                                      <FileText className="h-4 w-4" />
-                                      <span className="font-bold text-sm">Audit Logs</span>
+                                      <FileText className="h-5 w-5" />
+                                      <span className="font-black text-sm uppercase tracking-tight">Audit Logs</span>
                                     </DropdownMenuItem>
-                                    <DropdownMenuSeparator className="bg-white/5" />
+                                    <DropdownMenuSeparator className="bg-white/10" />
                                     <DropdownMenuItem 
                                       onClick={() => handleResetProfile(creator.handle)}
-                                      className="focus:bg-orange-500/15 focus:text-orange-400 rounded-xl cursor-pointer px-3 py-2.5 gap-3"
+                                      className="focus:bg-orange-500/20 focus:text-orange-400 rounded-xl cursor-pointer px-4 py-3 gap-4"
                                     >
-                                      <UserX className="h-4 w-4" />
-                                      <span className="font-bold text-sm">Reset Profile</span>
+                                      <UserX className="h-5 w-5" />
+                                      <span className="font-black text-sm uppercase tracking-tight">Reset Profile</span>
                                     </DropdownMenuItem>
                                     <DropdownMenuItem 
                                       onClick={() => handleTerminate(creator.handle)}
-                                      className="focus:bg-red-500/15 focus:text-red-400 rounded-xl cursor-pointer px-3 py-2.5 gap-3"
+                                      className="focus:bg-red-500/20 focus:text-red-400 rounded-xl cursor-pointer px-4 py-3 gap-4"
                                     >
-                                      <UserMinus className="h-4 w-4" />
-                                      <span className="font-bold text-sm">Terminate Account</span>
+                                      <UserMinus className="h-5 w-5" />
+                                      <span className="font-black text-sm uppercase tracking-tight">Erase Account</span>
                                     </DropdownMenuItem>
                                   </DropdownMenuContent>
                                 </DropdownMenu>
@@ -482,61 +504,61 @@ const AdminHub = () => {
 
       {/* Audit Log Dialog */}
       <Dialog open={isAuditModalOpen} onOpenChange={setIsAuditModalOpen}>
-        <DialogContent className="bg-[#1a102d] border-white/10 text-white rounded-3xl p-0 overflow-hidden max-w-2xl shadow-2xl">
-          <div className="p-8 border-b border-white/5">
+        <DialogContent className="bg-[#0d071a]/95 backdrop-blur-3xl border-white/20 text-white rounded-[40px] p-0 overflow-hidden max-w-2xl shadow-2xl">
+          <div className="p-10 border-b border-white/10">
             <DialogHeader>
-              <div className="flex items-center gap-4 mb-2">
-                <div className={cn("h-12 w-12 rounded-xl flex items-center justify-center text-xs font-black border border-white/10", selectedCreator?.color)}>
+              <div className="flex items-center gap-5 mb-4">
+                <div className={cn("h-16 w-16 rounded-3xl flex items-center justify-center text-sm font-black border-2 border-white/10 shadow-2xl", selectedCreator?.color)}>
                   {selectedCreator?.avatar}
                 </div>
                 <div>
-                  <DialogTitle className="text-2xl font-black italic tracking-tight uppercase">Network Audit Logs</DialogTitle>
-                  <DialogDescription className="text-white/40 font-bold">
-                    Historical record for @{selectedCreator?.handle}
+                  <DialogTitle className="text-3xl font-black italic tracking-tighter uppercase">Network Audit Logs</DialogTitle>
+                  <DialogDescription className="text-white/40 font-bold text-base">
+                    Administrative sequence for @{selectedCreator?.handle}
                   </DialogDescription>
                 </div>
               </div>
             </DialogHeader>
           </div>
 
-          <ScrollArea className="h-[450px] p-8">
-            <div className="space-y-6">
+          <ScrollArea className="h-[480px] p-10">
+            <div className="space-y-8">
               {(MOCK_AUDIT_LOGS[selectedCreator?.handle || ""] || [
                 { date: "2024-05-19", time: "10:00", event: "Initial Registration", actor: "System", type: "system" }
               ]).map((log, i) => (
-                <div key={i} className="flex gap-6 relative">
+                <div key={i} className="flex gap-8 relative">
                   {i < (MOCK_AUDIT_LOGS[selectedCreator?.handle || ""] || []).length - 1 && (
-                    <div className="absolute left-[23px] top-10 bottom-[-24px] w-px bg-white/5" />
+                    <div className="absolute left-[27px] top-14 bottom-[-32px] w-0.5 bg-white/5" />
                   )}
                   <div className={cn(
-                    "h-12 w-12 rounded-full border-2 flex items-center justify-center shrink-0 shadow-lg",
+                    "h-14 w-14 rounded-2xl border-2 flex items-center justify-center shrink-0 shadow-2xl relative z-10",
                     log.type === "system" ? "border-purple-500/30 bg-purple-500/10 text-purple-400" : 
                     log.type === "admin" ? "border-orange-500/30 bg-orange-500/10 text-orange-400" :
                     "border-white/10 bg-white/5 text-white/40"
                   )}>
-                    {log.type === "system" ? <Zap className="h-5 w-5" /> : 
-                     log.type === "admin" ? <ShieldAlert className="h-5 w-5" /> :
-                     <FileText className="h-5 w-5" />}
+                    {log.type === "system" ? <Zap className="h-6 w-6" /> : 
+                     log.type === "admin" ? <ShieldAlert className="h-6 w-6" /> :
+                     <FileText className="h-6 w-6" />}
                   </div>
-                  <div className="space-y-1 pt-1 flex-1">
+                  <div className="space-y-2 pt-1 flex-1">
                     <div className="flex items-center justify-between">
-                      <h4 className="font-black text-lg text-white/90">{log.event}</h4>
-                      <div className="flex items-center gap-4 text-[10px] font-black uppercase tracking-widest text-white/20">
-                        <div className="flex items-center gap-1.5"><Calendar className="h-3 w-3" /> {log.date}</div>
-                        <div className="flex items-center gap-1.5"><Clock className="h-3 w-3" /> {log.time}</div>
+                      <h4 className="font-black text-xl text-white tracking-tight">{log.event}</h4>
+                      <div className="flex items-center gap-4 text-[10px] font-black uppercase tracking-[0.2em] text-white/20">
+                        <div className="flex items-center gap-2"><Calendar className="h-3.5 w-3.5" /> {log.date}</div>
+                        <div className="flex items-center gap-2"><Clock className="h-3.5 w-3.5" /> {log.time}</div>
                       </div>
                     </div>
-                    <p className="text-xs font-bold text-white/40 italic">Triggered by: <span className="text-purple-400">@{log.actor}</span></p>
+                    <p className="text-sm font-bold text-white/30 italic">Executed by: <span className="text-purple-400">@{log.actor}</span></p>
                   </div>
                 </div>
               ))}
             </div>
           </ScrollArea>
 
-          <div className="p-8 bg-white/[0.02] border-t border-white/5 flex justify-end">
+          <div className="p-10 bg-white/[0.03] border-t border-white/10 flex justify-end">
             <Button 
               onClick={() => setIsAuditModalOpen(false)} 
-              className="rounded-xl bg-purple-600 hover:bg-purple-700 text-white font-black uppercase tracking-widest text-xs px-8 h-12 shadow-lg shadow-purple-500/20"
+              className="rounded-2xl bg-purple-600 hover:bg-purple-700 text-white font-black uppercase tracking-widest text-xs px-10 h-14 shadow-[0_15px_30px_rgba(168,85,247,0.3)]"
             >
               Close Audit
             </Button>
@@ -546,70 +568,72 @@ const AdminHub = () => {
 
       {/* Transaction History Dialog */}
       <Dialog open={isHistoryModalOpen} onOpenChange={setIsHistoryModalOpen}>
-        <DialogContent className="bg-[#1a102d] border-white/10 text-white rounded-3xl p-0 overflow-hidden max-w-2xl shadow-2xl">
-          <div className="p-8 border-b border-white/5">
+        <DialogContent className="bg-[#0d071a]/95 backdrop-blur-3xl border-white/20 text-white rounded-[40px] p-0 overflow-hidden max-w-2xl shadow-2xl">
+          <div className="p-10 border-b border-white/10">
             <DialogHeader>
-              <div className="flex items-center gap-4 mb-2">
-                <div className={cn("h-12 w-12 rounded-xl flex items-center justify-center text-xs font-black border border-white/10", selectedCreator?.color)}>
+              <div className="flex items-center gap-5 mb-4">
+                <div className={cn("h-16 w-16 rounded-3xl flex items-center justify-center text-sm font-black border-2 border-white/10 shadow-2xl", selectedCreator?.color)}>
                   {selectedCreator?.avatar}
                 </div>
                 <div>
-                  <DialogTitle className="text-2xl font-black italic tracking-tight uppercase">Transaction History</DialogTitle>
-                  <DialogDescription className="text-white/40 font-bold">
-                    Network tipping activity for @{selectedCreator?.handle}
+                  <DialogTitle className="text-3xl font-black italic tracking-tighter uppercase">Transaction History</DialogTitle>
+                  <DialogDescription className="text-white/40 font-bold text-base">
+                    Financial activity for @{selectedCreator?.handle}
                   </DialogDescription>
                 </div>
               </div>
             </DialogHeader>
           </div>
 
-          <ScrollArea className="h-[450px] p-8">
-            <div className="space-y-4">
+          <ScrollArea className="h-[480px] p-10">
+            <div className="space-y-5">
               {(MOCK_TRANSACTIONS[selectedCreator?.handle || ""] || []).length > 0 ? (
                 (MOCK_TRANSACTIONS[selectedCreator?.handle || ""] || []).map((tx, i) => (
-                  <div key={i} className="flex items-center justify-between p-5 rounded-2xl bg-white/[0.03] border border-white/5 group hover:bg-white/[0.06] transition-all">
-                    <div className="flex items-center gap-4">
+                  <div key={i} className="flex items-center justify-between p-6 rounded-[32px] bg-white/[0.03] border border-white/10 group hover:bg-white/[0.06] hover:border-purple-500/30 transition-all">
+                    <div className="flex items-center gap-5">
                       <div className={cn(
-                        "h-12 w-12 rounded-xl flex items-center justify-center border-2",
+                        "h-14 w-14 rounded-2xl flex items-center justify-center border-2 shadow-xl",
                         tx.type === "received" ? "border-green-500/20 bg-green-500/10 text-green-400" : "border-red-500/20 bg-red-500/10 text-red-400"
                       )}>
-                        {tx.type === "received" ? <ArrowDownLeft className="h-6 w-6" /> : <ArrowUpRight className="h-6 w-6" />}
+                        {tx.type === "received" ? <ArrowDownLeft className="h-7 w-7" /> : <ArrowUpRight className="h-7 w-7" />}
                       </div>
                       <div>
-                        <p className="font-black text-sm text-white/90">
-                          {tx.type === "received" ? "Received Tip" : "Sent Tip"}
+                        <p className="font-black text-lg text-white">
+                          {tx.type === "received" ? "Received Support" : "Sent Appreciation"}
                         </p>
-                        <p className="text-[10px] font-bold text-white/30 uppercase tracking-widest">
+                        <p className="text-[10px] font-black text-white/30 uppercase tracking-[0.2em] mt-1">
                           {tx.type === "received" ? "From" : "To"}: <span className="text-purple-400">@{tx.counterparty}</span>
                         </p>
                       </div>
                     </div>
                     <div className="text-right">
-                      <p className={cn("font-black text-lg", tx.type === "received" ? "text-green-400" : "text-red-400")}>
-                        {tx.type === "received" ? "+" : "-"}{tx.amount} {tx.asset}
+                      <p className={cn("font-black text-2xl tracking-tighter", tx.type === "received" ? "text-green-400" : "text-red-400")}>
+                        {tx.type === "received" ? "+" : "-"}{tx.amount} <span className="text-sm italic">{tx.asset}</span>
                       </p>
-                      <p className="text-[10px] font-bold text-white/20 uppercase tracking-widest">{tx.date}</p>
+                      <p className="text-[10px] font-black text-white/20 uppercase tracking-widest mt-1">{tx.date}</p>
                     </div>
                   </div>
                 ))
               ) : (
-                <div className="h-[300px] flex flex-col items-center justify-center text-center space-y-4">
-                  <HandCoins className="h-16 w-16 text-white/10" />
-                  <div>
-                    <p className="text-xl font-black text-white/20">No Transactions Found</p>
-                    <p className="text-sm text-white/10 font-bold">This user hasn't sent or received any tips yet.</p>
+                <div className="h-[320px] flex flex-col items-center justify-center text-center space-y-6">
+                  <div className="h-24 w-24 rounded-full bg-white/5 border border-white/5 flex items-center justify-center">
+                    <HandCoins className="h-12 w-12 text-white/10" />
+                  </div>
+                  <div className="space-y-2">
+                    <p className="text-2xl font-black text-white/20 uppercase italic tracking-tighter">Zero Activity Found</p>
+                    <p className="text-base text-white/10 font-bold max-w-[280px]">This node hasn't processed any TAB or XPR transfers yet.</p>
                   </div>
                 </div>
               )}
             </div>
           </ScrollArea>
 
-          <div className="p-8 bg-white/[0.02] border-t border-white/5 flex justify-end">
+          <div className="p-10 bg-white/[0.03] border-t border-white/10 flex justify-end">
             <Button 
               onClick={() => setIsHistoryModalOpen(false)} 
-              className="rounded-xl bg-orange-500 hover:bg-orange-600 text-white font-black uppercase tracking-widest text-xs px-8 h-12 shadow-lg shadow-orange-500/20"
+              className="rounded-2xl bg-orange-500 hover:bg-orange-600 text-white font-black uppercase tracking-widest text-xs px-10 h-14 shadow-[0_15px_30px_rgba(249,115,22,0.3)]"
             >
-              Close History
+              Close Ledger
             </Button>
           </div>
         </DialogContent>
