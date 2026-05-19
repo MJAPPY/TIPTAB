@@ -30,7 +30,7 @@ const CreatorProfile = () => {
   const { session, actor, login, isConnected } = useXpr();
   
   const [creator, setCreator] = useState<Creator | null>(null);
-  const [tipAmount, setTipAmount] = useState("50.0000");
+  const [tipAmount, setTipAmount] = useState("50");
   const [isProcessing, setIsProcessing] = useState(false);
   const [isMembershipOpen, setIsMembershipOpen] = useState(false);
   const [isCopied, setIsCopied] = useState(false);
@@ -57,8 +57,8 @@ const CreatorProfile = () => {
 
   const formatValue = (val: string) => {
     const numericValue = parseFloat(val);
-    if (isNaN(numericValue)) return "0.0000";
-    return numericValue.toFixed(4);
+    if (isNaN(numericValue)) return "0";
+    return Math.floor(numericValue).toString();
   };
 
   const handleConnect = async () => {
@@ -72,7 +72,7 @@ const CreatorProfile = () => {
   const handleSendTip = async () => {
     if (!session || !actor) return;
     
-    const amountNum = parseFloat(tipAmount);
+    const amountNum = Math.floor(parseFloat(tipAmount));
     if (isNaN(amountNum) || amountNum <= 0) {
       toast({ 
         title: "Invalid amount", 
@@ -85,7 +85,7 @@ const CreatorProfile = () => {
     setIsProcessing(true);
     try {
       const recipient = creator?.handle.replace(/^@/, "").toLowerCase().trim();
-      const quantityString = `${amountNum.toFixed(4)} TAB`;
+      const quantityString = `${amountNum} TAB`;
 
       const actions = [{
         account: 'tokencreate', 
@@ -236,7 +236,7 @@ const CreatorProfile = () => {
 
                   <div className="relative group">
                     <Input 
-                      placeholder="0.0000" 
+                      placeholder="0" 
                       value={tipAmount}
                       onChange={(e) => setTipAmount(e.target.value)}
                       onBlur={(e) => setTipAmount(formatValue(e.target.value))}
