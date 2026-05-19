@@ -210,10 +210,11 @@ const Dashboard = () => {
           <div className="lg:col-span-12">
             <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
               <TabsContent value="analytics" className="space-y-6 sm:space-y-10 mt-0 animate-in fade-in slide-in-from-bottom-4 duration-500">
-                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 sm:gap-8">
-                  <Card className="bg-[#130b21]/60 border-white/10 text-white rounded-[32px] sm:rounded-[40px] p-6 sm:p-10 shadow-2xl relative overflow-hidden group hover:border-orange-500/30 transition-all">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
+                  {/* Settled TAB Card */}
+                  <Card className="bg-[#130b21]/60 border-white/10 text-white rounded-[32px] sm:rounded-[40px] p-6 sm:p-10 shadow-2xl relative overflow-hidden group hover:border-orange-500/30 transition-all flex flex-col min-h-[220px] sm:min-h-[280px]">
                     <div className="absolute -top-12 -right-12 w-32 h-32 bg-orange-500/10 blur-3xl rounded-full group-hover:bg-orange-500/20 transition-all" />
-                    <CardHeader className="p-0 mb-4 sm:mb-6">
+                    <CardHeader className="p-0 mb-auto">
                       <div className="flex items-center justify-between">
                         <CardDescription className="text-slate-400 font-black uppercase tracking-[0.2em] text-[9px] sm:text-[10px]">Settled TAB</CardDescription>
                         <Button variant="ghost" size="icon" onClick={handleManualRefresh} className="h-8 w-8 sm:h-10 sm:w-10 rounded-xl bg-white/5 text-white/30 hover:text-white transition-all">
@@ -221,49 +222,51 @@ const Dashboard = () => {
                         </Button>
                       </div>
                     </CardHeader>
-                    <CardContent className="p-0">
-                      <div className="flex items-end gap-2 sm:gap-3 flex-wrap">
-                        <span className="text-4xl sm:text-6xl font-black tracking-tighter text-slate-100 truncate max-w-full">
+                    <CardContent className="p-0 mt-4 sm:mt-6">
+                      <div className="flex flex-col items-start gap-1">
+                        <span className="text-4xl sm:text-6xl md:text-7xl font-black tracking-tighter text-slate-100 break-all">
                           {Number(balances.tab).toLocaleString()}
                         </span>
-                        <span className="text-sm sm:text-lg font-black text-orange-500 italic mb-1.5 sm:mb-2">TAB</span>
+                        <span className="text-sm sm:text-xl font-black text-orange-500 italic uppercase">TAB</span>
                       </div>
-                      <div className="mt-4 sm:mt-6 flex items-center gap-2 text-green-400 text-[8px] sm:text-[10px] font-black uppercase tracking-widest">
+                      <div className="mt-8 sm:mt-10 flex items-center gap-2 text-green-400 text-[8px] sm:text-[10px] font-black uppercase tracking-widest">
                         <ShieldCheck className="h-3 w-3" />
                         Network Live
                       </div>
                     </CardContent>
                   </Card>
 
-                  <Card className="bg-[#130b21]/60 border-white/10 text-white rounded-[32px] sm:rounded-[40px] p-6 sm:p-10 shadow-2xl relative overflow-hidden group hover:border-purple-500/30 transition-all">
+                  {/* Liquid XPR Card */}
+                  <Card className="bg-[#130b21]/60 border-white/10 text-white rounded-[32px] sm:rounded-[40px] p-6 sm:p-10 shadow-2xl relative overflow-hidden group hover:border-purple-500/30 transition-all flex flex-col min-h-[220px] sm:min-h-[280px]">
                     <div className="absolute -top-12 -right-12 w-32 h-32 bg-purple-500/10 blur-3xl rounded-full group-hover:bg-purple-500/20 transition-all" />
-                    <CardHeader className="p-0 mb-4 sm:mb-6">
+                    <CardHeader className="p-0 mb-auto">
                       <CardDescription className="text-slate-400 font-black uppercase tracking-[0.2em] text-[9px] sm:text-[10px]">Liquid XPR</CardDescription>
                     </CardHeader>
-                    <CardContent className="p-0">
-                      <div className="flex items-end gap-2 sm:gap-3 flex-wrap">
-                        <span className="text-2xl sm:text-4xl md:text-5xl lg:text-6xl font-black tracking-tighter text-slate-100 truncate max-w-full">
+                    <CardContent className="p-0 mt-4 sm:mt-6">
+                      <div className="flex flex-col items-start gap-1">
+                        <span className="text-3xl sm:text-5xl md:text-6xl font-black tracking-tighter text-slate-100 break-all leading-none">
                           {Number(balances.xpr).toLocaleString(undefined, { minimumFractionDigits: 4, maximumFractionDigits: 4 })}
                         </span>
-                        <span className="text-sm sm:text-lg font-black text-purple-400 italic mb-1.5 sm:mb-2 shrink-0">XPR</span>
+                        <span className="text-sm sm:text-xl font-black text-purple-400 italic uppercase">XPR</span>
                       </div>
-                      <div className="mt-4 sm:mt-6 h-1 w-full bg-white/5 rounded-full overflow-hidden">
+                      <div className="mt-8 sm:mt-10 h-1.5 w-full bg-white/5 rounded-full overflow-hidden">
                         <div className="h-full bg-purple-500 w-[65%] rounded-full shadow-[0_0_15px_rgba(168,85,247,0.5)]" />
                       </div>
                     </CardContent>
                   </Card>
 
-                  <Card className="bg-[#130b21]/60 border-white/10 text-white rounded-[32px] sm:rounded-[40px] p-6 sm:p-10 shadow-2xl relative overflow-hidden group hover:border-pink-500/30 transition-all sm:col-span-2 md:col-span-1">
+                  {/* Tips Sent Card */}
+                  <Card className="bg-[#130b21]/60 border-white/10 text-white rounded-[32px] sm:rounded-[40px] p-6 sm:p-10 shadow-2xl relative overflow-hidden group hover:border-pink-500/30 transition-all flex flex-col min-h-[220px] sm:min-h-[280px]">
                     <div className="absolute -top-12 -right-12 w-32 h-32 bg-pink-500/10 blur-3xl rounded-full group-hover:bg-pink-500/20 transition-all" />
-                    <CardHeader className="p-0 mb-4 sm:mb-6">
+                    <CardHeader className="p-0 mb-auto">
                       <CardDescription className="text-slate-400 font-black uppercase tracking-[0.2em] text-[9px] sm:text-[10px]">Tips Sent</CardDescription>
                     </CardHeader>
-                    <CardContent className="p-0">
-                      <div className="flex items-end gap-2 sm:gap-3 flex-wrap">
-                        <span className="text-4xl sm:text-6xl font-black tracking-tighter text-slate-100 truncate max-w-full">0</span>
-                        <span className="text-sm sm:text-lg font-black text-pink-500 italic mb-1.5 sm:mb-2">TAB</span>
+                    <CardContent className="p-0 mt-4 sm:mt-6">
+                      <div className="flex flex-col items-start gap-1">
+                        <span className="text-4xl sm:text-6xl md:text-7xl font-black tracking-tighter text-slate-100">0</span>
+                        <span className="text-sm sm:text-xl font-black text-pink-500 italic uppercase">TAB</span>
                       </div>
-                      <div className="mt-4 sm:mt-6 flex items-center gap-2 text-pink-400 text-[8px] sm:text-[10px] font-black uppercase tracking-widest">
+                      <div className="mt-8 sm:mt-10 flex items-center gap-2 text-pink-400 text-[8px] sm:text-[10px] font-black uppercase tracking-widest">
                         <Heart className="h-3 w-3" />
                         Community Impact
                       </div>
