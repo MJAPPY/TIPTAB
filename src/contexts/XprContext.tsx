@@ -56,7 +56,7 @@ export const XprProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         method: 'POST',
         headers,
         body: JSON.stringify({
-          code: 'proton-tokencreate',
+          code: 'xtokens',
           account: account,
           symbol: 'TAB'
         })

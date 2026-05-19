@@ -88,7 +88,7 @@ const CreatorProfile = () => {
       const quantityString = `${amountNum.toFixed(4)} TAB`;
 
       const actions = [{
-        account: 'proton-tokencreate', 
+        account: 'xtokens', 
         name: 'transfer',
         authorization: [{
           actor: actor,
