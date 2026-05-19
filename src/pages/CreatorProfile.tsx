@@ -19,12 +19,15 @@ import { CREATORS, Creator } from "@/data/creators";
 import { Header } from "@/components/tab-platform/Header";
 import { MembershipModal } from "@/components/tab-platform/MembershipModal";
 import { useToast } from "@/hooks/use-toast";
+import { useXpr } from "@/contexts/XprContext";
 import { cn } from "@/lib/utils";
 
 const CreatorProfile = () => {
   const { handle } = useParams<{ handle: string }>();
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { session, actor, login } = useXpr();
+  
   const [creator, setCreator] = useState<Creator | null>(null);
   const [tipAmount, setTipAmount] = useState("100");
   const [isProcessing, setIsProcessing] = useState(false);
@@ -32,10 +35,12 @@ const CreatorProfile = () => {
   const [isCopied, setIsCopied] = useState(false);
 
   useEffect(() => {
+    // Check main data
     const found = CREATORS.find(c => c.handle.toLowerCase() === handle?.toLowerCase());
     if (found) {
       setCreator(found);
     } else {
+      // Check local storage for self-profile
       const savedUser = localStorage.getItem("tiptab_user_profile");
       if (savedUser) {
         const localUser = JSON.parse(savedUser) as Creator;
@@ -49,13 +54,60 @@ const CreatorProfile = () => {
   }, [handle, navigate]);
 
   const handleSendTip = async () => {
+    if (!tipAmount || isNaN(Number(tipAmount)) || Number(tipAmount) <= 0) {
+      toast({ 
+        title: "Invalid amount", 
+        description: "Please enter a valid TAB amount.", 
+        variant: "destructive" 
+      });
+      return;
+    }
+
+    if (!session) {
+      toast({
+        title: "Connection Required",
+        description: "Please connect your wallet to send appreciation.",
+      });
+      try {
+        await login();
+      } catch (err) {
+        return;
+      }
+      return;
+    }
+
     setIsProcessing(true);
-    await new Promise(resolve => setTimeout(resolve, 2000));
-    toast({
-      title: "Tip Sent!",
-      description: `Successfully sent ${tipAmount} TAB to ${creator?.name}.`,
-    });
-    setIsProcessing(false);
+    try {
+      const actions = [{
+        account: 'tokencreate', // TAB token contract
+        name: 'transfer',
+        authorization: [{
+          actor: actor!,
+          permission: session.auth.permission,
+        }],
+        data: {
+          from: actor,
+          to: creator?.handle, 
+          quantity: `${parseFloat(tipAmount).toFixed(6)} TAB`,
+          memo: 'Tipped via TipTab Profile',
+        },
+      }];
+
+      await session.transact({ actions }, { broadcast: true });
+      
+      toast({
+        title: "Tip Sent!",
+        description: `Successfully sent ${tipAmount} TAB to ${creator?.name}.`,
+      });
+    } catch (error: any) {
+      toast({
+        title: "Transaction Failed",
+        description: error.message || "Could not complete the tip. Please try again.",
+        variant: "destructive"
+      });
+    } finally {
+      setIsProcessing(false);
+    }
   };
 
   const copyToClipboard = (url: string) => {
@@ -63,7 +115,7 @@ const CreatorProfile = () => {
       setIsCopied(true);
       toast({ 
         title: "Link Copied!", 
-        description: "Profile URL has been saved to your clipboard.",
+        description: "Profile URL saved to clipboard.",
       });
       setTimeout(() => setIsCopied(false), 2000);
     }).catch(() => {
@@ -87,7 +139,6 @@ const CreatorProfile = () => {
       try {
         await navigator.share(shareData);
       } catch (err) {
-        // Fallback to clipboard if sharing is blocked or fails
         copyToClipboard(shareUrl);
       }
     } else {
