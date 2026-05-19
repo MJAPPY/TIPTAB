@@ -130,28 +130,28 @@ export const Header = ({ onBecomeCreator }: HeaderProps) => {
           className="w-full lg:w-auto border-orange-500/50 bg-orange-500/10 text-orange-500 hover:bg-orange-500 hover:text-white flex items-center justify-start lg:justify-center gap-3 font-black rounded-2xl h-12 px-5 transition-all shadow-[0_0_20px_rgba(249,115,22,0.15)]"
         >
           <Sparkles className="h-4 w-4" />
-          Become a Creator
+          Join Network
         </Button>
       )}
     </>
   );
 
   return (
-    <header className="fixed top-[52px] left-0 right-0 z-50 px-3 md:px-6">
+    <header className="fixed top-[20px] md:top-[52px] left-0 right-0 z-50 px-3 md:px-6">
       <div className="mx-auto w-full max-w-[98%] xl:max-w-[1600px]">
-        <div className="border border-white/10 bg-[#0a0514]/85 backdrop-blur-md rounded-[28px] px-3 md:px-8 py-2 md:py-3.5 flex items-center justify-between shadow-[0_20px_60px_rgba(0,0,0,0.7)]">
+        <div className="border border-white/10 bg-[#0a0514]/85 backdrop-blur-md rounded-[24px] md:rounded-[28px] px-3 md:px-8 py-2 md:py-3 flex items-center justify-between shadow-[0_20px_60px_rgba(0,0,0,0.7)] ring-1 ring-white/5">
           
           <div className="flex items-center gap-4">
             <Link to="/" className="flex items-center gap-2 md:gap-4 group shrink-0">
               <div className="relative">
                 <div className="absolute inset-0 bg-orange-500/20 blur-lg rounded-full group-hover:scale-110 transition-transform" />
-                <img src="/src/assets/logo.png" alt="TIPTAB Logo" className="h-10 w-10 md:h-14 md:w-14 object-contain relative z-10" />
+                <img src="/src/assets/logo.png" alt="TIPTAB Logo" className="h-8 w-8 md:h-12 md:w-12 object-contain relative z-10" />
               </div>
               <div className="flex flex-col -space-y-0.5 md:-space-y-1">
                 <span className="text-lg md:text-3xl font-black italic tracking-tighter text-white group-hover:text-[#a855f7] transition-colors duration-300">
                   TIP<span className="text-orange-500">TAB</span>
                 </span>
-                <span className="text-[7px] md:text-[10px] text-muted-foreground uppercase tracking-widest font-black opacity-60">
+                <span className="hidden xs:inline text-[7px] md:text-[10px] text-muted-foreground uppercase tracking-widest font-black opacity-60">
                   Appreciation Hub
                 </span>
               </div>
@@ -166,20 +166,20 @@ export const Header = ({ onBecomeCreator }: HeaderProps) => {
 
           <div className="flex items-center gap-2 md:gap-4">
             {isConnected && (
-              <div className="flex items-center gap-2 bg-white/5 border border-white/10 rounded-2xl p-1 px-4 h-14 md:h-16">
-                <div className="flex flex-col items-end pr-4 border-r border-white/10 py-1">
-                  <span className="text-xs md:text-sm font-black text-orange-500 flex items-center gap-1.5 leading-none mb-1">
-                    <Zap className="h-3 w-3 fill-orange-500" /> {Number(balances.tab).toLocaleString()} TAB
+              <div className="flex items-center gap-2 bg-white/5 border border-white/10 rounded-xl md:rounded-2xl p-1 px-3 md:px-4 h-12 md:h-16">
+                <div className="flex flex-col items-end pr-2 md:pr-4 border-r border-white/10 py-1">
+                  <span className="text-[10px] md:text-sm font-black text-orange-500 flex items-center gap-1.5 leading-none mb-1">
+                    {Number(balances.tab).toLocaleString()} <span className="hidden xs:inline">TAB</span>
                   </span>
-                  <span className="text-[10px] md:text-xs font-bold text-white/60 leading-none">{Number(balances.xpr).toLocaleString()} XPR</span>
+                  <span className="text-[8px] md:text-xs font-bold text-white/60 leading-none">{Number(balances.xpr).toLocaleString()} XPR</span>
                 </div>
                 <Button 
                   variant="ghost" 
                   size="icon" 
                   onClick={handleRefresh}
-                  className="h-8 w-8 text-white/30 hover:text-white"
+                  className="h-6 w-6 md:h-8 md:w-8 text-white/30 hover:text-white"
                 >
-                  <RefreshCw className={cn("h-4 w-4", isRefreshing && "animate-spin")} />
+                  <RefreshCw className={cn("h-3 w-3 md:h-4 md:w-4", isRefreshing && "animate-spin")} />
                 </Button>
               </div>
             )}
@@ -189,20 +189,20 @@ export const Header = ({ onBecomeCreator }: HeaderProps) => {
                 <DropdownMenuTrigger asChild>
                   <Button 
                     className={cn(
-                      "flex items-center gap-4 rounded-2xl h-14 md:h-16 px-6 md:px-8 font-black text-sm transition-all active:scale-95 group shrink-0 bg-white/5 border border-white/10 text-white hover:bg-white/10 shadow-xl",
+                      "flex items-center gap-2 md:gap-4 rounded-xl md:rounded-2xl h-12 md:h-16 px-4 md:px-8 font-black text-xs md:text-sm transition-all active:scale-95 group shrink-0 bg-white/5 border border-white/10 text-white hover:bg-white/10 shadow-xl",
                       isAdmin && "border-orange-500/60 bg-orange-500/10"
                     )}
                   >
-                    <div className="flex flex-col items-start -space-y-1 text-left">
+                    <div className="flex flex-col items-start -space-y-0.5 md:-space-y-1 text-left">
                       <div className="flex items-center gap-1.5">
-                        <span className="text-sm md:text-base font-black text-purple-400">@{actor}</span>
-                        {isAdmin && <ShieldCheck className="h-4 w-4 text-orange-500" />}
+                        <span className="text-xs md:text-base font-black text-purple-400">@{actor}</span>
+                        {isAdmin && <ShieldCheck className="h-3 w-3 md:h-4 md:w-4 text-orange-500" />}
                       </div>
-                      <span className="text-[8px] md:text-[10px] font-black text-white/60 uppercase tracking-widest">
-                        {isAdmin ? "Network Admin" : "Connected User"}
+                      <span className="hidden xs:inline text-[8px] md:text-[10px] font-black text-white/60 uppercase tracking-widest">
+                        {isAdmin ? "Network Admin" : "User"}
                       </span>
                     </div>
-                    <ChevronDown className="h-4 w-4 text-white/30 group-data-[state=open]:rotate-180 transition-transform" />
+                    <ChevronDown className="h-3 w-3 md:h-4 md:w-4 text-white/30 group-data-[state=open]:rotate-180 transition-transform" />
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end" className="w-64 bg-[#1a102d]/95 backdrop-blur-xl border-white/10 text-white rounded-2xl p-2 mt-2 shadow-2xl">
@@ -248,9 +248,9 @@ export const Header = ({ onBecomeCreator }: HeaderProps) => {
               <Button 
                 onClick={handleConnect}
                 disabled={isLoading}
-                className="flex items-center gap-2 rounded-2xl h-14 md:h-16 px-6 md:px-10 font-black text-sm md:text-base transition-all active:scale-95 group shrink-0 bg-[#a855f7] hover:bg-[#9333ea] text-white shadow-2xl shadow-purple-500/40"
+                className="flex items-center gap-2 rounded-xl md:rounded-2xl h-12 md:h-16 px-5 md:px-10 font-black text-xs md:text-base transition-all active:scale-95 group shrink-0 bg-[#a855f7] hover:bg-[#9333ea] text-white shadow-2xl shadow-purple-500/40"
               >
-                <Wallet className="h-6 w-6 group-hover:rotate-12 transition-transform" />
+                <Wallet className="h-5 w-5 md:h-6 md:w-6 group-hover:rotate-12 transition-transform" />
                 <span className="hidden xs:inline whitespace-nowrap">{isLoading ? "Restoring..." : "Connect WebAuth"}</span>
                 <span className="xs:hidden">Connect</span>
               </Button>
@@ -258,11 +258,11 @@ export const Header = ({ onBecomeCreator }: HeaderProps) => {
 
             <Sheet open={isOpen} onOpenChange={setIsOpen}>
               <SheetTrigger asChild>
-                <Button variant="ghost" size="icon" className="text-white bg-white/5 border border-white/10 hover:bg-white/10 h-14 w-14 md:h-16 md:w-16 rounded-2xl shrink-0">
-                  <Menu className="h-6 w-6" />
+                <Button variant="ghost" size="icon" className="text-white bg-white/5 border border-white/10 hover:bg-white/10 h-12 w-12 md:h-16 md:w-16 rounded-xl md:rounded-2xl shrink-0">
+                  <Menu className="h-5 w-5 md:h-6 md:w-6" />
                 </Button>
               </SheetTrigger>
-              <SheetContent side="right" className="bg-[#0a0514]/98 backdrop-blur-3xl border-white/10 p-8 pt-16 w-[320px]">
+              <SheetContent side="right" className="bg-[#0a0514]/98 backdrop-blur-3xl border-white/10 p-8 pt-16 w-[300px] md:w-[320px]">
                 <SheetHeader className="text-left mb-10">
                   <SheetTitle className="text-3xl font-black italic text-white tracking-tighter">
                     TIP<span className="text-orange-500">TAB</span>
