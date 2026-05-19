@@ -49,6 +49,9 @@ export const TippingModal = ({ creator, onClose }: TippingModalProps) => {
       const recipient = creator?.handle.replace(/^@/, "").toLowerCase().trim();
       const sender = actor;
 
+      // TAB token on 'tokencreate' contract uses 8 decimals
+      const TAB_PRECISION = 8;
+
       const actions = [{
         account: 'tokencreate', 
         name: 'transfer',
@@ -59,7 +62,7 @@ export const TippingModal = ({ creator, onClose }: TippingModalProps) => {
         data: {
           from: sender,
           to: recipient, 
-          quantity: `${parseFloat(tipAmount).toFixed(4)} TAB`,
+          quantity: `${parseFloat(tipAmount).toFixed(TAB_PRECISION)} TAB`,
           memo: 'Tipped via TipTab Map',
         },
       }];
@@ -75,7 +78,7 @@ export const TippingModal = ({ creator, onClose }: TippingModalProps) => {
       console.error("Tipping error:", error);
       toast({ 
         title: "Transaction failed", 
-        description: error.message || "Please check your wallet and try again.", 
+        description: error.message || "Precision mismatch or wallet error.", 
         variant: "destructive" 
       });
     } finally {
@@ -113,11 +116,6 @@ export const TippingModal = ({ creator, onClose }: TippingModalProps) => {
               {creator.twitter && (
                 <Button variant="outline" size="icon" className="rounded-xl bg-white/5 border-white/10 hover:border-white/30 h-10 w-10" asChild>
                   <a href={creator.twitter} target="_blank" rel="noopener noreferrer"><Twitter className="h-4 w-4" /></a>
-                </Button>
-              )}
-              {creator.instagram && (
-                <Button variant="outline" size="icon" className="rounded-xl bg-white/5 border-white/10 hover:border-white/30 h-10 w-10" asChild>
-                  <a href={creator.instagram} target="_blank" rel="noopener noreferrer"><Instagram className="h-4 w-4" /></a>
                 </Button>
               )}
               {creator.website && (

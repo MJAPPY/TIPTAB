@@ -82,6 +82,9 @@ const CreatorProfile = () => {
       const recipient = creator?.handle.replace(/^@/, "").toLowerCase().trim();
       const sender = actor;
 
+      // TAB token on 'tokencreate' contract uses 8 decimals
+      const TAB_PRECISION = 8;
+
       const actions = [{
         account: 'tokencreate', 
         name: 'transfer',
@@ -92,7 +95,7 @@ const CreatorProfile = () => {
         data: {
           from: sender,
           to: recipient, 
-          quantity: `${parseFloat(tipAmount).toFixed(4)} TAB`,
+          quantity: `${parseFloat(tipAmount).toFixed(TAB_PRECISION)} TAB`,
           memo: 'Tipped via TipTab Profile',
         },
       }];
@@ -107,7 +110,7 @@ const CreatorProfile = () => {
       console.error("Tipping error:", error);
       toast({
         title: "Transaction Failed",
-        description: error.message || "Could not complete the tip. Please try again.",
+        description: error.message || "Precision mismatch or wallet error.",
         variant: "destructive"
       });
     } finally {
