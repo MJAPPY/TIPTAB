@@ -15,6 +15,7 @@ interface XprContextType {
   actor: string | null;
   balances: Balances;
   isMember: boolean;
+  membershipDate: string | null;
   setIsMember: (status: boolean) => void;
   login: () => Promise<LinkSession | null>;
   logout: () => Promise<void>;
@@ -44,6 +45,7 @@ export const XprProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const [session, setSession] = useState<LinkSession | null>(null);
   const [balances, setBalances] = useState<Balances>({ xpr: '0.0000', tab: '0', tipsSent: 0 });
   const [isMember, setIsMember] = useState(false);
+  const [membershipDate, setMembershipDate] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [userProfile, setUserProfile] = useState<Creator | null>(null);
   const [isMaintenanceMode, setIsMaintenanceMode] = useState(() => {
@@ -106,9 +108,36 @@ export const XprProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         tipsSent: savedTips
       });
 
-      // Check local membership record
+      // Check local membership record (Yearly check)
       const membershipKey = `tiptab_membership_${account}`;
-      setIsMember(localStorage.getItem(membershipKey) === 'true');
+      const membershipDateKey = `tiptab_membership_date_${account}`;
+      const savedDate = localStorage.getItem(membershipDateKey);
+      
+      if (savedDate) {
+        const activationDate = new Date(savedDate);
+        const now = new Date();
+        const diffYears = (now.getTime() - activationDate.getTime()) / (1000 * 60 * 60 * 24 * 365);
+        
+        if (diffYears < 1) {
+          setIsMember(true);
+          setMembershipDate(savedDate);
+        } else {
+          setIsMember(false);
+          setMembershipDate(null);
+          localStorage.removeItem(membershipKey);
+        }
+      } else {
+        // Migration for old "true" flags
+        if (localStorage.getItem(membershipKey) === 'true') {
+          const fakeDate = new Date().toISOString();
+          localStorage.setItem(membershipDateKey, fakeDate);
+          setMembershipDate(fakeDate);
+          setIsMember(true);
+        } else {
+          setIsMember(false);
+          setMembershipDate(null);
+        }
+      }
 
       // Load Profile
       const savedProfile = localStorage.getItem(`tiptab_profile_${account}`);
@@ -197,6 +226,7 @@ export const XprProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       setSession(null);
       setBalances({ xpr: '0.0000', tab: '0', tipsSent: 0 });
       setIsMember(false);
+      setMembershipDate(null);
       setUserProfile(null);
     }
   };
@@ -220,6 +250,7 @@ export const XprProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     actor: session ? session.auth.actor : null,
     balances,
     isMember,
+    membershipDate,
     setIsMember,
     login,
     logout,

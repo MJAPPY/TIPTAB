@@ -8,7 +8,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { Zap, ShieldCheck, CheckCircle2, Wallet, ArrowRight, Sparkles } from "lucide-react";
+import { Zap, ShieldCheck, CheckCircle2, Wallet, ArrowRight, Sparkles, Calendar } from "lucide-react";
 import { useState, useEffect } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { useXpr } from "@/contexts/XprContext";
@@ -24,7 +24,7 @@ export const MembershipModal = ({ isOpen, onOpenChange }: MembershipModalProps) 
   const [step, setStep] = useState<OnboardingStep>("intro");
   const [isProcessing, setIsProcessing] = useState(false);
   const { toast } = useToast();
-  const { session, actor, login, isConnected, setIsMember } = useXpr();
+  const { session, actor, login, isConnected, setIsMember, isMember } = useXpr();
 
   // Safeguard: If the user is on the payment step but disconnects, move them back to intro
   useEffect(() => {
@@ -67,20 +67,24 @@ export const MembershipModal = ({ isOpen, onOpenChange }: MembershipModalProps) 
           from: actor,
           to: 'tiptab', 
           quantity: '2500.0000 XPR',
-          memo: 'TipTab Membership Activation',
+          memo: isMember ? 'TipTab Yearly Membership Renewal' : 'TipTab Membership Activation',
         },
       };
 
       await session.transact({ actions: [membershipAction] }, { broadcast: true });
       
-      // Update membership status
+      // Update membership status with activation date
+      const now = new Date().toISOString();
       const membershipKey = `tiptab_membership_${actor}`;
+      const membershipDateKey = `tiptab_membership_date_${actor}`;
+      
       localStorage.setItem(membershipKey, 'true');
+      localStorage.setItem(membershipDateKey, now);
       setIsMember(true);
       
       setStep("success");
       toast({
-        title: "Transaction Successful!",
+        title: isMember ? "Membership Renewed!" : "Membership Activated!",
         description: "Welcome to the TIPTAB creator network.",
       });
     } catch (error: any) {
@@ -120,16 +124,18 @@ export const MembershipModal = ({ isOpen, onOpenChange }: MembershipModalProps) 
                   <Sparkles className="h-12 w-12 text-white fill-white" />
                 </div>
                 <DialogHeader>
-                  <DialogTitle className="text-4xl font-black text-center tracking-tight italic">CLAIM YOUR SLOT</DialogTitle>
+                  <DialogTitle className="text-4xl font-black text-center tracking-tight italic">
+                    {isMember ? "RENEW YOUR SLOT" : "CLAIM YOUR SLOT"}
+                  </DialogTitle>
                   <DialogDescription className="text-white/80 text-center text-lg font-medium">
-                    Join the global map and start receiving tips directly from your fans.
+                    Maintain your presence on the global map and continue receiving tips directly.
                   </DialogDescription>
                 </DialogHeader>
               </div>
               
               <div className="space-y-4">
                 {[
-                  { title: "Valued Community Member", desc: "Get the exclusive orange checkmark", icon: ShieldCheck },
+                  { title: "Yearly Verification", desc: "Maintain your orange checkmark status", icon: Calendar },
                   { title: "Zero Platform Fees", desc: "Keep 100% of everything you earn", icon: Zap },
                   { title: "Global Discovery", desc: "Appear on the interactive creator map", icon: Sparkles },
                 ].map((item, i) => (
@@ -163,7 +169,7 @@ export const MembershipModal = ({ isOpen, onOpenChange }: MembershipModalProps) 
                 <DialogHeader>
                   <DialogTitle className="text-3xl font-black italic tracking-tighter">NETWORK ACTIVATION</DialogTitle>
                   <DialogDescription className="text-white/70 font-bold">
-                    One-time entry fee to the XPR network node.
+                    Yearly network entry fee to the XPR network node.
                   </DialogDescription>
                 </DialogHeader>
               </div>
@@ -171,7 +177,7 @@ export const MembershipModal = ({ isOpen, onOpenChange }: MembershipModalProps) 
               <div className="bg-white/5 border-2 border-white/10 rounded-[40px] p-10 text-center relative overflow-hidden group hover:border-purple-500/50 transition-all">
                 <div className="absolute top-0 right-0 p-6 sm:p-10">
                   <div className="px-4 py-1.5 rounded-full bg-orange-500 text-white text-[10px] font-black uppercase tracking-[0.2em] shadow-lg group-hover:bg-purple-500 transition-colors">
-                    Network Fee
+                    Yearly Fee
                   </div>
                 </div>
                 <p className="text-white/40 font-black uppercase tracking-[0.3em] text-[10px] mb-3 group-hover:text-purple-400 transition-colors">Total Activation Amount</p>
@@ -204,7 +210,7 @@ export const MembershipModal = ({ isOpen, onOpenChange }: MembershipModalProps) 
                       <span>AUTHORIZING...</span>
                     </div>
                   ) : (
-                    "PAY WITH WEBAUTH"
+                    isMember ? "RENEW WITH WEBAUTH" : "PAY WITH WEBAUTH"
                   )}
                 </Button>
               </div>
@@ -228,23 +234,16 @@ export const MembershipModal = ({ isOpen, onOpenChange }: MembershipModalProps) 
               <div className="space-y-4">
                 <h2 className="text-5xl font-black tracking-tighter italic">YOU'RE IN!</h2>
                 <p className="text-white/80 text-xl max-w-[320px] mx-auto leading-relaxed font-bold">
-                  Your creator profile is now live on the global map. Start sharing your link!
+                  Your creator status is updated. Start sharing your link!
                 </p>
               </div>
 
               <div className="flex flex-col gap-4">
                 <Button 
-                  onClick={() => (window.location.href = "/dashboard")}
+                  onClick={handleClose}
                   className="h-20 bg-white text-black hover:bg-purple-500 hover:text-white font-black text-2xl rounded-3xl shadow-2xl transition-all"
                 >
-                  GO TO CREATOR HUB
-                </Button>
-                <Button 
-                  variant="ghost"
-                  onClick={handleClose}
-                  className="text-white/40 hover:text-purple-400 font-black tracking-widest uppercase text-xs"
-                >
-                  CLOSE DIALOG
+                  BACK TO DASHBOARD
                 </Button>
               </div>
             </div>

@@ -15,7 +15,9 @@ import {
   ChevronRight,
   HandCoins,
   ShoppingCart,
-  ExternalLink
+  ExternalLink,
+  Calendar,
+  Clock
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
@@ -26,18 +28,20 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { TipTabCard } from "@/components/tab-platform/TipTabCard";
 import { ProfileEditor } from "@/components/tab-platform/ProfileEditor";
 import { Header } from "@/components/tab-platform/Header";
+import { MembershipModal } from "@/components/tab-platform/MembershipModal";
 import { CREATORS, Creator } from "@/data/creators";
 import { useToast } from "@/hooks/use-toast";
 import { useXpr } from "@/contexts/XprContext";
 import { cn } from "@/lib/utils";
 
 const Dashboard = () => {
-  const { isConnected, actor, balances, refreshBalances, recordTip, session, login, isLoading: isAuthLoading, isMember, userProfile, updateUserProfile } = useXpr();
+  const { isConnected, actor, balances, refreshBalances, recordTip, session, login, isLoading: isAuthLoading, isMember, membershipDate, userProfile, updateUserProfile } = useXpr();
   const navigate = useNavigate();
   const { toast } = useToast();
   
   const [activeTab, setActiveTab] = useState("analytics");
   const [isRefreshing, setIsRefreshing] = useState(false);
+  const [isMembershipModalOpen, setIsMembershipModalOpen] = useState(false);
   
   const [transferAmount, setTransferAmount] = useState("");
   const [transferRecipient, setTransferRecipient] = useState("");
@@ -112,6 +116,22 @@ const Dashboard = () => {
     } finally {
       setIsSending(false);
     }
+  };
+
+  const getExpiryDate = () => {
+    if (!membershipDate) return null;
+    const date = new Date(membershipDate);
+    date.setFullYear(date.getFullYear() + 1);
+    return date.toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric' });
+  };
+
+  const isNearingExpiry = () => {
+    if (!membershipDate) return false;
+    const expiry = new Date(membershipDate);
+    expiry.setFullYear(expiry.getFullYear() + 1);
+    const now = new Date();
+    const diffDays = (expiry.getTime() - now.getTime()) / (1000 * 60 * 60 * 24);
+    return diffDays < 30; // Within 30 days
   };
 
   if (!isConnected && !isAuthLoading) {
@@ -262,22 +282,52 @@ const Dashboard = () => {
                     </CardContent>
                   </Card>
 
-                  {/* Tips Sent Card */}
-                  <Card className="bg-[#130b21]/60 border-white/10 text-white rounded-[32px] sm:rounded-[40px] p-6 sm:p-10 shadow-2xl relative overflow-hidden group hover:border-pink-500/30 transition-all flex flex-col h-[280px] sm:h-[340px]">
-                    <div className="absolute -top-12 -right-12 w-32 h-32 bg-pink-500/10 blur-3xl rounded-full group-hover:bg-pink-500/20 transition-all" />
+                  {/* Membership Card */}
+                  <Card className="bg-[#130b21]/60 border-white/10 text-white rounded-[32px] sm:rounded-[40px] p-6 sm:p-10 shadow-2xl relative overflow-hidden group hover:border-blue-500/30 transition-all flex flex-col h-[280px] sm:h-[340px]">
+                    <div className="absolute -top-12 -right-12 w-32 h-32 bg-blue-500/10 blur-3xl rounded-full group-hover:bg-blue-500/20 transition-all" />
                     <CardHeader className="p-0">
-                      <CardDescription className="text-slate-400 font-black uppercase tracking-[0.2em] text-[9px] sm:text-[10px]">Tips Sent</CardDescription>
+                      <CardDescription className="text-slate-400 font-black uppercase tracking-[0.2em] text-[9px] sm:text-[10px]">Network Membership</CardDescription>
                     </CardHeader>
                     <CardContent className="p-0 mt-4 sm:mt-6 flex flex-col flex-1">
                       <div className="flex flex-col items-start gap-1 flex-1">
-                        <span className="text-4xl sm:text-6xl md:text-7xl font-black tracking-tighter text-slate-100 leading-none">
-                          {balances.tipsSent.toLocaleString()}
-                        </span>
-                        <span className="text-sm sm:text-xl font-black text-pink-500 italic uppercase">TAB</span>
+                        {isMember ? (
+                          <>
+                            <span className="text-xl sm:text-2xl font-black text-slate-100 uppercase tracking-tight">Active Plan</span>
+                            <div className="flex items-center gap-2 text-blue-400 mt-2">
+                              <Calendar className="h-4 w-4" />
+                              <span className="text-xs sm:text-sm font-bold">Expires: {getExpiryDate()}</span>
+                            </div>
+                          </>
+                        ) : (
+                          <>
+                            <span className="text-xl sm:text-2xl font-black text-slate-400 uppercase tracking-tight">No Active Plan</span>
+                            <p className="text-xs text-slate-500 mt-2 font-medium">Join the network to appear on the map and receive tips.</p>
+                          </>
+                        )}
                       </div>
-                      <div className="mt-auto pt-4 flex items-center gap-2 text-pink-400 text-[8px] sm:text-[10px] font-black uppercase tracking-widest">
-                        <Heart className="h-3 w-3" />
-                        Community Impact
+                      <div className="mt-auto pt-4">
+                        {isMember ? (
+                          <Button 
+                            onClick={() => setIsMembershipModalOpen(true)}
+                            className={cn(
+                              "w-full h-10 sm:h-12 rounded-xl font-black text-[10px] uppercase tracking-widest gap-2 transition-all",
+                              isNearingExpiry() 
+                                ? "bg-orange-500 hover:bg-orange-600 text-white shadow-lg" 
+                                : "bg-white/10 text-white/40 hover:bg-white/20 hover:text-white"
+                            )}
+                          >
+                            <RefreshCw className="h-3.5 w-3.5" />
+                            Renew Membership
+                          </Button>
+                        ) : (
+                          <Button 
+                            onClick={() => setIsMembershipModalOpen(true)}
+                            className="w-full h-10 sm:h-12 bg-[#a855f7] hover:bg-[#9333ea] text-white rounded-xl font-black text-[10px] uppercase tracking-widest gap-2 shadow-lg"
+                          >
+                            <Zap className="h-3.5 w-3.5" />
+                            Become a Creator
+                          </Button>
+                        )}
                       </div>
                     </CardContent>
                   </Card>
@@ -405,6 +455,11 @@ const Dashboard = () => {
           </div>
         </div>
       </main>
+
+      <MembershipModal 
+        isOpen={isMembershipModalOpen} 
+        onOpenChange={setIsMembershipModalOpen} 
+      />
     </div>
   );
 };
