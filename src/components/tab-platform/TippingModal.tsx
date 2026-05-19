@@ -6,12 +6,17 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Twitter, Globe, Instagram, Zap, ShieldCheck, Wallet } from "lucide-react";
+import { Twitter, Globe, Zap, ShieldCheck, Wallet } from "lucide-react";
 import { useState } from "react";
 import { Creator } from "@/data/creators";
 import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
 import { useXpr } from "@/contexts/XprContext";
+
+interface TippingModalProps {
+  creator: Creator | null;
+  onClose: () => void;
+}
 
 export const TippingModal = ({ creator, onClose }: TippingModalProps) => {
   const [tipAmount, setTipAmount] = useState<string>("50.0000");

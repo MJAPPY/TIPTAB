@@ -22,7 +22,6 @@ interface XprContextType {
 
 const XprContext = createContext<XprContextType | undefined>(undefined);
 
-// Using the specific endpoints provided for the XPR Network
 const PROTON_ENDPOINTS = [
   'https://api.protonnz.com',
   'https://proton.eosusa.io',
@@ -41,7 +40,6 @@ export const XprProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     if (!account) return;
     try {
       const headers = { 'Content-Type': 'application/json' };
-      
       const primaryEndpoint = PROTON_ENDPOINTS[0];
       
       const xprRes = await fetch(`${primaryEndpoint}/v1/chain/get_currency_balance`, {
@@ -68,8 +66,8 @@ export const XprProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       const tabData = tabRes.ok ? await tabRes.json() : [];
 
       setBalances({
-        xpr: xprData[0] ? xprData[0].split(' ')[0] : '0.0000',
-        tab: tabData[0] ? tabData[0].split(' ')[0] : '0.0000'
+        xpr: xprData[0] ? parseFloat(xprData[0].split(' ')[0]).toFixed(4) : '0.0000',
+        tab: tabData[0] ? parseFloat(tabData[0].split(' ')[0]).toFixed(4) : '0.0000'
       });
     } catch (error) {
       console.error('Balance sync error:', error);

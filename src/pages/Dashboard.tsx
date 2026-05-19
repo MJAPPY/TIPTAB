@@ -4,17 +4,10 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { 
   User as UserIcon, 
-  Settings, 
   CreditCard, 
   TrendingUp, 
   Wallet,
-  Zap,
-  Share2,
-  Check,
-  ArrowUpRight,
   RefreshCw,
-  ShieldCheck,
-  Send
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
@@ -36,7 +29,6 @@ const Dashboard = () => {
   const { toast } = useToast();
   
   const [activeTab, setActiveTab] = useState("analytics");
-  const [isCopied, setIsCopied] = useState(false);
   const [isRefreshing, setIsRefreshing] = useState(false);
   
   const [transferAmount, setTransferAmount] = useState("");
@@ -71,10 +63,9 @@ const Dashboard = () => {
     }
   }, [isConnected, actor]);
 
-  const formatPrecision = (val: string, symbol: string) => {
+  const formatPrecision = (val: string) => {
     const num = parseFloat(val);
     if (isNaN(num)) return "";
-    // Both TAB and XPR use 4 decimal places
     return num.toFixed(4);
   };
 
@@ -104,8 +95,7 @@ const Dashboard = () => {
     setIsSending(true);
     try {
       const contract = transferSymbol === "TAB" ? "tokencreate" : "eosio.token";
-      const precision = 4; // Both TAB and XPR use 4
-      const formattedQuantity = `${amountNum.toFixed(precision)} ${transferSymbol}`;
+      const formattedQuantity = `${amountNum.toFixed(4)} ${transferSymbol}`;
       
       const actions = [{
         account: contract,
@@ -141,20 +131,6 @@ const Dashboard = () => {
     } finally {
       setIsSending(false);
     }
-  };
-
-  const handleShare = async () => {
-    const shareUrl = `${window.location.origin}/tip/${user.handle}`;
-    if (navigator.share) {
-      try { await navigator.share({ title: `Support ${user.name}`, url: shareUrl }); } catch (err) { copyToClipboard(shareUrl); }
-    } else { copyToClipboard(shareUrl); }
-  };
-
-  const copyToClipboard = (url: string) => {
-    navigator.clipboard.writeText(url);
-    setIsCopied(true);
-    toast({ title: "Link Copied!", description: "Tipping link copied to clipboard." });
-    setTimeout(() => setIsCopied(false), 2000);
   };
 
   if (!isConnected && !isAuthLoading) {
@@ -202,42 +178,45 @@ const Dashboard = () => {
               <TabsContent value="analytics" className="space-y-6 mt-0">
                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
                   <Card className="bg-[#130b21] border-white/10 text-white rounded-[24px]">
-                    <CardHeader>
+                    <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                       <CardDescription className="text-white/60 font-black">Settled TAB</CardDescription>
-                      <CardTitle className="text-3xl font-black">{Number(balances.tab).toLocaleString()} TAB</CardTitle>
+                      <Button variant="ghost" size="icon" onClick={handleManualRefresh} className="h-8 w-8 text-white/30 hover:text-white">
+                        <RefreshCw className={cn("h-4 w-4", isRefreshing && "animate-spin")} />
+                      </Button>
                     </CardHeader>
+                    <CardContent>
+                      <CardTitle className="text-3xl font-black">{Number(balances.tab).toLocaleString(undefined, { minimumFractionDigits: 4 })} TAB</CardTitle>
+                    </CardContent>
                   </Card>
                 </div>
               </TabsContent>
 
               <TabsContent value="payouts" className="space-y-8 mt-0">
-                <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
-                  <Card className="lg:col-span-12 bg-[#130b21] border-white/10 rounded-[32px] p-10">
-                    <h3 className="text-2xl font-black italic uppercase mb-8">Transfer Funds</h3>
-                    <div className="space-y-8">
-                      <div className="space-y-3">
-                        <Label className="text-[10px] font-black uppercase text-white/40">Recipient Actor</Label>
-                        <Input placeholder="username" value={transferRecipient} onChange={(e) => setTransferRecipient(e.target.value)} className="bg-white/5 h-14 rounded-2xl font-bold text-white" />
-                      </div>
-                      <div className="space-y-3">
-                        <Label className="text-[10px] font-black uppercase text-white/40">Amount</Label>
-                        <div className="flex gap-2">
-                          <Input placeholder="0.0000" value={transferAmount} onChange={(e) => setTransferAmount(e.target.value)} onBlur={(e) => setTransferAmount(formatPrecision(e.target.value, transferSymbol))} className="flex-1 bg-white/5 h-14 rounded-2xl font-black text-xl text-white" />
-                          <Select value={transferSymbol} onValueChange={setTransferSymbol}>
-                            <SelectTrigger className="w-[120px] bg-white/5 h-14 rounded-2xl font-black text-white"><SelectValue /></SelectTrigger>
-                            <SelectContent className="bg-[#1a102d] text-white">
-                              <SelectItem value="TAB">TAB</SelectItem>
-                              <SelectItem value="XPR">XPR</SelectItem>
-                            </SelectContent>
-                          </Select>
-                        </div>
-                      </div>
-                      <Button onClick={handleTransfer} disabled={isSending} className="w-full h-20 bg-white text-black font-black text-xl rounded-3xl">
-                        {isSending ? "Authorizing..." : "Execute Transfer"}
-                      </Button>
+                <Card className="bg-[#130b21] border-white/10 rounded-[32px] p-10">
+                  <h3 className="text-2xl font-black italic uppercase mb-8">Transfer Funds</h3>
+                  <div className="space-y-8">
+                    <div className="space-y-3">
+                      <Label className="text-[10px] font-black uppercase text-white/40">Recipient Actor</Label>
+                      <Input placeholder="username" value={transferRecipient} onChange={(e) => setTransferRecipient(e.target.value)} className="bg-white/5 h-14 rounded-2xl font-bold text-white" />
                     </div>
-                  </Card>
-                </div>
+                    <div className="space-y-3">
+                      <Label className="text-[10px] font-black uppercase text-white/40">Amount</Label>
+                      <div className="flex gap-2">
+                        <Input placeholder="0.0000" value={transferAmount} onChange={(e) => setTransferAmount(e.target.value)} onBlur={(e) => setTransferAmount(formatPrecision(e.target.value))} className="flex-1 bg-white/5 h-14 rounded-2xl font-black text-xl text-white" />
+                        <Select value={transferSymbol} onValueChange={setTransferSymbol}>
+                          <SelectTrigger className="w-[120px] bg-white/5 h-14 rounded-2xl font-black text-white"><SelectValue /></SelectTrigger>
+                          <SelectContent className="bg-[#1a102d] text-white">
+                            <SelectItem value="TAB">TAB</SelectItem>
+                            <SelectItem value="XPR">XPR</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                    </div>
+                    <Button onClick={handleTransfer} disabled={isSending} className="w-full h-20 bg-white text-black font-black text-xl rounded-3xl">
+                      {isSending ? "Authorizing..." : "Execute Transfer"}
+                    </Button>
+                  </div>
+                </Card>
               </TabsContent>
 
               <TabsContent value="card" className="mt-0">
