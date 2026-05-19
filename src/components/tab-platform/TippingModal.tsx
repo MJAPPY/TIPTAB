@@ -19,13 +19,11 @@ interface TippingModalProps {
 }
 
 export const TippingModal = ({ creator, onClose }: TippingModalProps) => {
-  // Initialize with the full decimal format as requested
   const [tipAmount, setTipAmount] = useState<string>("100.0000");
   const [isProcessing, setIsProcessing] = useState(false);
   const { toast } = useToast();
   const { session, actor, login, isConnected } = useXpr();
 
-  // Helper to force 4-decimal formatting for any input
   const formatValue = (val: string) => {
     const numericValue = parseFloat(val);
     if (isNaN(numericValue)) return "0.0000";
@@ -57,7 +55,7 @@ export const TippingModal = ({ creator, onClose }: TippingModalProps) => {
     try {
       const recipient = creator?.handle.replace(/^@/, "").toLowerCase().trim();
       
-      // STICK TO 4 DECIMALS: Construct the exact asset string required by the contract
+      // ENSURE STRING FORMAT: This is exactly what the wallet and chain need
       const quantityString = `${amountNum.toFixed(4)} TAB`;
 
       const actions = [{
@@ -124,6 +122,11 @@ export const TippingModal = ({ creator, onClose }: TippingModalProps) => {
               {creator.twitter && (
                 <Button variant="outline" size="icon" className="rounded-xl bg-white/5 border-white/10 hover:border-white/30 h-10 w-10" asChild>
                   <a href={creator.twitter} target="_blank" rel="noopener noreferrer"><Twitter className="h-4 w-4" /></a>
+                </Button>
+              )}
+              {creator.instagram && (
+                <Button variant="outline" size="icon" className="rounded-xl bg-white/5 border-white/10 hover:border-white/30 h-10 w-10" asChild>
+                  <a href={creator.instagram} target="_blank" rel="noopener noreferrer"><Instagram className="h-4 w-4" /></a>
                 </Button>
               )}
               {creator.website && (
