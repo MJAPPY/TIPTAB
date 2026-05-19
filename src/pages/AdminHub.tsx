@@ -19,7 +19,9 @@ import {
   UserX,
   History,
   FileText,
-  AlertTriangle
+  AlertTriangle,
+  Calendar,
+  Clock
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
@@ -46,6 +48,18 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { ScrollArea } from "@/components/ui/scroll-area";
+
+const MOCK_AUDIT_LOGS: Record<string, any[]> = {
+  "tiptab": [
+    { date: "2024-05-15", time: "14:20", event: "Account Verified", actor: "System", type: "system" },
+    { date: "2024-05-18", time: "09:12", event: "Profile Updated", actor: "tiptab", type: "user" },
+  ],
+  "carlos_delivery": [
+    { date: "2024-04-10", time: "11:05", event: "Membership Activated", actor: "System", type: "system" },
+    { date: "2024-05-02", time: "16:45", event: "Location Verified", actor: "Admin", type: "admin" },
+  ]
+};
 
 const AdminHub = () => {
   const { isAdmin, isConnected, isMaintenanceMode, setMaintenanceMode, broadcastAlert, networkAlert, membershipFee, updateMembershipFee } = useXpr();
@@ -56,6 +70,8 @@ const AdminHub = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [alertMessage, setAlertMessage] = useState("");
   const [isAlertModalOpen, setIsAlertModalOpen] = useState(false);
+  const [isAuditModalOpen, setIsAuditModalOpen] = useState(false);
+  const [selectedCreator, setSelectedCreator] = useState<Creator | null>(null);
   const [moderatedCreators] = useState<Creator[]>(CREATORS);
   const [bannedHandles, setBannedHandles] = useState<string[]>([]);
 
@@ -120,6 +136,11 @@ const AdminHub = () => {
       setBannedHandles(prev => [...prev, handle]);
       toast({ title: "User Banned", description: `@${handle} has been restricted from the network.`, variant: "destructive" });
     }
+  };
+
+  const openAuditLogs = (creator: Creator) => {
+    setSelectedCreator(creator);
+    setIsAuditModalOpen(true);
   };
 
   const handleResetProfile = (handle: string) => {
@@ -355,7 +376,10 @@ const AdminHub = () => {
                                       <History className="h-4 w-4" />
                                       <span className="font-bold text-sm">View History</span>
                                     </DropdownMenuItem>
-                                    <DropdownMenuItem className="focus:bg-purple-500/15 focus:text-purple-400 rounded-xl cursor-pointer px-3 py-2.5 gap-3">
+                                    <DropdownMenuItem 
+                                      onClick={() => openAuditLogs(creator)}
+                                      className="focus:bg-purple-500/15 focus:text-purple-400 rounded-xl cursor-pointer px-3 py-2.5 gap-3"
+                                    >
                                       <FileText className="h-4 w-4" />
                                       <span className="font-bold text-sm">Audit Logs</span>
                                     </DropdownMenuItem>
@@ -389,6 +413,67 @@ const AdminHub = () => {
           </div>
         </div>
       </main>
+
+      {/* Audit Log Dialog */}
+      <Dialog open={isAuditModalOpen} onOpenChange={setIsAuditModalOpen}>
+        <DialogContent className="bg-[#1a102d] border-white/10 text-white rounded-3xl p-0 overflow-hidden max-w-2xl shadow-2xl">
+          <div className="p-8 border-b border-white/5">
+            <DialogHeader>
+              <div className="flex items-center gap-4 mb-2">
+                <div className={cn("h-12 w-12 rounded-xl flex items-center justify-center text-xs font-black border border-white/10", selectedCreator?.color)}>
+                  {selectedCreator?.avatar}
+                </div>
+                <div>
+                  <DialogTitle className="text-2xl font-black italic tracking-tight uppercase">Network Audit Logs</DialogTitle>
+                  <DialogDescription className="text-white/40 font-bold">
+                    Historical record for @{selectedCreator?.handle}
+                  </DialogDescription>
+                </div>
+              </div>
+            </DialogHeader>
+          </div>
+
+          <ScrollArea className="h-[450px] p-8">
+            <div className="space-y-6">
+              {(MOCK_AUDIT_LOGS[selectedCreator?.handle || ""] || [
+                { date: "2024-05-19", time: "10:00", event: "Initial Registration", actor: "System", type: "system" }
+              ]).map((log, i) => (
+                <div key={i} className="flex gap-6 relative">
+                  {i < (MOCK_AUDIT_LOGS[selectedCreator?.handle || ""] || []).length - 1 && (
+                    <div className="absolute left-[23px] top-10 bottom-[-24px] w-px bg-white/5" />
+                  )}
+                  <div className={cn(
+                    "h-12 w-12 rounded-full border-2 flex items-center justify-center shrink-0 shadow-lg",
+                    log.type === "system" ? "border-purple-500/30 bg-purple-500/10 text-purple-400" : 
+                    log.type === "admin" ? "border-orange-500/30 bg-orange-500/10 text-orange-400" :
+                    "border-white/10 bg-white/5 text-white/40"
+                  )}>
+                    {log.type === "system" ? <Zap className="h-5 w-5" /> : 
+                     log.type === "admin" ? <ShieldAlert className="h-5 w-5" /> :
+                     <FileText className="h-5 w-5" />}
+                  </div>
+                  <div className="space-y-1 pt-1 flex-1">
+                    <div className="flex items-center justify-between">
+                      <h4 className="font-black text-lg text-white/90">{log.event}</h4>
+                      <div className="flex items-center gap-4 text-[10px] font-black uppercase tracking-widest text-white/20">
+                        <div className="flex items-center gap-1.5"><Calendar className="h-3 w-3" /> {log.date}</div>
+                        <div className="flex items-center gap-1.5"><Clock className="h-3 w-3" /> {log.time}</div>
+                      </div>
+                    </div>
+                    <p className="text-xs font-bold text-white/40 italic">Triggered by: <span className="text-purple-400">@{log.actor}</span></p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </ScrollArea>
+
+          <div className="p-8 bg-white/[0.02] border-t border-white/5 flex justify-end">
+            <Button onClick={() => setIsAuditModalOpen(false)} variant="outline" className="rounded-xl border-white/10 hover:bg-white/5 font-black uppercase tracking-widest text-xs px-8">
+              Close Audit
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
