@@ -269,3 +269,5 @@ const CreatorProfile = () => {
     </div>
   );
 };
+
+export default CreatorProfile;
