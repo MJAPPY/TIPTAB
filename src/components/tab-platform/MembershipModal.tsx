@@ -44,13 +44,14 @@ export const MembershipModal = ({ isOpen, onOpenChange }: MembershipModalProps) 
     
     setIsProcessing(true);
     try {
-      // STARK COMPLIANCE: 4-decimal precision for XPR
-      const actions = [{
+      const permission = session.auth.permission || 'active';
+      
+      const membershipAction = {
         account: 'eosio.token', 
         name: 'transfer',
         authorization: [{
           actor: actor,
-          permission: session.auth.permission,
+          permission: permission,
         }],
         data: {
           from: actor,
@@ -58,9 +59,9 @@ export const MembershipModal = ({ isOpen, onOpenChange }: MembershipModalProps) 
           quantity: '2500.0000 XPR',
           memo: 'TipTab Membership Activation',
         },
-      }];
+      };
 
-      await session.transact({ actions }, { broadcast: true });
+      await session.transact({ actions: [membershipAction] }, { broadcast: true });
       
       setStep("success");
       toast({
@@ -68,6 +69,7 @@ export const MembershipModal = ({ isOpen, onOpenChange }: MembershipModalProps) 
         description: "Welcome to the TIPTAB creator network.",
       });
     } catch (error: any) {
+      console.error("Transact error:", error);
       toast({
         title: "Transaction Failed",
         description: error.message || "Please check your WebAuth wallet and try again.",

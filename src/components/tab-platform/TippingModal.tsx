@@ -39,7 +39,7 @@ export const TippingModal = ({ creator, onClose }: TippingModalProps) => {
   };
 
   const handleSendTip = async () => {
-    if (!session || !actor) return;
+    if (!session || !actor || !creator) return;
     
     const amountNum = parseFloat(tipAmount);
     if (isNaN(amountNum) || amountNum <= 0) {
@@ -53,17 +53,17 @@ export const TippingModal = ({ creator, onClose }: TippingModalProps) => {
 
     setIsProcessing(true);
     try {
-      const recipient = creator?.handle.replace(/^@/, "").toLowerCase().trim();
-      
-      // STARK COMPLIANCE: Exactly 4 decimals and TAB symbol
+      const recipient = creator.handle.replace(/^@/, "").toLowerCase().trim();
       const quantityString = `${amountNum.toFixed(4)} TAB`;
+      const permission = session.auth.permission || 'active';
 
-      const actions = [{
+      // CLEAN JSON POJO - No hidden prototype pollution
+      const transferAction = {
         account: 'tokencreate', 
         name: 'transfer',
         authorization: [{
           actor: actor,
-          permission: session.auth.permission,
+          permission: permission,
         }],
         data: {
           from: actor,
@@ -71,19 +71,20 @@ export const TippingModal = ({ creator, onClose }: TippingModalProps) => {
           quantity: quantityString,
           memo: 'Tipped via TipTab Map',
         },
-      }];
+      };
 
-      await session.transact({ actions }, { broadcast: true });
+      await session.transact({ actions: [transferAction] }, { broadcast: true });
       
       toast({
         title: "Tip Sent Successfully!",
-        description: `Sent ${quantityString} to ${creator?.name}.`,
+        description: `Sent ${quantityString} to ${creator.name}.`,
       });
       onClose();
     } catch (error: any) {
+      console.error("Transact error:", error);
       toast({ 
         title: "Transaction failed", 
-        description: error.message || "Precision mismatch or wallet error.", 
+        description: error.message || "Precision mismatch or network error.", 
         variant: "destructive" 
       });
     } finally {

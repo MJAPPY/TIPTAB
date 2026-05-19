@@ -27,37 +27,43 @@ const APP_IDENTIFIER = 'tiptab';
 
 export const XprProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [session, setSession] = useState<LinkSession | null>(null);
-  const [balances, setBalances] = useState<Balances>({ xpr: '0.00', tab: '0.00' });
+  const [balances, setBalances] = useState<Balances>({ xpr: '0.0000', tab: '0.0000' });
   const [isLoading, setIsLoading] = useState(true);
 
   const fetchBalances = useCallback(async (account: string) => {
+    if (!account) return;
     try {
+      const headers = { 'Content-Type': 'application/json' };
+      
       const xprRes = await fetch(`${ENDPOINT}/v1/chain/get_currency_balance`, {
         method: 'POST',
+        headers,
         body: JSON.stringify({
           code: 'eosio.token',
           account: account,
           symbol: 'XPR'
         })
       });
-      const xprData = await xprRes.json();
       
       const tabRes = await fetch(`${ENDPOINT}/v1/chain/get_currency_balance`, {
         method: 'POST',
+        headers,
         body: JSON.stringify({
           code: 'tokencreate',
           account: account,
           symbol: 'TAB'
         })
       });
-      const tabData = await tabRes.json();
+
+      const xprData = xprRes.ok ? await xprRes.json() : [];
+      const tabData = tabRes.ok ? await tabRes.json() : [];
 
       setBalances({
-        xpr: xprData[0] ? xprData[0].split(' ')[0] : '0.00',
-        tab: tabData[0] ? tabData[0].split(' ')[0] : '0.00'
+        xpr: xprData[0] ? xprData[0].split(' ')[0] : '0.0000',
+        tab: tabData[0] ? tabData[0].split(' ')[0] : '0.0000'
       });
     } catch (error) {
-      console.error('Failed to fetch balances:', error);
+      console.error('Balance sync error:', error);
     }
   }, []);
 
@@ -86,7 +92,7 @@ export const XprProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         await fetchBalances(restoredSession.auth.actor);
       }
     } catch (error) {
-      console.error('Failed to restore session:', error);
+      console.error('Session restoration error:', error);
     } finally {
       setIsLoading(false);
     }
@@ -99,12 +105,8 @@ export const XprProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const login = async () => {
     try {
       const { session: newSession } = await ProtonWebSDK({
-        linkOptions: {
-          endpoints: [ENDPOINT],
-        },
-        transportOptions: {
-          requestAccount: APP_IDENTIFIER,
-        },
+        linkOptions: { endpoints: [ENDPOINT] },
+        transportOptions: { requestAccount: APP_IDENTIFIER },
         selectorOptions: {
           appName: 'TIP TAB',
           appLogo: 'https://explorer.xprnetwork.org/api/account/tiptab/avatar',
@@ -118,7 +120,7 @@ export const XprProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       }
       return null;
     } catch (error) {
-      console.error('Login failed:', error);
+      console.error('Login error:', error);
       throw error;
     }
   };
@@ -127,7 +129,7 @@ export const XprProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     if (session) {
       await session.remove();
       setSession(null);
-      setBalances({ xpr: '0.00', tab: '0.00' });
+      setBalances({ xpr: '0.0000', tab: '0.0000' });
     }
   };
 
