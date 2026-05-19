@@ -82,8 +82,8 @@ const CreatorProfile = () => {
       const recipient = creator?.handle.replace(/^@/, "").toLowerCase().trim();
       const sender = actor;
 
-      // TAB token on 'tokencreate' contract uses 8 decimals
-      const TAB_PRECISION = 8;
+      // Corrected: TAB token uses 4 decimals as per network requirements
+      const TAB_PRECISION = 4;
 
       const actions = [{
         account: 'tokencreate', 

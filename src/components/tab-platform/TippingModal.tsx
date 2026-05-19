@@ -49,8 +49,8 @@ export const TippingModal = ({ creator, onClose }: TippingModalProps) => {
       const recipient = creator?.handle.replace(/^@/, "").toLowerCase().trim();
       const sender = actor;
 
-      // TAB token on 'tokencreate' contract uses 8 decimals
-      const TAB_PRECISION = 8;
+      // Corrected: TAB token uses 4 decimals as per network requirements
+      const TAB_PRECISION = 4;
 
       const actions = [{
         account: 'tokencreate', 
@@ -116,6 +116,11 @@ export const TippingModal = ({ creator, onClose }: TippingModalProps) => {
               {creator.twitter && (
                 <Button variant="outline" size="icon" className="rounded-xl bg-white/5 border-white/10 hover:border-white/30 h-10 w-10" asChild>
                   <a href={creator.twitter} target="_blank" rel="noopener noreferrer"><Twitter className="h-4 w-4" /></a>
+                </Button>
+              )}
+              {creator.instagram && (
+                <Button variant="outline" size="icon" className="rounded-xl bg-white/5 border-white/10 hover:border-white/30 h-10 w-10" asChild>
+                  <a href={creator.instagram} target="_blank" rel="noopener noreferrer"><Instagram className="h-4 w-4" /></a>
                 </Button>
               )}
               {creator.website && (
