@@ -214,7 +214,7 @@ const AdminHub = () => {
                       <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
                       <span className="relative inline-flex rounded-full h-2 w-2 bg-green-500"></span>
                     </span>
-                    <span className="text-[9px] font-black uppercase tracking-[0.2em] text-green-400">Live</span>
+                    <span className="text-[10px] font-black uppercase tracking-[0.2em] text-green-400">Live</span>
                   </div>
                 </div>
               </CardHeader>
@@ -224,7 +224,7 @@ const AdminHub = () => {
                   <div className="space-y-1 group/stat">
                     <div className="flex items-center gap-2">
                       <Users className="h-3 w-3 text-white/40" />
-                      <p className="text-[9px] font-black text-white/40 uppercase tracking-[0.3em]">Registered</p>
+                      <p className="text-[11px] font-black text-white uppercase tracking-[0.3em]">Registered</p>
                     </div>
                     <div className="flex items-end gap-3">
                       <p className="text-3xl md:text-4xl font-black text-white tracking-tighter leading-none group-hover/stat:text-purple-400 transition-colors">1,284</p>
@@ -236,7 +236,7 @@ const AdminHub = () => {
                   <div className="space-y-1 group/stat">
                     <div className="flex items-center gap-2">
                       <Cpu className="h-3 w-3 text-white/40" />
-                      <p className="text-[9px] font-black text-white/40 uppercase tracking-[0.3em]">Live Nodes</p>
+                      <p className="text-[11px] font-black text-white uppercase tracking-[0.3em]">Live Nodes</p>
                     </div>
                     <p className="text-3xl md:text-4xl font-black text-purple-400 tracking-tighter leading-none group-hover/stat:text-white transition-colors">42</p>
                   </div>
@@ -245,7 +245,7 @@ const AdminHub = () => {
                 <div className="space-y-4 bg-white/5 p-5 rounded-[28px] border border-white/10">
                   <div className="flex items-center justify-between">
                     <div className="space-y-0.5">
-                      <p className="text-[9px] font-black text-orange-500 uppercase tracking-[0.4em]">24H Vol</p>
+                      <p className="text-[11px] font-black text-orange-500 uppercase tracking-[0.4em]">24H Vol</p>
                       <p className="text-3xl font-black text-white tracking-tighter italic">124.5k <span className="text-orange-500 text-base">TAB</span></p>
                     </div>
                     <TrendingUp className="h-6 w-6 text-orange-500" />
@@ -258,17 +258,24 @@ const AdminHub = () => {
                 <div className="grid grid-cols-1 gap-2.5 pt-4 border-t border-white/10">
                   <div className="bg-gradient-to-r from-purple-500/10 to-transparent p-4 rounded-2xl border border-white/10 group/mini hover:border-purple-500/40 transition-all flex items-center justify-between">
                     <div>
-                      <span className="text-[8px] font-black text-white/40 uppercase tracking-[0.3em] block mb-0.5">Total TAB Sent</span>
+                      <span className="text-[11px] font-black text-white uppercase tracking-[0.3em] block mb-0.5">Total TAB Sent</span>
                       <span className="text-xl font-black text-white group-hover/mini:text-purple-400 transition-colors italic">8.4M</span>
                     </div>
                     <Zap className="h-5 w-5 text-orange-500 fill-orange-500" />
                   </div>
                   <div className="bg-gradient-to-r from-cyan-500/10 to-transparent p-4 rounded-2xl border border-white/10 group/mini hover:border-cyan-500/40 transition-all flex items-center justify-between">
                     <div>
-                      <span className="text-[8px] font-black text-white/40 uppercase tracking-[0.3em] block mb-0.5">Total XPR Sent</span>
+                      <span className="text-[11px] font-black text-white uppercase tracking-[0.3em] block mb-0.5">Total XPR Sent</span>
                       <span className="text-xl font-black text-white group-hover/mini:text-cyan-400 transition-colors italic">2.1M</span>
                     </div>
                     <Coins className="h-5 w-5 text-cyan-400" />
+                  </div>
+                  <div className="bg-white/5 p-4 rounded-2xl border border-white/10 group/mini hover:border-white/20 transition-all flex items-center justify-between">
+                    <div>
+                      <span className="text-[11px] font-black text-white/40 uppercase tracking-[0.3em] block mb-0.5">Ave Tip Sent</span>
+                      <span className="text-xl font-black text-orange-500 italic">450 <span className="text-[10px] text-white/40 uppercase tracking-widest">TAB</span></span>
+                    </div>
+                    <HandCoins className="h-5 w-5 text-purple-400" />
                   </div>
                 </div>
               </CardContent>
@@ -283,7 +290,7 @@ const AdminHub = () => {
               </CardHeader>
               <CardContent className="p-8 md:p-10 space-y-8">
                 <div className="space-y-4">
-                  <Label className="text-[10px] font-black uppercase tracking-widest text-white/40">MEMBERSHIP FEE (XPR)</Label>
+                  <Label className="text-[11px] font-black uppercase tracking-widest text-white/40">MEMBERSHIP FEE (XPR)</Label>
                   <div className="flex flex-col sm:flex-row gap-4">
                     <Input 
                       type="number" 
@@ -332,7 +339,7 @@ const AdminHub = () => {
                       </DialogHeader>
                       <div className="space-y-6 pt-4">
                         <div className="space-y-2">
-                          <Label className="text-[10px] font-black uppercase tracking-widest text-white/40">Alert Message</Label>
+                          <Label className="text-[11px] font-black uppercase tracking-widest text-white/40">Alert Message</Label>
                           <Input 
                             value={alertMessage}
                             onChange={(e) => setAlertMessage(e.target.value)}
@@ -389,10 +396,10 @@ const AdminHub = () => {
                   <table className="w-full min-w-[700px]">
                     <thead className="bg-white/[0.03]">
                       <tr>
-                        <th className="px-10 py-6 text-left text-[10px] font-black uppercase tracking-widest text-white/30">Creator Profile</th>
-                        <th className="px-10 py-6 text-left text-[10px] font-black uppercase tracking-widest text-white/30">Category</th>
-                        <th className="px-10 py-6 text-left text-[10px] font-black uppercase tracking-widest text-white/30">Node Status</th>
-                        <th className="px-10 py-6 text-right text-[10px] font-black uppercase tracking-widest text-white/30">Control</th>
+                        <th className="px-10 py-6 text-left text-[11px] font-black uppercase tracking-widest text-white/30">Creator Profile</th>
+                        <th className="px-10 py-6 text-left text-[11px] font-black uppercase tracking-widest text-white/30">Category</th>
+                        <th className="px-10 py-6 text-left text-[11px] font-black uppercase tracking-widest text-white/30">Node Status</th>
+                        <th className="px-10 py-6 text-right text-[11px] font-black uppercase tracking-widest text-white/30">Control</th>
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-white/5">
@@ -412,18 +419,18 @@ const AdminHub = () => {
                               </div>
                             </td>
                             <td className="px-10 py-8">
-                              <span className="px-4 py-1.5 rounded-full bg-white/5 border border-white/10 text-[10px] font-black uppercase tracking-widest text-white/60 group-hover:text-purple-300 group-hover:border-purple-500/30 transition-all">
+                              <span className="px-4 py-1.5 rounded-full bg-white/5 border border-white/10 text-[11px] font-black uppercase tracking-widest text-white/60 group-hover:text-purple-300 group-hover:border-purple-500/30 transition-all">
                                 {creator.category}
                               </span>
                             </td>
                             <td className="px-10 py-8">
                               <div className="flex items-center gap-2">
                                 {isBanned ? (
-                                  <div className="flex items-center gap-2 text-red-500 bg-red-500/10 px-3 py-1.5 rounded-xl border border-red-500/20 font-black text-[10px] uppercase tracking-widest">
+                                  <div className="flex items-center gap-2 text-red-500 bg-red-500/10 px-3 py-1.5 rounded-xl border border-red-500/20 font-black text-[11px] uppercase tracking-widest">
                                     <Lock className="h-3 w-3" /> Terminated
                                   </div>
                                 ) : (
-                                  <div className="flex items-center gap-2 text-green-500 bg-green-500/10 px-3 py-1.5 rounded-xl border border-green-500/20 font-black text-[10px] uppercase tracking-widest">
+                                  <div className="flex items-center gap-2 text-green-500 bg-green-500/10 px-3 py-1.5 rounded-xl border border-green-500/20 font-black text-[11px] uppercase tracking-widest">
                                     <CheckCircle2 className="h-3 w-3" /> Verified
                                   </div>
                                 )}
@@ -452,7 +459,7 @@ const AdminHub = () => {
                                     </Button>
                                   </DropdownMenuTrigger>
                                   <DropdownMenuContent align="end" className="w-64 bg-[#1a102d]/98 backdrop-blur-xl border-white/20 text-white rounded-[24px] p-2.5 mt-3 shadow-2xl">
-                                    <DropdownMenuLabel className="text-[10px] font-black uppercase tracking-[0.2em] text-white/40 px-4 py-3">Advanced Admin</DropdownMenuLabel>
+                                    <DropdownMenuLabel className="text-[11px] font-black uppercase tracking-[0.2em] text-white/40 px-4 py-3">Advanced Admin</DropdownMenuLabel>
                                     <DropdownMenuSeparator className="bg-white/10" />
                                     <DropdownMenuItem 
                                       onClick={() => openTransactionHistory(creator)}
@@ -540,7 +547,7 @@ const AdminHub = () => {
                   <div className="space-y-2 pt-1 flex-1">
                     <div className="flex items-center justify-between">
                       <h4 className="font-black text-xl text-white tracking-tight">{log.event}</h4>
-                      <div className="flex items-center gap-4 text-[10px] font-black uppercase tracking-[0.2em] text-white/20">
+                      <div className="flex items-center gap-4 text-[11px] font-black uppercase tracking-[0.2em] text-white/20">
                         <div className="flex items-center gap-2"><Calendar className="h-3.5 w-3.5" /> {log.date}</div>
                         <div className="flex items-center gap-2"><Clock className="h-3.5 w-3.5" /> {log.time}</div>
                       </div>
@@ -598,7 +605,7 @@ const AdminHub = () => {
                         <p className="font-black text-lg text-white">
                           {tx.type === "received" ? "Received Support" : "Sent Appreciation"}
                         </p>
-                        <p className="text-[10px] font-black text-white/30 uppercase tracking-[0.2em] mt-1">
+                        <p className="text-[11px] font-black text-white/30 uppercase tracking-[0.2em] mt-1">
                           {tx.type === "received" ? "From" : "To"}: <span className="text-purple-400">@{tx.counterparty}</span>
                         </p>
                       </div>
@@ -607,7 +614,7 @@ const AdminHub = () => {
                       <p className={cn("font-black text-2xl tracking-tighter", tx.type === "received" ? "text-green-400" : "text-red-400")}>
                         {tx.type === "received" ? "+" : "-"}{tx.amount} <span className="text-sm italic">{tx.asset}</span>
                       </p>
-                      <p className="text-[10px] font-black text-white/20 uppercase tracking-widest mt-1">{tx.date}</p>
+                      <p className="text-[11px] font-black text-white/20 uppercase tracking-widest mt-1">{tx.date}</p>
                     </div>
                   </div>
                 ))
