@@ -227,8 +227,8 @@ const AdminHub = () => {
                   </div>
                   <div className="flex items-end gap-3">
                     <p className="text-4xl md:text-5xl font-black text-white tracking-tighter leading-none group-hover/stat:text-purple-400 transition-colors">1,284</p>
-                    <div className="flex items-center gap-1 px-1.5 py-0.5 rounded bg-green-500/20 border border-green-500/30 text-[9px] font-black text-green-400 mb-0.5">
-                      <ArrowUpRight className="h-2.5 w-2.5" /> +14%
+                    <div className="flex items-center gap-1.5 px-3 py-1 rounded-lg bg-green-500/20 border-2 border-green-500/40 text-[12px] md:text-[14px] font-black text-green-400 mb-1 shadow-[0_0_15px_rgba(34,197,94,0.2)]">
+                      <ArrowUpRight className="h-4 w-4" /> +14%
                     </div>
                   </div>
                 </div>
