@@ -124,7 +124,7 @@ const Leaderboard = () => {
             </div>
             <div className="flex items-center gap-6 md:gap-12">
               <span className="hidden sm:inline">Activity</span>
-              <span className="w-20 md:w-24 text-right">Settled TAB</span>
+              <span className="w-20 md:w-24 text-right">Liquid TAB</span>
             </div>
           </div>
 

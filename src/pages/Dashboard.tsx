@@ -211,12 +211,12 @@ const Dashboard = () => {
             <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
               <TabsContent value="analytics" className="space-y-6 sm:space-y-10 mt-0 animate-in fade-in slide-in-from-bottom-4 duration-500">
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
-                  {/* Settled TAB Card */}
+                  {/* Liquid TAB Card */}
                   <Card className="bg-[#130b21]/60 border-white/10 text-white rounded-[32px] sm:rounded-[40px] p-6 sm:p-10 shadow-2xl relative overflow-hidden group hover:border-orange-500/30 transition-all flex flex-col min-h-[220px] sm:min-h-[280px]">
                     <div className="absolute -top-12 -right-12 w-32 h-32 bg-orange-500/10 blur-3xl rounded-full group-hover:bg-orange-500/20 transition-all" />
                     <CardHeader className="p-0 mb-auto">
                       <div className="flex items-center justify-between">
-                        <CardDescription className="text-slate-400 font-black uppercase tracking-[0.2em] text-[9px] sm:text-[10px]">Settled TAB</CardDescription>
+                        <CardDescription className="text-slate-400 font-black uppercase tracking-[0.2em] text-[9px] sm:text-[10px]">Liquid TAB</CardDescription>
                         <Button variant="ghost" size="icon" onClick={handleManualRefresh} className="h-8 w-8 sm:h-10 sm:w-10 rounded-xl bg-white/5 text-white/30 hover:text-white transition-all">
                           <RefreshCw className={cn("h-3 w-3 sm:h-4 sm:w-4", isRefreshing && "animate-spin")} />
                         </Button>
