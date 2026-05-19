@@ -27,7 +27,7 @@ export const MembershipModal = ({ isOpen, onOpenChange }: MembershipModalProps) 
   const { toast } = useToast();
   const { session, actor, login, isConnected, setIsMember, isMember, userProfile } = useXpr();
 
-  // Reset or initialize step whenever the modal opens
+  // Initialize step when modal opens
   useEffect(() => {
     if (isOpen) {
       if (isConnected) {
@@ -36,9 +36,9 @@ export const MembershipModal = ({ isOpen, onOpenChange }: MembershipModalProps) 
         setStep("intro");
       }
     }
-  }, [isOpen, isConnected]);
+  }, [isOpen]);
 
-  // Force transition to payment screen if connection is detected
+  // Watch for connection to auto-advance to payment screen
   useEffect(() => {
     if (isOpen && isConnected && (step === "intro" || step === "connect")) {
       setStep("payment");
@@ -57,7 +57,6 @@ export const MembershipModal = ({ isOpen, onOpenChange }: MembershipModalProps) 
     try {
       const newSession = await login();
       if (newSession) {
-        // Explicitly set step immediately after successful login
         setStep("payment");
       }
     } catch (err) {
@@ -178,7 +177,7 @@ export const MembershipModal = ({ isOpen, onOpenChange }: MembershipModalProps) 
             </div>
           )}
 
-          {/* Step 2: Connect Wallet (Shown if not connected after clicking Get Started) */}
+          {/* Step 2: Connect Wallet (Only if not connected) */}
           {step === "connect" && (
             <div className="space-y-10 animate-in fade-in slide-in-from-right-4 duration-500">
               <div className="space-y-2">
@@ -212,8 +211,8 @@ export const MembershipModal = ({ isOpen, onOpenChange }: MembershipModalProps) 
             </div>
           )}
 
-          {/* Step 3: Network Activation (Payment) - Only shown if connected */}
-          {step === "payment" && (
+          {/* Step 3: Network Activation (Payment) */}
+          {step === "payment" && isConnected && (
             <div className="space-y-10 animate-in fade-in slide-in-from-right-4 duration-500">
               <div className="space-y-4">
                 <Button variant="ghost" onClick={() => setStep("intro")} className="text-white/60 hover:text-purple-400 -ml-4 font-black tracking-widest uppercase text-[10px] gap-2 group">
@@ -244,7 +243,7 @@ export const MembershipModal = ({ isOpen, onOpenChange }: MembershipModalProps) 
               {/* Authenticated Wallet Display */}
               <div className="space-y-8">
                 <div className="flex items-center gap-5 p-6 rounded-[32px] bg-[#1a102d] border-2 border-purple-500/20 group hover:border-purple-500/40 transition-all">
-                  <div className={cn("h-14 w-14 rounded-2xl flex items-center justify-center text-lg font-black border-2 border-white/10 overflow-hidden shrink-0", userProfile?.color || "bg-purple-600")}>
+                  <div className={cn("h-14 w-14 rounded-2xl flex items-center justify-center text-lg font-black border-2 border-white/10 overflow-hidden shrink-0", userProfile?.color)}>
                     {userProfile?.avatarImage ? (
                       <img src={userProfile.avatarImage} alt="Avatar" className="w-full h-full object-cover" />
                     ) : (
@@ -253,7 +252,7 @@ export const MembershipModal = ({ isOpen, onOpenChange }: MembershipModalProps) 
                   </div>
                   <div className="flex-1 min-w-0">
                     <p className="text-[10px] font-black uppercase tracking-widest text-white/30 mb-0.5">Authenticated Wallet</p>
-                    <p className="text-2xl font-black text-purple-400 italic truncate tracking-tight">@{actor || "connected"}</p>
+                    <p className="text-2xl font-black text-purple-400 italic truncate tracking-tight">@{actor}</p>
                   </div>
                   <div className="h-10 w-10 rounded-full border-2 border-green-500/30 flex items-center justify-center bg-green-500/5">
                     <CheckCircle2 className="h-5 w-5 text-green-500 drop-shadow-[0_0_10px_rgba(34,197,94,0.4)]" />
