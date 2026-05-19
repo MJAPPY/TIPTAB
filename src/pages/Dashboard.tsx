@@ -11,7 +11,7 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { Tabs, TabsContent } from "@/tabs";
+import { Tabs, TabsContent } from "@/components/ui/tabs";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -94,7 +94,7 @@ const Dashboard = () => {
 
     setIsSending(true);
     try {
-      const contract = transferSymbol === "TAB" ? "xtokens" : "eosio.token";
+      const contract = transferSymbol === "TAB" ? "proton-tokencreate" : "eosio.token";
       const formattedQuantity = `${amountNum.toFixed(4)} ${transferSymbol}`;
       
       const actions = [{

@@ -58,7 +58,7 @@ export const TippingModal = ({ creator, onClose }: TippingModalProps) => {
       const permission = session.auth.permission || 'active';
 
       const transferAction = {
-        account: 'xtokens', 
+        account: 'proton-tokencreate', 
         name: 'transfer',
         authorization: [{
           actor: actor,
