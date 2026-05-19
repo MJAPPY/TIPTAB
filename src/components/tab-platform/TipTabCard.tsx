@@ -1,11 +1,12 @@
 "use client";
 
 import React, { useRef } from "react";
-import { QrCode, MapPin, Share2, Download, Check, ShieldCheck } from "lucide-react";
+import { MapPin, Share2, Download, Check, ShieldCheck } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Creator } from "@/data/creators";
 import { useToast } from "@/hooks/use-toast";
 import { toPng } from 'html-to-image';
+import { QRCodeSVG } from "qrcode.react";
 
 interface TipTabCardProps {
   creator: Creator;
@@ -85,7 +86,7 @@ export const TipTabCard = ({ creator }: TipTabCardProps) => {
         
         {/* Header Section */}
         <div className="relative z-10 flex items-start gap-4 h-24">
-          {/* Creator Info - Takes remaining space */}
+          {/* Creator Info */}
           <div className="flex items-center gap-3 flex-1 min-w-0">
             <div className={`h-14 w-14 shrink-0 rounded-2xl ${creator.color} flex items-center justify-center text-xl font-black border-2 border-white/20 shadow-xl overflow-hidden`}>
               {creator.avatarImage ? (
@@ -102,7 +103,7 @@ export const TipTabCard = ({ creator }: TipTabCardProps) => {
             </div>
           </div>
 
-          {/* Branding - Fixed to the right */}
+          {/* Branding */}
           <div className="flex flex-col items-end shrink-0 pt-1">
              <div className="flex items-center gap-1 -mr-2">
                <img src="/src/assets/logo.png" alt="TAB" className="h-16 w-16 object-contain" />
@@ -138,8 +139,21 @@ export const TipTabCard = ({ creator }: TipTabCardProps) => {
             <div className="relative">
               <div className="absolute inset-[-8px] bg-white/20 blur-xl rounded-full" />
               <div className="relative bg-white p-3 rounded-[24px] shadow-2xl">
-                <div className="h-24 w-24 bg-black flex items-center justify-center rounded-xl overflow-hidden">
-                  <QrCode className="h-20 w-20 text-white" />
+                <div className="h-24 w-24 bg-white flex items-center justify-center rounded-xl overflow-hidden">
+                  <QRCodeSVG 
+                    value={tippingUrl}
+                    size={84}
+                    level="H"
+                    includeMargin={false}
+                    imageSettings={{
+                      src: "/src/assets/logo.png",
+                      x: undefined,
+                      y: undefined,
+                      height: 20,
+                      width: 20,
+                      excavate: true,
+                    }}
+                  />
                 </div>
               </div>
             </div>
