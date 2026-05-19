@@ -28,6 +28,8 @@ interface XprContextType {
   updateUserProfile: (profile: Creator) => void;
   isMaintenanceMode: boolean;
   setMaintenanceMode: (status: boolean) => void;
+  networkAlert: string | null;
+  broadcastAlert: (message: string | null) => void;
 }
 
 const XprContext = createContext<XprContextType | undefined>(undefined);
@@ -48,6 +50,13 @@ export const XprProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const [membershipDate, setMembershipDate] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [userProfile, setUserProfile] = useState<Creator | null>(null);
+  const [networkAlert, setNetworkAlert] = useState<string | null>(() => {
+    if (typeof window !== "undefined") {
+      return localStorage.getItem("tiptab_network_alert");
+    }
+    return null;
+  });
+  
   const [isMaintenanceMode, setIsMaintenanceMode] = useState(() => {
     if (typeof window !== "undefined") {
       return localStorage.getItem("tiptab_maintenance") === "true";
@@ -58,6 +67,15 @@ export const XprProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const setMaintenanceMode = (status: boolean) => {
     setIsMaintenanceMode(status);
     localStorage.setItem("tiptab_maintenance", status.toString());
+  };
+
+  const broadcastAlert = (message: string | null) => {
+    setNetworkAlert(message);
+    if (message) {
+      localStorage.setItem("tiptab_network_alert", message);
+    } else {
+      localStorage.removeItem("tiptab_network_alert");
+    }
   };
 
   const recordTip = useCallback((amount: number) => {
@@ -108,7 +126,6 @@ export const XprProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         tipsSent: savedTips
       });
 
-      // Check local membership record (Yearly check)
       const membershipKey = `tiptab_membership_${account}`;
       const membershipDateKey = `tiptab_membership_date_${account}`;
       const savedDate = localStorage.getItem(membershipDateKey);
@@ -127,7 +144,6 @@ export const XprProvider: React.FC<{ children: React.ReactNode }> = ({ children 
           localStorage.removeItem(membershipKey);
         }
       } else {
-        // Migration for old "true" flags
         if (localStorage.getItem(membershipKey) === 'true') {
           const fakeDate = new Date().toISOString();
           localStorage.setItem(membershipDateKey, fakeDate);
@@ -139,7 +155,6 @@ export const XprProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         }
       }
 
-      // Load Profile
       const savedProfile = localStorage.getItem(`tiptab_profile_${account}`);
       if (savedProfile) {
         setUserProfile(JSON.parse(savedProfile));
@@ -262,7 +277,9 @@ export const XprProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     userProfile,
     updateUserProfile,
     isMaintenanceMode,
-    setMaintenanceMode
+    setMaintenanceMode,
+    networkAlert,
+    broadcastAlert
   };
 
   return <XprContext.Provider value={value}>{children}</XprContext.Provider>;

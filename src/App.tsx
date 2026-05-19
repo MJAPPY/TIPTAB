@@ -13,6 +13,7 @@ import Docs from "./pages/Docs";
 import NotFound from "./pages/NotFound";
 import Maintenance from "./pages/Maintenance";
 import { useXpr } from "./contexts/XprContext";
+import { NetworkAlert } from "./components/tab-platform/NetworkAlert";
 
 const queryClient = new QueryClient();
 
@@ -25,16 +26,19 @@ const AppRoutes = () => {
   }
 
   return (
-    <Routes>
-      <Route path="/" element={<Index />} />
-      <Route path="/dashboard" element={<Dashboard />} />
-      <Route path="/leaderboard" element={<Leaderboard />} />
-      <Route path="/calculator" element={<Calculator />} />
-      <Route path="/admin" element={<AdminHub />} />
-      <Route path="/docs" element={<Docs />} />
-      <Route path="/tip/:handle" element={<CreatorProfile />} />
-      <Route path="*" element={<NotFound />} />
-    </Routes>
+    <>
+      <NetworkAlert />
+      <Routes>
+        <Route path="/" element={<Index />} />
+        <Route path="/dashboard" element={<Dashboard />} />
+        <Route path="/leaderboard" element={<Leaderboard />} />
+        <Route path="/calculator" element={<Calculator />} />
+        <Route path="/admin" element={<AdminHub />} />
+        <Route path="/docs" element={<Docs />} />
+        <Route path="/tip/:handle" element={<CreatorProfile />} />
+        <Route path="*" element={<NotFound />} />
+      </Routes>
+    </>
   );
 };
 

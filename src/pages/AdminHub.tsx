@@ -14,7 +14,8 @@ import {
   Unlock,
   Bell,
   Zap,
-  Power
+  Power,
+  X
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
@@ -25,14 +26,24 @@ import { Header } from "@/components/tab-platform/Header";
 import { CREATORS, Creator } from "@/data/creators";
 import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 
 const AdminHub = () => {
-  const { isAdmin, isConnected, isMaintenanceMode, setMaintenanceMode } = useXpr();
+  const { isAdmin, isConnected, isMaintenanceMode, setMaintenanceMode, broadcastAlert, networkAlert } = useXpr();
   const navigate = useNavigate();
   const { toast } = useToast();
   
   const [membershipFee, setMembershipFee] = useState("2500");
   const [searchQuery, setSearchQuery] = useState("");
+  const [alertMessage, setAlertMessage] = useState("");
+  const [isAlertModalOpen, setIsAlertModalOpen] = useState(false);
   const [moderatedCreators] = useState<Creator[]>(CREATORS);
   const [bannedHandles, setBannedHandles] = useState<string[]>([]);
 
@@ -51,6 +62,25 @@ const AdminHub = () => {
     toast({
       title: "Fee Updated",
       description: `Membership fee set to ${membershipFee} XPR.`,
+    });
+  };
+
+  const handleBroadcast = () => {
+    if (!alertMessage.trim()) return;
+    broadcastAlert(alertMessage);
+    setIsAlertModalOpen(false);
+    setAlertMessage("");
+    toast({
+      title: "Alert Broadcasted",
+      description: "The message is now live across the platform.",
+    });
+  };
+
+  const clearAlert = () => {
+    broadcastAlert(null);
+    toast({
+      title: "Alert Cleared",
+      description: "Global message has been removed.",
     });
   };
 
@@ -142,7 +172,6 @@ const AdminHub = () => {
                       Update
                     </Button>
                   </div>
-                  <p className="text-[9px] md:text-[10px] text-white/30 italic font-medium">Reflects in Membership Modals immediately.</p>
                 </div>
                 
                 <div className="pt-4 border-t border-white/5 space-y-3">
@@ -159,15 +188,52 @@ const AdminHub = () => {
                       <Power className={cn("h-4 w-4", isMaintenanceMode && "animate-pulse")} />
                       {isMaintenanceMode ? "MAINTENANCE ACTIVE" : "MAINTENANCE MODE"}
                     </div>
-                    <div className={cn(
-                      "h-2.5 w-2.5 rounded-full",
-                      isMaintenanceMode ? "bg-white animate-ping" : "bg-red-500 animate-pulse shadow-[0_0_10px_rgba(239,68,68,0.5)]"
-                    )} />
                   </Button>
-                  <Button className="w-full h-14 md:h-16 rounded-[20px] md:rounded-[24px] bg-purple-500/10 border border-purple-500/20 text-purple-300 hover:bg-purple-500/20 font-black text-xs md:text-sm flex items-center justify-start gap-4 px-6 md:px-8">
-                    <Bell className="h-4 w-4" />
-                    Broadcast Network Alert
-                  </Button>
+
+                  <Dialog open={isAlertModalOpen} onOpenChange={setIsAlertModalOpen}>
+                    <DialogTrigger asChild>
+                      <Button className="w-full h-14 md:h-16 rounded-[20px] md:rounded-[24px] bg-purple-500/10 border border-purple-500/20 text-purple-300 hover:bg-purple-500/20 font-black text-xs md:text-sm flex items-center justify-start gap-4 px-6 md:px-8">
+                        <Bell className="h-4 w-4" />
+                        Broadcast Network Alert
+                      </Button>
+                    </DialogTrigger>
+                    <DialogContent className="bg-[#1a102d] border-white/10 text-white rounded-3xl p-8 max-w-md">
+                      <DialogHeader className="space-y-3">
+                        <DialogTitle className="text-2xl font-black italic tracking-tight">GLOBAL BROADCAST</DialogTitle>
+                        <DialogDescription className="text-white/50 font-bold">
+                          This message will appear at the top of the app for all users.
+                        </DialogDescription>
+                      </DialogHeader>
+                      <div className="space-y-6 pt-4">
+                        <div className="space-y-2">
+                          <Label className="text-[10px] font-black uppercase tracking-widest text-white/40">Alert Message</Label>
+                          <Input 
+                            value={alertMessage}
+                            onChange={(e) => setAlertMessage(e.target.value)}
+                            placeholder="e.g. Scheduled maintenance in 1 hour..."
+                            className="bg-white/5 border-white/10 h-14 rounded-xl px-4 text-white font-medium"
+                          />
+                        </div>
+                        <Button 
+                          onClick={handleBroadcast}
+                          className="w-full h-14 bg-purple-600 hover:bg-purple-700 text-white font-black rounded-xl shadow-xl shadow-purple-500/20"
+                        >
+                          Broadcast Live
+                        </Button>
+                      </div>
+                    </DialogContent>
+                  </Dialog>
+
+                  {networkAlert && (
+                    <Button 
+                      onClick={clearAlert}
+                      variant="ghost"
+                      className="w-full h-14 md:h-16 rounded-[20px] md:rounded-[24px] bg-red-500/5 border border-red-500/20 text-red-500 hover:bg-red-500/10 font-black text-xs md:text-sm flex items-center justify-start gap-4 px-6 md:px-8"
+                    >
+                      <X className="h-4 w-4" />
+                      Clear Current Alert
+                    </Button>
+                  )}
                 </div>
               </CardContent>
             </Card>
