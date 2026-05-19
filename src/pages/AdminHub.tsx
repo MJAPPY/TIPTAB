@@ -13,7 +13,8 @@ import {
   Lock,
   Unlock,
   Bell,
-  Zap
+  Zap,
+  Power
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
@@ -26,7 +27,7 @@ import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
 
 const AdminHub = () => {
-  const { isAdmin, isConnected } = useXpr();
+  const { isAdmin, isConnected, isMaintenanceMode, setMaintenanceMode } = useXpr();
   const navigate = useNavigate();
   const { toast } = useToast();
   
@@ -50,6 +51,16 @@ const AdminHub = () => {
     toast({
       title: "Fee Updated",
       description: `Membership fee set to ${membershipFee} XPR.`,
+    });
+  };
+
+  const toggleMaintenance = () => {
+    const newState = !isMaintenanceMode;
+    setMaintenanceMode(newState);
+    toast({
+      title: newState ? "Maintenance Activated" : "Network Online",
+      description: newState ? "All non-admin traffic is now diverted." : "Public access restored.",
+      variant: newState ? "destructive" : "default"
     });
   };
 
@@ -135,8 +146,23 @@ const AdminHub = () => {
                 </div>
                 
                 <div className="pt-4 border-t border-white/5 space-y-3">
-                  <Button className="w-full h-14 md:h-16 rounded-[20px] md:rounded-[24px] bg-red-500/10 border border-red-500/20 text-red-500 hover:bg-red-500/20 font-black text-xs md:text-sm flex items-center justify-between px-6 md:px-8">
-                    Maintenance Mode <div className="h-2 w-2 rounded-full bg-red-500 animate-pulse shadow-[0_0_10px_rgba(239,68,68,0.5)]" />
+                  <Button 
+                    onClick={toggleMaintenance}
+                    className={cn(
+                      "w-full h-14 md:h-16 rounded-[20px] md:rounded-[24px] border font-black text-xs md:text-sm flex items-center justify-between px-6 md:px-8 transition-all",
+                      isMaintenanceMode 
+                        ? "bg-red-500 text-white border-red-600 hover:bg-red-600" 
+                        : "bg-red-500/10 border-red-500/20 text-red-500 hover:bg-red-500/20"
+                    )}
+                  >
+                    <div className="flex items-center gap-3">
+                      <Power className={cn("h-4 w-4", isMaintenanceMode && "animate-pulse")} />
+                      {isMaintenanceMode ? "MAINTENANCE ACTIVE" : "MAINTENANCE MODE"}
+                    </div>
+                    <div className={cn(
+                      "h-2.5 w-2.5 rounded-full",
+                      isMaintenanceMode ? "bg-white animate-ping" : "bg-red-500 animate-pulse shadow-[0_0_10px_rgba(239,68,68,0.5)]"
+                    )} />
                   </Button>
                   <Button className="w-full h-14 md:h-16 rounded-[20px] md:rounded-[24px] bg-purple-500/10 border border-purple-500/20 text-purple-300 hover:bg-purple-500/20 font-black text-xs md:text-sm flex items-center justify-start gap-4 px-6 md:px-8">
                     <Bell className="h-4 w-4" />

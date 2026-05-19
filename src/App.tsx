@@ -10,8 +10,31 @@ import CreatorProfile from "./pages/CreatorProfile";
 import Calculator from "./pages/Calculator";
 import AdminHub from "./pages/AdminHub";
 import NotFound from "./pages/NotFound";
+import Maintenance from "./pages/Maintenance";
+import { useXpr } from "./contexts/XprContext";
 
 const queryClient = new QueryClient();
+
+const AppRoutes = () => {
+  const { isMaintenanceMode, isAdmin } = useXpr();
+
+  // If maintenance mode is on and user is NOT admin, block all routes
+  if (isMaintenanceMode && !isAdmin) {
+    return <Maintenance />;
+  }
+
+  return (
+    <Routes>
+      <Route path="/" element={<Index />} />
+      <Route path="/dashboard" element={<Dashboard />} />
+      <Route path="/leaderboard" element={<Leaderboard />} />
+      <Route path="/calculator" element={<Calculator />} />
+      <Route path="/admin" element={<AdminHub />} />
+      <Route path="/tip/:handle" element={<CreatorProfile />} />
+      <Route path="*" element={<NotFound />} />
+    </Routes>
+  );
+};
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
@@ -19,16 +42,7 @@ const App = () => (
       <Toaster />
       <Sonner />
       <BrowserRouter>
-        <Routes>
-          <Route path="/" element={<Index />} />
-          <Route path="/dashboard" element={<Dashboard />} />
-          <Route path="/leaderboard" element={<Leaderboard />} />
-          <Route path="/calculator" element={<Calculator />} />
-          <Route path="/admin" element={<AdminHub />} />
-          <Route path="/tip/:handle" element={<CreatorProfile />} />
-          {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-          <Route path="*" element={<NotFound />} />
-        </Routes>
+        <AppRoutes />
       </BrowserRouter>
     </TooltipProvider>
   </QueryClientProvider>

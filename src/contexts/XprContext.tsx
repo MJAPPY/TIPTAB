@@ -23,6 +23,8 @@ interface XprContextType {
   isAdmin: boolean;
   userProfile: Creator | null;
   updateUserProfile: (profile: Creator) => void;
+  isMaintenanceMode: boolean;
+  setMaintenanceMode: (status: boolean) => void;
 }
 
 const XprContext = createContext<XprContextType | undefined>(undefined);
@@ -42,6 +44,17 @@ export const XprProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const [isMember, setIsMember] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [userProfile, setUserProfile] = useState<Creator | null>(null);
+  const [isMaintenanceMode, setIsMaintenanceMode] = useState(() => {
+    if (typeof window !== "undefined") {
+      return localStorage.getItem("tiptab_maintenance") === "true";
+    }
+    return false;
+  });
+
+  const setMaintenanceMode = (status: boolean) => {
+    setIsMaintenanceMode(status);
+    localStorage.setItem("tiptab_maintenance", status.toString());
+  };
 
   const fetchBalances = useCallback(async (account: string) => {
     if (!account) return;
@@ -199,7 +212,9 @@ export const XprProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     isLoading,
     isAdmin: session?.auth.actor === 'tiptab',
     userProfile,
-    updateUserProfile
+    updateUserProfile,
+    isMaintenanceMode,
+    setMaintenanceMode
   };
 
   return <XprContext.Provider value={value}>{children}</XprContext.Provider>;
