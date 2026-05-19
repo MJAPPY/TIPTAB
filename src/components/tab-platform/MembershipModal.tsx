@@ -36,9 +36,10 @@ export const MembershipModal = ({ isOpen, onOpenChange }: MembershipModalProps) 
         setStep("intro");
       }
     }
-  }, [isOpen, isConnected]);
+  }, [isOpen]);
 
-  // Force transition to payment screen if connection is detected
+  // GUARANTEED TRANSITION: As soon as a connection is detected while the modal is open, 
+  // we force the payment screen to show.
   useEffect(() => {
     if (isOpen && isConnected && (step === "intro" || step === "connect")) {
       setStep("payment");
@@ -55,11 +56,8 @@ export const MembershipModal = ({ isOpen, onOpenChange }: MembershipModalProps) 
 
   const handleConnect = async () => {
     try {
-      const newSession = await login();
-      if (newSession) {
-        // Explicitly set step immediately after successful login
-        setStep("payment");
-      }
+      await login();
+      // The useEffect watcher will handle the transition once the session is set
     } catch (err) {
       console.error("Login failed", err);
     }
@@ -178,7 +176,7 @@ export const MembershipModal = ({ isOpen, onOpenChange }: MembershipModalProps) 
             </div>
           )}
 
-          {/* Step 2: Connect Wallet (Shown if not connected after clicking Get Started) */}
+          {/* Step 2: Connect Wallet (Only shown if not connected) */}
           {step === "connect" && (
             <div className="space-y-10 animate-in fade-in slide-in-from-right-4 duration-500">
               <div className="space-y-2">
@@ -212,8 +210,8 @@ export const MembershipModal = ({ isOpen, onOpenChange }: MembershipModalProps) 
             </div>
           )}
 
-          {/* Step 3: Network Activation (Payment) - Only shown if connected */}
-          {step === "payment" && (
+          {/* Step 3: Network Activation (Payment) */}
+          {step === "payment" && isConnected && (
             <div className="space-y-10 animate-in fade-in slide-in-from-right-4 duration-500">
               <div className="space-y-4">
                 <Button variant="ghost" onClick={() => setStep("intro")} className="text-white/60 hover:text-purple-400 -ml-4 font-black tracking-widest uppercase text-[10px] gap-2 group">
@@ -253,7 +251,7 @@ export const MembershipModal = ({ isOpen, onOpenChange }: MembershipModalProps) 
                   </div>
                   <div className="flex-1 min-w-0">
                     <p className="text-[10px] font-black uppercase tracking-widest text-white/30 mb-0.5">Authenticated Wallet</p>
-                    <p className="text-2xl font-black text-purple-400 italic truncate tracking-tight">@{actor || "connected"}</p>
+                    <p className="text-2xl font-black text-purple-400 italic truncate tracking-tight">@{actor}</p>
                   </div>
                   <div className="h-10 w-10 rounded-full border-2 border-green-500/30 flex items-center justify-center bg-green-500/5">
                     <CheckCircle2 className="h-5 w-5 text-green-500 drop-shadow-[0_0_10px_rgba(34,197,94,0.4)]" />
