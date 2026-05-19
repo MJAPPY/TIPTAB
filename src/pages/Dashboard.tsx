@@ -74,7 +74,8 @@ const Dashboard = () => {
   const formatPrecision = (val: string, symbol: string) => {
     const num = parseFloat(val);
     if (isNaN(num)) return "";
-    return symbol === "TAB" ? num.toFixed(8) : num.toFixed(4);
+    // Both TAB and XPR use 4 decimal places
+    return num.toFixed(4);
   };
 
   const handleUpdateProfile = (updatedData: Creator) => {
@@ -103,7 +104,7 @@ const Dashboard = () => {
     setIsSending(true);
     try {
       const contract = transferSymbol === "TAB" ? "tokencreate" : "eosio.token";
-      const precision = transferSymbol === "TAB" ? 8 : 4;
+      const precision = 4; // Both TAB and XPR use 4
       const formattedQuantity = `${amountNum.toFixed(precision)} ${transferSymbol}`;
       
       const actions = [{

@@ -42,7 +42,6 @@ export const XprProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     try {
       const headers = { 'Content-Type': 'application/json' };
       
-      // Use the first available endpoint for balance fetching
       const primaryEndpoint = PROTON_ENDPOINTS[0];
       
       const xprRes = await fetch(`${primaryEndpoint}/v1/chain/get_currency_balance`, {
@@ -70,7 +69,7 @@ export const XprProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
       setBalances({
         xpr: xprData[0] ? xprData[0].split(' ')[0] : '0.0000',
-        tab: tabData[0] ? tabData[0].split(' ')[0] : '0.00000000'
+        tab: tabData[0] ? tabData[0].split(' ')[0] : '0.0000'
       });
     } catch (error) {
       console.error('Balance sync error:', error);
@@ -139,7 +138,7 @@ export const XprProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     if (session) {
       await session.remove();
       setSession(null);
-      setBalances({ xpr: '0.0000', tab: '0.00000000' });
+      setBalances({ xpr: '0.0000', tab: '0.0000' });
     }
   };
 
