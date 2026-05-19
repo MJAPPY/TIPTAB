@@ -112,18 +112,20 @@ export const Header = ({ onBecomeCreator }: HeaderProps) => {
           Home
         </Button>
       </Link>
-      <Link to="/leaderboard" onClick={() => setIsOpen(false)} className={cn(isMobile ? "w-full" : "xl:w-auto")}>
-        <Button 
-          variant="ghost" 
-          className={cn(
-            "w-full text-slate-200 hover:text-yellow-400 hover:bg-purple-500/15 flex items-center gap-3 font-bold bg-white/5 border border-white/10 rounded-2xl px-5 transition-all",
-            isMobile ? "h-15 justify-start text-sm" : "lg:w-auto lg:justify-center h-12"
-          )}
-        >
-          <Trophy className={cn(isMobile ? "h-5 w-5" : "h-4 w-4")} />
-          Leaderboard
-        </Button>
-      </Link>
+      {isConnected && (
+        <Link to="/leaderboard" onClick={() => setIsOpen(false)} className={cn(isMobile ? "w-full" : "xl:w-auto")}>
+          <Button 
+            variant="ghost" 
+            className={cn(
+              "w-full text-slate-200 hover:text-yellow-400 hover:bg-purple-500/15 flex items-center gap-3 font-bold bg-white/5 border border-white/10 rounded-2xl px-5 transition-all",
+              isMobile ? "h-15 justify-start text-sm" : "lg:w-auto lg:justify-center h-12"
+            )}
+          >
+            <Trophy className={cn(isMobile ? "h-5 w-5" : "h-4 w-4")} />
+            Leaderboard
+          </Button>
+        </Link>
+      )}
       <Link to="/calculator" onClick={() => setIsOpen(false)} className={cn(isMobile ? "w-full" : "xl:w-auto")}>
         <Button 
           variant="ghost" 
