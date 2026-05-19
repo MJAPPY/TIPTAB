@@ -22,12 +22,12 @@ interface XprContextType {
 
 const XprContext = createContext<XprContextType | undefined>(undefined);
 
-// Using a list of multiple reliable endpoints for redundancy
-const ENDPOINTS = [
-  'https://proton.greymass.com',
-  'https://mainnet.protonchain.com',
-  'https://proton.pink.gg',
-  'https://proton.public.eosusa.news'
+// Using the specific endpoints provided for the XPR Network
+const PROTON_ENDPOINTS = [
+  'https://api.protonnz.com',
+  'https://proton.eosusa.io',
+  'https://proton.cryptolions.io',
+  'https://api.protonchain.com'
 ];
 
 const APP_IDENTIFIER = 'tiptab';
@@ -42,8 +42,8 @@ export const XprProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     try {
       const headers = { 'Content-Type': 'application/json' };
       
-      // We'll use the first endpoint for balance fetching
-      const primaryEndpoint = ENDPOINTS[0];
+      // Use the first available endpoint for balance fetching
+      const primaryEndpoint = PROTON_ENDPOINTS[0];
       
       const xprRes = await fetch(`${primaryEndpoint}/v1/chain/get_currency_balance`, {
         method: 'POST',
@@ -81,7 +81,7 @@ export const XprProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     try {
       const { session: restoredSession } = await ProtonWebSDK({
         linkOptions: {
-          endpoints: ENDPOINTS, // Use the full list here
+          endpoints: PROTON_ENDPOINTS,
           restoreSession: true,
         },
         transportOptions: {
@@ -115,7 +115,7 @@ export const XprProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const login = async () => {
     try {
       const { session: newSession } = await ProtonWebSDK({
-        linkOptions: { endpoints: ENDPOINTS }, // Use the full list here
+        linkOptions: { endpoints: PROTON_ENDPOINTS },
         transportOptions: { requestAccount: APP_IDENTIFIER },
         selectorOptions: {
           appName: 'TIP TAB',
