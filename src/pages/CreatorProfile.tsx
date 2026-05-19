@@ -11,7 +11,8 @@ import {
   MapPin, 
   ShieldCheck, 
   Share2,
-  Check
+  Check,
+  ArrowLeft
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -35,23 +36,44 @@ const CreatorProfile = () => {
   const [isCopied, setIsCopied] = useState(false);
 
   useEffect(() => {
-    // Check main data
-    const found = CREATORS.find(c => c.handle.toLowerCase() === handle?.toLowerCase());
-    if (found) {
-      setCreator(found);
-    } else {
-      // Check local storage for self-profile
-      const savedUser = localStorage.getItem("tiptab_user_profile");
-      if (savedUser) {
-        const localUser = JSON.parse(savedUser) as Creator;
-        if (localUser.handle.toLowerCase() === handle?.toLowerCase()) {
-          setCreator(localUser);
+    if (!handle) return;
+
+    // Standardize handle (remove @ if present and lowercase)
+    const cleanHandle = handle.replace(/^@/, "").toLowerCase();
+    
+    // 1. Search hardcoded creators
+    const foundInStatic = CREATORS.find(c => c.handle.toLowerCase() === cleanHandle);
+    
+    if (foundInStatic) {
+      setCreator(foundInStatic);
+      return;
+    }
+
+    // 2. Search local storage for self-profile or created profiles
+    const localKeys = Object.keys(localStorage).filter(key => 
+      key === "tiptab_user_profile" || key.startsWith("tiptab_profile_")
+    );
+
+    for (const key of localKeys) {
+      try {
+        const data = JSON.parse(localStorage.getItem(key) || "");
+        if (data && data.handle && data.handle.toLowerCase() === cleanHandle) {
+          setCreator(data);
           return;
         }
+      } catch (e) {
+        console.error("Error parsing local profile", e);
       }
-      navigate("/404");
     }
-  }, [handle, navigate]);
+
+    // If still not found after checking everywhere
+    toast({
+      title: "Profile Not Found",
+      description: `We couldn't find a creator with the handle @${cleanHandle}`,
+      variant: "destructive"
+    });
+    navigate("/");
+  }, [handle, navigate, toast]);
 
   const handleSendTip = async () => {
     if (!tipAmount || isNaN(Number(tipAmount)) || Number(tipAmount) <= 0) {
@@ -88,7 +110,7 @@ const CreatorProfile = () => {
         data: {
           from: actor,
           to: creator?.handle, 
-          quantity: `${parseFloat(tipAmount).toFixed(4)} TAB`, // Reverted to 4 decimals for TAB
+          quantity: `${parseFloat(tipAmount).toFixed(4)} TAB`,
           memo: 'Tipped via TipTab Profile',
         },
       }];
@@ -146,7 +168,13 @@ const CreatorProfile = () => {
     }
   };
 
-  if (!creator) return null;
+  if (!creator) {
+    return (
+      <div className="min-h-screen bg-[#0a0514] flex items-center justify-center">
+        <div className="h-12 w-12 border-4 border-purple-500/20 border-t-purple-500 rounded-full animate-spin" />
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-[#0a0514] text-white selection:bg-purple-500/30">
