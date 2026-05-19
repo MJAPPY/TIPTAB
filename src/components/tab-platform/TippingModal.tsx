@@ -34,43 +34,54 @@ export const TippingModal = ({ creator, onClose }: TippingModalProps) => {
       return;
     }
 
-    if (!session) {
-      toast({
-        title: "Connection Required",
-        description: "Please connect your wallet to send a tip.",
-      });
-      await login();
-      return;
-    }
-
     setIsProcessing(true);
     try {
+      // Handle immediate login if not connected
+      let activeSession = session;
+      if (!activeSession) {
+        toast({
+          title: "Connecting Wallet",
+          description: "Please approve the connection in WebAuth.",
+        });
+        activeSession = await login();
+      }
+
+      if (!activeSession) {
+        setIsProcessing(false);
+        return;
+      }
+
+      // Sanitize the recipient handle (remove @ if present)
+      const recipient = creator?.handle.replace(/^@/, "").toLowerCase().trim();
+      const sender = activeSession.auth.actor;
+
       const actions = [{
         account: 'tokencreate', 
         name: 'transfer',
         authorization: [{
-          actor: actor!,
-          permission: session.auth.permission,
+          actor: sender,
+          permission: activeSession.auth.permission,
         }],
         data: {
-          from: actor,
-          to: creator?.handle, 
-          quantity: `${parseFloat(tipAmount).toFixed(4)} TAB`, // Reverted to 4 decimals as per tokencreate explorer
-          memo: 'Tipped via TipTab',
+          from: sender,
+          to: recipient, 
+          quantity: `${parseFloat(tipAmount).toFixed(4)} TAB`,
+          memo: 'Tipped via TipTab Map',
         },
       }];
 
-      await session.transact({ actions }, { broadcast: true });
+      await activeSession.transact({ actions }, { broadcast: true });
       
       toast({
         title: "Tip Sent Successfully!",
-        description: `You've sent ${tipAmount} TAB to ${creator?.name}. Appreciation delivered!`,
+        description: `You've sent ${tipAmount} TAB to ${creator?.name}.`,
       });
       onClose();
     } catch (error: any) {
+      console.error("Tipping error:", error);
       toast({ 
         title: "Transaction failed", 
-        description: error.message || "Please check your connection and try again.", 
+        description: error.message || "Please check your wallet and try again.", 
         variant: "destructive" 
       });
     } finally {
@@ -187,7 +198,7 @@ export const TippingModal = ({ creator, onClose }: TippingModalProps) => {
                 {isProcessing ? (
                   <>
                     <div className="h-6 w-6 border-4 border-white/20 border-t-white rounded-full animate-spin" />
-                    <span>Sending...</span>
+                    <span>Processing...</span>
                   </>
                 ) : (
                   <>

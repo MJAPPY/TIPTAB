@@ -11,8 +11,7 @@ import {
   MapPin, 
   ShieldCheck, 
   Share2,
-  Check,
-  ArrowLeft
+  Check
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -37,43 +36,25 @@ const CreatorProfile = () => {
 
   useEffect(() => {
     if (!handle) return;
-
-    // Standardize handle (remove @ if present and lowercase)
-    const cleanHandle = handle.replace(/^@/, "").toLowerCase();
+    const cleanHandle = handle.replace(/^@/, "").toLowerCase().trim();
     
-    // 1. Search hardcoded creators
-    const foundInStatic = CREATORS.find(c => c.handle.toLowerCase() === cleanHandle);
-    
-    if (foundInStatic) {
-      setCreator(foundInStatic);
-      return;
-    }
-
-    // 2. Search local storage for self-profile or created profiles
-    const localKeys = Object.keys(localStorage).filter(key => 
-      key === "tiptab_user_profile" || key.startsWith("tiptab_profile_")
-    );
-
-    for (const key of localKeys) {
-      try {
-        const data = JSON.parse(localStorage.getItem(key) || "");
-        if (data && data.handle && data.handle.toLowerCase() === cleanHandle) {
-          setCreator(data);
+    // Check main data
+    const found = CREATORS.find(c => c.handle.toLowerCase() === cleanHandle);
+    if (found) {
+      setCreator(found);
+    } else {
+      // Check local storage for self-profile
+      const savedUser = localStorage.getItem("tiptab_user_profile");
+      if (savedUser) {
+        const localUser = JSON.parse(savedUser) as Creator;
+        if (localUser.handle.toLowerCase() === cleanHandle) {
+          setCreator(localUser);
           return;
         }
-      } catch (e) {
-        console.error("Error parsing local profile", e);
       }
+      navigate("/");
     }
-
-    // If still not found after checking everywhere
-    toast({
-      title: "Profile Not Found",
-      description: `We couldn't find a creator with the handle @${cleanHandle}`,
-      variant: "destructive"
-    });
-    navigate("/");
-  }, [handle, navigate, toast]);
+  }, [handle, navigate]);
 
   const handleSendTip = async () => {
     if (!tipAmount || isNaN(Number(tipAmount)) || Number(tipAmount) <= 0) {
@@ -85,43 +66,48 @@ const CreatorProfile = () => {
       return;
     }
 
-    if (!session) {
-      toast({
-        title: "Connection Required",
-        description: "Please connect your wallet to send appreciation.",
-      });
-      try {
-        await login();
-      } catch (err) {
-        return;
-      }
-      return;
-    }
-
     setIsProcessing(true);
     try {
+      let activeSession = session;
+      if (!activeSession) {
+        toast({
+          title: "Connecting Wallet",
+          description: "Please connect to send appreciation.",
+        });
+        activeSession = await login();
+      }
+
+      if (!activeSession) {
+        setIsProcessing(false);
+        return;
+      }
+
+      const recipient = creator?.handle.replace(/^@/, "").toLowerCase().trim();
+      const sender = activeSession.auth.actor;
+
       const actions = [{
         account: 'tokencreate', 
         name: 'transfer',
         authorization: [{
-          actor: actor!,
-          permission: session.auth.permission,
+          actor: sender,
+          permission: activeSession.auth.permission,
         }],
         data: {
-          from: actor,
-          to: creator?.handle, 
+          from: sender,
+          to: recipient, 
           quantity: `${parseFloat(tipAmount).toFixed(4)} TAB`,
           memo: 'Tipped via TipTab Profile',
         },
       }];
 
-      await session.transact({ actions }, { broadcast: true });
+      await activeSession.transact({ actions }, { broadcast: true });
       
       toast({
         title: "Tip Sent!",
         description: `Successfully sent ${tipAmount} TAB to ${creator?.name}.`,
       });
     } catch (error: any) {
+      console.error("Tipping error:", error);
       toast({
         title: "Transaction Failed",
         description: error.message || "Could not complete the tip. Please try again.",
@@ -249,7 +235,7 @@ const CreatorProfile = () => {
                 )}
                 {creator.instagram && (
                   <Button variant="outline" size="icon" className="h-14 w-14 rounded-2xl bg-white/5 border-white/10 hover:border-purple-500/50 hover:bg-purple-500/10" asChild>
-                    <a href={creator.instagram} target="_blank" rel="noopener noreferrer"><Instagram className="h-6 w-6" /></a>
+                    <a href={creator.instagram} target="_blank" rel="noopener noreferrer"><Instagram className="h-4 w-4" /></a>
                   </Button>
                 )}
                 {creator.videoUrl && (
