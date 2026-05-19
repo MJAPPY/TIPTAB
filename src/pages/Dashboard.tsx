@@ -30,7 +30,7 @@ import { useXpr } from "@/contexts/XprContext";
 import { cn } from "@/lib/utils";
 
 const Dashboard = () => {
-  const { isConnected, actor, balances, refreshBalances, session, login, isLoading: isAuthLoading, isMember, userProfile, updateUserProfile } = useXpr();
+  const { isConnected, actor, balances, refreshBalances, recordTip, session, login, isLoading: isAuthLoading, isMember, userProfile, updateUserProfile } = useXpr();
   const navigate = useNavigate();
   const { toast } = useToast();
   
@@ -85,6 +85,11 @@ const Dashboard = () => {
 
       await session.transact({ actions }, { broadcast: true });
       
+      // Update local tracking if it's TAB
+      if (transferSymbol === "TAB") {
+        recordTip(amountNum);
+      }
+
       toast({
         title: "Transfer Complete",
         description: `Successfully sent ${formattedQuantity} to @${transferRecipient}`,
@@ -230,7 +235,9 @@ const Dashboard = () => {
                     </CardHeader>
                     <CardContent className="p-0 mt-4 sm:mt-6 flex flex-col flex-1">
                       <div className="flex flex-col items-start gap-1 flex-1">
-                        <span className="text-4xl sm:text-6xl md:text-7xl font-black tracking-tighter text-slate-100 leading-none">0</span>
+                        <span className="text-4xl sm:text-6xl md:text-7xl font-black tracking-tighter text-slate-100 leading-none">
+                          {balances.tipsSent.toLocaleString()}
+                        </span>
                         <span className="text-sm sm:text-xl font-black text-pink-500 italic uppercase">TAB</span>
                       </div>
                       <div className="mt-auto pt-4 flex items-center gap-2 text-pink-400 text-[8px] sm:text-[10px] font-black uppercase tracking-widest">

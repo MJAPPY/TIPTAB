@@ -7,6 +7,7 @@ import { Creator, CREATORS } from '@/data/creators';
 interface Balances {
   xpr: string;
   tab: string;
+  tipsSent: number;
 }
 
 interface XprContextType {
@@ -18,6 +19,7 @@ interface XprContextType {
   login: () => Promise<LinkSession | null>;
   logout: () => Promise<void>;
   refreshBalances: () => Promise<void>;
+  recordTip: (amount: number) => void;
   isConnected: boolean;
   isLoading: boolean;
   isAdmin: boolean;
@@ -40,7 +42,7 @@ const APP_IDENTIFIER = 'tiptab';
 
 export const XprProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [session, setSession] = useState<LinkSession | null>(null);
-  const [balances, setBalances] = useState<Balances>({ xpr: '0.0000', tab: '0' });
+  const [balances, setBalances] = useState<Balances>({ xpr: '0.0000', tab: '0', tipsSent: 0 });
   const [isMember, setIsMember] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [userProfile, setUserProfile] = useState<Creator | null>(null);
@@ -55,6 +57,16 @@ export const XprProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     setIsMaintenanceMode(status);
     localStorage.setItem("tiptab_maintenance", status.toString());
   };
+
+  const recordTip = useCallback((amount: number) => {
+    if (!session?.auth.actor) return;
+    const actor = session.auth.actor;
+    const key = `tiptab_tips_sent_${actor}`;
+    const current = parseInt(localStorage.getItem(key) || "0");
+    const updated = current + amount;
+    localStorage.setItem(key, updated.toString());
+    setBalances(prev => ({ ...prev, tipsSent: updated }));
+  }, [session]);
 
   const fetchBalances = useCallback(async (account: string) => {
     if (!account) return;
@@ -85,9 +97,13 @@ export const XprProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       const xprData = xprRes.ok ? await xprRes.json() : [];
       const tabData = tabRes.ok ? await tabRes.json() : [];
 
+      const tipsSentKey = `tiptab_tips_sent_${account}`;
+      const savedTips = parseInt(localStorage.getItem(tipsSentKey) || "0");
+
       setBalances({
         xpr: xprData[0] ? parseFloat(xprData[0].split(' ')[0]).toFixed(4) : '0.0000',
-        tab: tabData[0] ? Math.floor(parseFloat(tabData[0].split(' ')[0])).toString() : '0'
+        tab: tabData[0] ? Math.floor(parseFloat(tabData[0].split(' ')[0])).toString() : '0',
+        tipsSent: savedTips
       });
 
       // Check local membership record
@@ -179,7 +195,7 @@ export const XprProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     if (session) {
       await session.remove();
       setSession(null);
-      setBalances({ xpr: '0.0000', tab: '0' });
+      setBalances({ xpr: '0.0000', tab: '0', tipsSent: 0 });
       setIsMember(false);
       setUserProfile(null);
     }
@@ -208,6 +224,7 @@ export const XprProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     login,
     logout,
     refreshBalances,
+    recordTip,
     isConnected: !!session,
     isLoading,
     isAdmin: session?.auth.actor === 'tiptab',

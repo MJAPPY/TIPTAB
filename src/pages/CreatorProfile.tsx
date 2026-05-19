@@ -27,7 +27,7 @@ const CreatorProfile = () => {
   const { handle } = useParams<{ handle: string }>();
   const navigate = useNavigate();
   const { toast } = useToast();
-  const { session, actor, login, isConnected } = useXpr();
+  const { session, actor, login, isConnected, recordTip } = useXpr();
   
   const [creator, setCreator] = useState<Creator | null>(null);
   const [tipAmount, setTipAmount] = useState("50");
@@ -104,6 +104,9 @@ const CreatorProfile = () => {
 
       await session.transact({ actions }, { broadcast: true });
       
+      // Update data sync for tips sent
+      recordTip(amountNum);
+
       toast({
         title: "Tip Sent!",
         description: `Successfully sent ${quantityString} to ${creator?.name}.`,

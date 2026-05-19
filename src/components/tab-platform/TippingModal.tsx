@@ -22,7 +22,7 @@ export const TippingModal = ({ creator, onClose }: TippingModalProps) => {
   const [tipAmount, setTipAmount] = useState<string>("50");
   const [isProcessing, setIsProcessing] = useState(false);
   const { toast } = useToast();
-  const { session, actor, login, isConnected } = useXpr();
+  const { session, actor, login, isConnected, recordTip } = useXpr();
 
   const formatValue = (val: string) => {
     const numericValue = parseFloat(val);
@@ -74,6 +74,9 @@ export const TippingModal = ({ creator, onClose }: TippingModalProps) => {
 
       await session.transact({ actions: [transferAction] }, { broadcast: true });
       
+      // Update data sync for tips sent
+      recordTip(amountNum);
+
       toast({
         title: "Tip Sent Successfully!",
         description: `Sent ${quantityString} to ${creator.name}.`,
