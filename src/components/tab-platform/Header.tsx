@@ -7,6 +7,7 @@ import {
   Sparkles, 
   Trophy, 
   Menu,
+  Home,
   Map as MapIcon,
   Calculator as CalcIcon,
   LogOut,
@@ -91,6 +92,18 @@ export const Header = ({ onBecomeCreator }: HeaderProps) => {
 
   const NavItems = ({ isMobile = false }) => (
     <>
+      <Link to="/" onClick={() => setIsOpen(false)} className={cn(isMobile ? "w-full" : "xl:w-auto")}>
+        <Button 
+          variant="ghost" 
+          className={cn(
+            "w-full text-slate-200 hover:text-white flex items-center gap-3 font-bold bg-white/5 border border-white/10 rounded-2xl px-5 transition-all",
+            isMobile ? "h-15 justify-start text-sm" : "lg:w-auto lg:justify-center h-12"
+          )}
+        >
+          <Home className={cn(isMobile ? "h-5 w-5" : "h-4 w-4")} />
+          Home
+        </Button>
+      </Link>
       <Link to="/leaderboard" onClick={() => setIsOpen(false)} className={cn(isMobile ? "w-full" : "xl:w-auto")}>
         <Button 
           variant="ghost" 
@@ -344,16 +357,6 @@ export const Header = ({ onBecomeCreator }: HeaderProps) => {
                   )}
 
                   <NavItems isMobile={true} />
-
-                  <Link to="/" onClick={() => setIsOpen(false)} className="w-full">
-                    <Button 
-                      variant="ghost" 
-                      className="w-full text-slate-200 hover:text-cyan-400 flex items-center justify-start gap-4 font-bold bg-white/5 border border-white/10 rounded-2xl h-15 px-6"
-                    >
-                      <MapIcon className="h-5 w-5" />
-                      View Map
-                    </Button>
-                  </Link>
                   
                   {isConnected && (
                     <Button 
