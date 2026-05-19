@@ -220,25 +220,16 @@ const AdminHub = () => {
               </CardHeader>
 
               <CardContent className="p-6 md:p-8 pt-0 space-y-6 relative z-10">
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="space-y-1 group/stat">
-                    <div className="flex items-center gap-2">
-                      <Users className="h-3 w-3 text-white/40" />
-                      <p className="text-[11px] font-black text-white uppercase tracking-[0.3em]">Registered</p>
-                    </div>
-                    <div className="flex items-end gap-3">
-                      <p className="text-3xl md:text-4xl font-black text-white tracking-tighter leading-none group-hover/stat:text-purple-400 transition-colors">1,284</p>
-                      <div className="flex items-center gap-1 px-1.5 py-0.5 rounded bg-green-500/20 border border-green-500/30 text-[9px] font-black text-green-400 mb-0.5">
-                        <ArrowUpRight className="h-2.5 w-2.5" /> +14%
-                      </div>
-                    </div>
+                <div className="space-y-1 group/stat">
+                  <div className="flex items-center gap-2">
+                    <Users className="h-3 w-3 text-white/40" />
+                    <p className="text-[11px] font-black text-white uppercase tracking-[0.3em]">Registered Users</p>
                   </div>
-                  <div className="space-y-1 group/stat">
-                    <div className="flex items-center gap-2">
-                      <Cpu className="h-3 w-3 text-white/40" />
-                      <p className="text-[11px] font-black text-white uppercase tracking-[0.3em]">Live Nodes</p>
+                  <div className="flex items-end gap-3">
+                    <p className="text-4xl md:text-5xl font-black text-white tracking-tighter leading-none group-hover/stat:text-purple-400 transition-colors">1,284</p>
+                    <div className="flex items-center gap-1 px-1.5 py-0.5 rounded bg-green-500/20 border border-green-500/30 text-[9px] font-black text-green-400 mb-0.5">
+                      <ArrowUpRight className="h-2.5 w-2.5" /> +14%
                     </div>
-                    <p className="text-3xl md:text-4xl font-black text-purple-400 tracking-tighter leading-none group-hover/stat:text-white transition-colors">42</p>
                   </div>
                 </div>
 
@@ -547,7 +538,7 @@ const AdminHub = () => {
                   <div className="space-y-2 pt-1 flex-1">
                     <div className="flex items-center justify-between">
                       <h4 className="font-black text-xl text-white tracking-tight">{log.event}</h4>
-                      <div className="flex items-center gap-4 text-[11px] font-black uppercase tracking-[0.2em] text-white/20">
+                      <div className="flex items-center gap-4 text-[10px] font-black uppercase tracking-[0.2em] text-white/20">
                         <div className="flex items-center gap-2"><Calendar className="h-3.5 w-3.5" /> {log.date}</div>
                         <div className="flex items-center gap-2"><Clock className="h-3.5 w-3.5" /> {log.time}</div>
                       </div>
