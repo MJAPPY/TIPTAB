@@ -55,7 +55,7 @@ export const TippingModal = ({ creator, onClose }: TippingModalProps) => {
         data: {
           from: actor,
           to: creator?.handle, 
-          quantity: `${parseFloat(tipAmount).toFixed(6)} TAB`,
+          quantity: `${parseFloat(tipAmount).toFixed(4)} TAB`, // Updated to 4 decimals
           memo: 'Tipped via TipTab',
         },
       }];

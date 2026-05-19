@@ -98,7 +98,7 @@ const Dashboard = () => {
     setIsSending(true);
     try {
       const contract = transferSymbol === "TAB" ? "tokencreate" : "eosio.token";
-      const precision = transferSymbol === "TAB" ? 6 : 4;
+      const precision = 4; // Both TAB and XPR use 4 decimal places
       
       const actions = [{
         account: contract,
