@@ -2,6 +2,7 @@ import { Button } from "@/components/ui/button";
 import { Zap, ArrowRight, UserCheck, Sparkles, Globe, Heart, Rocket } from "lucide-react";
 import { Creator } from "@/data/creators";
 import { useXpr } from "@/contexts/XprContext";
+import { cn } from "@/lib/utils";
 
 interface HeroProps {
   creators: Creator[];
