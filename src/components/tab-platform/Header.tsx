@@ -159,7 +159,7 @@ export const Header = ({ onBecomeCreator }: HeaderProps) => {
             setIsOpen(false);
           }}
           className={cn(
-            "w-full border-orange-500/50 bg-orange-500/10 text-orange-400 hover:bg-orange-500 hover:text-purple-100 flex items-center gap-3 font-black rounded-2xl px-5 transition-all shadow-[0_0_20px_rgba(249,115,22,0.15)]",
+            "w-full border-orange-500/50 bg-orange-500/10 text-orange-400 hover:bg-orange-500 hover:text-white flex items-center gap-3 font-black rounded-2xl px-5 transition-all shadow-[0_0_20px_rgba(249,115,22,0.15)]",
             isMobile ? "h-15 justify-start text-sm" : "lg:w-auto lg:justify-center h-12"
           )}
         >
@@ -233,7 +233,7 @@ export const Header = ({ onBecomeCreator }: HeaderProps) => {
               <div className="flex items-center gap-1 sm:gap-2 bg-white/5 border border-white/10 rounded-xl sm:rounded-2xl p-1 px-1.5 sm:px-4 h-10 sm:h-16 shrink-0">
                 <div className="flex flex-col items-end pr-1 sm:pr-4 border-r border-white/10 py-0.5 sm:py-1">
                   <span className="text-[8px] sm:text-sm font-black text-orange-500 flex items-center gap-0.5 sm:gap-1 leading-none mb-0.5 sm:mb-1">
-                    <Zap className="h-2 w-2 sm:h-3 sm:w-3 fill-orange-500" /> {Number(balances.tab).toLocaleString()} <span className="hidden sm:inline">TAB</span>
+                    <Zap className="h-2 w-2 sm:h-3 w-3 fill-orange-500" /> {Number(balances.tab).toLocaleString()} <span className="hidden sm:inline">TAB</span>
                   </span>
                   <span className="text-[6px] sm:text-xs font-bold text-slate-300 leading-none">{Number(balances.xpr).toLocaleString()} <span className="hidden sm:inline">XPR</span></span>
                 </div>
