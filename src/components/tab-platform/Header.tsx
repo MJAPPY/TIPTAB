@@ -105,7 +105,7 @@ export const Header = ({ onBecomeCreator }: HeaderProps) => {
         <Button 
           variant="ghost" 
           className={cn(
-            "w-full text-slate-200 hover:text-purple-400 flex items-center gap-3 font-bold bg-white/5 border border-white/10 rounded-2xl px-5 transition-all",
+            "w-full text-slate-200 hover:text-purple-400 hover:bg-purple-500/15 flex items-center gap-3 font-bold bg-white/5 border border-white/10 rounded-2xl px-5 transition-all",
             isMobile ? "h-15 justify-start text-sm" : "lg:w-auto lg:justify-center h-12"
           )}
         >
@@ -117,7 +117,7 @@ export const Header = ({ onBecomeCreator }: HeaderProps) => {
         <Button 
           variant="ghost" 
           className={cn(
-            "w-full text-slate-200 hover:text-yellow-400 flex items-center gap-3 font-bold bg-white/5 border border-white/10 rounded-2xl px-5 transition-all",
+            "w-full text-slate-200 hover:text-yellow-400 hover:bg-purple-500/15 flex items-center gap-3 font-bold bg-white/5 border border-white/10 rounded-2xl px-5 transition-all",
             isMobile ? "h-15 justify-start text-sm" : "lg:w-auto lg:justify-center h-12"
           )}
         >
@@ -129,7 +129,7 @@ export const Header = ({ onBecomeCreator }: HeaderProps) => {
         <Button 
           variant="ghost" 
           className={cn(
-            "w-full text-slate-200 hover:text-cyan-400 flex items-center gap-3 font-bold bg-white/5 border border-white/10 rounded-2xl px-5 transition-all",
+            "w-full text-slate-200 hover:text-cyan-400 hover:bg-purple-500/15 flex items-center gap-3 font-bold bg-white/5 border border-white/10 rounded-2xl px-5 transition-all",
             isMobile ? "h-15 justify-start text-sm" : "lg:w-auto lg:justify-center h-12"
           )}
         >
@@ -142,7 +142,7 @@ export const Header = ({ onBecomeCreator }: HeaderProps) => {
           <Button 
             variant="ghost" 
             className={cn(
-              "w-full text-slate-200 hover:text-purple-400 flex items-center gap-3 font-bold bg-white/5 border border-white/10 rounded-2xl px-5 transition-all",
+              "w-full text-slate-200 hover:text-purple-400 hover:bg-purple-500/15 flex items-center gap-3 font-bold bg-white/5 border border-white/10 rounded-2xl px-5 transition-all",
               isMobile ? "h-15 justify-start text-sm" : "lg:w-auto lg:justify-center h-12"
             )}
           >
@@ -159,7 +159,7 @@ export const Header = ({ onBecomeCreator }: HeaderProps) => {
             setIsOpen(false);
           }}
           className={cn(
-            "w-full border-orange-500/50 bg-orange-500/10 text-orange-400 hover:bg-orange-500 hover:text-white flex items-center gap-3 font-black rounded-2xl px-5 transition-all shadow-[0_0_20px_rgba(249,115,22,0.15)]",
+            "w-full border-orange-500/50 bg-orange-500/10 text-orange-400 hover:bg-orange-500/20 hover:text-white flex items-center gap-3 font-black rounded-2xl px-5 transition-all shadow-[0_0_20px_rgba(249,115,22,0.15)]",
             isMobile ? "h-15 justify-start text-sm" : "lg:w-auto lg:justify-center h-12"
           )}
         >
@@ -241,7 +241,7 @@ export const Header = ({ onBecomeCreator }: HeaderProps) => {
                   variant="ghost" 
                   size="icon" 
                   onClick={handleRefresh}
-                  className="h-5 w-5 sm:h-8 sm:w-8 text-white/30 hover:text-purple-400"
+                  className="h-5 w-5 sm:h-8 sm:w-8 text-white/30 hover:text-purple-400 hover:bg-purple-500/10"
                 >
                   <RefreshCw className={cn("h-2.5 w-2.5 sm:h-4 sm:w-4", isRefreshing && "animate-spin")} />
                 </Button>
@@ -303,7 +303,7 @@ export const Header = ({ onBecomeCreator }: HeaderProps) => {
                       </Link>
                     </DropdownMenuItem>
                   )}
-                  <DropdownMenuItem asChild className="focus:bg-purple-500/10 focus:text-purple-400 rounded-xl cursor-pointer">
+                  <DropdownMenuItem asChild className="focus:bg-purple-500/15 focus:text-purple-400 rounded-xl cursor-pointer">
                     <Link to="/dashboard" className="flex items-center gap-3 px-3 py-2.5">
                       <LayoutDashboard className="h-4 w-4 text-purple-400" />
                       <span className="font-bold text-slate-200">{isMember ? "Creator Hub" : "Supporter Hub"}</span>
@@ -328,7 +328,7 @@ export const Header = ({ onBecomeCreator }: HeaderProps) => {
 
             <Sheet open={isOpen} onOpenChange={setIsOpen}>
               <SheetTrigger asChild>
-                <Button variant="ghost" size="icon" className="text-white bg-white/5 border border-white/10 hover:bg-purple-500/10 h-10 w-10 sm:h-16 sm:w-16 rounded-xl sm:rounded-2xl shrink-0">
+                <Button variant="ghost" size="icon" className="text-white bg-white/5 border border-white/10 hover:bg-purple-500/15 h-10 w-10 sm:h-16 sm:w-16 rounded-xl sm:rounded-2xl shrink-0">
                   <Menu className="h-4 w-4 sm:h-6 sm:w-6 text-slate-200" />
                 </Button>
               </SheetTrigger>
