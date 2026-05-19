@@ -142,50 +142,20 @@ export const Header = ({ onBecomeCreator }: HeaderProps) => {
         <div className="border border-white/10 bg-[#0a0514]/85 backdrop-blur-md rounded-[28px] px-3 md:px-8 py-2 md:py-3.5 flex items-center justify-between shadow-[0_20px_60px_rgba(0,0,0,0.7)]">
           
           <div className="flex items-center gap-4">
-            {location.pathname === '/admin' ? (
-              <div className="flex items-center gap-4">
-                <Link to="/" className="flex items-center gap-2 text-white/40 hover:text-white transition-colors">
-                  <ArrowLeft className="h-4 w-4" />
-                  <span className="hidden sm:inline text-xs font-black uppercase tracking-widest">Exit Admin</span>
-                </Link>
-                <div className="h-6 w-px bg-white/10" />
-                <div className="flex items-center gap-2">
-                  <ShieldAlert className="h-5 w-5 text-orange-500" />
-                  <span className="text-xl font-black italic tracking-tighter text-white">
-                    ADMIN<span className="text-orange-500">HUB</span>
-                  </span>
-                </div>
+            <Link to="/" className="flex items-center gap-2 md:gap-4 group shrink-0">
+              <div className="relative">
+                <div className="absolute inset-0 bg-orange-500/20 blur-lg rounded-full group-hover:scale-110 transition-transform" />
+                <img src="/src/assets/logo.png" alt="TIPTAB Logo" className="h-10 w-10 md:h-14 md:w-14 object-contain relative z-10" />
               </div>
-            ) : location.pathname === '/dashboard' ? (
-              <div className="flex items-center gap-4">
-                <Link to="/" className="flex items-center gap-2 text-white/40 hover:text-white transition-colors">
-                  <ArrowLeft className="h-5 w-5" />
-                  <span className="hidden sm:inline font-bold">Map</span>
-                </Link>
-                <div className="h-6 w-px bg-white/10" />
-                <div className="flex items-center gap-2">
-                  <img src="/src/assets/logo.png" alt="TIPTAB" className="h-8 w-8 object-contain" />
-                  <span className="text-xl font-black italic tracking-tighter text-white">
-                    CREATOR<span className="text-orange-500">HUB</span>
-                  </span>
-                </div>
+              <div className="flex flex-col -space-y-0.5 md:-space-y-1">
+                <span className="text-lg md:text-3xl font-black italic tracking-tighter text-white group-hover:text-[#a855f7] transition-colors duration-300">
+                  TIP<span className="text-orange-500">TAB</span>
+                </span>
+                <span className="text-[7px] md:text-[10px] text-muted-foreground uppercase tracking-widest font-black opacity-60">
+                  Appreciation Hub
+                </span>
               </div>
-            ) : (
-              <Link to="/" className="flex items-center gap-2 md:gap-4 group shrink-0">
-                <div className="relative">
-                  <div className="absolute inset-0 bg-orange-500/20 blur-lg rounded-full group-hover:scale-110 transition-transform" />
-                  <img src="/src/assets/logo.png" alt="TIPTAB Logo" className="h-10 w-10 md:h-14 md:w-14 object-contain relative z-10" />
-                </div>
-                <div className="flex flex-col -space-y-0.5 md:-space-y-1">
-                  <span className="text-lg md:text-3xl font-black italic tracking-tighter text-white group-hover:text-[#a855f7] transition-colors duration-300">
-                    TIP<span className="text-orange-500">TAB</span>
-                  </span>
-                  <span className="text-[7px] md:text-[10px] text-muted-foreground uppercase tracking-widest font-black opacity-60">
-                    Appreciation Hub
-                  </span>
-                </div>
-              </Link>
-            )}
+            </Link>
           </div>
 
           {!isDashboardOrAdmin && (

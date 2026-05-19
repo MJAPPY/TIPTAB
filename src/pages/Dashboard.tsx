@@ -8,10 +8,15 @@ import {
   TrendingUp, 
   Wallet,
   RefreshCw,
+  Zap,
+  ShieldCheck,
+  ArrowRight,
+  Settings as SettingsIcon,
+  ChevronRight
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { Tabs, TabsContent } from "@/components/ui/tabs";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -136,8 +141,11 @@ const Dashboard = () => {
   if (!isConnected && !isAuthLoading) {
     return (
       <div className="min-h-screen bg-[#0a0514] flex flex-col items-center justify-center p-6 text-center">
-        <h1 className="text-3xl md:text-4xl font-black mb-4 tracking-tighter italic">AUTHENTICATION REQUIRED</h1>
-        <Button onClick={login} className="h-16 px-10 bg-[#a855f7] rounded-2xl font-black text-xl">Connect WebAuth</Button>
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-purple-600/10 blur-[150px] rounded-full -z-10" />
+        <h1 className="text-4xl md:text-6xl font-black mb-8 tracking-tighter italic">AUTHENTICATION <span className="text-orange-500">REQUIRED</span></h1>
+        <Button onClick={login} className="h-20 px-12 bg-white text-black hover:bg-orange-500 hover:text-white rounded-[32px] font-black text-2xl shadow-2xl transition-all active:scale-95">
+          Connect WebAuth
+        </Button>
       </div>
     );
   }
@@ -150,81 +158,179 @@ const Dashboard = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-[#0a0514] text-white">
+    <div className="min-h-screen bg-[#0a0514] text-white selection:bg-purple-500/30">
       <Header />
-      <main className="container mx-auto px-4 md:px-6 py-8 pt-32 md:pt-40">
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
-          <div className="lg:col-span-3 space-y-4">
-            <div className="flex flex-row lg:flex-col overflow-x-auto gap-2">
-              {navigationItems.map((item) => (
-                <Button
-                  key={item.id}
-                  variant="ghost"
-                  onClick={() => setActiveTab(item.id)}
-                  className={cn(
-                    "flex-1 lg:w-full justify-start h-12 rounded-xl gap-3 px-4 font-bold",
-                    activeTab === item.id ? "bg-purple-500/20 text-purple-400" : "text-white/80"
-                  )}
-                >
-                  <item.icon className="h-5 w-5" />
-                  <span className="text-sm">{item.label}</span>
-                </Button>
-              ))}
+      
+      {/* Cinematic Backgrounds */}
+      <div className="absolute top-0 left-0 w-full h-[600px] bg-gradient-to-b from-purple-900/10 to-transparent -z-10" />
+      <div className="absolute top-48 left-1/4 w-[600px] h-[600px] bg-magenta-500/5 blur-[180px] rounded-full -z-10 animate-pulse" />
+      
+      <main className="container mx-auto px-4 md:px-6 py-8 pt-36 md:pt-44 relative z-10">
+        <div className="flex flex-col md:flex-row md:items-end justify-between gap-8 mb-16">
+          <div className="space-y-4">
+             <div className="inline-flex items-center gap-2.5 px-4 py-1.5 rounded-full bg-white/5 border border-white/10 text-[10px] font-black uppercase tracking-[0.2em] text-white/40">
+              <Zap className="h-3 w-3 text-orange-500 fill-orange-500" />
+              Creator Portal
             </div>
+            <h1 className="text-5xl md:text-7xl font-black tracking-tighter leading-none">
+              Welcome, <span className="text-transparent bg-clip-text bg-gradient-to-r from-white via-white to-white/60">@{actor}</span>
+            </h1>
           </div>
+          
+          <div className="flex items-center gap-4 bg-white/5 border border-white/10 p-2 rounded-[28px] backdrop-blur-xl">
+             {navigationItems.map((item) => (
+               <Button
+                key={item.id}
+                variant="ghost"
+                onClick={() => setActiveTab(item.id)}
+                className={cn(
+                  "h-14 px-6 rounded-2xl gap-3 font-black text-xs uppercase tracking-widest transition-all",
+                  activeTab === item.id 
+                    ? "bg-white text-black shadow-xl" 
+                    : "text-white/40 hover:text-white hover:bg-white/5"
+                )}
+               >
+                 <item.icon className="h-4 w-4" />
+                 <span className="hidden md:inline">{item.label}</span>
+               </Button>
+             ))}
+          </div>
+        </div>
 
-          <div className="lg:col-span-9">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-10">
+          <div className="lg:col-span-12">
             <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-              <TabsContent value="analytics" className="space-y-6 mt-0">
-                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
-                  <Card className="bg-[#130b21] border-white/10 text-white rounded-[24px]">
-                    <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                      <CardDescription className="text-white/60 font-black">Settled TAB</CardDescription>
-                      <Button variant="ghost" size="icon" onClick={handleManualRefresh} className="h-8 w-8 text-white/30 hover:text-white">
-                        <RefreshCw className={cn("h-4 w-4", isRefreshing && "animate-spin")} />
-                      </Button>
+              <TabsContent value="analytics" className="space-y-10 mt-0 animate-in fade-in slide-in-from-bottom-4 duration-500">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+                  <Card className="bg-[#130b21]/60 border-white/10 text-white rounded-[40px] p-8 md:p-10 shadow-2xl relative overflow-hidden group hover:border-orange-500/30 transition-all">
+                    <div className="absolute -top-12 -right-12 w-32 h-32 bg-orange-500/10 blur-3xl rounded-full group-hover:bg-orange-500/20 transition-all" />
+                    <CardHeader className="p-0 mb-6">
+                      <div className="flex items-center justify-between">
+                        <CardDescription className="text-white/30 font-black uppercase tracking-[0.2em] text-[10px]">Settled TAB</CardDescription>
+                        <Button variant="ghost" size="icon" onClick={handleManualRefresh} className="h-10 w-10 rounded-xl bg-white/5 text-white/30 hover:text-white transition-all">
+                          <RefreshCw className={cn("h-4 w-4", isRefreshing && "animate-spin")} />
+                        </Button>
+                      </div>
                     </CardHeader>
-                    <CardContent>
-                      <CardTitle className="text-3xl font-black">{Number(balances.tab).toLocaleString()} TAB</CardTitle>
+                    <CardContent className="p-0">
+                      <div className="flex items-end gap-3">
+                        <span className="text-5xl md:text-6xl font-black tracking-tighter">{Number(balances.tab).toLocaleString()}</span>
+                        <span className="text-lg font-black text-orange-500 italic mb-2">TAB</span>
+                      </div>
+                      <div className="mt-6 flex items-center gap-2 text-green-400 text-[10px] font-black uppercase tracking-widest">
+                        <ShieldCheck className="h-3 w-3" />
+                        Network Synchronized
+                      </div>
                     </CardContent>
+                  </Card>
+
+                  <Card className="bg-[#130b21]/60 border-white/10 text-white rounded-[40px] p-8 md:p-10 shadow-2xl relative overflow-hidden group hover:border-purple-500/30 transition-all">
+                    <div className="absolute -top-12 -right-12 w-32 h-32 bg-purple-500/10 blur-3xl rounded-full group-hover:bg-purple-500/20 transition-all" />
+                    <CardHeader className="p-0 mb-6">
+                      <CardDescription className="text-white/30 font-black uppercase tracking-[0.2em] text-[10px]">Liquid XPR</CardDescription>
+                    </CardHeader>
+                    <CardContent className="p-0">
+                      <div className="flex items-end gap-3">
+                        <span className="text-5xl md:text-6xl font-black tracking-tighter">{Number(balances.xpr).toLocaleString()}</span>
+                        <span className="text-lg font-black text-purple-400 italic mb-2">XPR</span>
+                      </div>
+                      <div className="mt-6 h-1 w-full bg-white/5 rounded-full overflow-hidden">
+                        <div className="h-full bg-purple-500 w-[65%] rounded-full shadow-[0_0_15px_rgba(168,85,247,0.5)]" />
+                      </div>
+                    </CardContent>
+                  </Card>
+
+                  <Card className="bg-gradient-to-br from-orange-500/10 to-[#130b21]/60 border-white/10 text-white rounded-[40px] p-8 md:p-10 shadow-2xl flex flex-col justify-between">
+                    <div className="space-y-4">
+                      <h3 className="text-2xl font-black tracking-tight italic">Boost Your Earnings</h3>
+                      <p className="text-white/40 text-sm font-medium leading-relaxed">Join the high-tier creator pool to receive verified badges and increased visibility on the map.</p>
+                    </div>
+                    <Button className="w-full h-14 bg-white text-black hover:bg-orange-500 hover:text-white rounded-2xl font-black text-sm uppercase tracking-widest transition-all mt-8">
+                      Upgrade Status
+                    </Button>
                   </Card>
                 </div>
               </TabsContent>
 
-              <TabsContent value="payouts" className="space-y-8 mt-0">
-                <Card className="bg-[#130b21] border-white/10 rounded-[32px] p-10">
-                  <h3 className="text-2xl font-black italic uppercase mb-8">Transfer Funds</h3>
-                  <div className="space-y-8">
-                    <div className="space-y-3">
-                      <Label className="text-[10px] font-black uppercase text-white/40">Recipient Actor</Label>
-                      <Input placeholder="username" value={transferRecipient} onChange={(e) => setTransferRecipient(e.target.value)} className="bg-white/5 h-14 rounded-2xl font-bold text-white" />
+              <TabsContent value="payouts" className="space-y-8 mt-0 animate-in fade-in slide-in-from-right-4 duration-500">
+                <div className="max-w-3xl mx-auto">
+                  <Card className="bg-[#130b21] border-white/10 rounded-[48px] p-10 md:p-16 shadow-2xl relative overflow-hidden">
+                    <div className="absolute top-0 right-0 p-10">
+                      <Wallet className="h-12 w-12 text-white/5" />
                     </div>
-                    <div className="space-y-3">
-                      <Label className="text-[10px] font-black uppercase text-white/40">Amount</Label>
-                      <div className="flex gap-2">
-                        <Input placeholder="0" value={transferAmount} onChange={(e) => setTransferAmount(e.target.value)} onBlur={(e) => setTransferAmount(formatPrecision(e.target.value))} className="flex-1 bg-white/5 h-14 rounded-2xl font-black text-xl text-white" />
-                        <Select value={transferSymbol} onValueChange={setTransferSymbol}>
-                          <SelectTrigger className="w-[120px] bg-white/5 h-14 rounded-2xl font-black text-white"><SelectValue /></SelectTrigger>
-                          <SelectContent className="bg-[#1a102d] text-white">
-                            <SelectItem value="TAB">TAB</SelectItem>
-                            <SelectItem value="XPR">XPR</SelectItem>
-                          </SelectContent>
-                        </Select>
+                    <h3 className="text-3xl md:text-4xl font-black italic uppercase mb-10 tracking-tighter">Execute <span className="text-orange-500">Transfer</span></h3>
+                    
+                    <div className="space-y-10">
+                      <div className="space-y-4">
+                        <Label className="text-[10px] font-black uppercase tracking-[0.3em] text-white/30 ml-2">Recipient Actor</Label>
+                        <div className="relative group">
+                          <UserIcon className="absolute left-6 top-1/2 -translate-y-1/2 h-5 w-5 text-purple-500" />
+                          <Input 
+                            placeholder="username" 
+                            value={transferRecipient} 
+                            onChange={(e) => setTransferRecipient(e.target.value)} 
+                            className="bg-white/5 border-white/10 h-16 md:h-20 rounded-[28px] font-bold text-lg md:text-xl text-white pl-16 focus:ring-purple-500/50 focus:bg-white/10 transition-all" 
+                          />
+                        </div>
                       </div>
+
+                      <div className="space-y-4">
+                        <Label className="text-[10px] font-black uppercase tracking-[0.3em] text-white/30 ml-2">Amount & Asset</Label>
+                        <div className="flex flex-col sm:flex-row gap-4">
+                          <div className="relative flex-1">
+                            <Input 
+                              placeholder="0" 
+                              value={transferAmount} 
+                              onChange={(e) => setTransferAmount(e.target.value)} 
+                              onBlur={(e) => setTransferAmount(formatPrecision(e.target.value))} 
+                              className="bg-white/5 border-white/10 h-16 md:h-20 rounded-[28px] font-black text-2xl md:text-3xl text-white px-8 focus:ring-orange-500/50 focus:bg-white/10 transition-all" 
+                            />
+                          </div>
+                          <Select value={transferSymbol} onValueChange={setTransferSymbol}>
+                            <SelectTrigger className="w-full sm:w-[160px] bg-white/5 border-white/10 h-16 md:h-20 rounded-[28px] font-black text-xl text-white transition-all">
+                              <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent className="bg-[#1a102d] border-white/20 text-white rounded-2xl">
+                              <SelectItem value="TAB" className="font-black py-3 cursor-pointer">TAB</SelectItem>
+                              <SelectItem value="XPR" className="font-black py-3 cursor-pointer">XPR</SelectItem>
+                            </SelectContent>
+                          </Select>
+                        </div>
+                      </div>
+
+                      <Button 
+                        onClick={handleTransfer} 
+                        disabled={isSending} 
+                        className="w-full h-24 bg-white text-black hover:bg-orange-500 hover:text-white font-black text-2xl rounded-[32px] shadow-2xl shadow-white/5 transition-all active:scale-[0.98]"
+                      >
+                        {isSending ? (
+                          <div className="flex items-center gap-4">
+                            <div className="h-8 w-8 border-4 border-black/20 border-t-black rounded-full animate-spin" />
+                            <span>AUTHORIZING...</span>
+                          </div>
+                        ) : (
+                          "Execute Transfer"
+                        )}
+                      </Button>
                     </div>
-                    <Button onClick={handleTransfer} disabled={isSending} className="w-full h-20 bg-white text-black font-black text-xl rounded-3xl">
-                      {isSending ? "Authorizing..." : "Execute Transfer"}
-                    </Button>
+                  </Card>
+                </div>
+              </TabsContent>
+
+              <TabsContent value="card" className="mt-0 animate-in zoom-in-95 duration-500">
+                <div className="max-w-xl mx-auto">
+                  <div className="text-center mb-10 space-y-2">
+                    <h2 className="text-3xl font-black italic tracking-tighter">Your Network Pass</h2>
+                    <p className="text-white/40 font-medium">Share this card anywhere to receive zero-fee tips.</p>
                   </div>
-                </Card>
+                  <TipTabCard creator={user} />
+                </div>
               </TabsContent>
 
-              <TabsContent value="card" className="mt-0">
-                <TipTabCard creator={user} />
-              </TabsContent>
-
-              <TabsContent value="settings" className="mt-0">
-                <ProfileEditor initialData={user} onSave={handleUpdateProfile} />
+              <TabsContent value="settings" className="mt-0 animate-in fade-in slide-in-from-bottom-4 duration-500">
+                <div className="max-w-4xl mx-auto">
+                  <ProfileEditor initialData={user} onSave={handleUpdateProfile} />
+                </div>
               </TabsContent>
             </Tabs>
           </div>
