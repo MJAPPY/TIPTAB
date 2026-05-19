@@ -53,7 +53,7 @@ export const MembershipModal = ({ isOpen, onOpenChange }: MembershipModalProps) 
         }],
         data: {
           from: actor,
-          to: 'tabxpr', // Network fee destination
+          to: 'tokencreate', // Updated to an existing verified account
           quantity: '2500.0000 XPR', // Exactly 4 decimals for XPR
           memo: 'TipTab Membership Activation',
         },
@@ -192,7 +192,7 @@ export const MembershipModal = ({ isOpen, onOpenChange }: MembershipModalProps) 
 
               <p className="text-[10px] text-center text-white/30 uppercase tracking-[0.3em] font-black leading-relaxed">
                 <ShieldCheck className="h-3 w-3 inline mr-2 text-orange-500" />
-                Secured via XPR Network • Destination: @tabxpr
+                Secured via XPR Network • Destination: @tokencreate
               </p>
             </div>
           )}
