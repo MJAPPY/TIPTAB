@@ -222,8 +222,10 @@ const Dashboard = () => {
                       </div>
                     </CardHeader>
                     <CardContent className="p-0">
-                      <div className="flex items-end gap-2 sm:gap-3">
-                        <span className="text-4xl sm:text-6xl font-black tracking-tighter text-slate-100">{Number(balances.tab).toLocaleString()}</span>
+                      <div className="flex items-end gap-2 sm:gap-3 flex-wrap">
+                        <span className="text-4xl sm:text-6xl font-black tracking-tighter text-slate-100 truncate max-w-full">
+                          {Number(balances.tab).toLocaleString()}
+                        </span>
                         <span className="text-sm sm:text-lg font-black text-orange-500 italic mb-1.5 sm:mb-2">TAB</span>
                       </div>
                       <div className="mt-4 sm:mt-6 flex items-center gap-2 text-green-400 text-[8px] sm:text-[10px] font-black uppercase tracking-widest">
@@ -239,9 +241,11 @@ const Dashboard = () => {
                       <CardDescription className="text-slate-400 font-black uppercase tracking-[0.2em] text-[9px] sm:text-[10px]">Liquid XPR</CardDescription>
                     </CardHeader>
                     <CardContent className="p-0">
-                      <div className="flex items-end gap-2 sm:gap-3">
-                        <span className="text-4xl sm:text-6xl font-black tracking-tighter text-slate-100">{Number(balances.xpr).toLocaleString()}</span>
-                        <span className="text-sm sm:text-lg font-black text-purple-400 italic mb-1.5 sm:mb-2">XPR</span>
+                      <div className="flex items-end gap-2 sm:gap-3 flex-wrap">
+                        <span className="text-2xl sm:text-4xl md:text-5xl lg:text-6xl font-black tracking-tighter text-slate-100 truncate max-w-full">
+                          {Number(balances.xpr).toLocaleString(undefined, { minimumFractionDigits: 4, maximumFractionDigits: 4 })}
+                        </span>
+                        <span className="text-sm sm:text-lg font-black text-purple-400 italic mb-1.5 sm:mb-2 shrink-0">XPR</span>
                       </div>
                       <div className="mt-4 sm:mt-6 h-1 w-full bg-white/5 rounded-full overflow-hidden">
                         <div className="h-full bg-purple-500 w-[65%] rounded-full shadow-[0_0_15px_rgba(168,85,247,0.5)]" />
@@ -255,8 +259,8 @@ const Dashboard = () => {
                       <CardDescription className="text-slate-400 font-black uppercase tracking-[0.2em] text-[9px] sm:text-[10px]">Tips Sent</CardDescription>
                     </CardHeader>
                     <CardContent className="p-0">
-                      <div className="flex items-end gap-2 sm:gap-3">
-                        <span className="text-4xl sm:text-6xl font-black tracking-tighter text-slate-100">0</span>
+                      <div className="flex items-end gap-2 sm:gap-3 flex-wrap">
+                        <span className="text-4xl sm:text-6xl font-black tracking-tighter text-slate-100 truncate max-w-full">0</span>
                         <span className="text-sm sm:text-lg font-black text-pink-500 italic mb-1.5 sm:mb-2">TAB</span>
                       </div>
                       <div className="mt-4 sm:mt-6 flex items-center gap-2 text-pink-400 text-[8px] sm:text-[10px] font-black uppercase tracking-widest">
@@ -272,7 +276,7 @@ const Dashboard = () => {
                 <div className="max-w-3xl mx-auto">
                   <Card className="bg-[#130b21] border-white/10 rounded-[32px] sm:rounded-[48px] p-6 sm:p-10 md:p-16 shadow-2xl relative overflow-hidden">
                     <div className="absolute top-0 right-0 p-6 sm:p-10">
-                      <Wallet className="h-8 w-8 sm:h-12 sm:w-12 text-white/20" />
+                      <Wallet className="h-8 w-8 sm:h-12 sm:w-12 text-white/30" />
                     </div>
                     <h3 className="text-2xl sm:text-4xl font-black italic uppercase mb-6 sm:mb-10 tracking-tighter text-slate-100">Execute <span className="text-orange-500">Transfer</span></h3>
                     
