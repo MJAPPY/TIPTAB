@@ -118,13 +118,13 @@ export const TippingModal = ({ creator, onClose }: TippingModalProps) => {
             
             <div className="flex gap-2 mb-2">
               {creator.twitter && (
-                <Button variant="outline" size="icon" className="rounded-xl bg-white/5 border-white/10 hover:border-white/30 h-10 w-10" asChild>
-                  <a href={creator.twitter} target="_blank" rel="noopener noreferrer"><Twitter className="h-4 w-4" /></a>
+                <Button variant="outline" size="icon" className="rounded-xl bg-white/5 border-white/10 hover:border-purple-400 h-10 w-10 group" asChild>
+                  <a href={creator.twitter} target="_blank" rel="noopener noreferrer"><Twitter className="h-4 w-4 group-hover:text-purple-400" /></a>
                 </Button>
               )}
               {creator.website && (
-                <Button variant="outline" size="icon" className="rounded-xl bg-white/5 border-white/10 hover:border-white/30 h-10 w-10" asChild>
-                  <a href={creator.website} target="_blank" rel="noopener noreferrer"><Globe className="h-4 w-4" /></a>
+                <Button variant="outline" size="icon" className="rounded-xl bg-white/5 border-white/10 hover:border-purple-400 h-10 w-10 group" asChild>
+                  <a href={creator.website} target="_blank" rel="noopener noreferrer"><Globe className="h-4 w-4 group-hover:text-purple-400" /></a>
                 </Button>
               )}
             </div>
@@ -158,7 +158,7 @@ export const TippingModal = ({ creator, onClose }: TippingModalProps) => {
                     "h-12 rounded-2xl border-2 font-black transition-all",
                     parseFloat(tipAmount) === parseFloat(amount) 
                       ? "border-orange-500 bg-orange-500/10 text-orange-500 shadow-[0_0_20px_rgba(249,115,22,0.2)]" 
-                      : "bg-white/5 border-transparent hover:bg-white/10 text-white/60 hover:text-white"
+                      : "bg-white/5 border-transparent hover:bg-purple-500/10 text-white/60 hover:text-purple-400"
                   )}
                 >
                   {amount}
@@ -175,7 +175,7 @@ export const TippingModal = ({ creator, onClose }: TippingModalProps) => {
                 value={tipAmount}
                 onChange={(e) => setTipAmount(e.target.value)}
                 onBlur={(e) => setTipAmount(formatValue(e.target.value))}
-                className="bg-white/5 border-white/10 h-16 rounded-3xl text-right text-2xl font-black pl-8 pr-20 focus:ring-orange-500/50 focus:bg-white/10 transition-all border-2"
+                className="bg-white/5 border-white/10 h-16 rounded-3xl text-right text-2xl font-black pl-8 pr-20 focus:ring-purple-500/50 focus:bg-white/10 transition-all border-2"
               />
               <div className="absolute inset-y-0 right-6 flex items-center pointer-events-none">
                 <span className="text-orange-500 font-black">TAB</span>
@@ -187,7 +187,7 @@ export const TippingModal = ({ creator, onClose }: TippingModalProps) => {
                 <Button 
                   onClick={handleSendTip}
                   disabled={isProcessing}
-                  className="w-full h-20 bg-gradient-to-r from-orange-500 to-purple-600 hover:from-orange-600 hover:to-purple-700 text-white font-black text-2xl rounded-3xl shadow-[0_20px_40px_-10px_rgba(249,115,22,0.3)] mt-2 transition-all active:scale-[0.98] group overflow-hidden"
+                  className="w-full h-20 bg-gradient-to-r from-orange-500 to-purple-600 hover:from-purple-600 hover:to-purple-700 text-white font-black text-2xl rounded-3xl shadow-[0_20px_40px_-10px_rgba(249,115,22,0.3)] mt-2 transition-all active:scale-[0.98] group overflow-hidden"
                 >
                   <div className="relative z-10 flex items-center justify-center gap-3">
                     {isProcessing ? (

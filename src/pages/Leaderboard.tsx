@@ -83,7 +83,7 @@ const Leaderboard = () => {
               onClick={() => setActiveTab("creators")}
               className={cn(
                 "h-14 px-8 rounded-2xl font-black text-xs uppercase tracking-widest transition-all gap-3",
-                activeTab === "creators" ? "bg-white text-black shadow-2xl" : "text-white/40 hover:text-white"
+                activeTab === "creators" ? "bg-white text-black shadow-2xl" : "text-white/40 hover:text-purple-400"
               )}
             >
               <Zap className={cn("h-4 w-4", activeTab === "creators" ? "text-orange-500 fill-orange-500" : "")} />
@@ -93,7 +93,7 @@ const Leaderboard = () => {
               onClick={() => setActiveTab("supporters")}
               className={cn(
                 "h-14 px-8 rounded-2xl font-black text-xs uppercase tracking-widest transition-all gap-3",
-                activeTab === "supporters" ? "bg-white text-black shadow-2xl" : "text-white/40 hover:text-white"
+                activeTab === "supporters" ? "bg-white text-black shadow-2xl" : "text-white/40 hover:text-purple-400"
               )}
             >
               <Heart className={cn("h-4 w-4", activeTab === "supporters" ? "text-red-500 fill-red-500" : "")} />
@@ -193,7 +193,7 @@ const Leaderboard = () => {
               className="bg-white/5 border border-white/10 rounded-[24px] md:rounded-3xl p-4 md:p-6 flex items-center justify-between group hover:bg-white/15 hover:border-cyan-400/50 transition-all cursor-pointer"
             >
               <div className="flex items-center gap-4 md:gap-8">
-                <span className="w-8 text-center font-black text-white/60 text-lg md:text-xl group-hover:text-cyan-400 transition-colors">#{i + 4}</span>
+                <span className="w-8 text-center font-black text-white/60 text-lg md:text-xl group-hover:text-purple-400 transition-colors">#{i + 4}</span>
                 <div className="flex items-center gap-3 md:gap-4">
                   <div className={cn("h-12 md:h-16 w-12 md:w-16 rounded-xl md:rounded-2xl flex items-center justify-center text-base md:text-xl font-black border-2 border-white/20 overflow-hidden relative shadow-lg", participant.color)}>
                     {("avatarImage" in participant && participant.avatarImage) ? (
@@ -203,8 +203,8 @@ const Leaderboard = () => {
                     )}
                   </div>
                   <div className="max-w-[100px] sm:max-w-none">
-                    <h4 className="font-black text-sm md:text-lg group-hover:text-white transition-colors truncate">{participant.name}</h4>
-                    <p className="text-xs md:text-sm text-white/70 font-bold group-hover:text-cyan-300 transition-colors truncate">@{participant.handle}</p>
+                    <h4 className="font-black text-sm md:text-lg group-hover:text-purple-100 transition-colors truncate">{participant.name}</h4>
+                    <p className="text-xs md:text-sm text-white/70 font-bold group-hover:text-purple-400 transition-colors truncate">@{participant.handle}</p>
                     <p className="text-[9px] text-slate-500 font-bold mt-0.5">{participant.location}</p>
                   </div>
                 </div>
@@ -220,7 +220,7 @@ const Leaderboard = () => {
                   {participant.activityCount} {activeTab === "creators" ? "Tips" : "Tips Sent"}
                 </div>
                 <div className="w-20 md:w-32 text-right">
-                  <span className="text-xl md:text-2xl font-black group-hover:text-cyan-400 transition-colors">{participant.totalValue.toLocaleString()}</span>
+                  <span className="text-xl md:text-2xl font-black group-hover:text-purple-400 transition-colors">{participant.totalValue.toLocaleString()}</span>
                   <span className="text-[9px] md:text-[10px] font-black text-white/40 ml-1 uppercase tracking-widest">TAB</span>
                 </div>
               </div>
@@ -246,7 +246,7 @@ const Leaderboard = () => {
           </p>
           <Button 
             onClick={() => setIsMembershipOpen(true)}
-            className="bg-white text-black hover:bg-cyan-400 hover:text-black font-black text-lg md:text-2xl rounded-full h-16 md:h-20 px-8 md:px-12 shadow-[0_0_40px_rgba(255,255,255,0.3)] transition-all active:scale-95"
+            className="bg-white text-black hover:bg-purple-500 hover:text-white font-black text-lg md:text-2xl rounded-full h-16 md:h-20 px-8 md:px-12 shadow-[0_0_40px_rgba(255,255,255,0.3)] transition-all active:scale-95"
           >
             JOIN THE NETWORK
           </Button>

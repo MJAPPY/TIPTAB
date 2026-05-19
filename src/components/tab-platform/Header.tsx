@@ -105,7 +105,7 @@ export const Header = ({ onBecomeCreator }: HeaderProps) => {
         <Button 
           variant="ghost" 
           className={cn(
-            "w-full text-slate-200 hover:text-white flex items-center gap-3 font-bold bg-white/5 border border-white/10 rounded-2xl px-5 transition-all",
+            "w-full text-slate-200 hover:text-purple-400 flex items-center gap-3 font-bold bg-white/5 border border-white/10 rounded-2xl px-5 transition-all",
             isMobile ? "h-15 justify-start text-sm" : "lg:w-auto lg:justify-center h-12"
           )}
         >
@@ -159,7 +159,7 @@ export const Header = ({ onBecomeCreator }: HeaderProps) => {
             setIsOpen(false);
           }}
           className={cn(
-            "w-full border-orange-500/50 bg-orange-500/10 text-orange-400 hover:bg-orange-500 hover:text-white flex items-center gap-3 font-black rounded-2xl px-5 transition-all shadow-[0_0_20px_rgba(249,115,22,0.15)]",
+            "w-full border-orange-500/50 bg-orange-500/10 text-orange-400 hover:bg-orange-500 hover:text-purple-100 flex items-center gap-3 font-black rounded-2xl px-5 transition-all shadow-[0_0_20px_rgba(249,115,22,0.15)]",
             isMobile ? "h-15 justify-start text-sm" : "lg:w-auto lg:justify-center h-12"
           )}
         >
@@ -178,7 +178,7 @@ export const Header = ({ onBecomeCreator }: HeaderProps) => {
           <div className="flex items-center gap-2 sm:gap-4 shrink-0">
             {location.pathname === '/admin' ? (
               <div className="flex items-center gap-1.5 sm:gap-4">
-                <Link to="/" onClick={handleHomeClick} className="flex items-center gap-1 sm:gap-2 text-white/40 hover:text-white transition-colors">
+                <Link to="/" onClick={handleHomeClick} className="flex items-center gap-1 sm:gap-2 text-white/40 hover:text-purple-400 transition-colors">
                   <ArrowLeft className="h-4 w-4" />
                   <span className="hidden xs:inline text-[8px] sm:text-xs font-black uppercase tracking-widest text-slate-300">Exit</span>
                 </Link>
@@ -192,7 +192,7 @@ export const Header = ({ onBecomeCreator }: HeaderProps) => {
               </div>
             ) : location.pathname === '/dashboard' ? (
               <div className="flex items-center gap-1.5 sm:gap-4">
-                <Link to="/" onClick={handleHomeClick} className="flex items-center gap-1 sm:gap-2 text-white/40 hover:text-white transition-colors">
+                <Link to="/" onClick={handleHomeClick} className="flex items-center gap-1 sm:gap-2 text-white/40 hover:text-purple-400 transition-colors">
                   <ArrowLeft className="h-4 w-4 sm:h-5 sm:w-5" />
                   <span className="hidden xs:inline font-bold text-[10px] sm:text-base text-slate-300">Map</span>
                 </Link>
@@ -241,7 +241,7 @@ export const Header = ({ onBecomeCreator }: HeaderProps) => {
                   variant="ghost" 
                   size="icon" 
                   onClick={handleRefresh}
-                  className="h-5 w-5 sm:h-8 sm:w-8 text-white/30 hover:text-white"
+                  className="h-5 w-5 sm:h-8 sm:w-8 text-white/30 hover:text-purple-400"
                 >
                   <RefreshCw className={cn("h-2.5 w-2.5 sm:h-4 sm:w-4", isRefreshing && "animate-spin")} />
                 </Button>
@@ -253,7 +253,7 @@ export const Header = ({ onBecomeCreator }: HeaderProps) => {
                 <DropdownMenuTrigger asChild>
                   <Button 
                     className={cn(
-                      "flex items-center gap-1 sm:gap-4 rounded-xl sm:rounded-2xl h-10 sm:h-16 px-2 sm:px-8 font-black text-[9px] sm:text-sm transition-all active:scale-95 group shrink-0 bg-white/5 border border-white/10 text-slate-200 hover:bg-white/10 shadow-xl",
+                      "flex items-center gap-1 sm:gap-4 rounded-xl sm:rounded-2xl h-10 sm:h-16 px-2 sm:px-8 font-black text-[9px] sm:text-sm transition-all active:scale-95 group shrink-0 bg-white/5 border border-white/10 text-slate-200 hover:bg-purple-500/10 hover:text-purple-400 shadow-xl",
                       isAdmin && "border-orange-500/60 bg-orange-500/10"
                     )}
                   >
@@ -303,7 +303,7 @@ export const Header = ({ onBecomeCreator }: HeaderProps) => {
                       </Link>
                     </DropdownMenuItem>
                   )}
-                  <DropdownMenuItem asChild className="focus:bg-white/5 focus:text-white rounded-xl cursor-pointer">
+                  <DropdownMenuItem asChild className="focus:bg-purple-500/10 focus:text-purple-400 rounded-xl cursor-pointer">
                     <Link to="/dashboard" className="flex items-center gap-3 px-3 py-2.5">
                       <LayoutDashboard className="h-4 w-4 text-purple-400" />
                       <span className="font-bold text-slate-200">{isMember ? "Creator Hub" : "Supporter Hub"}</span>
@@ -328,7 +328,7 @@ export const Header = ({ onBecomeCreator }: HeaderProps) => {
 
             <Sheet open={isOpen} onOpenChange={setIsOpen}>
               <SheetTrigger asChild>
-                <Button variant="ghost" size="icon" className="text-white bg-white/5 border border-white/10 hover:bg-white/10 h-10 w-10 sm:h-16 sm:w-16 rounded-xl sm:rounded-2xl shrink-0">
+                <Button variant="ghost" size="icon" className="text-white bg-white/5 border border-white/10 hover:bg-purple-500/10 h-10 w-10 sm:h-16 sm:w-16 rounded-xl sm:rounded-2xl shrink-0">
                   <Menu className="h-4 w-4 sm:h-6 sm:w-6 text-slate-200" />
                 </Button>
               </SheetTrigger>

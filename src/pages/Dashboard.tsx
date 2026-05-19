@@ -109,7 +109,7 @@ const Dashboard = () => {
       <div className="min-h-screen bg-[#0a0514] flex flex-col items-center justify-center p-6 text-center">
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-purple-600/10 blur-[150px] rounded-full -z-10" />
         <h1 className="text-4xl md:text-6xl font-black mb-8 tracking-tighter italic text-slate-100">AUTHENTICATION <span className="text-orange-500">REQUIRED</span></h1>
-        <Button onClick={login} className="h-20 px-12 bg-white text-black hover:bg-orange-500 hover:text-white rounded-[32px] font-black text-2xl shadow-2xl transition-all active:scale-95">
+        <Button onClick={login} className="h-20 px-12 bg-white text-black hover:bg-purple-500 hover:text-white rounded-[32px] font-black text-2xl shadow-2xl transition-all active:scale-95">
           Connect WebAuth
         </Button>
       </div>
@@ -163,7 +163,7 @@ const Dashboard = () => {
                   "h-12 sm:h-14 px-4 sm:px-6 rounded-2xl gap-2 sm:gap-3 font-black text-[10px] sm:text-xs uppercase tracking-widest transition-all",
                   activeTab === item.id 
                     ? "bg-white text-black shadow-xl" 
-                    : "text-slate-400 hover:text-slate-100 hover:bg-white/5"
+                    : "text-slate-400 hover:text-purple-400 hover:bg-purple-500/5"
                 )}
                >
                  <item.icon className="h-3 w-3 sm:h-4 w-4" />
@@ -184,7 +184,7 @@ const Dashboard = () => {
                     <CardHeader className="p-0">
                       <div className="flex items-center justify-between">
                         <CardDescription className="text-slate-400 font-black uppercase tracking-[0.2em] text-[9px] sm:text-[10px]">Liquid TAB</CardDescription>
-                        <Button variant="ghost" size="icon" onClick={handleManualRefresh} className="h-8 w-8 sm:h-10 sm:w-10 rounded-xl bg-white/5 text-white/30 hover:text-white transition-all">
+                        <Button variant="ghost" size="icon" onClick={handleManualRefresh} className="h-8 w-8 sm:h-10 sm:w-10 rounded-xl bg-white/5 text-white/30 hover:text-purple-400 transition-all">
                           <RefreshCw className={cn("h-2.5 w-2.5 sm:h-4 sm:w-4", isRefreshing && "animate-spin")} />
                         </Button>
                       </div>
@@ -291,7 +291,7 @@ const Dashboard = () => {
                       <Button 
                         onClick={handleTransfer} 
                         disabled={isSending} 
-                        className="w-full h-16 sm:h-24 bg-white text-black hover:bg-orange-500 hover:text-white font-black text-lg sm:text-2xl rounded-2xl sm:rounded-[32px] shadow-2xl shadow-white/5 transition-all active:scale-[0.98]"
+                        className="w-full h-16 sm:h-24 bg-white text-black hover:bg-purple-500 hover:text-white font-black text-lg sm:text-2xl rounded-2xl sm:rounded-[32px] shadow-2xl shadow-white/5 transition-all active:scale-[0.98]"
                       >
                         {isSending ? (
                           <div className="flex items-center gap-3">

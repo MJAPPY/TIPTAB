@@ -58,7 +58,7 @@ export const FeaturedCreators = ({ creators, onSelectCreator, onAddYourself }: F
         
         <Button 
           onClick={onAddYourself}
-          className="bg-white text-black hover:bg-purple-500 hover:text-white flex items-center gap-3 rounded-[24px] h-16 px-10 font-black text-xl shadow-[0_20px_40px_rgba(255,255,255,0.1)] transition-all active:scale-95 group"
+          className="bg-white text-black hover:bg-purple-500 hover:text-purple-100 flex items-center gap-3 rounded-[24px] h-16 px-10 font-black text-xl shadow-[0_20px_40px_rgba(255,255,255,0.1)] transition-all active:scale-95 group"
         >
           <Plus className="h-6 w-6 group-hover:rotate-90 transition-transform" />
           Join The Map
@@ -87,7 +87,7 @@ export const FeaturedCreators = ({ creators, onSelectCreator, onAddYourself }: F
                   "rounded-2xl h-12 px-6 whitespace-nowrap font-black text-[11px] uppercase tracking-[0.15em] transition-all border-2",
                   activeCategory === cat.name 
                   ? "bg-purple-500/20 border-purple-500/60 text-purple-400 shadow-[0_0_20px_rgba(168,85,247,0.3)]" 
-                  : "bg-white/10 border-transparent text-white/60 hover:text-white hover:bg-white/20"
+                  : "bg-white/10 border-transparent text-white/60 hover:text-purple-400 hover:bg-purple-500/10"
                 )}
               >
                 {cat.name}
@@ -138,20 +138,20 @@ export const FeaturedCreators = ({ creators, onSelectCreator, onAddYourself }: F
                 </div>
               </div>
               
-              <p className="text-white/70 text-lg leading-relaxed mb-8 line-clamp-2 relative z-10 font-medium tracking-tight group-hover:text-white transition-colors">
+              <p className="text-white/70 text-lg leading-relaxed mb-8 line-clamp-2 relative z-10 font-medium tracking-tight group-hover:text-purple-300 transition-colors">
                 {creator.bio}
               </p>
               
               <div className="flex items-center justify-between mt-auto pt-6 border-t border-white/10 relative z-10">
                 <div className="flex items-center gap-6">
-                  <div className="flex items-center gap-2.5 text-white/60 text-xs font-black uppercase tracking-widest group-hover:text-white transition-colors">
+                  <div className="flex items-center gap-2.5 text-white/60 text-xs font-black uppercase tracking-widest group-hover:text-purple-300 transition-colors">
                     <MapPin className="h-4 w-4" style={{ color: theme.color }} />
                     {creator.location}
                   </div>
                   <div className="flex items-center gap-4">
-                    {creator.twitter && <Twitter className="h-4 w-4 text-white/40 hover:text-white transition-colors" />}
-                    {creator.instagram && <Instagram className="h-4 w-4 text-white/40 hover:text-white transition-colors" />}
-                    {creator.website && <Globe className="h-4 w-4 text-white/40 hover:text-white transition-colors" />}
+                    {creator.twitter && <Twitter className="h-4 w-4 text-white/40 hover:text-purple-400 transition-colors" />}
+                    {creator.instagram && <Instagram className="h-4 w-4 text-white/40 hover:text-purple-400 transition-colors" />}
+                    {creator.website && <Globe className="h-4 w-4 text-white/40 hover:text-purple-400 transition-colors" />}
                   </div>
                 </div>
                 

@@ -138,7 +138,7 @@ export const MembershipModal = ({ isOpen, onOpenChange }: MembershipModalProps) 
                       <item.icon className="h-6 w-6 text-purple-400" />
                     </div>
                     <div>
-                      <h4 className="font-black text-white text-base tracking-tight">{item.title}</h4>
+                      <h4 className="font-black text-white text-base tracking-tight group-hover:text-purple-400 transition-colors">{item.title}</h4>
                       <p className="text-sm text-white/50 font-bold">{item.desc}</p>
                     </div>
                   </div>
@@ -147,7 +147,7 @@ export const MembershipModal = ({ isOpen, onOpenChange }: MembershipModalProps) 
 
               <Button 
                 onClick={handleNextStep}
-                className="w-full h-20 bg-white text-black hover:bg-orange-500 hover:text-white font-black text-2xl rounded-3xl shadow-[0_20px_40px_rgba(255,255,255,0.1)] transition-all group active:scale-95 animate-shimmer-silver"
+                className="w-full h-20 bg-white text-black hover:bg-purple-500 hover:text-white font-black text-2xl rounded-3xl shadow-[0_20px_40px_rgba(255,255,255,0.1)] transition-all group active:scale-95 animate-shimmer-silver"
               >
                 {isConnected ? "Continue to Payment" : "Connect WebAuth"} <ArrowRight className="ml-3 h-6 w-6 group-hover:translate-x-2 transition-transform" />
               </Button>
@@ -157,7 +157,7 @@ export const MembershipModal = ({ isOpen, onOpenChange }: MembershipModalProps) 
           {step === "payment" && isConnected && (
             <div className="space-y-10 animate-in fade-in slide-in-from-right-4 duration-500">
               <div className="space-y-2">
-                <Button variant="ghost" onClick={() => setStep("intro")} className="text-white/60 hover:text-white -ml-4 font-black tracking-widest uppercase text-xs">
+                <Button variant="ghost" onClick={() => setStep("intro")} className="text-white/60 hover:text-purple-400 -ml-4 font-black tracking-widest uppercase text-xs">
                   ← Back to benefits
                 </Button>
                 <DialogHeader>
@@ -168,16 +168,16 @@ export const MembershipModal = ({ isOpen, onOpenChange }: MembershipModalProps) 
                 </DialogHeader>
               </div>
 
-              <div className="bg-white/5 border-2 border-white/10 rounded-[40px] p-10 text-center relative overflow-hidden group hover:border-orange-500/50 transition-all">
+              <div className="bg-white/5 border-2 border-white/10 rounded-[40px] p-10 text-center relative overflow-hidden group hover:border-purple-500/50 transition-all">
                 <div className="absolute top-0 right-0 p-6 sm:p-10">
-                  <div className="px-4 py-1.5 rounded-full bg-orange-500 text-white text-[10px] font-black uppercase tracking-[0.2em] shadow-lg">
+                  <div className="px-4 py-1.5 rounded-full bg-orange-500 text-white text-[10px] font-black uppercase tracking-[0.2em] shadow-lg group-hover:bg-purple-500 transition-colors">
                     Network Fee
                   </div>
                 </div>
-                <p className="text-white/40 font-black uppercase tracking-[0.3em] text-[10px] mb-3">Total Activation Amount</p>
+                <p className="text-white/40 font-black uppercase tracking-[0.3em] text-[10px] mb-3 group-hover:text-purple-400 transition-colors">Total Activation Amount</p>
                 <div className="flex items-center justify-center gap-4">
-                  <span className="text-7xl font-black tracking-tighter drop-shadow-[0_0_20px_rgba(255,255,255,0.2)]">2,500</span>
-                  <span className="text-3xl font-black text-orange-500 italic">XPR</span>
+                  <span className="text-7xl font-black tracking-tighter drop-shadow-[0_0_20px_rgba(255,255,255,0.2)] group-hover:text-purple-100 transition-colors">2,500</span>
+                  <span className="text-3xl font-black text-orange-500 italic group-hover:text-purple-400 transition-colors">XPR</span>
                 </div>
               </div>
 
@@ -196,7 +196,7 @@ export const MembershipModal = ({ isOpen, onOpenChange }: MembershipModalProps) 
                 <Button 
                   onClick={handleJoin} 
                   disabled={isProcessing}
-                  className="w-full h-24 bg-gradient-to-r from-orange-500 to-purple-600 hover:from-orange-600 hover:to-purple-700 text-white font-black text-2xl rounded-[32px] shadow-[0_20px_50px_rgba(249,115,22,0.3)] border-b-4 border-black/20 transition-all active:translate-y-1 active:border-b-0"
+                  className="w-full h-24 bg-gradient-to-r from-orange-500 to-purple-600 hover:from-purple-600 hover:to-purple-700 text-white font-black text-2xl rounded-[32px] shadow-[0_20px_50px_rgba(249,115,22,0.3)] border-b-4 border-black/20 transition-all active:translate-y-1 active:border-b-0"
                 >
                   {isProcessing ? (
                     <div className="flex items-center gap-4">
@@ -235,14 +235,14 @@ export const MembershipModal = ({ isOpen, onOpenChange }: MembershipModalProps) 
               <div className="flex flex-col gap-4">
                 <Button 
                   onClick={() => (window.location.href = "/dashboard")}
-                  className="h-20 bg-white text-black hover:bg-orange-500 hover:text-white font-black text-2xl rounded-3xl shadow-2xl transition-all"
+                  className="h-20 bg-white text-black hover:bg-purple-500 hover:text-white font-black text-2xl rounded-3xl shadow-2xl transition-all"
                 >
                   GO TO CREATOR HUB
                 </Button>
                 <Button 
                   variant="ghost"
                   onClick={handleClose}
-                  className="text-white/40 hover:text-white font-black tracking-widest uppercase text-xs"
+                  className="text-white/40 hover:text-purple-400 font-black tracking-widest uppercase text-xs"
                 >
                   CLOSE DIALOG
                 </Button>
