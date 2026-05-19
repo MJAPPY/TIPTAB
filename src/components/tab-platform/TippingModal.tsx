@@ -19,15 +19,17 @@ interface TippingModalProps {
 }
 
 export const TippingModal = ({ creator, onClose }: TippingModalProps) => {
-  const [tipAmount, setTipAmount] = useState<string>("50.0000");
+  // Initialize with 8 decimals for TAB
+  const [tipAmount, setTipAmount] = useState<string>("50.00000000");
   const [isProcessing, setIsProcessing] = useState(false);
   const { toast } = useToast();
   const { session, actor, login, isConnected } = useXpr();
 
   const formatValue = (val: string) => {
     const numericValue = parseFloat(val);
-    if (isNaN(numericValue)) return "0.0000";
-    return numericValue.toFixed(4);
+    if (isNaN(numericValue)) return "0.00000000";
+    // Using 8 decimals to match tokencreate contract requirements for TAB
+    return numericValue.toFixed(8);
   };
 
   const handleConnect = async () => {
@@ -54,7 +56,8 @@ export const TippingModal = ({ creator, onClose }: TippingModalProps) => {
     setIsProcessing(true);
     try {
       const recipient = creator.handle.replace(/^@/, "").toLowerCase().trim();
-      const quantityString = `${amountNum.toFixed(4)} TAB`;
+      // TAB is a tokencreate token which typically requires 8 decimal places
+      const quantityString = amountNum.toFixed(8) + " TAB";
       const permission = session.auth.permission || 'active';
 
       const transferAction = {
@@ -76,7 +79,7 @@ export const TippingModal = ({ creator, onClose }: TippingModalProps) => {
       
       toast({
         title: "Tip Sent Successfully!",
-        description: `Sent ${quantityString} to ${creator.name}.`,
+        description: "Sent " + quantityString + " to " + creator.name + ".",
       });
       onClose();
     } catch (error: any) {
@@ -155,7 +158,7 @@ export const TippingModal = ({ creator, onClose }: TippingModalProps) => {
                   variant="ghost"
                   onClick={() => setTipAmount(formatValue(amount))}
                   className={cn(
-                    "h-12 rounded-2xl border-2 font-black transition-all",
+                    "h-12 rounded-2xl border-2 font-black transition-all text-xs",
                     parseFloat(tipAmount) === parseFloat(amount) 
                       ? "border-orange-500 bg-orange-500/10 text-orange-500 shadow-[0_0_20px_rgba(249,115,22,0.2)]" 
                       : "bg-white/5 border-transparent hover:bg-white/10 text-white/60 hover:text-white"
@@ -168,17 +171,17 @@ export const TippingModal = ({ creator, onClose }: TippingModalProps) => {
             
             <div className="relative group">
               <div className="absolute inset-y-0 left-6 flex items-center pointer-events-none">
-                <span className="text-white/20 font-black tracking-widest text-[10px] uppercase">Custom Amount</span>
+                <span className="text-white/20 font-black tracking-widest text-[8px] uppercase">Amount</span>
               </div>
               <Input 
-                placeholder="0.0000" 
+                placeholder="0.00000000" 
                 value={tipAmount}
                 onChange={(e) => setTipAmount(e.target.value)}
                 onBlur={(e) => setTipAmount(formatValue(e.target.value))}
-                className="bg-white/5 border-white/10 h-16 rounded-3xl text-right text-2xl font-black pl-8 pr-20 focus:ring-orange-500/50 focus:bg-white/10 transition-all border-2"
+                className="bg-white/5 border-white/10 h-16 rounded-3xl text-right text-xl font-black pl-8 pr-20 focus:ring-orange-500/50 focus:bg-white/10 transition-all border-2"
               />
               <div className="absolute inset-y-0 right-6 flex items-center pointer-events-none">
-                <span className="text-orange-500 font-black">TAB</span>
+                <span className="text-orange-500 font-black text-sm">TAB</span>
               </div>
             </div>
             

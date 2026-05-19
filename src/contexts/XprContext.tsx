@@ -33,7 +33,7 @@ const APP_IDENTIFIER = 'tiptab';
 
 export const XprProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [session, setSession] = useState<LinkSession | null>(null);
-  const [balances, setBalances] = useState<Balances>({ xpr: '0.0000', tab: '0.0000' });
+  const [balances, setBalances] = useState<Balances>({ xpr: '0.0000', tab: '0.00000000' });
   const [isLoading, setIsLoading] = useState(true);
 
   const fetchBalances = useCallback(async (account: string) => {
@@ -67,7 +67,7 @@ export const XprProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
       setBalances({
         xpr: xprData[0] ? parseFloat(xprData[0].split(' ')[0]).toFixed(4) : '0.0000',
-        tab: tabData[0] ? parseFloat(tabData[0].split(' ')[0]).toFixed(4) : '0.0000'
+        tab: tabData[0] ? parseFloat(tabData[0].split(' ')[0]).toFixed(8) : '0.00000000'
       });
     } catch (error) {
       console.error('Balance sync error:', error);
@@ -136,7 +136,7 @@ export const XprProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     if (session) {
       await session.remove();
       setSession(null);
-      setBalances({ xpr: '0.0000', tab: '0.0000' });
+      setBalances({ xpr: '0.0000', tab: '0.00000000' });
     }
   };
 

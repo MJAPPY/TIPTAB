@@ -63,10 +63,10 @@ const Dashboard = () => {
     }
   }, [isConnected, actor]);
 
-  const formatPrecision = (val: string) => {
+  const formatPrecision = (val: string, symbol: string) => {
     const num = parseFloat(val);
     if (isNaN(num)) return "";
-    return num.toFixed(4);
+    return symbol === "TAB" ? num.toFixed(8) : num.toFixed(4);
   };
 
   const handleUpdateProfile = (updatedData: Creator) => {
@@ -95,7 +95,8 @@ const Dashboard = () => {
     setIsSending(true);
     try {
       const contract = transferSymbol === "TAB" ? "tokencreate" : "eosio.token";
-      const formattedQuantity = `${amountNum.toFixed(4)} ${transferSymbol}`;
+      const precision = transferSymbol === "TAB" ? 8 : 4;
+      const formattedQuantity = amountNum.toFixed(precision) + " " + transferSymbol;
       
       const actions = [{
         account: contract,
@@ -116,7 +117,7 @@ const Dashboard = () => {
       
       toast({
         title: "Transfer Complete",
-        description: `Successfully sent ${formattedQuantity} to @${transferRecipient}`,
+        description: "Successfully sent " + formattedQuantity + " to @" + transferRecipient,
       });
       
       setTransferAmount("");
@@ -185,7 +186,7 @@ const Dashboard = () => {
                       </Button>
                     </CardHeader>
                     <CardContent>
-                      <CardTitle className="text-3xl font-black">{Number(balances.tab).toLocaleString(undefined, { minimumFractionDigits: 4 })} TAB</CardTitle>
+                      <CardTitle className="text-2xl font-black truncate">{Number(balances.tab).toLocaleString(undefined, { minimumFractionDigits: 4 })} TAB</CardTitle>
                     </CardContent>
                   </Card>
                 </div>
@@ -202,7 +203,7 @@ const Dashboard = () => {
                     <div className="space-y-3">
                       <Label className="text-[10px] font-black uppercase text-white/40">Amount</Label>
                       <div className="flex gap-2">
-                        <Input placeholder="0.0000" value={transferAmount} onChange={(e) => setTransferAmount(e.target.value)} onBlur={(e) => setTransferAmount(formatPrecision(e.target.value))} className="flex-1 bg-white/5 h-14 rounded-2xl font-black text-xl text-white" />
+                        <Input placeholder="0.00000000" value={transferAmount} onChange={(e) => setTransferAmount(e.target.value)} onBlur={(e) => setTransferAmount(formatPrecision(e.target.value, transferSymbol))} className="flex-1 bg-white/5 h-14 rounded-2xl font-black text-xl text-white" />
                         <Select value={transferSymbol} onValueChange={setTransferSymbol}>
                           <SelectTrigger className="w-[120px] bg-white/5 h-14 rounded-2xl font-black text-white"><SelectValue /></SelectTrigger>
                           <SelectContent className="bg-[#1a102d] text-white">
