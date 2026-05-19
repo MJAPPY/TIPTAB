@@ -1,13 +1,12 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { 
   User as UserIcon, 
   Settings, 
   CreditCard, 
   TrendingUp, 
-  ArrowLeft, 
   Wallet,
   Zap,
   Share2,
@@ -105,7 +104,7 @@ const Dashboard = () => {
     try {
       const contract = transferSymbol === "TAB" ? "tokencreate" : "eosio.token";
       
-      // CRITICAL: Construct the exact 4-decimal asset string required by the contract
+      // STARK COMPLIANCE: Exactly 4 decimals and Symbol (X.XXXX SYMBOL)
       const formattedQuantity = `${amountNum.toFixed(4)} ${transferSymbol}`;
       
       const actions = [{

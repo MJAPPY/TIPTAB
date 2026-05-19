@@ -44,6 +44,7 @@ export const MembershipModal = ({ isOpen, onOpenChange }: MembershipModalProps) 
     
     setIsProcessing(true);
     try {
+      // STARK COMPLIANCE: 4-decimal precision for XPR
       const actions = [{
         account: 'eosio.token', 
         name: 'transfer',

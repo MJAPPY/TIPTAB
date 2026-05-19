@@ -7,7 +7,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Twitter, Globe, Instagram, Zap, ShieldCheck, Wallet } from "lucide-react";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Creator } from "@/data/creators";
 import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
@@ -19,13 +19,11 @@ interface TippingModalProps {
 }
 
 export const TippingModal = ({ creator, onClose }: TippingModalProps) => {
-  // Always start with the 4-decimal format
-  const [tipAmount, setTipAmount] = useState<string>("100.0000");
+  const [tipAmount, setTipAmount] = useState<string>("50.0000");
   const [isProcessing, setIsProcessing] = useState(false);
   const { toast } = useToast();
   const { session, actor, login, isConnected } = useXpr();
 
-  // Forces string input into X.XXXX format
   const formatValue = (val: string) => {
     const numericValue = parseFloat(val);
     if (isNaN(numericValue)) return "0.0000";
@@ -55,10 +53,9 @@ export const TippingModal = ({ creator, onClose }: TippingModalProps) => {
 
     setIsProcessing(true);
     try {
-      // Extract valid XPR account from handle
       const recipient = creator?.handle.replace(/^@/, "").toLowerCase().trim();
       
-      // CRITICAL: Construct the exact 4-decimal asset string required by tokencreate
+      // STARK COMPLIANCE: Exactly 4 decimals and TAB symbol
       const quantityString = `${amountNum.toFixed(4)} TAB`;
 
       const actions = [{
@@ -80,14 +77,13 @@ export const TippingModal = ({ creator, onClose }: TippingModalProps) => {
       
       toast({
         title: "Tip Sent Successfully!",
-        description: `Successfully sent ${quantityString} to ${creator?.name}.`,
+        description: `Sent ${quantityString} to ${creator?.name}.`,
       });
       onClose();
     } catch (error: any) {
-      console.error("Tipping error:", error);
       toast({ 
         title: "Transaction failed", 
-        description: error.message || "Please check your balance and try again.", 
+        description: error.message || "Precision mismatch or wallet error.", 
         variant: "destructive" 
       });
     } finally {
@@ -102,7 +98,6 @@ export const TippingModal = ({ creator, onClose }: TippingModalProps) => {
   return (
     <Dialog open={!!creator} onOpenChange={(open) => !open && onClose()}>
       <DialogContent className="bg-[#0d071a]/95 backdrop-blur-[32px] border-white/10 text-white sm:max-w-[460px] rounded-[40px] p-0 overflow-hidden shadow-[0_0_100px_rgba(0,0,0,0.8)] border-t-purple-500/20">
-        
         <div className="relative h-24 w-full overflow-hidden">
           <div className={cn("absolute inset-0 opacity-30", creator.color)} />
           <div className="absolute inset-0 bg-gradient-to-t from-[#0d071a] to-transparent" />

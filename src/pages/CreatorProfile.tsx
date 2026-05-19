@@ -30,7 +30,7 @@ const CreatorProfile = () => {
   const { session, actor, login, isConnected } = useXpr();
   
   const [creator, setCreator] = useState<Creator | null>(null);
-  const [tipAmount, setTipAmount] = useState("100.0000");
+  const [tipAmount, setTipAmount] = useState("50.0000");
   const [isProcessing, setIsProcessing] = useState(false);
   const [isMembershipOpen, setIsMembershipOpen] = useState(false);
   const [isCopied, setIsCopied] = useState(false);
@@ -109,7 +109,6 @@ const CreatorProfile = () => {
         description: `Successfully sent ${quantityString} to ${creator?.name}.`,
       });
     } catch (error: any) {
-      console.error("Tipping error:", error);
       toast({
         title: "Transaction Failed",
         description: error.message || "Please check your balance and try again.",
