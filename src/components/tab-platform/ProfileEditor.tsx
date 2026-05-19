@@ -222,10 +222,12 @@ export const ProfileEditor = ({ initialData, onSave, minimal = false }: ProfileE
             </div>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-            {/* Display Name is usually good for everyone, but minimal focuses on Location */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-10">
+            {/* Display Name */}
             <div className="space-y-2">
-              <Label htmlFor="name" className="text-white/60 font-bold uppercase tracking-widest text-[10px]">Display Name</Label>
+              <div className="flex items-center justify-between h-6 mb-1">
+                <Label htmlFor="name" className="text-white/60 font-bold uppercase tracking-widest text-[10px]">Display Name</Label>
+              </div>
               <div className="relative">
                 <User className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-purple-500" />
                 <Input 
@@ -238,9 +240,9 @@ export const ProfileEditor = ({ initialData, onSave, minimal = false }: ProfileE
               </div>
             </div>
 
-            {/* Location is essential for both */}
+            {/* Location */}
             <div className="space-y-2">
-              <div className="flex items-center justify-between mb-1">
+              <div className="flex items-center justify-between h-6 mb-1">
                 <Label htmlFor="location" className="text-white/60 font-bold uppercase tracking-widest text-[10px]">Location (Typed City Pin)</Label>
                 {isCityRecognized && (
                   <div className="flex items-center gap-1.5 text-[9px] font-black text-green-400 uppercase tracking-widest animate-in fade-in slide-in-from-right-2">
@@ -267,7 +269,9 @@ export const ProfileEditor = ({ initialData, onSave, minimal = false }: ProfileE
             {!minimal && (
               <>
                 <div className="space-y-2">
-                  <Label htmlFor="handle" className="text-white/60 font-bold uppercase tracking-widest text-[10px]">Public Handle</Label>
+                  <div className="flex items-center justify-between h-6 mb-1">
+                    <Label htmlFor="handle" className="text-white/60 font-bold uppercase tracking-widest text-[10px]">Public Handle</Label>
+                  </div>
                   <div className="relative">
                     <AtSign className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-purple-500" />
                     <Input 
@@ -280,19 +284,10 @@ export const ProfileEditor = ({ initialData, onSave, minimal = false }: ProfileE
                   </div>
                 </div>
 
-                <div className="space-y-2 md:col-span-2">
-                  <Label htmlFor="bio" className="text-white/60 font-bold uppercase tracking-widest text-[10px]">Short Bio</Label>
-                  <Textarea 
-                    id="bio"
-                    value={formData.bio}
-                    onChange={handleChange}
-                    placeholder="Tell the world what you build..."
-                    className="bg-white/5 border-white/10 min-h-[120px] rounded-2xl focus:ring-purple-500 focus:bg-white/10 transition-all resize-none p-4 text-white" 
-                  />
-                </div>
-
                 <div className="space-y-2">
-                  <Label className="text-white/60 font-bold uppercase tracking-widest text-[10px]">Category</Label>
+                  <div className="flex items-center justify-between h-6 mb-1">
+                    <Label className="text-white/60 font-bold uppercase tracking-widest text-[10px]">Category</Label>
+                  </div>
                   <Select 
                     value={formData.category}
                     onValueChange={handleCategoryChange}
@@ -310,8 +305,23 @@ export const ProfileEditor = ({ initialData, onSave, minimal = false }: ProfileE
                   </Select>
                 </div>
 
+                <div className="space-y-2 md:col-span-2">
+                  <div className="flex items-center justify-between h-6 mb-1">
+                    <Label htmlFor="bio" className="text-white/60 font-bold uppercase tracking-widest text-[10px]">Short Bio</Label>
+                  </div>
+                  <Textarea 
+                    id="bio"
+                    value={formData.bio}
+                    onChange={handleChange}
+                    placeholder="Tell the world what you build..."
+                    className="bg-white/5 border-white/10 min-h-[120px] rounded-2xl focus:ring-purple-500 focus:bg-white/10 transition-all resize-none p-4 text-white" 
+                  />
+                </div>
+
                 <div className="space-y-2">
-                  <Label htmlFor="twitter" className="text-white/60 font-bold uppercase tracking-widest text-[10px]">Twitter / X URL</Label>
+                  <div className="flex items-center justify-between h-6 mb-1">
+                    <Label htmlFor="twitter" className="text-white/60 font-bold uppercase tracking-widest text-[10px]">Twitter / X URL</Label>
+                  </div>
                   <div className="relative">
                     <Twitter className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-purple-500" />
                     <Input 
@@ -325,7 +335,9 @@ export const ProfileEditor = ({ initialData, onSave, minimal = false }: ProfileE
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="instagram" className="text-white/60 font-bold uppercase tracking-widest text-[10px]">Instagram URL</Label>
+                  <div className="flex items-center justify-between h-6 mb-1">
+                    <Label htmlFor="instagram" className="text-white/60 font-bold uppercase tracking-widest text-[10px]">Instagram URL</Label>
+                  </div>
                   <div className="relative">
                     <Instagram className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-purple-500" />
                     <Input 
@@ -339,7 +351,9 @@ export const ProfileEditor = ({ initialData, onSave, minimal = false }: ProfileE
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="videoUrl" className="text-white/60 font-bold uppercase tracking-widest text-[10px]">Video Channel URL</Label>
+                  <div className="flex items-center justify-between h-6 mb-1">
+                    <Label htmlFor="videoUrl" className="text-white/60 font-bold uppercase tracking-widest text-[10px]">Video Channel URL</Label>
+                  </div>
                   <div className="relative">
                     <Video className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-purple-500" />
                     <Input 
@@ -353,7 +367,9 @@ export const ProfileEditor = ({ initialData, onSave, minimal = false }: ProfileE
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="website" className="text-white/60 font-bold uppercase tracking-widest text-[10px]">Website URL</Label>
+                  <div className="flex items-center justify-between h-6 mb-1">
+                    <Label htmlFor="website" className="text-white/60 font-bold uppercase tracking-widest text-[10px]">Website URL</Label>
+                  </div>
                   <div className="relative">
                     <Globe className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-purple-500" />
                     <Input 
