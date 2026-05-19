@@ -47,7 +47,7 @@ interface HeaderProps {
 export const Header = ({ onBecomeCreator }: HeaderProps) => {
   const [isOpen, setIsOpen] = useState(false);
   const [isRefreshing, setIsRefreshing] = useState(false);
-  const { login, logout, actor, balances, isConnected, isLoading, refreshBalances, isAdmin, isMember } = useXpr();
+  const { login, logout, actor, balances, isConnected, isLoading, refreshBalances, isAdmin, isMember, userProfile } = useXpr();
   const { toast } = useToast();
   const location = useLocation();
 
@@ -248,6 +248,13 @@ export const Header = ({ onBecomeCreator }: HeaderProps) => {
                       isAdmin && "border-orange-500/60 bg-orange-500/10"
                     )}
                   >
+                    <div className={cn("hidden sm:flex h-10 w-10 rounded-full items-center justify-center text-[10px] font-black border border-white/10 overflow-hidden shrink-0", userProfile?.color)}>
+                      {userProfile?.avatarImage ? (
+                        <img src={userProfile.avatarImage} alt="Avatar" className="w-full h-full object-cover" />
+                      ) : (
+                        userProfile?.avatar
+                      )}
+                    </div>
                     <div className="flex flex-col items-start -space-y-0.5 sm:-space-y-1 text-left">
                       <div className="flex items-center gap-1">
                         <span className="text-[10px] sm:text-base font-black text-purple-400 truncate max-w-[50px] sm:max-w-none">@{actor}</span>
@@ -330,8 +337,12 @@ export const Header = ({ onBecomeCreator }: HeaderProps) => {
                       isAdmin && "border-orange-500/30 bg-orange-500/5"
                     )}>
                       <div className="flex items-center gap-3">
-                        <div className="h-10 w-10 rounded-full bg-purple-500/20 flex items-center justify-center">
-                          <User className="h-5 w-5 text-purple-400" />
+                        <div className={cn("h-10 w-10 rounded-full flex items-center justify-center text-[10px] font-black border border-white/10 overflow-hidden shrink-0", userProfile?.color || "bg-purple-500/20")}>
+                          {userProfile?.avatarImage ? (
+                            <img src={userProfile.avatarImage} alt="Avatar" className="w-full h-full object-cover" />
+                          ) : (
+                            userProfile?.avatar || <User className="h-5 w-5 text-purple-400" />
+                          )}
                         </div>
                         <div className="min-w-0">
                           <p className="text-xs font-black text-purple-400 truncate">@{actor}</p>

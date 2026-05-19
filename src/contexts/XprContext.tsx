@@ -2,6 +2,7 @@
 
 import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import ProtonWebSDK, { LinkSession } from '@proton/web-sdk';
+import { Creator, CREATORS } from '@/data/creators';
 
 interface Balances {
   xpr: string;
@@ -20,6 +21,8 @@ interface XprContextType {
   isConnected: boolean;
   isLoading: boolean;
   isAdmin: boolean;
+  userProfile: Creator | null;
+  updateUserProfile: (profile: Creator) => void;
 }
 
 const XprContext = createContext<XprContextType | undefined>(undefined);
@@ -38,6 +41,7 @@ export const XprProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const [balances, setBalances] = useState<Balances>({ xpr: '0.0000', tab: '0' });
   const [isMember, setIsMember] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  const [userProfile, setUserProfile] = useState<Creator | null>(null);
 
   const fetchBalances = useCallback(async (account: string) => {
     if (!account) return;
@@ -76,6 +80,25 @@ export const XprProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       // Check local membership record
       const membershipKey = `tiptab_membership_${account}`;
       setIsMember(localStorage.getItem(membershipKey) === 'true');
+
+      // Load Profile
+      const savedProfile = localStorage.getItem(`tiptab_profile_${account}`);
+      if (savedProfile) {
+        setUserProfile(JSON.parse(savedProfile));
+      } else {
+        const newProfile: Creator = {
+          id: `user_${account}`,
+          name: account,
+          handle: account,
+          bio: "Just joined the TIP TAB network!",
+          location: "Global",
+          coordinates: [0, 0],
+          category: "Other",
+          avatar: account.slice(0, 2).toUpperCase(),
+          color: "bg-purple-600"
+        };
+        setUserProfile(newProfile);
+      }
     } catch (error) {
       console.error('Balance sync error:', error);
     }
@@ -145,12 +168,21 @@ export const XprProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       setSession(null);
       setBalances({ xpr: '0.0000', tab: '0' });
       setIsMember(false);
+      setUserProfile(null);
     }
   };
 
   const refreshBalances = async () => {
     if (session) {
       await fetchBalances(session.auth.actor);
+    }
+  };
+
+  const updateUserProfile = (profile: Creator) => {
+    if (session?.auth.actor) {
+      localStorage.setItem(`tiptab_profile_${session.auth.actor}`, JSON.stringify(profile));
+      localStorage.setItem("tiptab_user_profile", JSON.stringify(profile));
+      setUserProfile(profile);
     }
   };
 
@@ -166,6 +198,8 @@ export const XprProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     isConnected: !!session,
     isLoading,
     isAdmin: session?.auth.actor === 'tiptab',
+    userProfile,
+    updateUserProfile
   };
 
   return <XprContext.Provider value={value}>{children}</XprContext.Provider>;

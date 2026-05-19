@@ -30,7 +30,7 @@ import { useXpr } from "@/contexts/XprContext";
 import { cn } from "@/lib/utils";
 
 const Dashboard = () => {
-  const { isConnected, actor, balances, refreshBalances, session, login, isLoading: isAuthLoading, isMember } = useXpr();
+  const { isConnected, actor, balances, refreshBalances, session, login, isLoading: isAuthLoading, isMember, userProfile, updateUserProfile } = useXpr();
   const navigate = useNavigate();
   const { toast } = useToast();
   
@@ -42,45 +42,10 @@ const Dashboard = () => {
   const [transferSymbol, setTransferSymbol] = useState("TAB");
   const [isSending, setIsSending] = useState(false);
 
-  const [user, setUser] = useState<Creator>(() => {
-    const saved = localStorage.getItem("tiptab_user_profile");
-    return saved ? JSON.parse(saved) : CREATORS[0];
-  });
-
-  useEffect(() => {
-    if (isConnected && actor) {
-      const savedProfile = localStorage.getItem(`tiptab_profile_${actor}`);
-      if (savedProfile) {
-        setUser(JSON.parse(savedProfile));
-      } else {
-        const newProfile: Creator = {
-          id: `user_${actor}`,
-          name: actor,
-          handle: actor,
-          bio: "Just joined the TIP TAB network!",
-          location: "Global",
-          coordinates: [0, 0],
-          category: "Other",
-          avatar: actor.slice(0, 2).toUpperCase(),
-          color: "bg-purple-600"
-        };
-        setUser(newProfile);
-      }
-    }
-  }, [isConnected, actor]);
-
   const formatPrecision = (val: string) => {
     const num = parseFloat(val);
     if (isNaN(num)) return "";
     return transferSymbol === "TAB" ? Math.floor(num).toString() : num.toFixed(4);
-  };
-
-  const handleUpdateProfile = (updatedData: Creator) => {
-    setUser(updatedData);
-    if (actor) {
-      localStorage.setItem(`tiptab_profile_${actor}`, JSON.stringify(updatedData));
-      localStorage.setItem("tiptab_user_profile", JSON.stringify(updatedData));
-    }
   };
 
   const handleManualRefresh = async () => {
@@ -220,7 +185,7 @@ const Dashboard = () => {
                       <div className="flex items-center justify-between">
                         <CardDescription className="text-slate-400 font-black uppercase tracking-[0.2em] text-[9px] sm:text-[10px]">Liquid TAB</CardDescription>
                         <Button variant="ghost" size="icon" onClick={handleManualRefresh} className="h-8 w-8 sm:h-10 sm:w-10 rounded-xl bg-white/5 text-white/30 hover:text-white transition-all">
-                          <RefreshCw className={cn("h-3 w-3 sm:h-4 sm:w-4", isRefreshing && "animate-spin")} />
+                          <RefreshCw className={cn("h-2.5 w-2.5 sm:h-4 sm:w-4", isRefreshing && "animate-spin")} />
                         </Button>
                       </div>
                     </CardHeader>
@@ -349,7 +314,7 @@ const Dashboard = () => {
                       <h2 className="text-2xl sm:text-3xl font-black italic tracking-tighter text-slate-100">Your Network Pass</h2>
                       <p className="text-slate-400 font-medium text-xs sm:text-base">Share this card anywhere to receive zero-fee tips.</p>
                     </div>
-                    <TipTabCard creator={user} />
+                    {userProfile && <TipTabCard creator={userProfile} />}
                   </div>
                 </TabsContent>
               )}
@@ -360,11 +325,13 @@ const Dashboard = () => {
                     <h2 className="text-2xl sm:text-3xl font-black italic tracking-tighter text-slate-100">Account Settings</h2>
                     <p className="text-slate-400 font-medium text-sm sm:text-base">Manage your identity and discovery on the network.</p>
                   </div>
-                  <ProfileEditor 
-                    initialData={user} 
-                    onSave={handleUpdateProfile} 
-                    minimal={!isMember} 
-                  />
+                  {userProfile && (
+                    <ProfileEditor 
+                      initialData={userProfile} 
+                      onSave={updateUserProfile} 
+                      minimal={!isMember} 
+                    />
+                  )}
                 </div>
               </TabsContent>
             </Tabs>
