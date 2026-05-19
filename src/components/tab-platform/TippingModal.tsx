@@ -55,7 +55,7 @@ export const TippingModal = ({ creator, onClose }: TippingModalProps) => {
         data: {
           from: actor,
           to: creator?.handle, 
-          quantity: `${parseFloat(tipAmount).toFixed(8)} TAB`, // Corrected to 8 decimals for TAB
+          quantity: `${parseFloat(tipAmount).toFixed(4)} TAB`, // Reverted to 4 decimals as per tokencreate explorer
           memo: 'Tipped via TipTab',
         },
       }];

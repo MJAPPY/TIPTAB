@@ -88,7 +88,7 @@ const CreatorProfile = () => {
         data: {
           from: actor,
           to: creator?.handle, 
-          quantity: `${parseFloat(tipAmount).toFixed(8)} TAB`, // Corrected to 8 decimals for TAB
+          quantity: `${parseFloat(tipAmount).toFixed(4)} TAB`, // Reverted to 4 decimals for TAB
           memo: 'Tipped via TipTab Profile',
         },
       }];
