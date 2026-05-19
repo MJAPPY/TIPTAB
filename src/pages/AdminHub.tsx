@@ -15,7 +15,11 @@ import {
   Bell,
   Zap,
   Power,
-  X
+  X,
+  UserX,
+  History,
+  FileText,
+  AlertTriangle
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
@@ -34,6 +38,14 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 const AdminHub = () => {
   const { isAdmin, isConnected, isMaintenanceMode, setMaintenanceMode, broadcastAlert, networkAlert, membershipFee, updateMembershipFee } = useXpr();
@@ -103,9 +115,15 @@ const AdminHub = () => {
     const isBanned = bannedHandles.includes(handle);
     if (isBanned) {
       setBannedHandles(prev => prev.filter(h => h !== handle));
+      toast({ title: "User Restored", description: `@${handle} has been reinstated on the map.` });
     } else {
       setBannedHandles(prev => [...prev, handle]);
+      toast({ title: "User Banned", description: `@${handle} has been restricted from the network.`, variant: "destructive" });
     }
+  };
+
+  const handleResetProfile = (handle: string) => {
+    toast({ title: "Profile Reset", description: `Meta data for @${handle} has been cleared.` });
   };
 
   const filteredCreators = moderatedCreators.filter(c => 
@@ -323,9 +341,41 @@ const AdminHub = () => {
                                 >
                                   {isBanned ? <Unlock className="h-4 w-4 md:h-5 md:w-5" /> : <Ban className="h-4 w-4 md:h-5 md:w-5" />}
                                 </Button>
-                                <Button variant="ghost" size="icon" className="h-10 w-10 md:h-11 md:w-11 rounded-xl bg-white/5 text-white/30 border border-white/5">
-                                  <MoreVertical className="h-4 w-4 md:h-5 md:w-5" />
-                                </Button>
+                                
+                                <DropdownMenu>
+                                  <DropdownMenuTrigger asChild>
+                                    <Button variant="ghost" size="icon" className="h-10 w-10 md:h-11 md:w-11 rounded-xl bg-white/5 text-white/30 border border-white/5 hover:text-white hover:bg-white/10">
+                                      <MoreVertical className="h-4 w-4 md:h-5 md:w-5" />
+                                    </Button>
+                                  </DropdownMenuTrigger>
+                                  <DropdownMenuContent align="end" className="w-56 bg-[#1a102d]/95 backdrop-blur-xl border-white/10 text-white rounded-2xl p-2 mt-2 shadow-2xl">
+                                    <DropdownMenuLabel className="text-[10px] font-black uppercase tracking-widest text-white/40 px-3 py-2">Account Actions</DropdownMenuLabel>
+                                    <DropdownMenuSeparator className="bg-white/5" />
+                                    <DropdownMenuItem className="focus:bg-purple-500/15 focus:text-purple-400 rounded-xl cursor-pointer px-3 py-2.5 gap-3">
+                                      <History className="h-4 w-4" />
+                                      <span className="font-bold text-sm">View History</span>
+                                    </DropdownMenuItem>
+                                    <DropdownMenuItem className="focus:bg-purple-500/15 focus:text-purple-400 rounded-xl cursor-pointer px-3 py-2.5 gap-3">
+                                      <FileText className="h-4 w-4" />
+                                      <span className="font-bold text-sm">Audit Logs</span>
+                                    </DropdownMenuItem>
+                                    <DropdownMenuSeparator className="bg-white/5" />
+                                    <DropdownMenuItem 
+                                      onClick={() => handleResetProfile(creator.handle)}
+                                      className="focus:bg-orange-500/15 focus:text-orange-400 rounded-xl cursor-pointer px-3 py-2.5 gap-3"
+                                    >
+                                      <UserX className="h-4 w-4" />
+                                      <span className="font-bold text-sm">Reset Profile</span>
+                                    </DropdownMenuItem>
+                                    <DropdownMenuItem 
+                                      onClick={() => toggleBan(creator.handle)}
+                                      className="focus:bg-red-500/15 focus:text-red-400 rounded-xl cursor-pointer px-3 py-2.5 gap-3"
+                                    >
+                                      <AlertTriangle className="h-4 w-4" />
+                                      <span className="font-bold text-sm">{isBanned ? "Unban Account" : "Terminate Account"}</span>
+                                    </DropdownMenuItem>
+                                  </DropdownMenuContent>
+                                </DropdownMenu>
                               </div>
                             </td>
                           </tr>
