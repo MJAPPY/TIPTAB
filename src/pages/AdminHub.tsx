@@ -199,7 +199,10 @@ const AdminHub = () => {
           
           <div className="lg:col-span-4 space-y-8">
             
-            <Card className="bg-[#0d071a] border-white/10 rounded-[40px] overflow-hidden shadow-[0_0_100px_rgba(0,0,0,0.8)] relative group">
+            <Card className="bg-[#0d071a] border-[3px] border-slate-400/30 rounded-[40px] overflow-hidden shadow-[0_0_100px_rgba(0,0,0,0.8),inset_0_0_20px_rgba(255,255,255,0.05)] relative group ring-1 ring-white/20">
+              {/* Silver Shimmer Effect */}
+              <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-white/[0.03] to-transparent pointer-events-none" />
+              
               {/* Animated Background Gradients */}
               <div className="absolute top-0 right-0 w-64 h-64 bg-purple-600/10 blur-[100px] rounded-full group-hover:bg-purple-600/20 transition-all duration-700" />
               <div className="absolute bottom-0 left-0 w-48 h-48 bg-orange-600/10 blur-[80px] rounded-full group-hover:bg-orange-600/20 transition-all duration-700" />
@@ -223,8 +226,8 @@ const AdminHub = () => {
                 <div className="grid grid-cols-2 gap-6">
                   <div className="space-y-2 group/stat">
                     <div className="flex items-center gap-2">
-                      <Users className="h-3 w-3 text-white/30" />
-                      <p className="text-[9px] font-black text-white/30 uppercase tracking-[0.3em]">Total Registered</p>
+                      <Users className="h-3 w-3 text-slate-300" />
+                      <p className="text-[9px] font-black text-slate-300 uppercase tracking-[0.3em]">Total Registered</p>
                     </div>
                     <div className="relative">
                       <p className="text-4xl md:text-5xl font-black text-white tracking-tighter leading-none group-hover/stat:text-purple-400 transition-colors">1,284</p>
@@ -235,12 +238,12 @@ const AdminHub = () => {
                   </div>
                   <div className="space-y-2 group/stat">
                     <div className="flex items-center gap-2">
-                      <Cpu className="h-3 w-3 text-white/30" />
-                      <p className="text-[9px] font-black text-white/30 uppercase tracking-[0.3em]">Active Live</p>
+                      <Cpu className="h-3 w-3 text-slate-300" />
+                      <p className="text-[9px] font-black text-slate-300 uppercase tracking-[0.3em]">Active Live</p>
                     </div>
                     <div className="relative">
                       <p className="text-4xl md:text-5xl font-black text-purple-400 tracking-tighter leading-none group-hover/stat:text-white transition-colors">42</p>
-                      <p className="text-[10px] font-bold text-white/20 mt-2 uppercase tracking-widest italic">Current Nodes</p>
+                      <p className="text-[10px] font-bold text-white/40 mt-2 uppercase tracking-widest italic">Current Nodes</p>
                     </div>
                   </div>
                 </div>
@@ -251,26 +254,26 @@ const AdminHub = () => {
                       <p className="text-[10px] font-black text-orange-500 uppercase tracking-[0.4em]">24H Network Volume</p>
                       <p className="text-3xl font-black text-white tracking-tighter italic">124.5k <span className="text-orange-500 text-lg">TAB</span></p>
                     </div>
-                    <div className="h-14 w-14 rounded-2xl bg-orange-500/10 border border-orange-500/20 flex items-center justify-center shadow-[0_0_20px_rgba(249,115,22,0.1)]">
+                    <div className="h-14 w-14 rounded-2xl bg-orange-500/10 border-2 border-slate-400/40 flex items-center justify-center shadow-[0_0_20px_rgba(249,115,22,0.1)]">
                       <TrendingUp className="h-7 w-7 text-orange-500" />
                     </div>
                   </div>
-                  <div className="relative h-3 w-full bg-white/5 rounded-full overflow-hidden border border-white/5 p-0.5">
+                  <div className="relative h-3 w-full bg-white/5 rounded-full overflow-hidden border border-white/10 p-0.5">
                     <div className="h-full bg-gradient-to-r from-orange-600 via-orange-400 to-white w-[65%] rounded-full shadow-[0_0_15px_rgba(249,115,22,0.6)] animate-shimmer" />
                   </div>
-                  <div className="flex justify-between text-[9px] font-black uppercase tracking-widest text-white/20">
+                  <div className="flex justify-between text-[9px] font-black uppercase tracking-widest text-slate-300">
                     <span>Peak Load: 85%</span>
                     <span>Next Sync: 12:00 UTC</span>
                   </div>
                 </div>
 
-                <div className="grid grid-cols-2 gap-2 pt-6 border-t border-white/5">
-                  <div className="bg-white/5 p-4 rounded-3xl border border-white/5 group/mini hover:bg-white/10 transition-all">
-                    <span className="text-[8px] font-black text-white/20 uppercase tracking-[0.2em] block mb-1">Avg Tip</span>
+                <div className="grid grid-cols-2 gap-3 pt-6 border-t border-white/10">
+                  <div className="bg-white/5 p-4 rounded-3xl border border-slate-400/20 group/mini hover:bg-white/10 transition-all">
+                    <span className="text-[8px] font-black text-slate-300 uppercase tracking-[0.2em] block mb-1">Avg Tip</span>
                     <span className="text-lg font-black text-white group-hover/mini:text-orange-400 transition-colors">142 TAB</span>
                   </div>
-                  <div className="bg-white/5 p-4 rounded-3xl border border-white/5 group/mini hover:bg-white/10 transition-all">
-                    <span className="text-[8px] font-black text-white/20 uppercase tracking-[0.2em] block mb-1">Settlement</span>
+                  <div className="bg-white/5 p-4 rounded-3xl border border-slate-400/20 group/mini hover:bg-white/10 transition-all">
+                    <span className="text-[8px] font-black text-slate-300 uppercase tracking-[0.2em] block mb-1">Settlement</span>
                     <span className="text-lg font-black text-emerald-400 group-hover/mini:text-white transition-colors uppercase">Instant</span>
                   </div>
                 </div>
