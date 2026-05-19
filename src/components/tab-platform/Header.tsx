@@ -173,9 +173,9 @@ export const Header = ({ onBecomeCreator }: HeaderProps) => {
   return (
     <header className="fixed top-[52px] left-0 right-0 z-50 px-2 sm:px-6">
       <div className="mx-auto w-full max-w-[98%] xl:max-w-[1600px]">
-        <div className="border border-purple-500/20 bg-[#0a0514]/90 backdrop-blur-md rounded-[20px] sm:rounded-[28px] px-2 sm:px-6 py-2 md:py-3.5 flex items-center justify-between shadow-[0_0_40px_rgba(168,85,247,0.15),0_20px_60px_rgba(0,0,0,0.7)] overflow-hidden relative">
+        <div className="border border-purple-500/50 bg-[#0a0514]/90 backdrop-blur-md rounded-[20px] sm:rounded-[28px] px-2 sm:px-6 py-2 md:py-3.5 flex items-center justify-between shadow-[0_0_50px_rgba(168,85,247,0.35),0_20px_60px_rgba(0,0,0,0.8)] overflow-hidden relative ring-1 ring-inset ring-purple-500/10">
           {/* Subtle background glow overlay */}
-          <div className="absolute inset-0 bg-gradient-to-r from-purple-500/5 via-transparent to-orange-500/5 pointer-events-none" />
+          <div className="absolute inset-0 bg-gradient-to-r from-purple-500/10 via-transparent to-orange-500/5 pointer-events-none" />
           
           <div className="flex items-center gap-2 sm:gap-4 shrink-0 relative z-10">
             {location.pathname === '/admin' ? (
