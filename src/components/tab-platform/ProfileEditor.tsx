@@ -115,7 +115,9 @@ export const ProfileEditor = ({ initialData, onSave, minimal = false }: ProfileE
       
       toast({
         title: "Profile Updated",
-        description: `Location saved as ${formData.location}. Map pin updated.`,
+        description: minimal 
+          ? `Location saved as ${formData.location} for Leaderboard rankings.` 
+          : `Location saved as ${formData.location}. Map pin updated.`,
       });
     } catch (error) {
       toast({
