@@ -272,7 +272,7 @@ const Dashboard = () => {
                 <div className="max-w-3xl mx-auto">
                   <Card className="bg-[#130b21] border-white/10 rounded-[32px] sm:rounded-[48px] p-6 sm:p-10 md:p-16 shadow-2xl relative overflow-hidden">
                     <div className="absolute top-0 right-0 p-6 sm:p-10">
-                      <Wallet className="h-8 w-8 sm:h-12 sm:w-12 text-white/5" />
+                      <Wallet className="h-8 w-8 sm:h-12 sm:w-12 text-white/20" />
                     </div>
                     <h3 className="text-2xl sm:text-4xl font-black italic uppercase mb-6 sm:mb-10 tracking-tighter text-slate-100">Execute <span className="text-orange-500">Transfer</span></h3>
                     
