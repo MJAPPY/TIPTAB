@@ -22,7 +22,10 @@ import {
   AlertTriangle,
   Calendar,
   Clock,
-  UserMinus
+  UserMinus,
+  ArrowUpRight,
+  ArrowDownLeft,
+  HandCoins
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
@@ -62,6 +65,19 @@ const MOCK_AUDIT_LOGS: Record<string, any[]> = {
   ]
 };
 
+const MOCK_TRANSACTIONS: Record<string, any[]> = {
+  "tiptab": [
+    { date: "2024-05-19", amount: "1,200", asset: "TAB", type: "received", counterparty: "whaleshark" },
+    { date: "2024-05-18", amount: "500", asset: "TAB", type: "received", counterparty: "early" },
+    { date: "2024-05-17", amount: "250", asset: "XPR", type: "received", counterparty: "fanatic" },
+  ],
+  "carlos_delivery": [
+    { date: "2024-05-19", amount: "50", asset: "TAB", type: "received", counterparty: "anonymous" },
+    { date: "2024-05-18", amount: "100", asset: "TAB", type: "received", counterparty: "local_fan" },
+    { date: "2024-05-15", amount: "10.5000", asset: "XPR", type: "received", counterparty: "cking" },
+  ]
+};
+
 const AdminHub = () => {
   const { isAdmin, isConnected, isMaintenanceMode, setMaintenanceMode, broadcastAlert, networkAlert, membershipFee, updateMembershipFee } = useXpr();
   const navigate = useNavigate();
@@ -72,6 +88,7 @@ const AdminHub = () => {
   const [alertMessage, setAlertMessage] = useState("");
   const [isAlertModalOpen, setIsAlertModalOpen] = useState(false);
   const [isAuditModalOpen, setIsAuditModalOpen] = useState(false);
+  const [isHistoryModalOpen, setIsHistoryModalOpen] = useState(false);
   const [selectedCreator, setSelectedCreator] = useState<Creator | null>(null);
   const [moderatedCreators, setModeratedCreators] = useState<Creator[]>(CREATORS);
   const [bannedHandles, setBannedHandles] = useState<string[]>([]);
@@ -151,6 +168,11 @@ const AdminHub = () => {
   const openAuditLogs = (creator: Creator) => {
     setSelectedCreator(creator);
     setIsAuditModalOpen(true);
+  };
+
+  const openTransactionHistory = (creator: Creator) => {
+    setSelectedCreator(creator);
+    setIsHistoryModalOpen(true);
   };
 
   const handleResetProfile = (handle: string) => {
@@ -382,7 +404,10 @@ const AdminHub = () => {
                                   <DropdownMenuContent align="end" className="w-56 bg-[#1a102d]/95 backdrop-blur-xl border-white/10 text-white rounded-2xl p-2 mt-2 shadow-2xl">
                                     <DropdownMenuLabel className="text-[10px] font-black uppercase tracking-widest text-white/40 px-3 py-2">Account Actions</DropdownMenuLabel>
                                     <DropdownMenuSeparator className="bg-white/5" />
-                                    <DropdownMenuItem className="focus:bg-purple-500/15 focus:text-purple-400 rounded-xl cursor-pointer px-3 py-2.5 gap-3">
+                                    <DropdownMenuItem 
+                                      onClick={() => openTransactionHistory(creator)}
+                                      className="focus:bg-purple-500/15 focus:text-purple-400 rounded-xl cursor-pointer px-3 py-2.5 gap-3"
+                                    >
                                       <History className="h-4 w-4" />
                                       <span className="font-bold text-sm">View History</span>
                                     </DropdownMenuItem>
@@ -483,6 +508,77 @@ const AdminHub = () => {
               className="rounded-xl bg-purple-600 hover:bg-purple-700 text-white font-black uppercase tracking-widest text-xs px-8 h-12 shadow-lg shadow-purple-500/20"
             >
               Close Audit
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Transaction History Dialog */}
+      <Dialog open={isHistoryModalOpen} onOpenChange={setIsHistoryModalOpen}>
+        <DialogContent className="bg-[#1a102d] border-white/10 text-white rounded-3xl p-0 overflow-hidden max-w-2xl shadow-2xl">
+          <div className="p-8 border-b border-white/5">
+            <DialogHeader>
+              <div className="flex items-center gap-4 mb-2">
+                <div className={cn("h-12 w-12 rounded-xl flex items-center justify-center text-xs font-black border border-white/10", selectedCreator?.color)}>
+                  {selectedCreator?.avatar}
+                </div>
+                <div>
+                  <DialogTitle className="text-2xl font-black italic tracking-tight uppercase">Transaction History</DialogTitle>
+                  <DialogDescription className="text-white/40 font-bold">
+                    Network tipping activity for @{selectedCreator?.handle}
+                  </DialogDescription>
+                </div>
+              </div>
+            </DialogHeader>
+          </div>
+
+          <ScrollArea className="h-[450px] p-8">
+            <div className="space-y-4">
+              {(MOCK_TRANSACTIONS[selectedCreator?.handle || ""] || []).length > 0 ? (
+                (MOCK_TRANSACTIONS[selectedCreator?.handle || ""] || []).map((tx, i) => (
+                  <div key={i} className="flex items-center justify-between p-5 rounded-2xl bg-white/[0.03] border border-white/5 group hover:bg-white/[0.06] transition-all">
+                    <div className="flex items-center gap-4">
+                      <div className={cn(
+                        "h-12 w-12 rounded-xl flex items-center justify-center border-2",
+                        tx.type === "received" ? "border-green-500/20 bg-green-500/10 text-green-400" : "border-red-500/20 bg-red-500/10 text-red-400"
+                      )}>
+                        {tx.type === "received" ? <ArrowDownLeft className="h-6 w-6" /> : <ArrowUpRight className="h-6 w-6" />}
+                      </div>
+                      <div>
+                        <p className="font-black text-sm text-white/90">
+                          {tx.type === "received" ? "Received Tip" : "Sent Tip"}
+                        </p>
+                        <p className="text-[10px] font-bold text-white/30 uppercase tracking-widest">
+                          {tx.type === "received" ? "From" : "To"}: <span className="text-purple-400">@{tx.counterparty}</span>
+                        </p>
+                      </div>
+                    </div>
+                    <div className="text-right">
+                      <p className={cn("font-black text-lg", tx.type === "received" ? "text-green-400" : "text-red-400")}>
+                        {tx.type === "received" ? "+" : "-"}{tx.amount} {tx.asset}
+                      </p>
+                      <p className="text-[10px] font-bold text-white/20 uppercase tracking-widest">{tx.date}</p>
+                    </div>
+                  </div>
+                ))
+              ) : (
+                <div className="h-[300px] flex flex-col items-center justify-center text-center space-y-4">
+                  <HandCoins className="h-16 w-16 text-white/10" />
+                  <div>
+                    <p className="text-xl font-black text-white/20">No Transactions Found</p>
+                    <p className="text-sm text-white/10 font-bold">This user hasn't sent or received any tips yet.</p>
+                  </div>
+                </div>
+              )}
+            </div>
+          </ScrollArea>
+
+          <div className="p-8 bg-white/[0.02] border-t border-white/5 flex justify-end">
+            <Button 
+              onClick={() => setIsHistoryModalOpen(false)} 
+              className="rounded-xl bg-orange-500 hover:bg-orange-600 text-white font-black uppercase tracking-widest text-xs px-8 h-12 shadow-lg shadow-orange-500/20"
+            >
+              Close History
             </Button>
           </div>
         </DialogContent>
