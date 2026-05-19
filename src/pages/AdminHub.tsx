@@ -263,7 +263,7 @@ const AdminHub = () => {
                   </div>
                   <div className="bg-white/5 p-4 rounded-2xl border border-white/10 group/mini hover:border-white/20 transition-all flex items-center justify-between">
                     <div>
-                      <span className="text-[11px] font-black text-white/40 uppercase tracking-[0.3em] block mb-0.5">Ave Tip Sent</span>
+                      <span className="text-[11px] font-black text-white/40 uppercase tracking-[0.3em] block mb-0.5">Avg Tip Sent</span>
                       <span className="text-xl font-black text-orange-500 italic">450 <span className="text-[10px] text-white/40 uppercase tracking-widest">TAB</span></span>
                     </div>
                     <HandCoins className="h-5 w-5 text-purple-400" />
@@ -538,7 +538,7 @@ const AdminHub = () => {
                   <div className="space-y-2 pt-1 flex-1">
                     <div className="flex items-center justify-between">
                       <h4 className="font-black text-xl text-white tracking-tight">{log.event}</h4>
-                      <div className="flex items-center gap-4 text-[10px] font-black uppercase tracking-[0.2em] text-white/20">
+                      <div className="flex items-center gap-4 text-[11px] font-black uppercase tracking-[0.2em] text-white/20">
                         <div className="flex items-center gap-2"><Calendar className="h-3.5 w-3.5" /> {log.date}</div>
                         <div className="flex items-center gap-2"><Clock className="h-3.5 w-3.5" /> {log.time}</div>
                       </div>
