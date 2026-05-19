@@ -160,7 +160,7 @@ const CreatorProfile = () => {
     );
   }
 
-  const quickAmounts = asset === "TAB" ? ["10", "50", "100", "500"] : ["100", "500", "1000", "5000"];
+  const quickAmounts = asset === "TAB" ? ["10", "50", "100", "250"] : ["100", "500", "1000", "5000"];
 
   return (
     <div className="min-h-screen bg-[#0a0514] text-white selection:bg-purple-500/30">

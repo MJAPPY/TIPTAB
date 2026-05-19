@@ -101,7 +101,7 @@ export const TippingModal = ({ creator, onClose }: TippingModalProps) => {
 
   if (!creator) return null;
 
-  const quickAmounts = asset === "TAB" ? ["10", "50", "100", "500"] : ["100", "500", "1000", "5000"];
+  const quickAmounts = asset === "TAB" ? ["10", "50", "100", "250"] : ["100", "500", "1000", "5000"];
 
   return (
     <Dialog open={!!creator} onOpenChange={(open) => !open && onClose()}>
