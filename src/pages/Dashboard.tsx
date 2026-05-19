@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { 
   User as UserIcon, 
@@ -10,9 +10,10 @@ import {
   RefreshCw,
   Zap,
   ShieldCheck,
-  ArrowRight,
+  Heart,
   Settings as SettingsIcon,
-  ChevronRight
+  ChevronRight,
+  HandCoins
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
@@ -29,7 +30,7 @@ import { useXpr } from "@/contexts/XprContext";
 import { cn } from "@/lib/utils";
 
 const Dashboard = () => {
-  const { isConnected, actor, balances, refreshBalances, session, login, isLoading: isAuthLoading } = useXpr();
+  const { isConnected, actor, balances, refreshBalances, session, login, isLoading: isAuthLoading, isMember } = useXpr();
   const navigate = useNavigate();
   const { toast } = useToast();
   
@@ -150,12 +151,19 @@ const Dashboard = () => {
     );
   }
 
-  const navigationItems = [
-    { id: "analytics", icon: TrendingUp, label: "Analytics" },
-    { id: "card", icon: CreditCard, label: "My TipTab Card" },
-    { id: "payouts", icon: Wallet, label: "Wallet & Payouts" },
-    { id: "settings", icon: UserIcon, label: "Profile Settings" },
-  ];
+  const navigationItems = useMemo(() => {
+    const items = [
+      { id: "analytics", icon: TrendingUp, label: "Analytics" },
+      { id: "payouts", icon: Wallet, label: "Wallet & Payouts" },
+    ];
+    
+    if (isMember) {
+      items.splice(1, 0, { id: "card", icon: CreditCard, label: "My TipTab Card" });
+      items.push({ id: "settings", icon: UserIcon, label: "Profile Settings" });
+    }
+    
+    return items;
+  }, [isMember]);
 
   return (
     <div className="min-h-screen bg-[#0a0514] text-white selection:bg-purple-500/30">
@@ -170,7 +178,7 @@ const Dashboard = () => {
           <div className="space-y-4">
              <div className="inline-flex items-center gap-2.5 px-4 py-1.5 rounded-full bg-white/5 border border-white/10 text-[10px] font-black uppercase tracking-[0.2em] text-white/40">
               <Zap className="h-3 w-3 text-orange-500 fill-orange-500" />
-              Creator Portal
+              {isMember ? "Creator Portal" : "Supporter Portal"}
             </div>
             <h1 className="text-5xl md:text-7xl font-black tracking-tighter leading-none">
               Welcome, <span className="text-transparent bg-clip-text bg-gradient-to-r from-white via-white to-white/60">@{actor}</span>
@@ -240,14 +248,21 @@ const Dashboard = () => {
                     </CardContent>
                   </Card>
 
-                  <Card className="bg-gradient-to-br from-orange-500/10 to-[#130b21]/60 border-white/10 text-white rounded-[40px] p-8 md:p-10 shadow-2xl flex flex-col justify-between">
-                    <div className="space-y-4">
-                      <h3 className="text-2xl font-black tracking-tight italic">Boost Your Earnings</h3>
-                      <p className="text-white/40 text-sm font-medium leading-relaxed">Join the high-tier creator pool to receive verified badges and increased visibility on the map.</p>
-                    </div>
-                    <Button className="w-full h-14 bg-white text-black hover:bg-orange-500 hover:text-white rounded-2xl font-black text-sm uppercase tracking-widest transition-all mt-8">
-                      Upgrade Status
-                    </Button>
+                  <Card className="bg-[#130b21]/60 border-white/10 text-white rounded-[40px] p-8 md:p-10 shadow-2xl relative overflow-hidden group hover:border-pink-500/30 transition-all">
+                    <div className="absolute -top-12 -right-12 w-32 h-32 bg-pink-500/10 blur-3xl rounded-full group-hover:bg-pink-500/20 transition-all" />
+                    <CardHeader className="p-0 mb-6">
+                      <CardDescription className="text-white/30 font-black uppercase tracking-[0.2em] text-[10px]">Total Tips Sent</CardDescription>
+                    </CardHeader>
+                    <CardContent className="p-0">
+                      <div className="flex items-end gap-3">
+                        <span className="text-5xl md:text-6xl font-black tracking-tighter">0</span>
+                        <span className="text-lg font-black text-pink-500 italic mb-2">TAB</span>
+                      </div>
+                      <div className="mt-6 flex items-center gap-2 text-pink-400 text-[10px] font-black uppercase tracking-widest">
+                        <Heart className="h-3 w-3" />
+                        Community Impact
+                      </div>
+                    </CardContent>
                   </Card>
                 </div>
               </TabsContent>
@@ -317,21 +332,25 @@ const Dashboard = () => {
                 </div>
               </TabsContent>
 
-              <TabsContent value="card" className="mt-0 animate-in zoom-in-95 duration-500">
-                <div className="max-w-xl mx-auto">
-                  <div className="text-center mb-10 space-y-2">
-                    <h2 className="text-3xl font-black italic tracking-tighter">Your Network Pass</h2>
-                    <p className="text-white/40 font-medium">Share this card anywhere to receive zero-fee tips.</p>
-                  </div>
-                  <TipTabCard creator={user} />
-                </div>
-              </TabsContent>
+              {isMember && (
+                <>
+                  <TabsContent value="card" className="mt-0 animate-in zoom-in-95 duration-500">
+                    <div className="max-w-xl mx-auto">
+                      <div className="text-center mb-10 space-y-2">
+                        <h2 className="text-3xl font-black italic tracking-tighter">Your Network Pass</h2>
+                        <p className="text-white/40 font-medium">Share this card anywhere to receive zero-fee tips.</p>
+                      </div>
+                      <TipTabCard creator={user} />
+                    </div>
+                  </TabsContent>
 
-              <TabsContent value="settings" className="mt-0 animate-in fade-in slide-in-from-bottom-4 duration-500">
-                <div className="max-w-4xl mx-auto">
-                  <ProfileEditor initialData={user} onSave={handleUpdateProfile} />
-                </div>
-              </TabsContent>
+                  <TabsContent value="settings" className="mt-0 animate-in fade-in slide-in-from-bottom-4 duration-500">
+                    <div className="max-w-4xl mx-auto">
+                      <ProfileEditor initialData={user} onSave={handleUpdateProfile} />
+                    </div>
+                  </TabsContent>
+                </>
+              )}
             </Tabs>
           </div>
         </div>
