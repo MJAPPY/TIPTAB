@@ -26,6 +26,21 @@ const Docs = () => {
   const { isMember, isConnected, login } = useXpr();
   const navigate = useNavigate();
 
+  const faqs = [
+    {
+      q: "What is TAB?",
+      a: "TAB is a utility token on the XPR Network designed for the tipping economy. It offers high-speed settlement and is the primary currency of the TIPTAB ecosystem."
+    },
+    {
+      q: "Are there any hidden fees?",
+      a: "No. TIPTAB takes 0% from tips. The only cost is the yearly network activation fee for creators and standard XPR Network resource usage (which is usually free for end-users via WebAuth)."
+    },
+    {
+      q: "How do I get my location on the map?",
+      a: "Once you are a member, go to your Dashboard > Profile. Enter your city in the location field. Our geocoder will automatically place your pin on the global map."
+    }
+  ];
+
   const handleCtaClick = () => {
     if (isMember) {
       navigate("/dashboard");
