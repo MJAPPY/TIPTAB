@@ -83,7 +83,7 @@ const Leaderboard = () => {
               onClick={() => setActiveTab("creators")}
               className={cn(
                 "h-14 px-8 rounded-2xl font-black text-xs uppercase tracking-widest transition-all gap-3",
-                activeTab === "creators" ? "bg-white text-black shadow-2xl" : "text-white/40 hover:text-purple-400"
+                activeTab === "creators" ? "bg-purple-600 text-white shadow-[0_0_30px_rgba(168,85,247,0.4)]" : "text-white/40 hover:text-purple-400"
               )}
             >
               <Zap className={cn("h-4 w-4", activeTab === "creators" ? "text-orange-500 fill-orange-500" : "")} />
@@ -93,7 +93,7 @@ const Leaderboard = () => {
               onClick={() => setActiveTab("supporters")}
               className={cn(
                 "h-14 px-8 rounded-2xl font-black text-xs uppercase tracking-widest transition-all gap-3",
-                activeTab === "supporters" ? "bg-white text-black shadow-2xl" : "text-white/40 hover:text-purple-400"
+                activeTab === "supporters" ? "bg-purple-600 text-white shadow-[0_0_30px_rgba(168,85,247,0.4)]" : "text-white/40 hover:text-purple-400"
               )}
             >
               <Heart className={cn("h-4 w-4", activeTab === "supporters" ? "text-red-500 fill-red-500" : "")} />

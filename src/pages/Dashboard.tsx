@@ -162,7 +162,7 @@ const Dashboard = () => {
                 className={cn(
                   "h-12 sm:h-14 px-4 sm:px-6 rounded-2xl gap-2 sm:gap-3 font-black text-[10px] sm:text-xs uppercase tracking-widest transition-all",
                   activeTab === item.id 
-                    ? "bg-white text-black shadow-xl" 
+                    ? "bg-purple-600 text-white shadow-[0_10px_30px_rgba(168,85,247,0.3)]" 
                     : "text-slate-400 hover:text-purple-400 hover:bg-purple-500/5"
                 )}
                >
