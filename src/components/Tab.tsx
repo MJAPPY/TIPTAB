@@ -81,7 +81,14 @@ export const Tab = () => {
           </p>
           <div className="flex justify-center gap-10 text-white/60 font-bold">
             <a href="#" className="hover:text-purple-400 transition-colors">Documentation</a>
-            <a href="#" className="hover:text-purple-400 transition-colors">Twitter</a>
+            <a 
+              href="https://x.com/tabtokenxpr" 
+              target="_blank" 
+              rel="noopener noreferrer" 
+              className="hover:text-purple-400 transition-colors"
+            >
+              Twitter
+            </a>
             <a href="#" className="hover:text-purple-400 transition-colors">Telegram</a>
             <a href="#" className="hover:text-purple-400 transition-colors">Support</a>
           </div>
