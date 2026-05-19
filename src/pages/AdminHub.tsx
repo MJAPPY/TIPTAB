@@ -25,7 +25,9 @@ import {
   UserMinus,
   ArrowUpRight,
   ArrowDownLeft,
-  HandCoins
+  HandCoins,
+  Users,
+  BarChart3
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
@@ -197,28 +199,57 @@ const AdminHub = () => {
             
             <Card className="bg-[#120a21] border-white/5 rounded-[28px] md:rounded-[32px] overflow-hidden shadow-2xl">
               <CardHeader className="p-6 md:p-8 pb-4">
-                <CardTitle className="text-lg md:text-xl font-black flex items-center gap-3 tracking-tight text-white">
-                  <Activity className="h-5 w-5 text-purple-400" /> PLATFORM VITALS
+                <CardTitle className="text-lg md:text-xl font-black flex items-center justify-between tracking-tight text-white">
+                  <div className="flex items-center gap-3">
+                    <Activity className="h-5 w-5 text-purple-400" /> PLATFORM VITALS
+                  </div>
+                  <div className="flex items-center gap-1.5 text-[9px] font-black text-green-500 uppercase tracking-widest bg-green-500/5 px-2 py-0.5 rounded border border-green-500/10">
+                    <div className="h-1 w-1 rounded-full bg-green-500 animate-pulse" /> Live
+                  </div>
                 </CardTitle>
               </CardHeader>
-              <CardContent className="p-6 md:p-8 pt-2 space-y-8">
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <div className="p-5 md:p-6 rounded-[20px] md:rounded-[24px] bg-[#1a112d] border border-white/5 space-y-1">
-                    <p className="text-[9px] md:text-[10px] font-black text-white/40 uppercase tracking-widest">TOTAL MEMBERS</p>
-                    <p className="text-3xl md:text-4xl font-black text-white">{moderatedCreators.length}</p>
+              <CardContent className="p-6 md:p-8 pt-2 space-y-6">
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="p-4 rounded-[20px] bg-white/[0.03] border border-white/5 space-y-1">
+                    <p className="text-[8px] font-black text-white/30 uppercase tracking-widest">Total Registered</p>
+                    <p className="text-2xl font-black text-white">1,284</p>
+                    <div className="flex items-center gap-1 text-[8px] font-bold text-green-400">
+                      <ArrowUpRight className="h-2.5 w-2.5" /> +14%
+                    </div>
                   </div>
-                  <div className="p-5 md:p-6 rounded-[20px] md:rounded-[24px] bg-[#1a112d] border border-white/5 space-y-1">
-                    <p className="text-[9px] md:text-[10px] font-black text-white/40 uppercase tracking-widest">WEEKLY GROWTH</p>
-                    <p className="text-3xl md:text-4xl font-black text-green-500">+14%</p>
+                  <div className="p-4 rounded-[20px] bg-white/[0.03] border border-white/5 space-y-1">
+                    <p className="text-[8px] font-black text-white/30 uppercase tracking-widest">Active Live</p>
+                    <p className="text-2xl font-black text-purple-400">42</p>
+                    <div className="flex items-center gap-1 text-[8px] font-bold text-white/20">
+                      Current Sessions
+                    </div>
                   </div>
                 </div>
-                <div className="space-y-4">
-                  <div className="flex justify-between items-center text-[11px] md:text-sm">
-                    <span className="font-bold text-white/40">Total TAB Tipped</span>
-                    <span className="font-black text-orange-500">4.2M TAB</span>
+
+                <div className="p-5 rounded-[24px] bg-gradient-to-br from-orange-500/10 to-transparent border border-orange-500/10 space-y-3">
+                  <div className="flex items-center justify-between">
+                    <p className="text-[9px] font-black text-orange-500 uppercase tracking-widest">24H Network Volume</p>
+                    <BarChart3 className="h-4 w-4 text-orange-500/40" />
                   </div>
-                  <div className="w-full h-1.5 md:h-2 bg-white/5 rounded-full overflow-hidden">
-                    <div className="h-full bg-orange-500 w-[60%] rounded-full shadow-[0_0_15px_rgba(249,115,22,0.5)]" />
+                  <div className="flex items-baseline gap-2">
+                    <p className="text-3xl font-black text-white">124.5k</p>
+                    <p className="text-xs font-black text-orange-500 italic">TAB</p>
+                  </div>
+                  <div className="w-full h-1.5 bg-black/40 rounded-full overflow-hidden">
+                    <div className="h-full bg-orange-500 w-[65%] rounded-full shadow-[0_0_15px_rgba(249,115,22,0.5)]" />
+                  </div>
+                  <p className="text-[9px] font-bold text-white/20 italic">Peak activity: 18:00 UTC</p>
+                </div>
+
+                <div className="flex items-center justify-between px-2 pt-2">
+                  <div className="flex flex-col">
+                    <span className="text-[9px] font-black text-white/30 uppercase">Avg Tip Size</span>
+                    <span className="text-sm font-black text-white">142 TAB</span>
+                  </div>
+                  <div className="h-8 w-px bg-white/5" />
+                  <div className="flex flex-col text-right">
+                    <span className="text-[9px] font-black text-white/30 uppercase">Settlement Time</span>
+                    <span className="text-sm font-black text-emerald-400">Instant</span>
                   </div>
                 </div>
               </CardContent>
