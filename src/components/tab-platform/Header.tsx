@@ -313,8 +313,7 @@ export const Header = ({ onBecomeCreator }: HeaderProps) => {
                 className="flex items-center gap-2 rounded-xl sm:rounded-2xl h-10 sm:h-16 px-3 sm:px-10 font-black text-[10px] sm:text-base transition-all active:scale-95 group shrink-0 bg-[#a855f7] hover:bg-[#9333ea] text-white shadow-2xl shadow-purple-500/40 animate-shimmer"
               >
                 <Wallet className="h-4 w-4 sm:h-6 sm:w-6 group-hover:rotate-12 transition-transform" />
-                <span className="hidden xs:inline whitespace-nowrap">{isLoading ? "Syncing..." : "Connect WebAuth"}</span>
-                <span className="xs:hidden">WebAuth</span>
+                <span className="whitespace-nowrap">{isLoading ? "Syncing..." : "Connect WebAuth"}</span>
               </Button>
             )}
 

@@ -136,9 +136,9 @@ export const MembershipModal = ({ isOpen, onOpenChange }: MembershipModalProps) 
 
               <Button 
                 onClick={handleNextStep}
-                className="w-full h-20 bg-white text-black hover:bg-orange-500 hover:text-white font-black text-2xl rounded-3xl shadow-[0_20px_40px_rgba(255,255,255,0.1)] transition-all group active:scale-95"
+                className="w-full h-20 bg-white text-black hover:bg-orange-500 hover:text-white font-black text-2xl rounded-3xl shadow-[0_20px_40px_rgba(255,255,255,0.1)] transition-all group active:scale-95 animate-shimmer"
               >
-                {isConnected ? "Continue to Payment" : "Connect Wallet"} <ArrowRight className="ml-3 h-6 w-6 group-hover:translate-x-2 transition-transform" />
+                {isConnected ? "Continue to Payment" : "Connect WebAuth"} <ArrowRight className="ml-3 h-6 w-6 group-hover:translate-x-2 transition-transform" />
               </Button>
             </div>
           )}
@@ -158,7 +158,7 @@ export const MembershipModal = ({ isOpen, onOpenChange }: MembershipModalProps) 
               </div>
 
               <div className="bg-white/5 border-2 border-white/10 rounded-[40px] p-10 text-center relative overflow-hidden group hover:border-orange-500/50 transition-all">
-                <div className="absolute top-0 right-0 p-6">
+                <div className="absolute top-0 right-0 p-6 sm:p-10">
                   <div className="px-4 py-1.5 rounded-full bg-orange-500 text-white text-[10px] font-black uppercase tracking-[0.2em] shadow-lg">
                     Network Fee
                   </div>

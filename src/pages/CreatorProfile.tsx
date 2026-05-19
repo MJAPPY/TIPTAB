@@ -253,8 +253,8 @@ const CreatorProfile = () => {
                         {isProcessing ? "Processing..." : "Send Appreciation"}
                       </Button>
                     ) : (
-                      <Button onClick={handleConnect} className="w-full h-24 bg-[#a855f7] text-white font-black text-2xl rounded-[32px] shadow-xl">
-                        Connect to Tip
+                      <Button onClick={handleConnect} className="w-full h-24 bg-[#a855f7] text-white font-black text-2xl rounded-[32px] shadow-xl animate-shimmer">
+                        Connect WebAuth
                       </Button>
                     )}
                   </div>
@@ -269,5 +269,3 @@ const CreatorProfile = () => {
     </div>
   );
 };
-
-export default CreatorProfile;

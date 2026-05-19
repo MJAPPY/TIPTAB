@@ -207,10 +207,10 @@ export const TippingModal = ({ creator, onClose }: TippingModalProps) => {
                 <Button 
                   onClick={handleConnect}
                   disabled={isProcessing}
-                  className="w-full h-20 bg-[#a855f7] hover:bg-[#9333ea] text-white font-black text-xl md:text-2xl rounded-3xl shadow-xl transition-all active:scale-95 flex items-center justify-center gap-3"
+                  className="w-full h-20 bg-[#a855f7] hover:bg-[#9333ea] text-white font-black text-xl md:text-2xl rounded-3xl shadow-xl transition-all active:scale-95 flex items-center justify-center gap-3 animate-shimmer"
                 >
                   <Wallet className="h-6 w-6" />
-                  Connect to Tip
+                  Connect WebAuth
                 </Button>
               )}
             </div>
