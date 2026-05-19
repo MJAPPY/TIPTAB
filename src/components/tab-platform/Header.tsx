@@ -46,7 +46,7 @@ interface HeaderProps {
 export const Header = ({ onBecomeCreator }: HeaderProps) => {
   const [isOpen, setIsOpen] = useState(false);
   const [isRefreshing, setIsRefreshing] = useState(false);
-  const { login, logout, actor, balances, isConnected, isLoading, refreshBalances, isAdmin } = useXpr();
+  const { login, logout, actor, balances, isConnected, isLoading, refreshBalances, isAdmin, isMember } = useXpr();
   const { toast } = useToast();
   const location = useLocation();
 
@@ -120,7 +120,7 @@ export const Header = ({ onBecomeCreator }: HeaderProps) => {
           </Button>
         </Link>
       )}
-      {onBecomeCreator && (
+      {onBecomeCreator && !isMember && (
         <Button 
           variant="outline" 
           onClick={() => {

@@ -1,6 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { Zap, ArrowRight, UserCheck, Sparkles, Globe, Heart, Rocket } from "lucide-react";
 import { Creator } from "@/data/creators";
+import { useXpr } from "@/contexts/XprContext";
 
 interface HeroProps {
   creators: Creator[];
@@ -8,6 +9,7 @@ interface HeroProps {
 }
 
 export const Hero = ({ creators, onJoin }: HeroProps) => {
+  const { isMember } = useXpr();
   // Take the first 4 creators for the preview avatars
   const previewCreators = creators.slice(0, 4);
   // Calculate a dynamic count (using a base of 10k to maintain the 'scale' vibe)
@@ -37,12 +39,14 @@ export const Hero = ({ creators, onJoin }: HeroProps) => {
             </p>
 
             <div className="flex flex-col sm:flex-row items-center gap-4 pt-4">
-              <Button 
-                onClick={onJoin}
-                className="w-full sm:w-auto h-16 md:h-20 px-10 md:px-14 bg-white text-black hover:bg-orange-500 hover:text-white rounded-[24px] md:rounded-[32px] font-black text-xl md:text-2xl shadow-[0_20px_50px_rgba(255,255,255,0.1)] transition-all group active:scale-95"
-              >
-                Join the Network <ArrowRight className="ml-3 h-6 w-6 group-hover:translate-x-2 transition-transform" />
-              </Button>
+              {!isMember && (
+                <Button 
+                  onClick={onJoin}
+                  className="w-full sm:w-auto h-16 md:h-20 px-10 md:px-14 bg-white text-black hover:bg-orange-500 hover:text-white rounded-[24px] md:rounded-[32px] font-black text-xl md:text-2xl shadow-[0_20px_50px_rgba(255,255,255,0.1)] transition-all group active:scale-95"
+                >
+                  Join the Network <ArrowRight className="ml-3 h-6 w-6 group-hover:translate-x-2 transition-transform" />
+                </Button>
+              )}
               <div className="flex items-center gap-4 px-6">
                 <div className="flex -space-x-3">
                   {previewCreators.map((creator) => (

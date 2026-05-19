@@ -24,7 +24,7 @@ export const MembershipModal = ({ isOpen, onOpenChange }: MembershipModalProps) 
   const [step, setStep] = useState<OnboardingStep>("intro");
   const [isProcessing, setIsProcessing] = useState(false);
   const { toast } = useToast();
-  const { session, actor, login, isConnected } = useXpr();
+  const { session, actor, login, isConnected, setIsMember } = useXpr();
 
   const handleNextStep = async () => {
     if (step === "intro") {
@@ -62,6 +62,11 @@ export const MembershipModal = ({ isOpen, onOpenChange }: MembershipModalProps) 
       };
 
       await session.transact({ actions: [membershipAction] }, { broadcast: true });
+      
+      // Update membership status
+      const membershipKey = `tiptab_membership_${actor}`;
+      localStorage.setItem(membershipKey, 'true');
+      setIsMember(true);
       
       setStep("success");
       toast({

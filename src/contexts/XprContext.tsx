@@ -12,6 +12,8 @@ interface XprContextType {
   session: LinkSession | null;
   actor: string | null;
   balances: Balances;
+  isMember: boolean;
+  setIsMember: (status: boolean) => void;
   login: () => Promise<LinkSession | null>;
   logout: () => Promise<void>;
   refreshBalances: () => Promise<void>;
@@ -34,6 +36,7 @@ const APP_IDENTIFIER = 'tiptab';
 export const XprProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [session, setSession] = useState<LinkSession | null>(null);
   const [balances, setBalances] = useState<Balances>({ xpr: '0.0000', tab: '0' });
+  const [isMember, setIsMember] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
 
   const fetchBalances = useCallback(async (account: string) => {
@@ -69,6 +72,10 @@ export const XprProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         xpr: xprData[0] ? parseFloat(xprData[0].split(' ')[0]).toFixed(4) : '0.0000',
         tab: tabData[0] ? Math.floor(parseFloat(tabData[0].split(' ')[0])).toString() : '0'
       });
+
+      // Check local membership record
+      const membershipKey = `tiptab_membership_${account}`;
+      setIsMember(localStorage.getItem(membershipKey) === 'true');
     } catch (error) {
       console.error('Balance sync error:', error);
     }
@@ -137,6 +144,7 @@ export const XprProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       await session.remove();
       setSession(null);
       setBalances({ xpr: '0.0000', tab: '0' });
+      setIsMember(false);
     }
   };
 
@@ -150,6 +158,8 @@ export const XprProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     session,
     actor: session ? session.auth.actor : null,
     balances,
+    isMember,
+    setIsMember,
     login,
     logout,
     refreshBalances,
