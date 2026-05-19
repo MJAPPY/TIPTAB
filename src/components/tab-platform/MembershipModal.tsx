@@ -26,7 +26,8 @@ export const MembershipModal = ({ isOpen, onOpenChange }: MembershipModalProps) 
   const { toast } = useToast();
   const { session, actor, login, isConnected, setIsMember, isMember } = useXpr();
 
-  // Smart Step Management: Initialize based on connection status when opened
+  // Determine the starting step ONLY when the modal is opened.
+  // This prevents the step from resetting if isConnected updates in the background.
   useEffect(() => {
     if (isOpen) {
       if (isConnected) {
@@ -34,23 +35,19 @@ export const MembershipModal = ({ isOpen, onOpenChange }: MembershipModalProps) 
       } else {
         setStep("intro");
       }
-    } else {
-      // Reset step with delay to avoid flicker during close animation
-      const timer = setTimeout(() => setStep("intro"), 300);
-      return () => clearTimeout(timer);
     }
-  }, [isOpen, isConnected]);
+  }, [isOpen]); // Intentionally omitting isConnected here to only set initial state
 
   const handleNextStep = async () => {
     if (!isConnected) {
       try {
         const newSession = await login();
-        // Explicitly advance to payment if login was successful
+        // If login returns a valid session, explicitly move to payment
         if (newSession) {
           setStep("payment");
         }
       } catch (err) {
-        console.error("Login failed or cancelled", err);
+        console.error("Login process interrupted:", err);
       }
     } else {
       setStep("payment");
@@ -108,6 +105,8 @@ export const MembershipModal = ({ isOpen, onOpenChange }: MembershipModalProps) 
 
   const handleClose = () => {
     onOpenChange(false);
+    // Give time for the exit animation before resetting step
+    setTimeout(() => setStep("intro"), 200);
   };
 
   return (
