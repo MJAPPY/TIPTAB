@@ -155,21 +155,22 @@ export const TipTabCard = ({ creator }: TipTabCardProps) => {
           <div className="flex flex-col items-center gap-2.5 shrink-0">
             <div className="relative group/qr">
               <div className="absolute inset-[-10px] bg-white/5 blur-xl rounded-full" />
-              <div className="relative bg-white p-2.5 rounded-[24px] shadow-[0_20px_40px_rgba(0,0,0,0.5)]">
+              <div className="relative bg-white p-1.5 rounded-[24px] shadow-[0_20px_40px_rgba(0,0,0,0.5)]">
                 <div className="h-20 w-20 md:h-24 md:w-24 bg-white flex items-center justify-center rounded-xl overflow-hidden">
                   <QRCodeSVG 
                     value={tippingUrl}
-                    size={80}
+                    size={110}
                     level="H"
                     includeMargin={false}
                     imageSettings={{
                       src: "/src/assets/logo.png",
                       x: undefined,
                       y: undefined,
-                      height: 18,
-                      width: 18,
+                      height: 22,
+                      width: 22,
                       excavate: true,
                     }}
+                    className="w-full h-full"
                   />
                 </div>
               </div>
