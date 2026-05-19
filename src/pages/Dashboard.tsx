@@ -98,7 +98,7 @@ const Dashboard = () => {
     setIsSending(true);
     try {
       const contract = transferSymbol === "TAB" ? "tokencreate" : "eosio.token";
-      const precision = 4; // Both TAB and XPR use 4 decimal places
+      const precision = transferSymbol === "TAB" ? 8 : 4; // Corrected: TAB is 8 decimals, XPR is 4
       
       const actions = [{
         account: contract,
@@ -354,7 +354,7 @@ const Dashboard = () => {
 
                   <Card className="lg:col-span-7 bg-[#130b21] border-white/10 rounded-[32px] md:rounded-[40px] p-6 md:p-10 shadow-2xl">
                     <h3 className="text-xl md:text-2xl font-black italic tracking-tighter uppercase mb-8 flex items-center gap-3 text-white">
-                      <Send className="h-4 w-4 md:h-5 md:w-5 text-orange-500" /> Transfer Funds
+                      <index.Send className="h-4 w-4 md:h-5 md:w-5 text-orange-500" /> Transfer Funds
                     </h3>
                     <div className="space-y-6 md:space-y-8">
                       <div className="space-y-3">
