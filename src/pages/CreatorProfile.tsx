@@ -108,7 +108,6 @@ const CreatorProfile = () => {
 
       await session.transact({ actions }, { broadcast: true });
       
-      // Update data sync for tips sent (Currently tracking TAB only)
       if (asset === "TAB") {
         recordTip(Math.floor(amountNum));
       }
@@ -161,7 +160,7 @@ const CreatorProfile = () => {
     );
   }
 
-  const quickAmounts = asset === "TAB" ? ["50", "100", "500", "1000"] : ["100", "500", "1000", "5000"];
+  const quickAmounts = asset === "TAB" ? ["10", "50", "100", "500"] : ["100", "500", "1000", "5000"];
 
   return (
     <div className="min-h-screen bg-[#0a0514] text-white selection:bg-purple-500/30">
