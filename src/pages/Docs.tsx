@@ -11,7 +11,7 @@ import {
   MapPin, 
   Users, 
   HelpCircle, 
-  ChevronRight,
+  ChevronRight, 
   ArrowRight
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -85,7 +85,7 @@ const Docs = () => {
               NETWORK <span className="text-orange-500">GUIDELINES</span>
             </h1>
             <p className="text-xl text-white/60 max-w-2xl mx-auto font-medium">
-              Everything you need to know about the most direct appreciation network on the XPR Network.
+              Everything you need to know about the most direct appreciation network available anywhere built on the XPR Network.
             </p>
           </div>
 
