@@ -19,7 +19,6 @@ const Calculator = () => {
   const [result, setResult] = useState<number>(0);
   const [isSyncing, setIsSyncing] = useState(false);
 
-  // Initial rates - will be updated by live fetches
   const [rates, setRates] = useState<Record<string, number>>({
     TAB: 2.768, 
     XPR: 1.0000,
@@ -127,7 +126,7 @@ const Calculator = () => {
     setToCurrency(oldFrom);
   };
 
-  const buyTabLink = "https://alcor.exchange/v/xpr/swap?input=xpr-eosio.token&output=tab-tokencreate";
+  const buyTabLink = "https://alcor.exchange/v/xpr/swap?input=xpr-eosio.token&output=tab-proton-tokencreate";
   const explorerLink = "https://explorer.xprnetwork.org/tokens/TAB-proton-tokencreate";
 
   return (
@@ -288,7 +287,7 @@ const Calculator = () => {
                   
                   <Button 
                     asChild
-                    className="w-full bg-orange-500 hover:bg-orange-600 text-white font-black h-10 md:h-12 rounded-xl transition-all text-[11px] md:text-sm"
+                    className="w-full bg-orange-500 hover:bg-orange-600 text-white font-black h-10 md:h-12 rounded-xl transition-all text-[11px] md:sm"
                   >
                     <a href={buyTabLink} target="_blank" rel="noopener noreferrer">
                       <ShoppingCart className="mr-2 h-3.5 w-3.5 md:h-4 md:w-4" />

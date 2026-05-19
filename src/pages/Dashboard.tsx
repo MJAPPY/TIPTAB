@@ -94,7 +94,7 @@ const Dashboard = () => {
 
     setIsSending(true);
     try {
-      const contract = transferSymbol === "TAB" ? "tokencreate" : "eosio.token";
+      const contract = transferSymbol === "TAB" ? "proton-tokencreate" : "eosio.token";
       const formattedQuantity = `${amountNum.toFixed(4)} ${transferSymbol}`;
       
       const actions = [{
