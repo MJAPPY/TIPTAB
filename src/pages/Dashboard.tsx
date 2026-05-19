@@ -201,7 +201,7 @@ const Dashboard = () => {
                     : "text-slate-400 hover:text-slate-100 hover:bg-white/5"
                 )}
                >
-                 <item.icon className="h-3 w-3 sm:h-4 sm:w-4" />
+                 <item.icon className="h-3 w-3 sm:h-4 w-4" />
                  <span>{item.label}</span>
                </Button>
              ))}
@@ -360,7 +360,11 @@ const Dashboard = () => {
                     <h2 className="text-2xl sm:text-3xl font-black italic tracking-tighter text-slate-100">Account Settings</h2>
                     <p className="text-slate-400 font-medium text-sm sm:text-base">Manage your identity and discovery on the network.</p>
                   </div>
-                  <ProfileEditor initialData={user} onSave={handleUpdateProfile} />
+                  <ProfileEditor 
+                    initialData={user} 
+                    onSave={handleUpdateProfile} 
+                    minimal={!isMember} 
+                  />
                 </div>
               </TabsContent>
             </Tabs>

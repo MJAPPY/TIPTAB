@@ -43,9 +43,10 @@ const CITY_COORDINATES: Record<string, [number, number]> = {
 interface ProfileEditorProps {
   initialData: Creator;
   onSave: (updatedData: Creator) => void;
+  minimal?: boolean;
 }
 
-export const ProfileEditor = ({ initialData, onSave }: ProfileEditorProps) => {
+export const ProfileEditor = ({ initialData, onSave, minimal = false }: ProfileEditorProps) => {
   const [isSaving, setIsSaving] = useState(false);
   const [hasChanged, setHasChanged] = useState(false);
   const [isCityRecognized, setIsCityRecognized] = useState(false);
@@ -160,7 +161,9 @@ export const ProfileEditor = ({ initialData, onSave }: ProfileEditorProps) => {
       <CardHeader className="p-8 border-b border-white/10 flex flex-row items-center justify-between">
         <div>
           <CardTitle className="text-2xl font-black">Public Profile</CardTitle>
-          <CardDescription className="text-white/40">Update how you appear to others on the global map</CardDescription>
+          <CardDescription className="text-white/40">
+            {minimal ? "Update your identity on the network" : "Update how you appear to others on the global map"}
+          </CardDescription>
         </div>
         <Button 
           onClick={handleSave}
@@ -220,6 +223,7 @@ export const ProfileEditor = ({ initialData, onSave }: ProfileEditorProps) => {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+            {/* Display Name is usually good for everyone, but minimal focuses on Location */}
             <div className="space-y-2">
               <Label htmlFor="name" className="text-white/60 font-bold uppercase tracking-widest text-[10px]">Display Name</Label>
               <div className="relative">
@@ -234,37 +238,13 @@ export const ProfileEditor = ({ initialData, onSave }: ProfileEditorProps) => {
               </div>
             </div>
 
+            {/* Location is essential for both */}
             <div className="space-y-2">
-              <Label htmlFor="handle" className="text-white/60 font-bold uppercase tracking-widest text-[10px]">Public Handle</Label>
-              <div className="relative">
-                <AtSign className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-purple-500" />
-                <Input 
-                  id="handle"
-                  value={formData.handle}
-                  onChange={handleChange}
-                  placeholder="username"
-                  className="pl-12 bg-white/5 border-white/10 h-14 rounded-2xl focus:ring-purple-500 focus:bg-white/10 transition-all text-white" 
-                />
-              </div>
-            </div>
-
-            <div className="space-y-2 md:col-span-2">
-              <Label htmlFor="bio" className="text-white/60 font-bold uppercase tracking-widest text-[10px]">Short Bio</Label>
-              <Textarea 
-                id="bio"
-                value={formData.bio}
-                onChange={handleChange}
-                placeholder="Tell the world what you build..."
-                className="bg-white/5 border-white/10 min-h-[120px] rounded-2xl focus:ring-purple-500 focus:bg-white/10 transition-all resize-none p-4 text-white" 
-              />
-            </div>
-
-            <div className="space-y-2 md:col-span-2">
               <div className="flex items-center justify-between mb-1">
-                <Label htmlFor="location" className="text-white/60 font-bold uppercase tracking-widest text-[10px]">Location (Typed City Determines Map Placement)</Label>
+                <Label htmlFor="location" className="text-white/60 font-bold uppercase tracking-widest text-[10px]">Location (Typed City Pin)</Label>
                 {isCityRecognized && (
                   <div className="flex items-center gap-1.5 text-[9px] font-black text-green-400 uppercase tracking-widest animate-in fade-in slide-in-from-right-2">
-                    <CheckCircle2 className="h-3 w-3" /> Map Ready
+                    <CheckCircle2 className="h-3 w-3" /> Ready
                   </div>
                 )}
               </div>
@@ -274,92 +254,119 @@ export const ProfileEditor = ({ initialData, onSave }: ProfileEditorProps) => {
                   id="location"
                   value={formData.location}
                   onChange={handleChange}
-                  placeholder="e.g. London, Perth, or New York"
+                  placeholder="e.g. London or Tokyo"
                   className={cn(
                     "pl-12 bg-white/5 border-white/10 h-14 rounded-2xl focus:ring-purple-500 focus:bg-white/10 transition-all text-white",
                     isCityRecognized && "border-green-500/30"
                   )} 
                 />
               </div>
-              <p className="text-[10px] text-white/30 font-bold italic mt-2 px-1">
-                Note: GPS is disabled for privacy. Simply type your city to pin your spot on the world map.
-              </p>
             </div>
 
-            <div className="space-y-2">
-              <Label className="text-white/60 font-bold uppercase tracking-widest text-[10px]">Category</Label>
-              <Select 
-                value={formData.category}
-                onValueChange={handleCategoryChange}
-              >
-                <SelectTrigger className="bg-white/5 border-white/10 h-14 rounded-2xl focus:ring-purple-500 focus:bg-white/10 transition-all text-white">
-                  <SelectValue placeholder="Select a category" />
-                </SelectTrigger>
-                <SelectContent className="bg-[#1a102d] border-white/10 text-white rounded-xl">
-                  {["Content", "Dev", "Art", "Education", "Gaming", "Music", "Sports", "Service", "Other"].map((cat) => (
-                    <SelectItem key={cat} value={cat} className="focus:bg-purple-500 focus:text-white cursor-pointer">
-                      {cat}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
+            {/* Creator specific fields only show if NOT minimal */}
+            {!minimal && (
+              <>
+                <div className="space-y-2">
+                  <Label htmlFor="handle" className="text-white/60 font-bold uppercase tracking-widest text-[10px]">Public Handle</Label>
+                  <div className="relative">
+                    <AtSign className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-purple-500" />
+                    <Input 
+                      id="handle"
+                      value={formData.handle}
+                      onChange={handleChange}
+                      placeholder="username"
+                      className="pl-12 bg-white/5 border-white/10 h-14 rounded-2xl focus:ring-purple-500 focus:bg-white/10 transition-all text-white" 
+                    />
+                  </div>
+                </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="twitter" className="text-white/60 font-bold uppercase tracking-widest text-[10px]">Twitter / X URL</Label>
-              <div className="relative">
-                <Twitter className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-purple-500" />
-                <Input 
-                  id="twitter"
-                  value={formData.twitter}
-                  onChange={handleChange}
-                  placeholder="https://twitter.com/username"
-                  className="pl-12 bg-white/5 border-white/10 h-14 rounded-2xl focus:ring-purple-500 focus:bg-white/10 transition-all text-white" 
-                />
-              </div>
-            </div>
+                <div className="space-y-2 md:col-span-2">
+                  <Label htmlFor="bio" className="text-white/60 font-bold uppercase tracking-widest text-[10px]">Short Bio</Label>
+                  <Textarea 
+                    id="bio"
+                    value={formData.bio}
+                    onChange={handleChange}
+                    placeholder="Tell the world what you build..."
+                    className="bg-white/5 border-white/10 min-h-[120px] rounded-2xl focus:ring-purple-500 focus:bg-white/10 transition-all resize-none p-4 text-white" 
+                  />
+                </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="instagram" className="text-white/60 font-bold uppercase tracking-widest text-[10px]">Instagram URL</Label>
-              <div className="relative">
-                <Instagram className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-purple-500" />
-                <Input 
-                  id="instagram"
-                  value={formData.instagram}
-                  onChange={handleChange}
-                  placeholder="https://instagram.com/username"
-                  className="pl-12 bg-white/5 border-white/10 h-14 rounded-2xl focus:ring-purple-500 focus:bg-white/10 transition-all text-white" 
-                />
-              </div>
-            </div>
+                <div className="space-y-2">
+                  <Label className="text-white/60 font-bold uppercase tracking-widest text-[10px]">Category</Label>
+                  <Select 
+                    value={formData.category}
+                    onValueChange={handleCategoryChange}
+                  >
+                    <SelectTrigger className="bg-white/5 border-white/10 h-14 rounded-2xl focus:ring-purple-500 focus:bg-white/10 transition-all text-white">
+                      <SelectValue placeholder="Select a category" />
+                    </SelectTrigger>
+                    <SelectContent className="bg-[#1a102d] border-white/10 text-white rounded-xl">
+                      {["Content", "Dev", "Art", "Education", "Gaming", "Music", "Sports", "Service", "Other"].map((cat) => (
+                        <SelectItem key={cat} value={cat} className="focus:bg-purple-500 focus:text-white cursor-pointer">
+                          {cat}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="videoUrl" className="text-white/60 font-bold uppercase tracking-widest text-[10px]">Video Channel URL</Label>
-              <div className="relative">
-                <Video className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-purple-500" />
-                <Input 
-                  id="videoUrl"
-                  value={formData.videoUrl}
-                  onChange={handleChange}
-                  placeholder="YouTube or Twitch channel link"
-                  className="pl-12 bg-white/5 border-white/10 h-14 rounded-2xl focus:ring-purple-500 focus:bg-white/10 transition-all text-white" 
-                />
-              </div>
-            </div>
+                <div className="space-y-2">
+                  <Label htmlFor="twitter" className="text-white/60 font-bold uppercase tracking-widest text-[10px]">Twitter / X URL</Label>
+                  <div className="relative">
+                    <Twitter className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-purple-500" />
+                    <Input 
+                      id="twitter"
+                      value={formData.twitter}
+                      onChange={handleChange}
+                      placeholder="https://twitter.com/username"
+                      className="pl-12 bg-white/5 border-white/10 h-14 rounded-2xl focus:ring-purple-500 focus:bg-white/10 transition-all text-white" 
+                    />
+                  </div>
+                </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="website" className="text-white/60 font-bold uppercase tracking-widest text-[10px]">Website URL</Label>
-              <div className="relative">
-                <Globe className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-purple-500" />
-                <Input 
-                  id="website"
-                  value={formData.website}
-                  onChange={handleChange}
-                  placeholder="https://yourwebsite.com"
-                  className="pl-12 bg-white/5 border-white/10 h-14 rounded-2xl focus:ring-purple-500 focus:bg-white/10 transition-all text-white" 
-                />
-              </div>
-            </div>
+                <div className="space-y-2">
+                  <Label htmlFor="instagram" className="text-white/60 font-bold uppercase tracking-widest text-[10px]">Instagram URL</Label>
+                  <div className="relative">
+                    <Instagram className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-purple-500" />
+                    <Input 
+                      id="instagram"
+                      value={formData.instagram}
+                      onChange={handleChange}
+                      placeholder="https://instagram.com/username"
+                      className="pl-12 bg-white/5 border-white/10 h-14 rounded-2xl focus:ring-purple-500 focus:bg-white/10 transition-all text-white" 
+                    />
+                  </div>
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="videoUrl" className="text-white/60 font-bold uppercase tracking-widest text-[10px]">Video Channel URL</Label>
+                  <div className="relative">
+                    <Video className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-purple-500" />
+                    <Input 
+                      id="videoUrl"
+                      value={formData.videoUrl}
+                      onChange={handleChange}
+                      placeholder="YouTube or Twitch channel link"
+                      className="pl-12 bg-white/5 border-white/10 h-14 rounded-2xl focus:ring-purple-500 focus:bg-white/10 transition-all text-white" 
+                    />
+                  </div>
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="website" className="text-white/60 font-bold uppercase tracking-widest text-[10px]">Website URL</Label>
+                  <div className="relative">
+                    <Globe className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-purple-500" />
+                    <Input 
+                      id="website"
+                      value={formData.website}
+                      onChange={handleChange}
+                      placeholder="https://yourwebsite.com"
+                      className="pl-12 bg-white/5 border-white/10 h-14 rounded-2xl focus:ring-purple-500 focus:bg-white/10 transition-all text-white" 
+                    />
+                  </div>
+                </div>
+              </>
+            )}
           </div>
         </div>
       </CardContent>
