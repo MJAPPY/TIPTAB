@@ -143,7 +143,7 @@ const Dashboard = () => {
     return (
       <div className="min-h-screen bg-[#0a0514] flex flex-col items-center justify-center p-6 text-center">
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-purple-600/10 blur-[150px] rounded-full -z-10" />
-        <h1 className="text-4xl md:text-6xl font-black mb-8 tracking-tighter italic">AUTHENTICATION <span className="text-orange-500">REQUIRED</span></h1>
+        <h1 className="text-4xl md:text-6xl font-black mb-8 tracking-tighter italic text-slate-100">AUTHENTICATION <span className="text-orange-500">REQUIRED</span></h1>
         <Button onClick={login} className="h-20 px-12 bg-white text-black hover:bg-orange-500 hover:text-white rounded-[32px] font-black text-2xl shadow-2xl transition-all active:scale-95">
           Connect WebAuth
         </Button>
@@ -176,11 +176,11 @@ const Dashboard = () => {
       <main className="container mx-auto px-4 md:px-6 py-8 pt-36 md:pt-44 relative z-10">
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-8 mb-16">
           <div className="space-y-4">
-             <div className="inline-flex items-center gap-2.5 px-4 py-1.5 rounded-full bg-white/5 border border-white/10 text-[10px] font-black uppercase tracking-[0.2em] text-white/40">
+             <div className="inline-flex items-center gap-2.5 px-4 py-1.5 rounded-full bg-white/5 border border-white/10 text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">
               <Zap className="h-3 w-3 text-orange-500 fill-orange-500" />
               {isMember ? "Creator Portal" : "Supporter Portal"}
             </div>
-            <h1 className="text-5xl md:text-7xl font-black tracking-tighter leading-none">
+            <h1 className="text-5xl md:text-7xl font-black tracking-tighter leading-none text-slate-100">
               Welcome, <span className="text-transparent bg-clip-text bg-gradient-to-r from-white via-white to-white/60">@{actor}</span>
             </h1>
           </div>
@@ -195,7 +195,7 @@ const Dashboard = () => {
                   "h-14 px-6 rounded-2xl gap-3 font-black text-xs uppercase tracking-widest transition-all",
                   activeTab === item.id 
                     ? "bg-white text-black shadow-xl" 
-                    : "text-white/40 hover:text-white hover:bg-white/5"
+                    : "text-slate-400 hover:text-slate-100 hover:bg-white/5"
                 )}
                >
                  <item.icon className="h-4 w-4" />
@@ -214,7 +214,7 @@ const Dashboard = () => {
                     <div className="absolute -top-12 -right-12 w-32 h-32 bg-orange-500/10 blur-3xl rounded-full group-hover:bg-orange-500/20 transition-all" />
                     <CardHeader className="p-0 mb-6">
                       <div className="flex items-center justify-between">
-                        <CardDescription className="text-white/30 font-black uppercase tracking-[0.2em] text-[10px]">Settled TAB</CardDescription>
+                        <CardDescription className="text-slate-400 font-black uppercase tracking-[0.2em] text-[10px]">Settled TAB</CardDescription>
                         <Button variant="ghost" size="icon" onClick={handleManualRefresh} className="h-10 w-10 rounded-xl bg-white/5 text-white/30 hover:text-white transition-all">
                           <RefreshCw className={cn("h-4 w-4", isRefreshing && "animate-spin")} />
                         </Button>
@@ -222,7 +222,7 @@ const Dashboard = () => {
                     </CardHeader>
                     <CardContent className="p-0">
                       <div className="flex items-end gap-3">
-                        <span className="text-5xl md:text-6xl font-black tracking-tighter">{Number(balances.tab).toLocaleString()}</span>
+                        <span className="text-5xl md:text-6xl font-black tracking-tighter text-slate-100">{Number(balances.tab).toLocaleString()}</span>
                         <span className="text-lg font-black text-orange-500 italic mb-2">TAB</span>
                       </div>
                       <div className="mt-6 flex items-center gap-2 text-green-400 text-[10px] font-black uppercase tracking-widest">
@@ -235,11 +235,11 @@ const Dashboard = () => {
                   <Card className="bg-[#130b21]/60 border-white/10 text-white rounded-[40px] p-8 md:p-10 shadow-2xl relative overflow-hidden group hover:border-purple-500/30 transition-all">
                     <div className="absolute -top-12 -right-12 w-32 h-32 bg-purple-500/10 blur-3xl rounded-full group-hover:bg-purple-500/20 transition-all" />
                     <CardHeader className="p-0 mb-6">
-                      <CardDescription className="text-white/30 font-black uppercase tracking-[0.2em] text-[10px]">Liquid XPR</CardDescription>
+                      <CardDescription className="text-slate-400 font-black uppercase tracking-[0.2em] text-[10px]">Liquid XPR</CardDescription>
                     </CardHeader>
                     <CardContent className="p-0">
                       <div className="flex items-end gap-3">
-                        <span className="text-5xl md:text-6xl font-black tracking-tighter">{Number(balances.xpr).toLocaleString()}</span>
+                        <span className="text-5xl md:text-6xl font-black tracking-tighter text-slate-100">{Number(balances.xpr).toLocaleString()}</span>
                         <span className="text-lg font-black text-purple-400 italic mb-2">XPR</span>
                       </div>
                       <div className="mt-6 h-1 w-full bg-white/5 rounded-full overflow-hidden">
@@ -251,11 +251,11 @@ const Dashboard = () => {
                   <Card className="bg-[#130b21]/60 border-white/10 text-white rounded-[40px] p-8 md:p-10 shadow-2xl relative overflow-hidden group hover:border-pink-500/30 transition-all">
                     <div className="absolute -top-12 -right-12 w-32 h-32 bg-pink-500/10 blur-3xl rounded-full group-hover:bg-pink-500/20 transition-all" />
                     <CardHeader className="p-0 mb-6">
-                      <CardDescription className="text-white/30 font-black uppercase tracking-[0.2em] text-[10px]">Total Tips Sent</CardDescription>
+                      <CardDescription className="text-slate-400 font-black uppercase tracking-[0.2em] text-[10px]">Total Tips Sent</CardDescription>
                     </CardHeader>
                     <CardContent className="p-0">
                       <div className="flex items-end gap-3">
-                        <span className="text-5xl md:text-6xl font-black tracking-tighter">0</span>
+                        <span className="text-5xl md:text-6xl font-black tracking-tighter text-slate-100">0</span>
                         <span className="text-lg font-black text-pink-500 italic mb-2">TAB</span>
                       </div>
                       <div className="mt-6 flex items-center gap-2 text-pink-400 text-[10px] font-black uppercase tracking-widest">
@@ -273,24 +273,24 @@ const Dashboard = () => {
                     <div className="absolute top-0 right-0 p-10">
                       <Wallet className="h-12 w-12 text-white/5" />
                     </div>
-                    <h3 className="text-3xl md:text-4xl font-black italic uppercase mb-10 tracking-tighter">Execute <span className="text-orange-500">Transfer</span></h3>
+                    <h3 className="text-3xl md:text-4xl font-black italic uppercase mb-10 tracking-tighter text-slate-100">Execute <span className="text-orange-500">Transfer</span></h3>
                     
                     <div className="space-y-10">
                       <div className="space-y-4">
-                        <Label className="text-[10px] font-black uppercase tracking-[0.3em] text-white/30 ml-2">Recipient Actor</Label>
+                        <Label className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-500 ml-2">Recipient Actor</Label>
                         <div className="relative group">
                           <UserIcon className="absolute left-6 top-1/2 -translate-y-1/2 h-5 w-5 text-purple-500" />
                           <Input 
                             placeholder="username" 
                             value={transferRecipient} 
                             onChange={(e) => setTransferRecipient(e.target.value)} 
-                            className="bg-white/5 border-white/10 h-16 md:h-20 rounded-[28px] font-bold text-lg md:text-xl text-white pl-16 focus:ring-purple-500/50 focus:bg-white/10 transition-all" 
+                            className="bg-white/5 border-white/10 h-16 md:h-20 rounded-[28px] font-bold text-lg md:text-xl text-slate-100 pl-16 focus:ring-purple-500/50 focus:bg-white/10 transition-all" 
                           />
                         </div>
                       </div>
 
                       <div className="space-y-4">
-                        <Label className="text-[10px] font-black uppercase tracking-[0.3em] text-white/30 ml-2">Amount & Asset</Label>
+                        <Label className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-500 ml-2">Amount & Asset</Label>
                         <div className="flex flex-col sm:flex-row gap-4">
                           <div className="relative flex-1">
                             <Input 
@@ -298,11 +298,11 @@ const Dashboard = () => {
                               value={transferAmount} 
                               onChange={(e) => setTransferAmount(e.target.value)} 
                               onBlur={(e) => setTransferAmount(formatPrecision(e.target.value))} 
-                              className="bg-white/5 border-white/10 h-16 md:h-20 rounded-[28px] font-black text-2xl md:text-3xl text-white px-8 focus:ring-orange-500/50 focus:bg-white/10 transition-all" 
+                              className="bg-white/5 border-white/10 h-16 md:h-20 rounded-[28px] font-black text-2xl md:text-3xl text-slate-100 px-8 focus:ring-orange-500/50 focus:bg-white/10 transition-all" 
                             />
                           </div>
                           <Select value={transferSymbol} onValueChange={setTransferSymbol}>
-                            <SelectTrigger className="w-full sm:w-[160px] bg-white/5 border-white/10 h-16 md:h-20 rounded-[28px] font-black text-xl text-white transition-all">
+                            <SelectTrigger className="w-full sm:w-[160px] bg-white/5 border-white/10 h-16 md:h-20 rounded-[28px] font-black text-xl text-slate-100 transition-all">
                               <SelectValue />
                             </SelectTrigger>
                             <SelectContent className="bg-[#1a102d] border-white/20 text-white rounded-2xl">
@@ -337,8 +337,8 @@ const Dashboard = () => {
                   <TabsContent value="card" className="mt-0 animate-in zoom-in-95 duration-500">
                     <div className="max-w-xl mx-auto">
                       <div className="text-center mb-10 space-y-2">
-                        <h2 className="text-3xl font-black italic tracking-tighter">Your Network Pass</h2>
-                        <p className="text-white/40 font-medium">Share this card anywhere to receive zero-fee tips.</p>
+                        <h2 className="text-3xl font-black italic tracking-tighter text-slate-100">Your Network Pass</h2>
+                        <p className="text-slate-400 font-medium">Share this card anywhere to receive zero-fee tips.</p>
                       </div>
                       <TipTabCard creator={user} />
                     </div>

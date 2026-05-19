@@ -94,7 +94,7 @@ export const Header = ({ onBecomeCreator }: HeaderProps) => {
       <Link to="/leaderboard" onClick={() => setIsOpen(false)} className="w-full xl:w-auto">
         <Button 
           variant="ghost" 
-          className="w-full lg:w-auto text-white hover:text-yellow-400 flex items-center justify-start lg:justify-center gap-3 font-bold bg-white/5 border border-white/10 rounded-2xl h-12 px-5"
+          className="w-full lg:w-auto text-slate-200 hover:text-yellow-400 flex items-center justify-start lg:justify-center gap-3 font-bold bg-white/5 border border-white/10 rounded-2xl h-12 px-5"
         >
           <Trophy className="h-4 w-4" />
           Leaderboard
@@ -103,7 +103,7 @@ export const Header = ({ onBecomeCreator }: HeaderProps) => {
       <Link to="/calculator" onClick={() => setIsOpen(false)} className="w-full xl:w-auto">
         <Button 
           variant="ghost" 
-          className="w-full lg:w-auto text-white hover:text-cyan-400 flex items-center justify-start lg:justify-center gap-3 font-bold bg-white/5 border border-white/10 rounded-2xl h-12 px-5"
+          className="w-full lg:w-auto text-slate-200 hover:text-cyan-400 flex items-center justify-start lg:justify-center gap-3 font-bold bg-white/5 border border-white/10 rounded-2xl h-12 px-5"
         >
           <CalcIcon className="h-4 w-4" />
           Calculator
@@ -113,7 +113,7 @@ export const Header = ({ onBecomeCreator }: HeaderProps) => {
         <Link to="/dashboard" onClick={() => setIsOpen(false)} className="w-full xl:w-auto">
           <Button 
             variant="ghost" 
-            className="w-full lg:w-auto text-white hover:text-purple-400 flex items-center justify-start lg:justify-center gap-3 font-bold bg-white/5 border border-white/10 rounded-2xl h-12 px-5"
+            className="w-full lg:w-auto text-slate-200 hover:text-purple-400 flex items-center justify-start lg:justify-center gap-3 font-bold bg-white/5 border border-white/10 rounded-2xl h-12 px-5"
           >
             <LayoutDashboard className="h-4 w-4" />
             My Dashboard
@@ -127,7 +127,7 @@ export const Header = ({ onBecomeCreator }: HeaderProps) => {
             onBecomeCreator();
             setIsOpen(false);
           }}
-          className="w-full lg:w-auto border-orange-500/50 bg-orange-500/10 text-orange-500 hover:bg-orange-500 hover:text-white flex items-center justify-start lg:justify-center gap-3 font-black rounded-2xl h-12 px-5 transition-all shadow-[0_0_20px_rgba(249,115,22,0.15)]"
+          className="w-full lg:w-auto border-orange-500/50 bg-orange-500/10 text-orange-400 hover:bg-orange-500 hover:text-white flex items-center justify-start lg:justify-center gap-3 font-black rounded-2xl h-12 px-5 transition-all shadow-[0_0_20px_rgba(249,115,22,0.15)]"
         >
           <Sparkles className="h-4 w-4" />
           Become a Creator
@@ -146,12 +146,12 @@ export const Header = ({ onBecomeCreator }: HeaderProps) => {
               <div className="flex items-center gap-2 sm:gap-4">
                 <Link to="/" className="flex items-center gap-1 sm:gap-2 text-white/40 hover:text-white transition-colors">
                   <ArrowLeft className="h-4 w-4" />
-                  <span className="hidden sm:inline text-[8px] sm:text-xs font-black uppercase tracking-widest">Exit Admin</span>
+                  <span className="hidden sm:inline text-[8px] sm:text-xs font-black uppercase tracking-widest text-slate-300">Exit Admin</span>
                 </Link>
                 <div className="h-6 w-px bg-white/10" />
                 <div className="flex items-center gap-1.5 sm:gap-2">
                   <ShieldAlert className="h-4 w-4 sm:h-5 sm:w-5 text-orange-500" />
-                  <span className="text-sm sm:text-xl font-black italic tracking-tighter text-white">
+                  <span className="text-sm sm:text-xl font-black italic tracking-tighter text-slate-100">
                     ADMIN<span className="text-orange-500">HUB</span>
                   </span>
                 </div>
@@ -160,12 +160,12 @@ export const Header = ({ onBecomeCreator }: HeaderProps) => {
               <div className="flex items-center gap-2 sm:gap-4">
                 <Link to="/" className="flex items-center gap-1 sm:gap-2 text-white/40 hover:text-white transition-colors">
                   <ArrowLeft className="h-4 w-4 sm:h-5 sm:w-5" />
-                  <span className="hidden sm:inline font-bold text-xs sm:text-base">Map</span>
+                  <span className="hidden sm:inline font-bold text-xs sm:text-base text-slate-300">Map</span>
                 </Link>
                 <div className="h-6 w-px bg-white/10" />
                 <div className="flex items-center gap-1.5 sm:gap-2">
                   <img src="/src/assets/logo.png" alt="TIPTAB" className="h-6 w-6 sm:h-8 sm:w-8 object-contain" />
-                  <span className="text-sm sm:text-xl font-black italic tracking-tighter text-white">
+                  <span className="text-sm sm:text-xl font-black italic tracking-tighter text-slate-100">
                     {isMember ? "CREATOR" : "SUPPORTER"}<span className="text-orange-500">HUB</span>
                   </span>
                 </div>
@@ -177,10 +177,10 @@ export const Header = ({ onBecomeCreator }: HeaderProps) => {
                   <img src="/src/assets/logo.png" alt="TIPTAB Logo" className="h-8 w-8 sm:h-14 sm:w-14 object-contain relative z-10" />
                 </div>
                 <div className="flex flex-col -space-y-0.5 md:-space-y-1">
-                  <span className="text-sm sm:text-3xl font-black italic tracking-tighter text-white group-hover:text-[#a855f7] transition-colors duration-300 leading-none">
+                  <span className="text-sm sm:text-3xl font-black italic tracking-tighter text-slate-100 group-hover:text-[#a855f7] transition-colors duration-300 leading-none">
                     TIP<span className="text-orange-500">TAB</span>
                   </span>
-                  <span className="hidden xs:block text-[6px] sm:text-[10px] text-muted-foreground uppercase tracking-widest font-black opacity-60">
+                  <span className="hidden xs:block text-[6px] sm:text-[10px] text-slate-400 uppercase tracking-widest font-black opacity-60">
                     Appreciation Hub
                   </span>
                 </div>
@@ -201,7 +201,7 @@ export const Header = ({ onBecomeCreator }: HeaderProps) => {
                   <span className="text-[9px] sm:text-sm font-black text-orange-500 flex items-center gap-1 leading-none mb-0.5 sm:mb-1">
                     <Zap className="h-2 w-2 sm:h-3 sm:w-3 fill-orange-500" /> {Number(balances.tab).toLocaleString()} <span className="hidden xs:inline">TAB</span>
                   </span>
-                  <span className="text-[7px] sm:text-xs font-bold text-white/60 leading-none">{Number(balances.xpr).toLocaleString()} <span className="hidden xs:inline">XPR</span></span>
+                  <span className="text-[7px] sm:text-xs font-bold text-slate-300 leading-none">{Number(balances.xpr).toLocaleString()} <span className="hidden xs:inline">XPR</span></span>
                 </div>
                 <Button 
                   variant="ghost" 
@@ -219,16 +219,16 @@ export const Header = ({ onBecomeCreator }: HeaderProps) => {
                 <DropdownMenuTrigger asChild>
                   <Button 
                     className={cn(
-                      "flex items-center gap-2 sm:gap-4 rounded-xl sm:rounded-2xl h-11 sm:h-16 px-3 sm:px-8 font-black text-[10px] sm:text-sm transition-all active:scale-95 group shrink-0 bg-white/5 border border-white/10 text-white hover:bg-white/10 shadow-xl",
+                      "flex items-center gap-2 sm:gap-4 rounded-xl sm:rounded-2xl h-11 sm:h-16 px-3 sm:px-8 font-black text-[10px] sm:text-sm transition-all active:scale-95 group shrink-0 bg-white/5 border border-white/10 text-slate-200 hover:bg-white/10 shadow-xl",
                       isAdmin && "border-orange-500/60 bg-orange-500/10"
                     )}
                   >
                     <div className="flex flex-col items-start -space-y-0.5 sm:-space-y-1 text-left">
-                      <div className="flex items-center gap-1 sm:gap-1.5">
+                      <div className="flex items-center gap-1.5">
                         <span className="text-xs sm:text-base font-black text-purple-400">@{actor}</span>
                         {isAdmin && <ShieldCheck className="h-3 w-3 sm:h-4 sm:w-4 text-orange-500" />}
                       </div>
-                      <span className="hidden sm:block text-[8px] md:text-[10px] font-black text-white/60 uppercase tracking-widest">
+                      <span className="hidden sm:block text-[8px] md:text-[10px] font-black text-slate-400 uppercase tracking-widest">
                         {isAdmin ? "Network Admin" : "Connected User"}
                       </span>
                     </div>
@@ -245,12 +245,12 @@ export const Header = ({ onBecomeCreator }: HeaderProps) => {
                   <DropdownMenuSeparator className="bg-white/5" />
                   <div className="px-3 py-3 space-y-2">
                     <div className="flex items-center justify-between text-xs font-bold">
-                      <span className="text-white/60">TAB Balance:</span>
+                      <span className="text-slate-400">TAB Balance:</span>
                       <span className="text-orange-500">{Number(balances.tab).toLocaleString()}</span>
                     </div>
                     <div className="flex items-center justify-between text-xs font-bold">
-                      <span className="text-white/60">XPR Balance:</span>
-                      <span>{Number(balances.xpr).toLocaleString()}</span>
+                      <span className="text-slate-400">XPR Balance:</span>
+                      <span className="text-slate-200">{Number(balances.xpr).toLocaleString()}</span>
                     </div>
                   </div>
                   <DropdownMenuSeparator className="bg-white/5" />
@@ -258,14 +258,14 @@ export const Header = ({ onBecomeCreator }: HeaderProps) => {
                     <DropdownMenuItem asChild className="focus:bg-orange-500/10 focus:text-orange-500 rounded-xl cursor-pointer">
                       <Link to="/admin" className="flex items-center gap-3 px-3 py-2.5">
                         <ShieldAlert className="h-4 w-4 text-orange-500" />
-                        <span className="font-bold">Admin Hub</span>
+                        <span className="font-bold text-slate-200">Admin Hub</span>
                       </Link>
                     </DropdownMenuItem>
                   )}
                   <DropdownMenuItem asChild className="focus:bg-white/5 focus:text-white rounded-xl cursor-pointer">
                     <Link to="/dashboard" className="flex items-center gap-3 px-3 py-2.5">
                       <LayoutDashboard className="h-4 w-4 text-purple-400" />
-                      <span className="font-bold">{isMember ? "Creator Hub" : "Supporter Hub"}</span>
+                      <span className="font-bold text-slate-200">{isMember ? "Creator Hub" : "Supporter Hub"}</span>
                     </Link>
                   </DropdownMenuItem>
                   <DropdownMenuItem onClick={handleLogout} className="focus:bg-red-500/10 focus:text-red-500 rounded-xl cursor-pointer text-red-400 flex items-center gap-3 px-3 py-2.5">
@@ -289,12 +289,12 @@ export const Header = ({ onBecomeCreator }: HeaderProps) => {
             <Sheet open={isOpen} onOpenChange={setIsOpen}>
               <SheetTrigger asChild>
                 <Button variant="ghost" size="icon" className="text-white bg-white/5 border border-white/10 hover:bg-white/10 h-11 w-11 sm:h-16 sm:w-16 rounded-xl sm:rounded-2xl shrink-0">
-                  <Menu className="h-5 w-5 sm:h-6 sm:w-6" />
+                  <Menu className="h-5 w-5 sm:h-6 sm:w-6 text-slate-200" />
                 </Button>
               </SheetTrigger>
               <SheetContent side="right" className="bg-[#0a0514]/98 backdrop-blur-3xl border-white/10 p-8 pt-16 w-[320px]">
                 <SheetHeader className="text-left mb-10">
-                  <SheetTitle className="text-3xl font-black italic text-white tracking-tighter">
+                  <SheetTitle className="text-3xl font-black italic text-slate-100 tracking-tighter">
                     TIP<span className="text-orange-500">TAB</span>
                   </SheetTitle>
                 </SheetHeader>
@@ -312,7 +312,7 @@ export const Header = ({ onBecomeCreator }: HeaderProps) => {
                           <p className="text-xs font-black text-purple-400">@{actor}</p>
                           <div className="flex flex-col">
                             <span className="text-[9px] font-black text-orange-500">{Number(balances.tab).toLocaleString()} TAB</span>
-                            <span className="text-[9px] font-bold text-white/40">{Number(balances.xpr).toLocaleString()} XPR</span>
+                            <span className="text-[9px] font-bold text-slate-400">{Number(balances.xpr).toLocaleString()} XPR</span>
                           </div>
                         </div>
                       </div>
@@ -333,7 +333,7 @@ export const Header = ({ onBecomeCreator }: HeaderProps) => {
                   <Link to="/" onClick={() => setIsOpen(false)}>
                     <Button 
                       variant="ghost" 
-                      className="w-full text-white hover:text-cyan-400 flex items-center justify-start gap-4 font-bold bg-white/5 border border-white/10 rounded-2xl h-16 px-6"
+                      className="w-full text-slate-200 hover:text-cyan-400 flex items-center justify-start gap-4 font-bold bg-white/5 border border-white/10 rounded-2xl h-16 px-6"
                     >
                       <MapIcon className="h-6 w-6" />
                       View Map
