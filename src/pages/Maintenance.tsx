@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import { Hammer, Zap, ShieldAlert, Clock, Settings, Lock } from "lucide-react";
+import { Sparkles, Activity, ShieldAlert, Radio, Zap } from "lucide-react";
 import { useXpr } from "@/contexts/XprContext";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
@@ -13,11 +13,11 @@ const Maintenance = () => {
   const [clickCount, setClickCount] = useState(0);
 
   const handleHiddenLogin = async () => {
-    // Hidden trigger: Click 5 times to show login
+    // Hidden trigger: Click 3 times to show login
     const newCount = clickCount + 1;
     setClickCount(newCount);
 
-    if (newCount >= 5) {
+    if (newCount >= 3) {
       setClickCount(0);
       if (!isConnected) {
         try {
@@ -38,103 +38,104 @@ const Maintenance = () => {
   };
 
   return (
-    <div className="min-h-screen bg-[#06030e] text-white flex flex-col items-center justify-center p-6 relative overflow-hidden selection:bg-red-500/30">
-      {/* Cinematic Background Glows */}
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[1000px] h-[1000px] bg-red-600/10 blur-[180px] rounded-full animate-pulse" />
-      <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-orange-500/5 blur-[150px] rounded-full" />
-      <div className="absolute bottom-0 left-0 w-[400px] h-[400px] bg-purple-600/5 blur-[120px] rounded-full" />
+    <div className="min-h-screen bg-[#06030e] text-white flex flex-col items-center justify-center p-6 relative overflow-hidden selection:bg-purple-500/30">
+      {/* Dynamic Background Effects */}
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-purple-600/10 blur-[150px] rounded-full animate-pulse-slow" />
+      <div className="absolute top-0 right-0 w-[600px] h-[600px] bg-orange-500/5 blur-[120px] rounded-full" />
       
-      {/* Scanning Line Effect */}
-      <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')] opacity-10 pointer-events-none" />
-      <div className="absolute top-0 left-0 w-full h-[2px] bg-gradient-to-r from-transparent via-red-500/50 to-transparent animate-scan" />
+      {/* Animated Grid Overlay */}
+      <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/stardust.png')] opacity-20 pointer-events-none" />
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,transparent_0%,rgba(6,3,14,1)_70%)]" />
 
-      <div className="relative z-10 max-w-2xl w-full text-center space-y-12">
+      <div className="relative z-10 max-w-3xl w-full text-center space-y-12">
         {/* Hidden Login Trigger Logo */}
         <div 
-          className="relative inline-block cursor-default group"
+          className="relative inline-block cursor-pointer group"
           onClick={handleHiddenLogin}
         >
-          <div className="absolute inset-0 bg-red-500/20 blur-[80px] rounded-full scale-150 animate-pulse" />
-          <div className="relative h-32 w-32 md:h-48 md:w-48 bg-[#130b21] border-4 border-white/5 rounded-[48px] flex items-center justify-center shadow-[0_0_80px_rgba(239,68,68,0.2)] mx-auto transition-transform active:scale-95">
-             <div className="absolute inset-4 rounded-[32px] border border-white/5 bg-gradient-to-br from-white/5 to-transparent" />
+          {/* Multi-layered glow */}
+          <div className="absolute inset-0 bg-purple-500/20 blur-[100px] rounded-full scale-150 animate-pulse" />
+          <div className="absolute inset-0 bg-orange-500/10 blur-[60px] rounded-full scale-125 animate-pulse-slow" />
+          
+          <div className="relative h-40 w-40 md:h-56 md:w-56 bg-black/40 backdrop-blur-3xl border-2 border-white/10 rounded-[60px] flex items-center justify-center shadow-[0_0_80px_rgba(168,85,247,0.15)] mx-auto transition-all active:scale-95 group-hover:border-purple-500/30">
+             <div className="absolute inset-4 rounded-[40px] border border-white/5 bg-gradient-to-br from-white/10 to-transparent" />
              <img 
               src="/src/assets/logo.png" 
               alt="TIPTAB" 
-              className="h-20 w-20 md:h-32 md:w-32 object-contain drop-shadow-[0_0_20px_rgba(239,68,68,0.5)] opacity-80 group-hover:opacity-100 transition-opacity" 
+              className="h-24 w-24 md:h-36 md:w-36 object-contain drop-shadow-[0_0_30px_rgba(168,85,247,0.6)] group-hover:scale-105 transition-transform duration-500" 
             />
-            <div className="absolute -top-4 -right-4 bg-red-600 text-white font-black text-[10px] px-4 py-1.5 rounded-full shadow-[0_0_20px_rgba(220,38,38,0.5)] border border-white/20">
-              OFFLINE
+            <div className="absolute -bottom-3 left-1/2 -translate-x-1/2 bg-purple-600 text-white font-black text-[9px] px-5 py-1.5 rounded-full shadow-[0_10px_20px_rgba(168,85,247,0.3)] border border-white/20 whitespace-nowrap tracking-[0.2em]">
+              SYNCING NETWORK
             </div>
           </div>
         </div>
 
         <div className="space-y-6">
-          <div className="inline-flex items-center gap-3 px-4 py-2 rounded-full bg-white/5 border border-white/10 backdrop-blur-md">
-            <Settings className="h-4 w-4 text-red-500 animate-spin-slow" />
-            <span className="text-[10px] font-black uppercase tracking-[0.3em] text-white/60">System Maintenance</span>
+          <div className="inline-flex items-center gap-3 px-5 py-2 rounded-full bg-white/5 border border-white/10 backdrop-blur-md">
+            <Radio className="h-4 w-4 text-purple-400 animate-pulse" />
+            <span className="text-[10px] font-black uppercase tracking-[0.3em] text-white/60">Live Calibration</span>
           </div>
-          <h1 className="text-5xl md:text-8xl font-black tracking-tighter italic leading-none">
-            NETWORK <br />
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-red-500 via-orange-500 to-yellow-500">OPTIMIZATION</span>
+          
+          <h1 className="text-6xl md:text-9xl font-black tracking-tighter italic leading-[0.8] text-white">
+            MAINTENANCE <br />
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-orange-400 via-purple-500 to-cyan-400">MODE ACTIVE</span>
           </h1>
-          <p className="text-white/50 text-lg md:text-2xl font-bold leading-relaxed max-w-xl mx-auto">
-            We're calibrating the XPR Network nodes to enhance TAB liquidity and settle network rewards.
-          </p>
-        </div>
-
-        <div className="flex flex-col sm:flex-row items-center justify-center gap-4 md:gap-8">
-          <div className="flex items-center gap-4 bg-white/5 px-8 py-5 rounded-[24px] border border-white/10 backdrop-blur-xl w-full sm:w-auto">
-            <Clock className="h-6 w-6 text-orange-500" />
-            <div className="text-left">
-              <p className="text-[9px] font-black uppercase tracking-widest text-white/30">Estimated Delay</p>
-              <p className="text-sm font-black text-white">~15 MINUTES</p>
-            </div>
-          </div>
-          <div className="flex items-center gap-4 bg-white/5 px-8 py-5 rounded-[24px] border border-white/10 backdrop-blur-xl w-full sm:w-auto">
-            <Zap className="h-6 w-6 text-yellow-500 fill-yellow-500" />
-            <div className="text-left">
-              <p className="text-[9px] font-black uppercase tracking-widest text-white/30">Current Task</p>
-              <p className="text-sm font-black text-white">SYNCING NODES</p>
+          
+          <div className="flex flex-col items-center gap-4">
+            <p className="text-white/60 text-xl md:text-3xl font-bold leading-tight max-w-xl mx-auto tracking-tight">
+              We're polishing the edges. <br />
+              <span className="text-white">Be back very soon.</span>
+            </p>
+            <div className="flex items-center gap-2 mt-4">
+              <div className="h-1.5 w-8 rounded-full bg-orange-500/20 overflow-hidden">
+                <div className="h-full bg-orange-500 animate-loading-bar w-1/2" />
+              </div>
+              <Sparkles className="h-5 w-5 text-orange-500 animate-pulse" />
             </div>
           </div>
         </div>
 
         {isAdmin && (
-          <div className="pt-12 animate-in fade-in slide-in-from-bottom-4 duration-1000">
-            <div className="bg-red-500/10 border border-red-500/20 rounded-[32px] p-8 space-y-6">
-              <div className="flex items-center justify-center gap-3">
-                <ShieldAlert className="h-6 w-6 text-red-500" />
-                <h2 className="text-xl font-black italic tracking-tight">ADMINISTRATOR OVERRIDE</h2>
+          <div className="pt-12 animate-in fade-in zoom-in-95 duration-700">
+            <div className="bg-gradient-to-br from-purple-500/10 to-orange-500/10 border border-white/10 rounded-[40px] p-10 space-y-6 relative overflow-hidden">
+              <div className="absolute top-0 right-0 p-8 opacity-20">
+                <ShieldAlert className="h-20 w-20 text-white" />
               </div>
-              <Button 
-                onClick={() => setMaintenanceMode(false)}
-                className="bg-white text-black hover:bg-red-600 hover:text-white rounded-2xl h-14 px-10 font-black uppercase tracking-widest text-xs transition-all shadow-xl active:scale-95"
-              >
-                RESTORE PUBLIC ACCESS
-              </Button>
+              <div className="relative z-10 space-y-6">
+                <div className="flex items-center justify-center gap-3">
+                  <Zap className="h-6 w-6 text-orange-500 fill-orange-500" />
+                  <h2 className="text-2xl font-black italic tracking-tight uppercase">Admin Override Connected</h2>
+                </div>
+                <Button 
+                  onClick={() => setMaintenanceMode(false)}
+                  className="bg-white text-black hover:bg-orange-500 hover:text-white rounded-[20px] h-16 px-12 font-black uppercase tracking-widest text-sm transition-all shadow-[0_20px_40px_rgba(255,255,255,0.1)] active:scale-95"
+                >
+                  Restore Public Access
+                </Button>
+              </div>
             </div>
           </div>
         )}
       </div>
 
-      <div className="fixed bottom-10 left-1/2 -translate-x-1/2 text-[9px] font-black uppercase tracking-[0.5em] text-white/10 whitespace-nowrap">
-        TIPTAB PROTOCOL • SECURED BY XPR NETWORK
+      <div className="fixed bottom-10 left-1/2 -translate-x-1/2 text-[10px] font-black uppercase tracking-[0.6em] text-white/10 whitespace-nowrap italic">
+        TIP TAB PROTOCOL • XPR NETWORK
       </div>
 
       <style>{`
-        @keyframes scan {
-          0% { top: 0; }
-          100% { top: 100%; }
+        @keyframes pulse-slow {
+          0%, 100% { opacity: 0.3; transform: scale(1) translate(-50%, -50%); }
+          50% { opacity: 0.5; transform: scale(1.1) translate(-50%, -50%); }
         }
-        .animate-scan {
-          animation: scan 4s linear infinite;
+        .animate-pulse-slow {
+          animation: pulse-slow 8s ease-in-out infinite;
         }
-        @keyframes spin-slow {
-          from { transform: rotate(0deg); }
-          to { transform: rotate(360deg); }
+        @keyframes loading-bar {
+          0% { transform: translateX(-100%); }
+          100% { transform: translateX(200%); }
         }
-        .animate-spin-slow {
-          animation: spin-slow 12s linear infinite;
+        .animate-loading-bar {
+          animation: loading-bar 2s cubic-bezier(0.4, 0, 0.2, 1) infinite;
         }
       `}</style>
     </div>
