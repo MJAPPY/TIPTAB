@@ -73,6 +73,13 @@ const Dashboard = () => {
     }
   }, [isConnected, actor]);
 
+  // Helper to format precision for UI feedback
+  const formatPrecision = (val: string) => {
+    const num = parseFloat(val);
+    if (isNaN(num)) return "";
+    return num.toFixed(4);
+  };
+
   const handleUpdateProfile = (updatedData: Creator) => {
     setUser(updatedData);
     if (actor) {
@@ -100,7 +107,7 @@ const Dashboard = () => {
     try {
       const contract = transferSymbol === "TAB" ? "tokencreate" : "eosio.token";
       
-      // Force exactly 4 decimal places for the network string
+      // Force exactly 4 decimal places for the network string: X.XXXX SYMBOL
       const formattedQuantity = amountNum.toFixed(4) + " " + transferSymbol;
       
       const actions = [{
@@ -122,7 +129,7 @@ const Dashboard = () => {
       
       toast({
         title: "Transfer Complete",
-        description: `Successfully sent ${transferAmount} ${transferSymbol} to @${transferRecipient}`,
+        description: `Successfully sent ${formattedQuantity} to @${transferRecipient}`,
       });
       
       setTransferAmount("");
@@ -357,7 +364,9 @@ const Dashboard = () => {
 
                   <Card className="lg:col-span-7 bg-[#130b21] border-white/10 rounded-[32px] md:rounded-[40px] p-6 md:p-10 shadow-2xl">
                     <h3 className="text-xl md:text-2xl font-black italic tracking-tighter uppercase mb-8 flex items-center gap-3 text-white">
-                      <Send className="h-4 w-4 md:h-5 md:w-5 text-orange-500" /> Transfer Funds
+                      <span className="flex items-center gap-3">
+                        <Send className="h-4 w-4 md:h-5 md:w-5 text-orange-500" /> Transfer Funds
+                      </span>
                     </h3>
                     <div className="space-y-6 md:space-y-8">
                       <div className="space-y-3">
@@ -377,10 +386,11 @@ const Dashboard = () => {
                         <Label className="text-[10px] font-black uppercase tracking-widest text-white/40">Amount & Currency</Label>
                         <div className="flex gap-2">
                           <Input 
-                            type="number"
-                            placeholder="0.00" 
+                            type="text"
+                            placeholder="0.0000" 
                             value={transferAmount}
                             onChange={(e) => setTransferAmount(e.target.value)}
+                            onBlur={(e) => setTransferAmount(formatPrecision(e.target.value))}
                             className="flex-1 bg-white/5 border-white/10 h-14 rounded-2xl font-black text-xl focus:ring-orange-500 text-white"
                           />
                           <Select value={transferSymbol} onValueChange={setTransferSymbol}>
