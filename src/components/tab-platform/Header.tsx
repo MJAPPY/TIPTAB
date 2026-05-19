@@ -50,7 +50,6 @@ export const Header = ({ onBecomeCreator }: HeaderProps) => {
   const { login, logout, actor, balances, isConnected, isLoading, refreshBalances, isAdmin, isMember, userProfile } = useXpr();
   const { toast } = useToast();
   const location = useLocation();
-  const navigate = useNavigate();
 
   const handleConnect = async () => {
     try {
@@ -58,7 +57,7 @@ export const Header = ({ onBecomeCreator }: HeaderProps) => {
       if (session) {
         toast({
           title: "Wallet Connected",
-          description: `Successfully connected as @${session.auth.actor} via @tabxpr`,
+          description: `Successfully connected as @${session.auth.actor}`,
         });
       }
     } catch (error) {
@@ -159,7 +158,7 @@ export const Header = ({ onBecomeCreator }: HeaderProps) => {
             setIsOpen(false);
           }}
           className={cn(
-            "w-full border-orange-500/50 bg-orange-500/10 text-orange-400 hover:bg-orange-500/20 hover:text-white flex items-center gap-3 font-black rounded-2xl px-5 transition-all shadow-[0_0_20px_rgba(249,115,22,0.15)]",
+            "w-full border-orange-500/50 bg-orange-500/10 text-orange-400 hover:bg-orange-500 hover:text-white flex items-center gap-3 font-black rounded-2xl px-5 transition-all shadow-[0_0_20px_rgba(249,115,22,0.25)] animate-pulse",
             isMobile ? "h-15 justify-start text-sm" : "lg:w-auto lg:justify-center h-12"
           )}
         >
@@ -174,7 +173,6 @@ export const Header = ({ onBecomeCreator }: HeaderProps) => {
     <header className="fixed top-[52px] left-0 right-0 z-50 px-2 sm:px-6">
       <div className="mx-auto w-full max-w-[98%] xl:max-w-[1600px]">
         <div className="border border-purple-500/50 bg-[#0a0514]/90 backdrop-blur-md rounded-[20px] sm:rounded-[28px] px-2 sm:px-6 py-2 md:py-3.5 flex items-center justify-between shadow-[0_0_50px_rgba(168,85,247,0.35),0_20px_60px_rgba(0,0,0,0.8)] overflow-hidden relative ring-1 ring-inset ring-purple-500/10">
-          {/* Subtle background glow overlay */}
           <div className="absolute inset-0 bg-gradient-to-r from-purple-500/10 via-transparent to-orange-500/5 pointer-events-none" />
           
           <div className="flex items-center gap-2 sm:gap-4 shrink-0 relative z-10">
@@ -318,14 +316,25 @@ export const Header = ({ onBecomeCreator }: HeaderProps) => {
                 </DropdownMenuContent>
               </DropdownMenu>
             ) : (
-              <Button 
-                onClick={handleConnect}
-                disabled={isLoading}
-                className="flex items-center gap-2 rounded-xl sm:rounded-2xl h-10 sm:h-16 px-3 sm:px-10 font-black text-[10px] sm:text-base transition-all active:scale-95 group shrink-0 bg-[#a855f7] hover:bg-[#9333ea] text-white shadow-2xl shadow-purple-500/40 animate-shimmer"
-              >
-                <Wallet className="h-4 w-4 sm:h-6 sm:w-6 group-hover:rotate-12 transition-transform" />
-                <span className="whitespace-nowrap">{isLoading ? "Syncing..." : "Connect WebAuth"}</span>
-              </Button>
+              <div className="flex items-center gap-2">
+                {onBecomeCreator && (
+                  <Button 
+                    onClick={onBecomeCreator}
+                    className="hidden sm:flex items-center gap-2 rounded-xl sm:rounded-2xl h-10 sm:h-16 px-6 font-black text-[10px] sm:text-base transition-all bg-orange-500 hover:bg-orange-600 text-white shadow-xl"
+                  >
+                    <Sparkles className="h-4 w-4" />
+                    Join as Creator
+                  </Button>
+                )}
+                <Button 
+                  onClick={handleConnect}
+                  disabled={isLoading}
+                  className="flex items-center gap-2 rounded-xl sm:rounded-2xl h-10 sm:h-16 px-3 sm:px-10 font-black text-[10px] sm:text-base transition-all active:scale-95 group shrink-0 bg-[#a855f7] hover:bg-[#9333ea] text-white shadow-2xl shadow-purple-500/40 animate-shimmer"
+                >
+                  <Wallet className="h-4 w-4 sm:h-6 sm:w-6 group-hover:rotate-12 transition-transform" />
+                  <span className="whitespace-nowrap">{isLoading ? "Syncing..." : "Connect WebAuth"}</span>
+                </Button>
+              </div>
             )}
 
             <Sheet open={isOpen} onOpenChange={setIsOpen}>
