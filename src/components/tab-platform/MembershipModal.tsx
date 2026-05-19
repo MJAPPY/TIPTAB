@@ -26,8 +26,7 @@ export const MembershipModal = ({ isOpen, onOpenChange }: MembershipModalProps) 
   const { toast } = useToast();
   const { session, actor, login, isConnected, setIsMember, isMember } = useXpr();
 
-  // Determine the starting step ONLY when the modal is opened.
-  // This prevents the step from resetting if isConnected updates in the background.
+  // Reset or initialize step whenever the modal opens
   useEffect(() => {
     if (isOpen) {
       if (isConnected) {
@@ -36,13 +35,21 @@ export const MembershipModal = ({ isOpen, onOpenChange }: MembershipModalProps) 
         setStep("intro");
       }
     }
-  }, [isOpen]); // Intentionally omitting isConnected here to only set initial state
+  }, [isOpen]); // Run only on open to set initial state
+
+  // ACTIVE WATCHER: If the user connects while the modal is open on the intro screen,
+  // automatically advance them to the payment screen.
+  useEffect(() => {
+    if (isOpen && isConnected && step === "intro") {
+      setStep("payment");
+    }
+  }, [isOpen, isConnected, step]);
 
   const handleNextStep = async () => {
     if (!isConnected) {
       try {
         const newSession = await login();
-        // If login returns a valid session, explicitly move to payment
+        // Explicitly set step for immediate UI response after login
         if (newSession) {
           setStep("payment");
         }
@@ -105,8 +112,8 @@ export const MembershipModal = ({ isOpen, onOpenChange }: MembershipModalProps) 
 
   const handleClose = () => {
     onOpenChange(false);
-    // Give time for the exit animation before resetting step
-    setTimeout(() => setStep("intro"), 200);
+    // Short delay before resetting to avoid visual jump during close
+    setTimeout(() => setStep("intro"), 300);
   };
 
   return (
