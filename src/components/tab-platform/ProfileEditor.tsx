@@ -335,25 +335,26 @@ export const ProfileEditor = ({ initialData, onSave, minimal = false }: ProfileE
             )}
           </div>
 
-          {/* Media & Social Section */}
+          {/* Media & Integration Section */}
           {!minimal && (
-            <div className="space-y-8 pt-4">
-              <div className="flex items-center gap-3">
-                <Video className="h-4 w-4 text-purple-500" />
-                <h3 className="text-[10px] font-black uppercase tracking-[0.3em] text-white/40">Media & Social Integration</h3>
-              </div>
+            <div className="space-y-12 pt-4">
+              {/* Featured Media */}
+              <div className="space-y-8">
+                <div className="flex items-center gap-3">
+                  <Video className="h-4 w-4 text-purple-500" />
+                  <h3 className="text-[10px] font-black uppercase tracking-[0.3em] text-white/40">Featured Media Player</h3>
+                </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-10">
-                <div className="space-y-4 md:col-span-2">
+                <div className="space-y-6">
                   <div className="space-y-2">
-                    <Label htmlFor="videoUrl" className="text-white/60 font-bold uppercase tracking-widest text-[10px]">Featured Media Link (YouTube, Spotify, Apple Music, Twitch)</Label>
+                    <Label htmlFor="videoUrl" className="text-white/60 font-bold uppercase tracking-widest text-[10px]">Featured Media Link (YouTube, Spotify, Apple Music)</Label>
                     <div className="relative">
                       <Music className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-purple-500/50" />
                       <Input 
                         id="videoUrl"
                         value={formData.videoUrl}
                         onChange={handleChange}
-                        placeholder="https://youtube.com/watch?v=... or Twitch link"
+                        placeholder="https://youtube.com/watch?v=... or Spotify link"
                         className="pl-12 bg-white/5 border-white/10 h-14 rounded-2xl focus:ring-purple-500 focus:bg-white/10 transition-all text-white" 
                       />
                     </div>
@@ -361,127 +362,138 @@ export const ProfileEditor = ({ initialData, onSave, minimal = false }: ProfileE
                   
                   {formData.videoUrl && (
                     <div className="space-y-3 animate-in fade-in slide-in-from-top-2 duration-500">
-                      <Label className="text-[9px] font-black uppercase tracking-[0.2em] text-purple-400/60 ml-2">Media Preview</Label>
+                      <Label className="text-[9px] font-black uppercase tracking-[0.2em] text-purple-400/60 ml-2">Player Preview</Label>
                       <EmbedPlayer url={formData.videoUrl} className="bg-black/20" />
                     </div>
                   )}
                 </div>
+              </div>
 
-                {/* Live Streaming Section */}
-                <div className="md:col-span-2 pt-6 space-y-8 border-t border-white/5">
-                  <div className="flex items-center gap-3">
-                    <Radio className="h-4 w-4 text-orange-500" />
-                    <h3 className="text-[10px] font-black uppercase tracking-[0.3em] text-white/40">Live Stream Integration</h3>
+              {/* Live Stream Integration */}
+              <div className="pt-8 border-t border-white/5 space-y-8">
+                <div className="flex items-center gap-3">
+                  <Radio className="h-4 w-4 text-orange-500" />
+                  <h3 className="text-[10px] font-black uppercase tracking-[0.3em] text-white/40">Live Broadcast Channels</h3>
+                </div>
+                
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-10">
+                  <div className="space-y-2">
+                    <Label htmlFor="twitch" className="text-white/60 font-bold uppercase tracking-widest text-[10px]">Twitch Channel</Label>
+                    <div className="relative">
+                      <Twitch className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-[#9146FF]" />
+                      <Input 
+                        id="twitch"
+                        value={formData.twitch}
+                        onChange={handleChange}
+                        placeholder="https://twitch.tv/username"
+                        className="pl-12 bg-white/5 border-white/10 h-14 rounded-2xl focus:ring-purple-500 focus:bg-white/10 transition-all text-white" 
+                      />
+                    </div>
                   </div>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-10">
-                    <div className="space-y-2">
-                      <Label htmlFor="twitch" className="text-white/60 font-bold uppercase tracking-widest text-[10px]">Twitch Channel URL</Label>
-                      <div className="relative">
-                        <Twitch className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-[#9146FF]" />
-                        <Input 
-                          id="twitch"
-                          value={formData.twitch}
-                          onChange={handleChange}
-                          placeholder="https://twitch.tv/username"
-                          className="pl-12 bg-white/5 border-white/10 h-14 rounded-2xl focus:ring-purple-500 focus:bg-white/10 transition-all text-white" 
-                        />
-                      </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="youtubeLive" className="text-white/60 font-bold uppercase tracking-widest text-[10px]">YouTube Live</Label>
+                    <div className="relative">
+                      <Youtube className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-[#FF0000]" />
+                      <Input 
+                        id="youtubeLive"
+                        value={formData.youtubeLive}
+                        onChange={handleChange}
+                        placeholder="https://youtube.com/c/username/live"
+                        className="pl-12 bg-white/5 border-white/10 h-14 rounded-2xl focus:ring-purple-500 focus:bg-white/10 transition-all text-white" 
+                      />
                     </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="youtubeLive" className="text-white/60 font-bold uppercase tracking-widest text-[10px]">YouTube Live URL</Label>
-                      <div className="relative">
-                        <Youtube className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-[#FF0000]" />
-                        <Input 
-                          id="youtubeLive"
-                          value={formData.youtubeLive}
-                          onChange={handleChange}
-                          placeholder="https://youtube.com/c/username/live"
-                          className="pl-12 bg-white/5 border-white/10 h-14 rounded-2xl focus:ring-purple-500 focus:bg-white/10 transition-all text-white" 
-                        />
-                      </div>
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="tiktok" className="text-white/60 font-bold uppercase tracking-widest text-[10px]">TikTok Live</Label>
+                    <div className="relative">
+                      <svg className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 fill-white" viewBox="0 0 24 24"><path d="M12.525.02c1.31-.02 2.61-.01 3.91-.02.08 1.53.63 3.09 1.75 4.17 1.12 1.11 2.7 1.62 4.24 1.79v4.03c-1.44-.05-2.89-.35-4.2-.97-.57-.26-1.1-.59-1.62-.93-.01 2.92.01 5.84-.02 8.75-.08 1.4-.54 2.79-1.35 3.94-1.31 1.92-3.58 3.17-5.91 3.21-1.43.08-2.86-.31-4.08-1.03-2.02-1.19-3.44-3.37-3.65-5.71-.28-2.26.74-4.63 2.58-5.91 1.64-1.15 3.7-1.49 5.66-1.02v4.53c-.31-.19-.71-.24-1.07-.23-.39.03-.77.17-1.02.47-.5.62-.14 1.53.55 1.81.47.24 1.13.14 1.51-.25.23-.27.35-.63.35-.98.01-3.55-.01-7.1.02-10.65z"/></svg>
+                      <Input 
+                        id="tiktok"
+                        value={formData.tiktok}
+                        onChange={handleChange}
+                        placeholder="https://tiktok.com/@username"
+                        className="pl-12 bg-white/5 border-white/10 h-14 rounded-2xl focus:ring-purple-500 focus:bg-white/10 transition-all text-white" 
+                      />
                     </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="tiktok" className="text-white/60 font-bold uppercase tracking-widest text-[10px]">TikTok Profile URL</Label>
-                      <div className="relative">
-                        <svg className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 fill-white" viewBox="0 0 24 24"><path d="M12.525.02c1.31-.02 2.61-.01 3.91-.02.08 1.53.63 3.09 1.75 4.17 1.12 1.11 2.7 1.62 4.24 1.79v4.03c-1.44-.05-2.89-.35-4.2-.97-.57-.26-1.1-.59-1.62-.93-.01 2.92.01 5.84-.02 8.75-.08 1.4-.54 2.79-1.35 3.94-1.31 1.92-3.58 3.17-5.91 3.21-1.43.08-2.86-.31-4.08-1.03-2.02-1.19-3.44-3.37-3.65-5.71-.28-2.26.74-4.63 2.58-5.91 1.64-1.15 3.7-1.49 5.66-1.02v4.53c-.31-.19-.71-.24-1.07-.23-.39.03-.77.17-1.02.47-.5.62-.14 1.53.55 1.81.47.24 1.13.14 1.51-.25.23-.27.35-.63.35-.98.01-3.55-.01-7.1.02-10.65z"/></svg>
-                        <Input 
-                          id="tiktok"
-                          value={formData.tiktok}
-                          onChange={handleChange}
-                          placeholder="https://tiktok.com/@username"
-                          className="pl-12 bg-white/5 border-white/10 h-14 rounded-2xl focus:ring-purple-500 focus:bg-white/10 transition-all text-white" 
-                        />
-                      </div>
-                    </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="instagramLive" className="text-white/60 font-bold uppercase tracking-widest text-[10px]">Instagram Live URL</Label>
-                      <div className="relative">
-                        <Instagram className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-[#E4405F]" />
-                        <Input 
-                          id="instagramLive"
-                          value={formData.instagramLive}
-                          onChange={handleChange}
-                          placeholder="https://instagram.com/username/live"
-                          className="pl-12 bg-white/5 border-white/10 h-14 rounded-2xl focus:ring-purple-500 focus:bg-white/10 transition-all text-white" 
-                        />
-                      </div>
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="instagramLive" className="text-white/60 font-bold uppercase tracking-widest text-[10px]">Instagram Live</Label>
+                    <div className="relative">
+                      <Instagram className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-[#E4405F]" />
+                      <Input 
+                        id="instagramLive"
+                        value={formData.instagramLive}
+                        onChange={handleChange}
+                        placeholder="https://instagram.com/username/live"
+                        className="pl-12 bg-white/5 border-white/10 h-14 rounded-2xl focus:ring-purple-500 focus:bg-white/10 transition-all text-white" 
+                      />
                     </div>
                   </div>
                 </div>
+              </div>
 
-                <div className="space-y-2">
-                  <Label htmlFor="twitter" className="text-white/60 font-bold uppercase tracking-widest text-[10px]">Twitter / X URL</Label>
-                  <div className="relative">
-                    <Twitter className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-purple-500/50" />
-                    <Input 
-                      id="twitter"
-                      value={formData.twitter}
-                      onChange={handleChange}
-                      placeholder="https://twitter.com/username"
-                      className="pl-12 bg-white/5 border-white/10 h-14 rounded-2xl focus:ring-purple-500 focus:bg-white/10 transition-all text-white" 
-                    />
-                  </div>
+              {/* Social Profiles */}
+              <div className="pt-8 border-t border-white/5 space-y-8">
+                <div className="flex items-center gap-3">
+                  <AtSign className="h-4 w-4 text-cyan-400" />
+                  <h3 className="text-[10px] font-black uppercase tracking-[0.3em] text-white/40">Social Network Profiles</h3>
                 </div>
 
-                <div className="space-y-2">
-                  <Label htmlFor="instagram" className="text-white/60 font-bold uppercase tracking-widest text-[10px]">Instagram URL</Label>
-                  <div className="relative">
-                    <Instagram className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-purple-500/50" />
-                    <Input 
-                      id="instagram"
-                      value={formData.instagram}
-                      onChange={handleChange}
-                      placeholder="https://instagram.com/username"
-                      className="pl-12 bg-white/5 border-white/10 h-14 rounded-2xl focus:ring-purple-500 focus:bg-white/10 transition-all text-white" 
-                    />
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-10">
+                  <div className="space-y-2">
+                    <Label htmlFor="twitter" className="text-white/60 font-bold uppercase tracking-widest text-[10px]">Twitter / X URL</Label>
+                    <div className="relative">
+                      <Twitter className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-[#1DA1F2]" />
+                      <Input 
+                        id="twitter"
+                        value={formData.twitter}
+                        onChange={handleChange}
+                        placeholder="https://twitter.com/username"
+                        className="pl-12 bg-white/5 border-white/10 h-14 rounded-2xl focus:ring-purple-500 focus:bg-white/10 transition-all text-white" 
+                      />
+                    </div>
                   </div>
-                </div>
 
-                <div className="space-y-2">
-                  <Label htmlFor="spotify" className="text-white/60 font-bold uppercase tracking-widest text-[10px]">Spotify Profile URL</Label>
-                  <div className="relative">
-                    <svg className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 fill-[#1DB954]" viewBox="0 0 24 24"><path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm5.508 17.302c-.216.354-.675.467-1.028.249-2.857-1.745-6.452-2.14-10.686-1.172-.406.092-.817-.16-.908-.566-.092-.406.16-.817.566-.908 4.642-1.062 8.624-.606 11.806 1.34.354.216.467.675.25 1.028zm1.474-3.26c-.272.441-.848.583-1.288.311-3.266-2.008-8.246-2.593-12.108-1.42-.497.151-1.025-.129-1.176-.626-.151-.497.129-1.025.626-1.176 4.417-1.341 9.904-.691 13.636 1.601.44.272.583.847.31 1.288zm.126-3.411c-3.917-2.326-10.372-2.541-14.131-1.399-.6.182-1.238-.163-1.42-.763-.182-.6.163-1.238.763-1.42 4.307-1.307 11.436-1.05 15.961 1.637.54.321.716 1.018.395 1.558-.321.54-1.017.717-1.558.396z"/></svg>
-                    <Input 
-                      id="spotify"
-                      value={formData.spotify}
-                      onChange={handleChange}
-                      placeholder="https://open.spotify.com/user/..."
-                      className="pl-12 bg-white/5 border-white/10 h-14 rounded-2xl focus:ring-purple-500 focus:bg-white/10 transition-all text-white" 
-                    />
+                  <div className="space-y-2">
+                    <Label htmlFor="instagram" className="text-white/60 font-bold uppercase tracking-widest text-[10px]">Instagram URL</Label>
+                    <div className="relative">
+                      <Instagram className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-[#E4405F]" />
+                      <Input 
+                        id="instagram"
+                        value={formData.instagram}
+                        onChange={handleChange}
+                        placeholder="https://instagram.com/username"
+                        className="pl-12 bg-white/5 border-white/10 h-14 rounded-2xl focus:ring-purple-500 focus:bg-white/10 transition-all text-white" 
+                      />
+                    </div>
                   </div>
-                </div>
 
-                <div className="space-y-2">
-                  <Label htmlFor="website" className="text-white/60 font-bold uppercase tracking-widest text-[10px]">Website URL</Label>
-                  <div className="relative">
-                    <Globe className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-purple-500/50" />
-                    <Input 
-                      id="website"
-                      value={formData.website}
-                      onChange={handleChange}
-                      placeholder="https://yourwebsite.com"
-                      className="pl-12 bg-white/5 border-white/10 h-14 rounded-2xl focus:ring-purple-500 focus:bg-white/10 transition-all text-white" 
-                    />
+                  <div className="space-y-2">
+                    <Label htmlFor="spotify" className="text-white/60 font-bold uppercase tracking-widest text-[10px]">Spotify Profile</Label>
+                    <div className="relative">
+                      <svg className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 fill-[#1DB954]" viewBox="0 0 24 24"><path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm5.508 17.302c-.216.354-.675.467-1.028.249-2.857-1.745-6.452-2.14-10.686-1.172-.406.092-.817-.16-.908-.566-.092-.406.16-.817.566-.908 4.642-1.062 8.624-.606 11.806 1.34.354.216.467.675.25 1.028zm1.474-3.26c-.272.441-.848.583-1.288.311-3.266-2.008-8.246-2.593-12.108-1.42-.497.151-1.025-.129-1.176-.626-.151-.497.129-1.025.626-1.176 4.417-1.341 9.904-.691 13.636 1.601.44.272.583.847.31 1.288zm.126-3.411c-3.917-2.326-10.372-2.541-14.131-1.399-.6.182-1.238-.163-1.42-.763-.182-.6.163-1.238.763-1.42 4.307-1.307 11.436-1.05 15.961 1.637.54.321.716 1.018.395 1.558-.321.54-1.017.717-1.558.396z"/></svg>
+                      <Input 
+                        id="spotify"
+                        value={formData.spotify}
+                        onChange={handleChange}
+                        placeholder="https://open.spotify.com/user/..."
+                        className="pl-12 bg-white/5 border-white/10 h-14 rounded-2xl focus:ring-purple-500 focus:bg-white/10 transition-all text-white" 
+                      />
+                    </div>
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="website" className="text-white/60 font-bold uppercase tracking-widest text-[10px]">Website URL</Label>
+                    <div className="relative">
+                      <Globe className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-purple-500/50" />
+                      <Input 
+                        id="website"
+                        value={formData.website}
+                        onChange={handleChange}
+                        placeholder="https://yourwebsite.com"
+                        className="pl-12 bg-white/5 border-white/10 h-14 rounded-2xl focus:ring-purple-500 focus:bg-white/10 transition-all text-white" 
+                      />
+                    </div>
                   </div>
                 </div>
               </div>
