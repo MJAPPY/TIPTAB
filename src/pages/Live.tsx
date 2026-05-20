@@ -207,3 +207,5 @@ const Live = () => {
     </div>
   );
 };
+
+export default Live;
