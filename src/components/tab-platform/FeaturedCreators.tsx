@@ -6,15 +6,18 @@ import { Creator } from "@/data/creators";
 import { cn } from "@/lib/utils";
 
 const CATEGORIES = [
-  { name: "All", color: "#a855f7" }, // XPR Purple
-  { name: "Content", color: "#ff00ff" },
-  { name: "Dev", color: "#00ffff" },
-  { name: "Art", color: "#39ff14" },
-  { name: "Education", color: "#ffff00" },
-  { name: "Gaming", color: "#bc13fe" },
-  { name: "Music", color: "#ff3131" },
-  { name: "Sports", color: "#1f51ff" },
-  { name: "Service", color: "#ff5f1f" },
+  { name: "All", color: "#a855f7" },
+  { name: "Delivery", color: "#f97316" }, 
+  { name: "Hospitality", color: "#eab308" }, 
+  { name: "Content", color: "#ec4899" },
+  { name: "Music", color: "#ef4444" },
+  { name: "Gaming", color: "#8b5cf6" },
+  { name: "Art", color: "#22c55e" },
+  { name: "Dev", color: "#06b6d4" },
+  { name: "Sports", color: "#3b82f6" },
+  { name: "Fitness", color: "#10b981" },
+  { name: "Education", color: "#84cc16" },
+  { name: "Service", color: "#64748b" },
   { name: "Other", color: "#ffffff" }
 ];
 

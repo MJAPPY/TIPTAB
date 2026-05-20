@@ -4,7 +4,7 @@ import React, { useState, useMemo } from "react";
 import { Header } from "@/components/tab-platform/Header";
 import { MembershipModal } from "@/components/tab-platform/MembershipModal";
 import { CREATORS, Creator } from "@/data/creators";
-import { Search, MapPin, Tv, Radio, Music, Gamepad2, Zap, LayoutGrid, Users, ArrowUpDown } from "lucide-react";
+import { Search, MapPin, Tv, Radio, Music, Gamepad2, Zap, LayoutGrid, Users, ArrowUpDown, Truck, Coffee, Dumbbell } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -20,9 +20,12 @@ import { cn } from "@/lib/utils";
 
 const CATEGORIES = [
   { name: "All", icon: LayoutGrid },
+  { name: "Delivery", icon: Truck },
+  { name: "Hospitality", icon: Coffee },
+  { name: "Content", icon: Tv },
   { name: "Music", icon: Music },
   { name: "Gaming", icon: Gamepad2 },
-  { name: "Content", icon: Tv },
+  { name: "Fitness", icon: Dumbbell },
   { name: "Service", icon: Zap },
   { name: "Other", icon: Users }
 ];
