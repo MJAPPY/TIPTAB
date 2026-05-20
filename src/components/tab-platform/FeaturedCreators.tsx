@@ -15,6 +15,7 @@ const CATEGORIES = [
   { name: "Art", color: "#22c55e" },
   { name: "Dev", color: "#06b6d4" },
   { name: "Sports", color: "#3b82f6" },
+  { name: "Fishing", color: "#0ea5e9" },
   { name: "Fitness", color: "#10b981" },
   { name: "Education", color: "#84cc16" },
   { name: "Service", color: "#64748b" },
