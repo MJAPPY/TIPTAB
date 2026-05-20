@@ -2,7 +2,7 @@
 
 import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import ProtonWebSDK, { LinkSession } from '@proton/web-sdk';
-import { Creator } from '@/data/creators';
+import { CREATORS, Creator } from '@/data/creators';
 
 interface Balances {
   xpr: string;
@@ -181,7 +181,10 @@ export const XprProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       if (savedProfile) {
         setUserProfile(JSON.parse(savedProfile));
       } else {
-        const newProfile: Creator = {
+        // Try to find if this user is a seed creator
+        const seedCreator = CREATORS.find(c => c.handle === account);
+        
+        const newProfile: Creator = seedCreator ? { ...seedCreator } : {
           id: `user_${account}`,
           name: account,
           handle: account,
@@ -193,6 +196,9 @@ export const XprProvider: React.FC<{ children: React.ReactNode }> = ({ children 
           color: "bg-purple-600"
         };
         setUserProfile(newProfile);
+        
+        // Save the profile locally for the session
+        localStorage.setItem("tiptab_user_profile", JSON.stringify(newProfile));
       }
     } catch (error) {
       console.error('Balance sync error:', error);
@@ -266,6 +272,7 @@ export const XprProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       setIsMember(false);
       setMembershipDate(null);
       setUserProfile(null);
+      localStorage.removeItem("tiptab_user_profile");
     }
   };
 
