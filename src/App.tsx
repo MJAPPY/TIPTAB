@@ -6,6 +6,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Index from "./pages/Index";
 import Dashboard from "./pages/Dashboard";
 import Leaderboard from "./pages/Leaderboard";
+import Live from "./pages/Live";
 import CreatorProfile from "./pages/CreatorProfile";
 import Calculator from "./pages/Calculator";
 import AdminHub from "./pages/AdminHub";
@@ -32,6 +33,7 @@ const AppRoutes = () => {
         <Route path="/" element={<Index />} />
         <Route path="/dashboard" element={<Dashboard />} />
         <Route path="/leaderboard" element={<Leaderboard />} />
+        <Route path="/live" element={<Live />} />
         <Route path="/calculator" element={<Calculator />} />
         <Route path="/admin" element={<AdminHub />} />
         <Route path="/docs" element={<Docs />} />

@@ -17,7 +17,8 @@ import {
   Zap,
   ShieldCheck,
   ShieldAlert,
-  ArrowLeft
+  ArrowLeft,
+  Radio
 } from "lucide-react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useState } from "react";
@@ -110,6 +111,19 @@ export const Header = ({ onBecomeCreator }: HeaderProps) => {
         >
           <Home className={cn(isMobile ? "h-5 w-5" : "h-4 w-4")} />
           Home
+        </Button>
+      </Link>
+      <Link to="/live" onClick={() => setIsOpen(false)} className={cn(isMobile ? "w-full" : "xl:w-auto")}>
+        <Button 
+          variant="ghost" 
+          className={cn(
+            "w-full text-slate-200 hover:text-red-400 hover:bg-red-500/15 flex items-center gap-3 font-bold bg-white/5 border border-white/10 rounded-2xl px-5 transition-all",
+            isMobile ? "h-15 justify-start text-sm" : "lg:w-auto lg:justify-center h-12",
+            location.pathname === "/live" && "border-red-500/40 bg-red-500/10 text-red-400"
+          )}
+        >
+          <Radio className={cn(isMobile ? "h-5 w-5" : "h-4 w-4", "animate-pulse")} />
+          Live
         </Button>
       </Link>
       {isConnected && (
