@@ -44,7 +44,11 @@ const CreatorProfile = () => {
   const [isProcessing, setIsProcessing] = useState(false);
   const [isMembershipOpen, setIsMembershipOpen] = useState(false);
   const [isCopied, setIsCopied] = useState(false);
-  const [likeCount, setLikeCount] = useState(128);
+  
+  // Interaction Counts
+  const [likeCount, setLikeCount] = useState(130);
+  const [fireworkCount, setFireworkCount] = useState(42);
+  const [applauseCount, setApplauseCount] = useState(84);
 
   // Ensure page starts at top when handle changes
   useEffect(() => {
@@ -72,9 +76,10 @@ const CreatorProfile = () => {
   }, [handle, navigate]);
 
   const handleReaction = (type: 'heart' | 'firework' | 'applause') => {
-    if (type === 'heart') {
-      setLikeCount(prev => prev + 1);
-    }
+    if (type === 'heart') setLikeCount(prev => prev + 1);
+    if (type === 'firework') setFireworkCount(prev => prev + 1);
+    if (type === 'applause') setApplauseCount(prev => prev + 1);
+    
     if ((window as any).triggerReaction) {
       (window as any).triggerReaction(type);
     }
@@ -293,43 +298,9 @@ const CreatorProfile = () => {
                 </div>
               )}
 
-              <div className="space-y-6 pt-4">
-                <div className="flex flex-col gap-6">
-                  <div className="flex items-center justify-between">
-                    <h3 className="text-xs font-black uppercase tracking-[0.3em] text-white/30">Network Interaction</h3>
-                  </div>
-                  
-                  {/* Dedicated Reaction Button Row */}
-                  <div className="flex items-center gap-4 bg-white/5 p-4 rounded-3xl border border-white/10 w-fit">
-                    <Button 
-                      variant="ghost" 
-                      onClick={() => handleReaction('heart')}
-                      className="h-14 px-6 rounded-2xl bg-white/5 border border-white/10 hover:bg-red-500/15 hover:border-red-500/40 group transition-all flex items-center gap-3"
-                    >
-                      <Heart className="h-6 w-6 text-red-500 fill-red-500 group-hover:scale-125 transition-transform" />
-                      <span className="font-black text-base text-slate-100">{likeCount}</span>
-                    </Button>
-                    <Button 
-                      variant="ghost" 
-                      onClick={() => handleReaction('firework')}
-                      className="h-14 w-16 rounded-2xl bg-white/5 border border-white/10 hover:bg-purple-500/15 hover:border-purple-500/40 text-2xl flex items-center justify-center group transition-all"
-                    >
-                      <span className="group-hover:scale-125 group-hover:rotate-12 transition-transform">🎆</span>
-                    </Button>
-                    <Button 
-                      variant="ghost" 
-                      onClick={() => handleReaction('applause')}
-                      className="h-14 w-16 rounded-2xl bg-white/5 border border-white/10 hover:bg-yellow-500/15 hover:border-yellow-500/40 text-2xl flex items-center justify-center group transition-all"
-                    >
-                      <span className="group-hover:scale-125 transition-transform">👏</span>
-                    </Button>
-                  </div>
-                </div>
-
-                <div className="space-y-4 pt-4">
-                  <h3 className="text-xs font-black uppercase tracking-[0.3em] text-white/30">Bio</h3>
-                  <p className="text-xl md:text-2xl text-white/80 leading-relaxed font-medium">{creator.bio}</p>
-                </div>
+              <div className="space-y-4">
+                <h3 className="text-xs font-black uppercase tracking-[0.3em] text-white/30">About</h3>
+                <p className="text-xl md:text-2xl text-white/80 leading-relaxed font-medium">{creator.bio}</p>
               </div>
 
               {/* Permanent Featured Media Section */}
@@ -388,12 +359,40 @@ const CreatorProfile = () => {
               <div className="bg-[#130b21] border border-white/10 rounded-[48px] p-10 shadow-[0_30px_60px_-15px_rgba(0,0,0,0.5)] relative overflow-hidden">
                 <div className="flex items-center justify-between mb-10">
                   <h2 className="text-3xl font-black tracking-tight">Support <br /> {creator.name.split(' ')[0]}</h2>
-                  <div className="flex gap-2">
-                    <Button variant="ghost" size="icon" onClick={() => handleReaction('heart')} className="h-12 w-12 rounded-2xl bg-white/5 border border-white/10 hover:bg-red-500/20 group">
-                      <Heart className="h-5 w-5 text-red-500 group-hover:fill-red-500 transition-all" />
+                  <div className="flex flex-wrap items-center justify-end gap-2 max-w-[240px]">
+                    {/* Heart Reaction */}
+                    <Button 
+                      variant="ghost" 
+                      onClick={() => handleReaction('heart')}
+                      className="h-10 px-3 rounded-xl bg-white/5 border border-white/10 hover:bg-red-500/15 hover:border-red-500/40 group transition-all flex items-center gap-2"
+                    >
+                      <Heart className="h-4 w-4 text-red-500 fill-red-500 group-hover:scale-110 transition-transform" />
+                      <span className="font-black text-[11px] text-slate-100">{likeCount}</span>
                     </Button>
-                    <Button variant="ghost" size="icon" onClick={handleShare} className="h-12 w-12 rounded-2xl bg-white/5 border border-white/10 hover:bg-white/10">
-                      {isCopied ? <Check className="h-5 w-5 text-green-500" /> : <Share2 className="h-5 w-5 text-white/40" />}
+                    
+                    {/* Firework Reaction */}
+                    <Button 
+                      variant="ghost" 
+                      onClick={() => handleReaction('firework')}
+                      className="h-10 px-3 rounded-xl bg-white/5 border border-white/10 hover:bg-purple-500/15 hover:border-purple-500/40 group transition-all flex items-center gap-2"
+                    >
+                      <span className="text-base group-hover:scale-110 group-hover:rotate-12 transition-transform">🎆</span>
+                      <span className="font-black text-[11px] text-slate-100">{fireworkCount}</span>
+                    </Button>
+
+                    {/* Applause Reaction */}
+                    <Button 
+                      variant="ghost" 
+                      onClick={() => handleReaction('applause')}
+                      className="h-10 px-3 rounded-xl bg-white/5 border border-white/10 hover:bg-yellow-500/15 hover:border-yellow-500/40 group transition-all flex items-center gap-2"
+                    >
+                      <span className="text-base group-hover:scale-110 transition-transform">👏</span>
+                      <span className="font-black text-[11px] text-slate-100">{applauseCount}</span>
+                    </Button>
+
+                    {/* Share Button */}
+                    <Button variant="ghost" size="icon" onClick={handleShare} className="h-10 w-10 rounded-xl bg-white/5 border border-white/10 hover:bg-white/10">
+                      {isCopied ? <Check className="h-4 w-4 text-green-500" /> : <Share2 className="h-4 w-4 text-white/40" />}
                     </Button>
                   </div>
                 </div>
