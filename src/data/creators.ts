@@ -13,6 +13,7 @@ export interface Creator {
   website?: string;
   videoUrl?: string;
   instagram?: string;
+  spotify?: string;
   mediaEmbed?: string; // Specific field for the player
   // Live Stream Links
   twitch?: string;
@@ -60,6 +61,7 @@ export const CREATORS: Creator[] = [
     avatarImage: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=400&h=400&fit=crop",
     color: "bg-emerald-500",
     instagram: "https://instagram.com",
+    spotify: "https://spotify.com",
     mediaEmbed: "https://open.spotify.com/track/4cOdK2wGvWyR9p79hnIvov"
   },
   {

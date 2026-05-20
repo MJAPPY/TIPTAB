@@ -64,6 +64,7 @@ export const ProfileEditor = ({ initialData, onSave, minimal = false }: ProfileE
     website: initialData.website || "",
     videoUrl: initialData.videoUrl || "",
     instagram: initialData.instagram || "",
+    spotify: initialData.spotify || "",
     avatarImage: initialData.avatarImage || "",
     // Live Stream Links
     twitch: initialData.twitch || "",
@@ -86,6 +87,7 @@ export const ProfileEditor = ({ initialData, onSave, minimal = false }: ProfileE
       website: initialData.website || "",
       videoUrl: initialData.videoUrl || "",
       instagram: initialData.instagram || "",
+      spotify: initialData.spotify || "",
       avatarImage: initialData.avatarImage || "",
       twitch: initialData.twitch || "",
       tiktok: initialData.tiktok || "",
@@ -450,6 +452,20 @@ export const ProfileEditor = ({ initialData, onSave, minimal = false }: ProfileE
                       value={formData.instagram}
                       onChange={handleChange}
                       placeholder="https://instagram.com/username"
+                      className="pl-12 bg-white/5 border-white/10 h-14 rounded-2xl focus:ring-purple-500 focus:bg-white/10 transition-all text-white" 
+                    />
+                  </div>
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="spotify" className="text-white/60 font-bold uppercase tracking-widest text-[10px]">Spotify Profile URL</Label>
+                  <div className="relative">
+                    <svg className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 fill-[#1DB954]" viewBox="0 0 24 24"><path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm5.508 17.302c-.216.354-.675.467-1.028.249-2.857-1.745-6.452-2.14-10.686-1.172-.406.092-.817-.16-.908-.566-.092-.406.16-.817.566-.908 4.642-1.062 8.624-.606 11.806 1.34.354.216.467.675.25 1.028zm1.474-3.26c-.272.441-.848.583-1.288.311-3.266-2.008-8.246-2.593-12.108-1.42-.497.151-1.025-.129-1.176-.626-.151-.497.129-1.025.626-1.176 4.417-1.341 9.904-.691 13.636 1.601.44.272.583.847.31 1.288zm.126-3.411c-3.917-2.326-10.372-2.541-14.131-1.399-.6.182-1.238-.163-1.42-.763-.182-.6.163-1.238.763-1.42 4.307-1.307 11.436-1.05 15.961 1.637.54.321.716 1.018.395 1.558-.321.54-1.017.717-1.558.396z"/></svg>
+                    <Input 
+                      id="spotify"
+                      value={formData.spotify}
+                      onChange={handleChange}
+                      placeholder="https://open.spotify.com/user/..."
                       className="pl-12 bg-white/5 border-white/10 h-14 rounded-2xl focus:ring-purple-500 focus:bg-white/10 transition-all text-white" 
                     />
                   </div>
