@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
-import { User, AtSign, MapPin, Globe, Twitter, Save, Image as ImageIcon, Upload, X, Video, Instagram, CheckCircle2 } from "lucide-react";
+import { User, AtSign, MapPin, Globe, Twitter, Save, Image as ImageIcon, Upload, X, Video, Instagram, CheckCircle2, Music } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -8,6 +8,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
 import { Creator } from "@/data/creators";
+import { EmbedPlayer } from "./EmbedPlayer";
 import { cn } from "@/lib/utils";
 
 // Expanded Mock Geocoder - The sole source for map placement
@@ -160,7 +161,7 @@ export const ProfileEditor = ({ initialData, onSave, minimal = false }: ProfileE
 
   return (
     <Card className="bg-[#130b21] border-white/10 text-white rounded-[32px] overflow-hidden">
-      <CardHeader className="p-8 border-b border-white/10 flex flex-row items-center justify-between">
+      <CardHeader className="p-8 border-b border-white/10 flex flex-col sm:flex-row items-center justify-between gap-4">
         <div>
           <CardTitle className="text-2xl font-black">Public Profile</CardTitle>
           <CardDescription className="text-white/40">
@@ -171,7 +172,7 @@ export const ProfileEditor = ({ initialData, onSave, minimal = false }: ProfileE
           onClick={handleSave}
           disabled={isSaving || !hasChanged}
           className={cn(
-            "rounded-xl gap-2 font-bold transition-all h-12 px-6",
+            "w-full sm:w-auto rounded-xl gap-2 font-bold transition-all h-12 px-6",
             hasChanged 
               ? "bg-purple-600 hover:bg-purple-500 text-white shadow-lg shadow-purple-500/20" 
               : "bg-white/5 text-white/20 border-white/5 cursor-not-allowed"
@@ -181,8 +182,9 @@ export const ProfileEditor = ({ initialData, onSave, minimal = false }: ProfileE
         </Button>
       </CardHeader>
       <CardContent className="p-8">
-        <div className="space-y-8">
-          <div className="flex items-center gap-6 pb-8 border-b border-white/5">
+        <div className="space-y-12">
+          {/* Avatar Section */}
+          <div className="flex flex-col sm:flex-row items-center gap-6 pb-8 border-b border-white/5">
             <div className="relative group">
               <div className={cn("h-24 w-24 rounded-3xl flex items-center justify-center text-3xl font-black border-4 border-white/10 shadow-xl overflow-hidden", initialData.color)}>
                 {formData.avatarImage ? (
@@ -201,10 +203,10 @@ export const ProfileEditor = ({ initialData, onSave, minimal = false }: ProfileE
               )}
             </div>
             
-            <div className="space-y-2">
+            <div className="space-y-2 text-center sm:text-left">
               <h4 className="font-bold text-lg">Profile Avatar</h4>
               <p className="text-sm text-white/40">Upload a custom photo or use your generated initials.</p>
-              <div className="flex gap-2">
+              <div className="flex justify-center sm:justify-start gap-2">
                 <input 
                   type="file" 
                   ref={fileInputRef} 
@@ -224,108 +226,140 @@ export const ProfileEditor = ({ initialData, onSave, minimal = false }: ProfileE
             </div>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-10">
-            {/* Display Name */}
-            <div className="space-y-2">
-              <div className="flex items-center justify-between h-6 mb-1">
+          {/* Core Info */}
+          <div className="space-y-8">
+            <div className="flex items-center gap-3">
+              <User className="h-4 w-4 text-purple-500" />
+              <h3 className="text-[10px] font-black uppercase tracking-[0.3em] text-white/40">Identity & Location</h3>
+            </div>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-10">
+              <div className="space-y-2">
                 <Label htmlFor="name" className="text-white/60 font-bold uppercase tracking-widest text-[10px]">Display Name</Label>
-              </div>
-              <div className="relative">
-                <User className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-purple-500" />
-                <Input 
-                  id="name"
-                  value={formData.name}
-                  onChange={handleChange}
-                  placeholder="Enter your name"
-                  className="pl-12 bg-white/5 border-white/10 h-14 rounded-2xl focus:ring-purple-500 focus:bg-white/10 transition-all text-white" 
-                />
-              </div>
-            </div>
-
-            {/* Location */}
-            <div className="space-y-2">
-              <div className="flex items-center justify-between h-6 mb-1">
-                <Label htmlFor="location" className="text-white/60 font-bold uppercase tracking-widest text-[10px]">Location (Typed City Pin)</Label>
-                {isCityRecognized && (
-                  <div className="flex items-center gap-1.5 text-[9px] font-black text-green-400 uppercase tracking-widest animate-in fade-in slide-in-from-right-2">
-                    <CheckCircle2 className="h-3 w-3" /> Ready
-                  </div>
-                )}
-              </div>
-              <div className="relative">
-                <MapPin className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-purple-500" />
-                <Input 
-                  id="location"
-                  value={formData.location}
-                  onChange={handleChange}
-                  placeholder="e.g. London or Tokyo"
-                  className={cn(
-                    "pl-12 bg-white/5 border-white/10 h-14 rounded-2xl focus:ring-purple-500 focus:bg-white/10 transition-all text-white",
-                    isCityRecognized && "border-green-500/30"
-                  )} 
-                />
-              </div>
-            </div>
-
-            {/* Creator specific fields only show if NOT minimal */}
-            {!minimal && (
-              <>
-                <div className="space-y-2">
-                  <div className="flex items-center justify-between h-6 mb-1">
-                    <Label htmlFor="handle" className="text-white/60 font-bold uppercase tracking-widest text-[10px]">Public Handle</Label>
-                  </div>
-                  <div className="relative">
-                    <AtSign className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-purple-500" />
-                    <Input 
-                      id="handle"
-                      value={formData.handle}
-                      onChange={handleChange}
-                      placeholder="username"
-                      className="pl-12 bg-white/5 border-white/10 h-14 rounded-2xl focus:ring-purple-500 focus:bg-white/10 transition-all text-white" 
-                    />
-                  </div>
-                </div>
-
-                <div className="space-y-2">
-                  <div className="flex items-center justify-between h-6 mb-1">
-                    <Label className="text-white/60 font-bold uppercase tracking-widest text-[10px]">Category</Label>
-                  </div>
-                  <Select 
-                    value={formData.category}
-                    onValueChange={handleCategoryChange}
-                  >
-                    <SelectTrigger className="bg-white/5 border-white/10 h-14 rounded-2xl focus:ring-purple-500 focus:bg-white/10 transition-all text-white">
-                      <SelectValue placeholder="Select a category" />
-                    </SelectTrigger>
-                    <SelectContent className="bg-[#1a102d] border-white/10 text-white rounded-xl">
-                      {["Content", "Dev", "Art", "Education", "Gaming", "Music", "Sports", "Service", "Other"].map((cat) => (
-                        <SelectItem key={cat} value={cat} className="focus:bg-purple-500 focus:text-white cursor-pointer">
-                          {cat}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-
-                <div className="space-y-2 md:col-span-2">
-                  <div className="flex items-center justify-between h-6 mb-1">
-                    <Label htmlFor="bio" className="text-white/60 font-bold uppercase tracking-widest text-[10px]">Short Bio</Label>
-                  </div>
-                  <Textarea 
-                    id="bio"
-                    value={formData.bio}
+                <div className="relative">
+                  <User className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-purple-500/50" />
+                  <Input 
+                    id="name"
+                    value={formData.name}
                     onChange={handleChange}
-                    placeholder="Tell the world what you build..."
-                    className="bg-white/5 border-white/10 min-h-[120px] rounded-2xl focus:ring-purple-500 focus:bg-white/10 transition-all resize-none p-4 text-white" 
+                    placeholder="Enter your name"
+                    className="pl-12 bg-white/5 border-white/10 h-14 rounded-2xl focus:ring-purple-500 focus:bg-white/10 transition-all text-white" 
                   />
                 </div>
+              </div>
+
+              <div className="space-y-2">
+                <div className="flex items-center justify-between">
+                  <Label htmlFor="location" className="text-white/60 font-bold uppercase tracking-widest text-[10px]">Location (Typed City Pin)</Label>
+                  {isCityRecognized && (
+                    <div className="flex items-center gap-1.5 text-[9px] font-black text-green-400 uppercase tracking-widest animate-in fade-in slide-in-from-right-2">
+                      <CheckCircle2 className="h-3 w-3" /> Recognized
+                    </div>
+                  )}
+                </div>
+                <div className="relative">
+                  <MapPin className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-purple-500/50" />
+                  <Input 
+                    id="location"
+                    value={formData.location}
+                    onChange={handleChange}
+                    placeholder="e.g. London or Tokyo"
+                    className={cn(
+                      "pl-12 bg-white/5 border-white/10 h-14 rounded-2xl focus:ring-purple-500 focus:bg-white/10 transition-all text-white",
+                      isCityRecognized && "border-green-500/30"
+                    )} 
+                  />
+                </div>
+              </div>
+
+              {!minimal && (
+                <>
+                  <div className="space-y-2">
+                    <Label htmlFor="handle" className="text-white/60 font-bold uppercase tracking-widest text-[10px]">Public Handle</Label>
+                    <div className="relative">
+                      <AtSign className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-purple-500/50" />
+                      <Input 
+                        id="handle"
+                        value={formData.handle}
+                        onChange={handleChange}
+                        placeholder="username"
+                        className="pl-12 bg-white/5 border-white/10 h-14 rounded-2xl focus:ring-purple-500 focus:bg-white/10 transition-all text-white" 
+                      />
+                    </div>
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label className="text-white/60 font-bold uppercase tracking-widest text-[10px]">Category</Label>
+                    <Select 
+                      value={formData.category}
+                      onValueChange={handleCategoryChange}
+                    >
+                      <SelectTrigger className="bg-white/5 border-white/10 h-14 rounded-2xl focus:ring-purple-500 focus:bg-white/10 transition-all text-white">
+                        <SelectValue placeholder="Select a category" />
+                      </SelectTrigger>
+                      <SelectContent className="bg-[#1a102d] border-white/10 text-white rounded-xl">
+                        {["Content", "Dev", "Art", "Education", "Gaming", "Music", "Sports", "Service", "Other"].map((cat) => (
+                          <SelectItem key={cat} value={cat} className="focus:bg-purple-500 focus:text-white cursor-pointer font-bold">
+                            {cat}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </>
+              )}
+            </div>
+
+            {!minimal && (
+              <div className="space-y-2">
+                <Label htmlFor="bio" className="text-white/60 font-bold uppercase tracking-widest text-[10px]">Short Bio</Label>
+                <Textarea 
+                  id="bio"
+                  value={formData.bio}
+                  onChange={handleChange}
+                  placeholder="Tell the world what you build..."
+                  className="bg-white/5 border-white/10 min-h-[120px] rounded-2xl focus:ring-purple-500 focus:bg-white/10 transition-all resize-none p-4 text-white font-medium" 
+                />
+              </div>
+            )}
+          </div>
+
+          {/* Media & Social Section */}
+          {!minimal && (
+            <div className="space-y-8 pt-4">
+              <div className="flex items-center gap-3">
+                <Video className="h-4 w-4 text-purple-500" />
+                <h3 className="text-[10px] font-black uppercase tracking-[0.3em] text-white/40">Media & Social Integration</h3>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-10">
+                <div className="space-y-4 md:col-span-2">
+                  <div className="space-y-2">
+                    <Label htmlFor="videoUrl" className="text-white/60 font-bold uppercase tracking-widest text-[10px]">Featured Media Link (YouTube, Spotify, Apple Music)</Label>
+                    <div className="relative">
+                      <Music className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-purple-500/50" />
+                      <Input 
+                        id="videoUrl"
+                        value={formData.videoUrl}
+                        onChange={handleChange}
+                        placeholder="https://youtube.com/watch?v=... or Spotify link"
+                        className="pl-12 bg-white/5 border-white/10 h-14 rounded-2xl focus:ring-purple-500 focus:bg-white/10 transition-all text-white" 
+                      />
+                    </div>
+                  </div>
+                  
+                  {formData.videoUrl && (
+                    <div className="space-y-3 animate-in fade-in slide-in-from-top-2 duration-500">
+                      <Label className="text-[9px] font-black uppercase tracking-[0.2em] text-purple-400/60 ml-2">Media Preview</Label>
+                      <EmbedPlayer url={formData.videoUrl} className="bg-black/20" />
+                    </div>
+                  )}
+                </div>
 
                 <div className="space-y-2">
-                  <div className="flex items-center justify-between h-6 mb-1">
-                    <Label htmlFor="twitter" className="text-white/60 font-bold uppercase tracking-widest text-[10px]">Twitter / X URL</Label>
-                  </div>
+                  <Label htmlFor="twitter" className="text-white/60 font-bold uppercase tracking-widest text-[10px]">Twitter / X URL</Label>
                   <div className="relative">
-                    <Twitter className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-purple-500" />
+                    <Twitter className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-purple-500/50" />
                     <Input 
                       id="twitter"
                       value={formData.twitter}
@@ -337,11 +371,9 @@ export const ProfileEditor = ({ initialData, onSave, minimal = false }: ProfileE
                 </div>
 
                 <div className="space-y-2">
-                  <div className="flex items-center justify-between h-6 mb-1">
-                    <Label htmlFor="instagram" className="text-white/60 font-bold uppercase tracking-widest text-[10px]">Instagram URL</Label>
-                  </div>
+                  <Label htmlFor="instagram" className="text-white/60 font-bold uppercase tracking-widest text-[10px]">Instagram URL</Label>
                   <div className="relative">
-                    <Instagram className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-purple-500" />
+                    <Instagram className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-purple-500/50" />
                     <Input 
                       id="instagram"
                       value={formData.instagram}
@@ -353,27 +385,9 @@ export const ProfileEditor = ({ initialData, onSave, minimal = false }: ProfileE
                 </div>
 
                 <div className="space-y-2">
-                  <div className="flex items-center justify-between h-6 mb-1">
-                    <Label htmlFor="videoUrl" className="text-white/60 font-bold uppercase tracking-widest text-[10px]">Video Channel URL</Label>
-                  </div>
+                  <Label htmlFor="website" className="text-white/60 font-bold uppercase tracking-widest text-[10px]">Website URL</Label>
                   <div className="relative">
-                    <Video className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-purple-500" />
-                    <Input 
-                      id="videoUrl"
-                      value={formData.videoUrl}
-                      onChange={handleChange}
-                      placeholder="YouTube or Twitch channel link"
-                      className="pl-12 bg-white/5 border-white/10 h-14 rounded-2xl focus:ring-purple-500 focus:bg-white/10 transition-all text-white" 
-                    />
-                  </div>
-                </div>
-
-                <div className="space-y-2">
-                  <div className="flex items-center justify-between h-6 mb-1">
-                    <Label htmlFor="website" className="text-white/60 font-bold uppercase tracking-widest text-[10px]">Website URL</Label>
-                  </div>
-                  <div className="relative">
-                    <Globe className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-purple-500" />
+                    <Globe className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-purple-500/50" />
                     <Input 
                       id="website"
                       value={formData.website}
@@ -383,9 +397,9 @@ export const ProfileEditor = ({ initialData, onSave, minimal = false }: ProfileE
                     />
                   </div>
                 </div>
-              </>
-            )}
-          </div>
+              </div>
+            </div>
+          )}
         </div>
       </CardContent>
     </Card>
