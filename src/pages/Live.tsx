@@ -4,10 +4,17 @@ import React, { useState, useMemo } from "react";
 import { Header } from "@/components/tab-platform/Header";
 import { MembershipModal } from "@/components/tab-platform/MembershipModal";
 import { CREATORS, Creator } from "@/data/creators";
-import { Search, MapPin, Tv, Radio, Music, Gamepad2, Zap, LayoutGrid, Users } from "lucide-react";
+import { Search, MapPin, Tv, Radio, Music, Gamepad2, Zap, LayoutGrid, Users, ArrowUpDown } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { 
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { useNavigate } from "react-router-dom";
 import { cn } from "@/lib/utils";
 
@@ -23,12 +30,13 @@ const CATEGORIES = [
 const Live = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("All");
+  const [sortBy, setSortBy] = useState("alphabetical");
   const [isMembershipOpen, setIsMembershipOpen] = useState(false);
   const navigate = useNavigate();
 
-  // Filter creators who have live links and match search criteria
+  // Filter and Sort creators
   const liveCreators = useMemo(() => {
-    return CREATORS.filter((c) => {
+    let filtered = CREATORS.filter((c) => {
       const hasLiveLink = c.twitch || c.youtubeLive || c.tiktok || c.instagramLive;
       const matchesSearch = c.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
                            c.handle.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -37,7 +45,15 @@ const Live = () => {
       
       return hasLiveLink && matchesSearch && matchesCategory;
     });
-  }, [searchQuery, selectedCategory]);
+
+    if (sortBy === "alphabetical") {
+      return [...filtered].sort((a, b) => a.name.localeCompare(b.name));
+    } else if (sortBy === "random") {
+      return [...filtered].sort(() => Math.random() - 0.5);
+    }
+
+    return filtered;
+  }, [searchQuery, selectedCategory, sortBy]);
 
   return (
     <div className="min-h-screen bg-[#0a0514] text-white selection:bg-purple-500/30">
@@ -72,23 +88,40 @@ const Live = () => {
             />
           </div>
 
-          <div className="flex items-center gap-2 overflow-x-auto no-scrollbar w-full lg:w-auto px-2">
-            {CATEGORIES.map((cat) => (
-              <Button
-                key={cat.name}
-                variant="ghost"
-                onClick={() => setSelectedCategory(cat.name)}
-                className={cn(
-                  "h-12 px-6 rounded-2xl gap-2 font-black text-[11px] uppercase tracking-widest transition-all",
-                  selectedCategory === cat.name 
-                    ? "bg-purple-600 text-white shadow-lg" 
-                    : "text-white/40 hover:text-white hover:bg-white/5"
-                )}
-              >
-                <cat.icon className="h-4 w-4" />
-                {cat.name}
-              </Button>
-            ))}
+          <div className="flex items-center gap-4 w-full lg:w-auto px-2">
+            <div className="flex items-center gap-2 overflow-x-auto no-scrollbar flex-1 lg:flex-initial">
+              {CATEGORIES.map((cat) => (
+                <Button
+                  key={cat.name}
+                  variant="ghost"
+                  onClick={() => setSelectedCategory(cat.name)}
+                  className={cn(
+                    "h-12 px-6 rounded-2xl gap-2 font-black text-[11px] uppercase tracking-widest transition-all",
+                    selectedCategory === cat.name 
+                      ? "bg-purple-600 text-white shadow-lg" 
+                      : "text-white/40 hover:text-white hover:bg-white/5"
+                  )}
+                >
+                  <cat.icon className="h-4 w-4" />
+                  {cat.name}
+                </Button>
+              ))}
+            </div>
+
+            <div className="h-8 w-px bg-white/10 hidden lg:block" />
+
+            <Select value={sortBy} onValueChange={setSortBy}>
+              <SelectTrigger className="w-[140px] h-12 bg-white/10 border-white/10 rounded-2xl font-black text-[10px] uppercase tracking-widest text-white focus:ring-purple-500">
+                <div className="flex items-center gap-2">
+                  <ArrowUpDown className="h-3 w-3" />
+                  <SelectValue placeholder="Sort" />
+                </div>
+              </SelectTrigger>
+              <SelectContent className="bg-[#1a102d] border-white/20 text-white rounded-xl">
+                <SelectItem value="alphabetical" className="font-black text-[10px] uppercase tracking-widest py-3">Name (A-Z)</SelectItem>
+                <SelectItem value="random" className="font-black text-[10px] uppercase tracking-widest py-3">Random Mix</SelectItem>
+              </SelectContent>
+            </Select>
           </div>
         </div>
 
