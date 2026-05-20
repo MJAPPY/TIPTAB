@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
-import { User, AtSign, MapPin, Globe, Twitter, Save, Image as ImageIcon, Upload, X, Video, Instagram, CheckCircle2, Music, Radio, Youtube, Twitch } from "lucide-react";
+import { User, AtSign, MapPin, Globe, Twitter, Save, Image as ImageIcon, Upload, X, Video, Instagram, CheckCircle2, Music, Radio, Youtube, Twitch, ShieldCheck } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -286,17 +286,23 @@ export const ProfileEditor = ({ initialData, onSave, minimal = false }: ProfileE
               {!minimal && (
                 <>
                   <div className="space-y-2">
-                    <Label htmlFor="handle" className="text-white/60 font-bold uppercase tracking-widest text-[10px]">Public Handle</Label>
+                    <div className="flex items-center justify-between">
+                      <Label htmlFor="handle" className="text-white/60 font-bold uppercase tracking-widest text-[10px]">XPR Receiving Address</Label>
+                      <div className="flex items-center gap-1.5 text-[9px] font-black text-orange-500 uppercase tracking-widest">
+                        <ShieldCheck className="h-3 w-3" /> Locked to Wallet
+                      </div>
+                    </div>
                     <div className="relative">
-                      <AtSign className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-purple-500/50" />
+                      <AtSign className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-orange-500/50" />
                       <Input 
                         id="handle"
                         value={formData.handle}
-                        onChange={handleChange}
-                        placeholder="username"
-                        className="pl-12 bg-white/5 border-white/10 h-14 rounded-2xl focus:ring-purple-500 focus:bg-white/10 transition-all text-white" 
+                        readOnly
+                        disabled
+                        className="pl-12 bg-white/[0.02] border-white/5 h-14 rounded-2xl text-white/40 cursor-not-allowed font-black italic" 
                       />
                     </div>
+                    <p className="text-[9px] text-white/20 font-bold uppercase tracking-widest px-1">TIPS ARE SENT DIRECTLY TO THIS XPR ACCOUNT NAME.</p>
                   </div>
 
                   <div className="space-y-2">
