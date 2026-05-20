@@ -184,7 +184,13 @@ const CreatorProfile = () => {
   const quickAmounts = asset === "TAB" ? ["10", "50", "100", "250"] : ["100", "500", "1000", "5000"];
 
   const hasLiveLinks = creator.twitch || creator.youtubeLive || creator.tiktok || creator.instagramLive;
-  const liveEmbedUrl = creator.youtubeLive || creator.twitch || "";
+  
+  // Identify all available embeddable live streams
+  const liveStreams = [
+    { type: 'YouTube', url: creator.youtubeLive, icon: Youtube, color: 'text-red-500' },
+    { type: 'Twitch', url: creator.twitch, icon: Twitch, color: 'text-[#9146FF]' }
+  ].filter(s => s.url);
+
   const featuredEmbedUrl = creator.mediaEmbed || creator.videoUrl || "";
 
   return (
@@ -227,57 +233,50 @@ const CreatorProfile = () => {
 
             <div className="bg-white/[0.03] border border-white/10 rounded-[40px] p-8 md:p-12 space-y-8">
               
-              {/* 1. Live Broadcast Section (If active live link exists) */}
-              {liveEmbedUrl && (
-                <div className="space-y-6 animate-in fade-in slide-in-from-top-4 duration-700">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-3">
-                      <div className="relative flex h-3 w-3">
-                        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
-                        <span className="relative inline-flex rounded-full h-3 w-3 bg-red-500 shadow-[0_0_10px_rgba(239,68,68,0.5)]"></span>
+              {/* Multi-Stream Section */}
+              {liveStreams.length > 0 && (
+                <div className="space-y-10 animate-in fade-in slide-in-from-top-4 duration-700">
+                  {liveStreams.map((stream, idx) => (
+                    <div key={idx} className="space-y-6">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-3">
+                          <div className="relative flex h-3 w-3">
+                            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
+                            <span className="relative inline-flex rounded-full h-3 w-3 bg-red-500 shadow-[0_0_10px_rgba(239,68,68,0.5)]"></span>
+                          </div>
+                          <h3 className="text-xs font-black uppercase tracking-[0.3em] text-red-500">Live on {stream.type}</h3>
+                        </div>
+                        <a 
+                          href={stream.url} 
+                          target="_blank" 
+                          rel="noopener noreferrer" 
+                          className={cn("text-[10px] font-black uppercase tracking-widest hover:text-white transition-colors flex items-center gap-2", stream.color)}
+                        >
+                          <stream.icon className="h-3 w-3" /> External Link
+                        </a>
                       </div>
-                      <h3 className="text-xs font-black uppercase tracking-[0.3em] text-red-500">Live Broadcast</h3>
+                      <EmbedPlayer url={stream.url!} />
                     </div>
-                    {creator.twitch && (
-                      <a href={creator.twitch} target="_blank" rel="noopener noreferrer" className="text-[10px] font-black uppercase tracking-widest text-purple-400 hover:text-white transition-colors flex items-center gap-2">
-                        <Twitch className="h-3 w-3" /> Twitch Channel
-                      </a>
-                    )}
-                  </div>
-                  <EmbedPlayer url={liveEmbedUrl} />
+                  ))}
                 </div>
               )}
 
-              {/* Live Status Buttons (Mobile/Backup) */}
-              {hasLiveLinks && (
-                <div className="flex flex-wrap gap-4 pt-2 border-t border-white/5 pt-8">
-                  {creator.twitch && (
-                    <Button asChild className="rounded-2xl bg-[#9146FF] hover:bg-[#772ce8] h-12 px-6 gap-3 group">
-                      <a href={creator.twitch} target="_blank" rel="noopener noreferrer">
-                        <Twitch className="h-5 w-5" />
-                        <span className="font-black text-xs uppercase tracking-widest">Twitch</span>
-                      </a>
-                    </Button>
-                  )}
-                  {creator.youtubeLive && (
-                    <Button asChild className="rounded-2xl bg-[#FF0000] hover:bg-[#cc0000] h-12 px-6 gap-3 group">
-                      <a href={creator.youtubeLive} target="_blank" rel="noopener noreferrer">
-                        <Youtube className="h-5 w-5" />
-                        <span className="font-black text-xs uppercase tracking-widest">YouTube</span>
-                      </a>
-                    </Button>
-                  )}
+              {/* TikTok/Instagram specific Link Buttons (Non-Embeddable) */}
+              {(creator.tiktok || creator.instagramLive) && (
+                <div className={cn("flex flex-wrap gap-4 pt-8", liveStreams.length > 0 ? "border-t border-white/5" : "")}>
                   {creator.tiktok && (
                     <Button asChild className="rounded-2xl bg-black border border-white/20 hover:bg-white/10 h-12 px-6 gap-3 group">
                       <a href={creator.tiktok} target="_blank" rel="noopener noreferrer">
+                        <div className="h-2 w-2 rounded-full bg-red-500 animate-pulse" />
                         <svg className="h-5 w-5 fill-white" viewBox="0 0 24 24"><path d="M12.525.02c1.31-.02 2.61-.01 3.91-.02.08 1.53.63 3.09 1.75 4.17 1.12 1.11 2.7 1.62 4.24 1.79v4.03c-1.44-.05-2.89-.35-4.2-.97-.57-.26-1.1-.59-1.62-.93-.01 2.92.01 5.84-.02 8.75-.08 1.4-.54 2.79-1.35 3.94-1.31 1.92-3.58 3.17-5.91 3.21-1.43.08-2.86-.31-4.08-1.03-2.02-1.19-3.44-3.37-3.65-5.71-.28-2.26.74-4.63 2.58-5.91 1.64-1.15 3.7-1.49 5.66-1.02v4.53c-.31-.19-.71-.24-1.07-.23-.39.03-.77.17-1.02.47-.5.62-.14 1.53.55 1.81.47.24 1.13.14 1.51-.25.23-.27.35-.63.35-.98.01-3.55-.01-7.1.02-10.65z"/></svg>
-                        <span className="font-black text-xs uppercase tracking-widest">TikTok</span>
+                        <span className="font-black text-xs uppercase tracking-widest">TikTok Live</span>
                       </a>
                     </Button>
                   )}
                   {creator.instagramLive && (
                     <Button asChild className="rounded-2xl bg-gradient-to-tr from-[#f09433] via-[#e6683c] to-[#bc1888] h-12 px-6 gap-3 group">
                       <a href={creator.instagramLive} target="_blank" rel="noopener noreferrer">
+                        <div className="h-2 w-2 rounded-full bg-white animate-pulse" />
                         <Instagram className="h-5 w-5" />
                         <span className="font-black text-xs uppercase tracking-widest">IG Live</span>
                       </a>
@@ -299,7 +298,7 @@ const CreatorProfile = () => {
                 <p className="text-xl md:text-2xl text-white/80 leading-relaxed font-medium">{creator.bio}</p>
               </div>
 
-              {/* 2. Featured Media Section (Static content) */}
+              {/* Permanent Featured Media Section */}
               {featuredEmbedUrl && (
                 <div className="space-y-6 pt-8 border-t border-white/5">
                   <div className="flex items-center gap-3">
