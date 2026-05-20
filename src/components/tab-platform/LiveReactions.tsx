@@ -20,8 +20,8 @@ export const LiveReactions = () => {
   const addReaction = useCallback((type?: ReactionType) => {
     const id = Date.now() + Math.random();
     const x = Math.random() * 80 + 10; // 10% to 90%
-    const scale = Math.random() * 0.5 + 0.8;
-    const duration = Math.random() * 1000 + 2000;
+    const scale = Math.random() * 0.8 + 1.2; // Increased scale range: 1.2 to 2.0
+    const duration = Math.random() * 1000 + 2500; // Slightly slower float for better visibility
     
     // If no type is provided, pick one randomly
     const types: ReactionType[] = ['heart', 'firework', 'applause'];
@@ -43,11 +43,11 @@ export const LiveReactions = () => {
   const renderReaction = (reaction: Reaction) => {
     switch (reaction.type) {
       case 'firework':
-        return <span className="text-2xl drop-shadow-[0_0_15px_rgba(255,255,255,0.5)]">🎆</span>;
+        return <span className="text-5xl drop-shadow-[0_0_20px_rgba(255,255,255,0.6)]">🎆</span>;
       case 'applause':
-        return <span className="text-2xl drop-shadow-[0_0_15px_rgba(255,255,255,0.5)]">👏</span>;
+        return <span className="text-5xl drop-shadow-[0_0_20px_rgba(255,255,255,0.6)]">👏</span>;
       default:
-        return <Heart className="text-red-500 fill-red-500 drop-shadow-[0_0_10px_rgba(239,68,68,0.6)]" size={24} />;
+        return <Heart className="text-red-500 fill-red-500 drop-shadow-[0_0_15px_rgba(239,68,68,0.7)]" size={48} />;
     }
   };
 
@@ -69,22 +69,23 @@ export const LiveReactions = () => {
       <style>{`
         @keyframes float-up {
           0% {
-            transform: translateY(0) scale(0.5) rotate(0deg);
+            transform: translateY(0) scale(0.3) rotate(0deg);
             opacity: 0;
           }
           10% {
             opacity: 1;
+            transform: translateY(-50px) scale(1) rotate(5deg);
           }
           90% {
-            opacity: 1;
+            opacity: 0.8;
           }
           100% {
-            transform: translateY(-600px) scale(1.5) rotate(20deg);
+            transform: translateY(-800px) scale(1.8) rotate(25deg);
             opacity: 0;
           }
         }
         .animate-float-up {
-          animation: float-up linear forwards;
+          animation: float-up cubic-bezier(0.2, 0, 0.4, 1) forwards;
         }
       `}</style>
     </div>
