@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Calculator as CalcIcon, RefreshCw, Zap, TrendingUp, DollarSign, ArrowRightLeft, Info, ArrowUpRight, ShoppingCart, ExternalLink, CreditCard, Activity } from "lucide-react";
+import { Calculator as CalcIcon, RefreshCw, Zap, TrendingUp, DollarSign, ArrowRightLeft, Info, ArrowUpRight, ShoppingCart, ExternalLink, CreditCard } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const Calculator = () => {
@@ -130,7 +130,6 @@ const Calculator = () => {
   const buyTabLink = "https://alcor.exchange/v/xpr/swap?input=xpr-eosio.token&output=tab-tokencreate";
   const metalPayLink = "https://onramp.metalpay.com/buy/xpr";
   const explorerLink = "https://explorer.xprnetwork.org/tokens/TAB-proton-tokencreate";
-  const accountExplorer = "https://explorer.xprnetwork.org/account/tiptab";
 
   return (
     <div className="min-h-screen bg-[#0a0514] text-white selection:bg-orange-500/30">
@@ -269,11 +268,11 @@ const Calculator = () => {
               <div className="bg-gradient-to-br from-orange-500/10 to-[#0d071a] border border-white/10 rounded-[32px] p-6 md:p-8 relative overflow-hidden group shadow-xl space-y-6">
                 <div className="space-y-3">
                   <div className="flex items-center gap-3">
-                    <Activity className="h-4 w-4 text-orange-400" />
+                    <Info className="h-4 w-4 text-orange-400" />
                     <h4 className="font-black text-base md:text-lg tracking-tight italic text-white uppercase">Explorer Data</h4>
                   </div>
                   <p className="text-slate-400 text-[11px] md:text-xs leading-relaxed font-bold">
-                    Direct access to the XPR Network public ledger showing TIPTAB operation.
+                    View on-chain supply, holders, and contract details for TAB on the XPR Network.
                   </p>
                 </div>
                 
@@ -284,27 +283,27 @@ const Calculator = () => {
                   >
                     <a href={explorerLink} target="_blank" rel="noopener noreferrer">
                       <ExternalLink className="mr-2 h-4 w-4" />
-                      Token Explorer (TAB)
+                      Token Explorer
                     </a>
                   </Button>
                   
                   <div className="grid grid-cols-2 gap-3">
                     <Button 
                       asChild
-                      className="bg-purple-600/20 border border-purple-500/30 hover:bg-purple-600 text-white font-black h-10 md:h-12 rounded-xl transition-all text-[10px] md:text-sm"
-                    >
-                      <a href={accountExplorer} target="_blank" rel="noopener noreferrer">
-                        <Activity className="mr-2 h-3.5 w-3.5" />
-                        System Ledger
-                      </a>
-                    </Button>
-                    <Button 
-                      asChild
                       className="bg-orange-500 hover:bg-orange-600 text-white font-black h-10 md:h-12 rounded-xl transition-all text-[10px] md:text-sm"
                     >
                       <a href={buyTabLink} target="_blank" rel="noopener noreferrer">
                         <ShoppingCart className="mr-2 h-3.5 w-3.5" />
-                        Market Op
+                        Alcor DEX
+                      </a>
+                    </Button>
+                    <Button 
+                      asChild
+                      className="bg-cyan-500 hover:bg-cyan-600 text-white font-black h-10 md:h-12 rounded-xl transition-all text-[10px] md:text-sm"
+                    >
+                      <a href={metalPayLink} target="_blank" rel="noopener noreferrer">
+                        <CreditCard className="mr-2 h-3.5 w-3.5" />
+                        Card Buy
                       </a>
                     </Button>
                   </div>
