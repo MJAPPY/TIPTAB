@@ -142,32 +142,38 @@ export const XprProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         tipsSent: savedTips
       });
 
-      const membershipKey = `tiptab_membership_${account}`;
-      const membershipDateKey = `tiptab_membership_date_${account}`;
-      const savedDate = localStorage.getItem(membershipDateKey);
-      
-      if (savedDate) {
-        const activationDate = new Date(savedDate);
-        const now = new Date();
-        const diffYears = (now.getTime() - activationDate.getTime()) / (1000 * 60 * 60 * 24 * 365);
-        
-        if (diffYears < 1) {
-          setIsMember(true);
-          setMembershipDate(savedDate);
-        } else {
-          setIsMember(false);
-          setMembershipDate(null);
-          localStorage.removeItem(membershipKey);
-        }
+      // Special case: Official Project account is always a member
+      if (account === 'tiptab') {
+        setIsMember(true);
+        setMembershipDate(new Date(2024, 0, 1).toISOString());
       } else {
-        if (localStorage.getItem(membershipKey) === 'true') {
-          const fakeDate = new Date().toISOString();
-          localStorage.setItem(membershipDateKey, fakeDate);
-          setMembershipDate(fakeDate);
-          setIsMember(true);
+        const membershipKey = `tiptab_membership_${account}`;
+        const membershipDateKey = `tiptab_membership_date_${account}`;
+        const savedDate = localStorage.getItem(membershipDateKey);
+        
+        if (savedDate) {
+          const activationDate = new Date(savedDate);
+          const now = new Date();
+          const diffYears = (now.getTime() - activationDate.getTime()) / (1000 * 60 * 60 * 24 * 365);
+          
+          if (diffYears < 1) {
+            setIsMember(true);
+            setMembershipDate(savedDate);
+          } else {
+            setIsMember(false);
+            setMembershipDate(null);
+            localStorage.removeItem(membershipKey);
+          }
         } else {
-          setIsMember(false);
-          setMembershipDate(null);
+          if (localStorage.getItem(membershipKey) === 'true') {
+            const fakeDate = new Date().toISOString();
+            localStorage.setItem(membershipDateKey, fakeDate);
+            setMembershipDate(fakeDate);
+            setIsMember(true);
+          } else {
+            setIsMember(false);
+            setMembershipDate(null);
+          }
         }
       }
 
