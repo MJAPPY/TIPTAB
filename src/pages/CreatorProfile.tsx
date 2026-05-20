@@ -140,7 +140,7 @@ const CreatorProfile = () => {
         description: `Successfully sent ${quantityString} to ${creator?.name}.`,
       });
       
-      // Trigger a multi-emoji celebration!
+      // Trigger celebration sequence
       const trigger = (window as any).triggerReaction;
       if (trigger) {
         const sequence = ['heart', 'firework', 'applause', 'firework', 'heart', 'applause', 'firework'];
@@ -293,37 +293,43 @@ const CreatorProfile = () => {
                 </div>
               )}
 
-              <div className="space-y-6">
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6">
-                  <h3 className="text-xs font-black uppercase tracking-[0.3em] text-white/30">About</h3>
+              <div className="space-y-6 pt-4">
+                <div className="flex flex-col gap-6">
+                  <div className="flex items-center justify-between">
+                    <h3 className="text-xs font-black uppercase tracking-[0.3em] text-white/30">Network Interaction</h3>
+                  </div>
                   
-                  {/* Interactive Reaction Buttons */}
-                  <div className="flex items-center gap-3">
+                  {/* Dedicated Reaction Button Row */}
+                  <div className="flex items-center gap-4 bg-white/5 p-4 rounded-3xl border border-white/10 w-fit">
                     <Button 
                       variant="ghost" 
                       onClick={() => handleReaction('heart')}
-                      className="h-12 px-5 rounded-2xl bg-white/5 border border-white/10 hover:bg-red-500/10 hover:border-red-500/30 group transition-all flex items-center gap-3"
+                      className="h-14 px-6 rounded-2xl bg-white/5 border border-white/10 hover:bg-red-500/15 hover:border-red-500/40 group transition-all flex items-center gap-3"
                     >
-                      <Heart className="h-5 w-5 text-red-500 fill-red-500 group-hover:scale-110 transition-transform" />
-                      <span className="font-black text-sm text-slate-100">{likeCount}</span>
+                      <Heart className="h-6 w-6 text-red-500 fill-red-500 group-hover:scale-125 transition-transform" />
+                      <span className="font-black text-base text-slate-100">{likeCount}</span>
                     </Button>
                     <Button 
                       variant="ghost" 
                       onClick={() => handleReaction('firework')}
-                      className="h-12 w-14 rounded-2xl bg-white/5 border border-white/10 hover:bg-purple-500/10 hover:border-purple-500/30 text-xl flex items-center justify-center group transition-all"
+                      className="h-14 w-16 rounded-2xl bg-white/5 border border-white/10 hover:bg-purple-500/15 hover:border-purple-500/40 text-2xl flex items-center justify-center group transition-all"
                     >
-                      <span className="group-hover:scale-110 transition-transform">🎆</span>
+                      <span className="group-hover:scale-125 group-hover:rotate-12 transition-transform">🎆</span>
                     </Button>
                     <Button 
                       variant="ghost" 
                       onClick={() => handleReaction('applause')}
-                      className="h-12 w-14 rounded-2xl bg-white/5 border border-white/10 hover:bg-yellow-500/10 hover:border-yellow-500/30 text-xl flex items-center justify-center group transition-all"
+                      className="h-14 w-16 rounded-2xl bg-white/5 border border-white/10 hover:bg-yellow-500/15 hover:border-yellow-500/40 text-2xl flex items-center justify-center group transition-all"
                     >
-                      <span className="group-hover:scale-110 transition-transform">👏</span>
+                      <span className="group-hover:scale-125 transition-transform">👏</span>
                     </Button>
                   </div>
                 </div>
-                <p className="text-xl md:text-2xl text-white/80 leading-relaxed font-medium">{creator.bio}</p>
+
+                <div className="space-y-4 pt-4">
+                  <h3 className="text-xs font-black uppercase tracking-[0.3em] text-white/30">Bio</h3>
+                  <p className="text-xl md:text-2xl text-white/80 leading-relaxed font-medium">{creator.bio}</p>
+                </div>
               </div>
 
               {/* Permanent Featured Media Section */}
