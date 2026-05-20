@@ -74,7 +74,7 @@ const CreatorProfile = () => {
   const handleLike = () => {
     setLikeCount(prev => prev + 1);
     if ((window as any).triggerReaction) {
-      (window as any).triggerReaction();
+      (window as any).triggerReaction('heart');
     }
   };
 
@@ -138,9 +138,13 @@ const CreatorProfile = () => {
         description: `Successfully sent ${quantityString} to ${creator?.name}.`,
       });
       
-      // Trigger a bunch of hearts on successful tip
-      for(let i=0; i<5; i++) {
-        setTimeout(() => (window as any).triggerReaction?.(), i * 100);
+      // Trigger a multi-emoji celebration!
+      const trigger = (window as any).triggerReaction;
+      if (trigger) {
+        const sequence = ['heart', 'firework', 'applause', 'firework', 'heart', 'applause', 'firework'];
+        sequence.forEach((type, i) => {
+          setTimeout(() => trigger(type as any), i * 150);
+        });
       }
     } catch (error: any) {
       toast({
