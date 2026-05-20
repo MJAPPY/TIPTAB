@@ -93,9 +93,9 @@ export const TipTabCard = ({ creator }: TipTabCardProps) => {
 
   return (
     <div className="group relative w-full max-w-[480px] mx-auto transition-transform duration-500 hover:scale-[1.02]">
-      {/* Outer Glow */}
+      {/* Outer Glow - Added pointer-events-none to prevent blocking clicks */}
       <div className={cn(
-        "absolute inset-0 blur-[60px] opacity-20 transition-opacity group-hover:opacity-40 rounded-[48px]",
+        "absolute inset-0 blur-[60px] opacity-20 transition-opacity group-hover:opacity-40 rounded-[48px] pointer-events-none",
         creator.color
       )} />
 
@@ -126,7 +126,7 @@ export const TipTabCard = ({ creator }: TipTabCardProps) => {
                   src={creator.avatarImage} 
                   alt="Avatar" 
                   className="w-full h-full object-cover" 
-                  crossOrigin="anonymous" // Crucial for html-to-image to work with external URLs
+                  crossOrigin="anonymous"
                 />
               ) : (
                 creator.avatar
@@ -207,8 +207,8 @@ export const TipTabCard = ({ creator }: TipTabCardProps) => {
         <div className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-white/20 to-transparent" />
       </div>
 
-      {/* Action Buttons */}
-      <div className="mt-8 grid grid-cols-2 gap-4">
+      {/* Action Buttons - Added relative z-20 to ensure buttons stay on top */}
+      <div className="mt-8 grid grid-cols-2 gap-4 relative z-20">
         <Button 
           variant="secondary" 
           onClick={handleShare}
