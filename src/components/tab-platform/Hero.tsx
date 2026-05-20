@@ -35,7 +35,10 @@ export const Hero = ({ creators, onJoin }: HeroProps) => {
             </h1>
             
             <p className="text-xl md:text-2xl text-white/80 max-w-2xl leading-relaxed font-medium">
-              Whether you're a delivery pro, a fitness coach, or a digital creator—TIPTAB connects you directly to the people who value your hustle via the <span className="text-purple-400 font-black">XPR Network</span>. Zero fees. Instant TAB rewards. <span className="text-white italic">“Tipping is the value of appreciation.”</span>
+              Whether you're a delivery pro, a fitness coach, or a digital creator—TIPTAB connects you directly to the people who value your hustle via the <span className="text-purple-400 font-black">XPR Network</span>. Zero fees. Instant TAB rewards. <br />
+              <span className="inline-block mt-4 text-transparent bg-clip-text bg-gradient-to-b from-white via-slate-200 to-slate-500 italic drop-shadow-[0_0_15px_rgba(255,255,255,0.3)] font-black">
+                “Tipping is the value of appreciation.”
+              </span>
             </p>
 
             <div className="flex flex-col sm:flex-row items-center gap-4 pt-4">
