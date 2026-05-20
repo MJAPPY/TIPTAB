@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
-import { User, AtSign, MapPin, Globe, Twitter, Save, Image as ImageIcon, Upload, X, Video, Instagram, CheckCircle2, Music } from "lucide-react";
+import { User, AtSign, MapPin, Globe, Twitter, Save, Image as ImageIcon, Upload, X, Video, Instagram, CheckCircle2, Music, Radio, Youtube, Twitch } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -65,6 +65,11 @@ export const ProfileEditor = ({ initialData, onSave, minimal = false }: ProfileE
     videoUrl: initialData.videoUrl || "",
     instagram: initialData.instagram || "",
     avatarImage: initialData.avatarImage || "",
+    // Live Stream Links
+    twitch: initialData.twitch || "",
+    tiktok: initialData.tiktok || "",
+    youtubeLive: initialData.youtubeLive || "",
+    instagramLive: initialData.instagramLive || "",
   });
 
   const { toast } = useToast();
@@ -82,6 +87,10 @@ export const ProfileEditor = ({ initialData, onSave, minimal = false }: ProfileE
       videoUrl: initialData.videoUrl || "",
       instagram: initialData.instagram || "",
       avatarImage: initialData.avatarImage || "",
+      twitch: initialData.twitch || "",
+      tiktok: initialData.tiktok || "",
+      youtubeLive: initialData.youtubeLive || "",
+      instagramLive: initialData.instagramLive || "",
     });
     setHasChanged(false);
   }, [initialData]);
@@ -335,14 +344,14 @@ export const ProfileEditor = ({ initialData, onSave, minimal = false }: ProfileE
               <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-10">
                 <div className="space-y-4 md:col-span-2">
                   <div className="space-y-2">
-                    <Label htmlFor="videoUrl" className="text-white/60 font-bold uppercase tracking-widest text-[10px]">Featured Media Link (YouTube, Spotify, Apple Music)</Label>
+                    <Label htmlFor="videoUrl" className="text-white/60 font-bold uppercase tracking-widest text-[10px]">Featured Media Link (YouTube, Spotify, Apple Music, Twitch)</Label>
                     <div className="relative">
                       <Music className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-purple-500/50" />
                       <Input 
                         id="videoUrl"
                         value={formData.videoUrl}
                         onChange={handleChange}
-                        placeholder="https://youtube.com/watch?v=... or Spotify link"
+                        placeholder="https://youtube.com/watch?v=... or Twitch link"
                         className="pl-12 bg-white/5 border-white/10 h-14 rounded-2xl focus:ring-purple-500 focus:bg-white/10 transition-all text-white" 
                       />
                     </div>
@@ -354,6 +363,68 @@ export const ProfileEditor = ({ initialData, onSave, minimal = false }: ProfileE
                       <EmbedPlayer url={formData.videoUrl} className="bg-black/20" />
                     </div>
                   )}
+                </div>
+
+                {/* Live Streaming Section */}
+                <div className="md:col-span-2 pt-6 space-y-8 border-t border-white/5">
+                  <div className="flex items-center gap-3">
+                    <Radio className="h-4 w-4 text-orange-500" />
+                    <h3 className="text-[10px] font-black uppercase tracking-[0.3em] text-white/40">Live Stream Integration</h3>
+                  </div>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-10">
+                    <div className="space-y-2">
+                      <Label htmlFor="twitch" className="text-white/60 font-bold uppercase tracking-widest text-[10px]">Twitch Channel URL</Label>
+                      <div className="relative">
+                        <Twitch className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-[#9146FF]" />
+                        <Input 
+                          id="twitch"
+                          value={formData.twitch}
+                          onChange={handleChange}
+                          placeholder="https://twitch.tv/username"
+                          className="pl-12 bg-white/5 border-white/10 h-14 rounded-2xl focus:ring-purple-500 focus:bg-white/10 transition-all text-white" 
+                        />
+                      </div>
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="youtubeLive" className="text-white/60 font-bold uppercase tracking-widest text-[10px]">YouTube Live URL</Label>
+                      <div className="relative">
+                        <Youtube className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-[#FF0000]" />
+                        <Input 
+                          id="youtubeLive"
+                          value={formData.youtubeLive}
+                          onChange={handleChange}
+                          placeholder="https://youtube.com/c/username/live"
+                          className="pl-12 bg-white/5 border-white/10 h-14 rounded-2xl focus:ring-purple-500 focus:bg-white/10 transition-all text-white" 
+                        />
+                      </div>
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="tiktok" className="text-white/60 font-bold uppercase tracking-widest text-[10px]">TikTok Profile URL</Label>
+                      <div className="relative">
+                        <svg className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 fill-white" viewBox="0 0 24 24"><path d="M12.525.02c1.31-.02 2.61-.01 3.91-.02.08 1.53.63 3.09 1.75 4.17 1.12 1.11 2.7 1.62 4.24 1.79v4.03c-1.44-.05-2.89-.35-4.2-.97-.57-.26-1.1-.59-1.62-.93-.01 2.92.01 5.84-.02 8.75-.08 1.4-.54 2.79-1.35 3.94-1.31 1.92-3.58 3.17-5.91 3.21-1.43.08-2.86-.31-4.08-1.03-2.02-1.19-3.44-3.37-3.65-5.71-.28-2.26.74-4.63 2.58-5.91 1.64-1.15 3.7-1.49 5.66-1.02v4.53c-.31-.19-.71-.24-1.07-.23-.39.03-.77.17-1.02.47-.5.62-.14 1.53.55 1.81.47.24 1.13.14 1.51-.25.23-.27.35-.63.35-.98.01-3.55-.01-7.1.02-10.65z"/></svg>
+                        <Input 
+                          id="tiktok"
+                          value={formData.tiktok}
+                          onChange={handleChange}
+                          placeholder="https://tiktok.com/@username"
+                          className="pl-12 bg-white/5 border-white/10 h-14 rounded-2xl focus:ring-purple-500 focus:bg-white/10 transition-all text-white" 
+                        />
+                      </div>
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="instagramLive" className="text-white/60 font-bold uppercase tracking-widest text-[10px]">Instagram Live URL</Label>
+                      <div className="relative">
+                        <Instagram className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-[#E4405F]" />
+                        <Input 
+                          id="instagramLive"
+                          value={formData.instagramLive}
+                          onChange={handleChange}
+                          placeholder="https://instagram.com/username/live"
+                          className="pl-12 bg-white/5 border-white/10 h-14 rounded-2xl focus:ring-purple-500 focus:bg-white/10 transition-all text-white" 
+                        />
+                      </div>
+                    </div>
+                  </div>
                 </div>
 
                 <div className="space-y-2">

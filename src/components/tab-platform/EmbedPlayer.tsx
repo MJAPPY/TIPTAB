@@ -1,7 +1,8 @@
 "use client";
 
 import React from "react";
-import { Play, Music, Youtube } from "lucide-react";
+import { Play, Music, Youtube, Twitch, Radio } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
 interface EmbedPlayerProps {
@@ -21,6 +22,21 @@ export const EmbedPlayer = ({ url, className }: EmbedPlayerProps) => {
           src={`https://www.youtube.com/embed/${youtubeMatch[1]}`}
           className="absolute inset-0 w-full h-full"
           allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+          allowFullScreen
+        />
+      </div>
+    );
+  }
+
+  // Detect Twitch
+  const twitchMatch = url.match(/(?:https?:\/\/)?(?:www\.)?twitch\.tv\/([a-zA-Z0-9_]+)/);
+  if (twitchMatch) {
+    const parent = typeof window !== "undefined" ? window.location.hostname : "localhost";
+    return (
+      <div className={cn("relative aspect-video rounded-[32px] overflow-hidden border border-white/10 shadow-2xl bg-black", className)}>
+        <iframe
+          src={`https://player.twitch.tv/?channel=${twitchMatch[1]}&parent=${parent}&autoplay=false`}
+          className="absolute inset-0 w-full h-full"
           allowFullScreen
         />
       </div>
@@ -65,10 +81,10 @@ export const EmbedPlayer = ({ url, className }: EmbedPlayerProps) => {
     <div className={cn("p-8 rounded-[32px] bg-white/5 border border-white/10 flex items-center justify-between group hover:bg-white/10 transition-all", className)}>
       <div className="flex items-center gap-4">
         <div className="h-12 w-12 rounded-xl bg-purple-500/20 flex items-center justify-center">
-          <Music className="h-6 w-6 text-purple-400" />
+          <Radio className="h-6 w-6 text-purple-400" />
         </div>
         <div>
-          <p className="font-black text-sm uppercase tracking-widest text-white/40">External Media</p>
+          <p className="font-black text-sm uppercase tracking-widest text-white/40">External Link</p>
           <p className="font-bold text-white truncate max-w-[200px]">{url}</p>
         </div>
       </div>

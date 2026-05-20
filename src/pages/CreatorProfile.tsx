@@ -15,7 +15,10 @@ import {
   Wallet,
   Heart,
   Music,
-  Tv
+  Tv,
+  Twitch,
+  Youtube,
+  Radio
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -180,6 +183,8 @@ const CreatorProfile = () => {
 
   const quickAmounts = asset === "TAB" ? ["10", "50", "100", "250"] : ["100", "500", "1000", "5000"];
 
+  const hasLiveLinks = creator.twitch || creator.youtubeLive || creator.tiktok || creator.instagramLive;
+
   return (
     <div className="min-h-screen bg-[#0a0514] text-white selection:bg-purple-500/30">
       <Header onBecomeCreator={() => setIsMembershipOpen(true)} />
@@ -219,6 +224,46 @@ const CreatorProfile = () => {
             </div>
 
             <div className="bg-white/[0.03] border border-white/10 rounded-[40px] p-8 md:p-12 space-y-8">
+              {/* Live Status Indicator (Public) */}
+              {hasLiveLinks && (
+                <div className="flex flex-wrap gap-4 pt-2">
+                  {creator.twitch && (
+                    <Button asChild className="rounded-2xl bg-[#9146FF] hover:bg-[#772ce8] h-12 px-6 gap-3 group animate-pulse-slow">
+                      <a href={creator.twitch} target="_blank" rel="noopener noreferrer">
+                        <div className="h-2 w-2 rounded-full bg-white animate-ping" />
+                        <Twitch className="h-5 w-5" />
+                        <span className="font-black text-xs uppercase tracking-widest">Twitch Live</span>
+                      </a>
+                    </Button>
+                  )}
+                  {creator.youtubeLive && (
+                    <Button asChild className="rounded-2xl bg-[#FF0000] hover:bg-[#cc0000] h-12 px-6 gap-3 group animate-pulse-slow">
+                      <a href={creator.youtubeLive} target="_blank" rel="noopener noreferrer">
+                        <div className="h-2 w-2 rounded-full bg-white animate-ping" />
+                        <Youtube className="h-5 w-5" />
+                        <span className="font-black text-xs uppercase tracking-widest">YouTube Live</span>
+                      </a>
+                    </Button>
+                  )}
+                  {creator.tiktok && (
+                    <Button asChild className="rounded-2xl bg-black border border-white/20 hover:bg-white/10 h-12 px-6 gap-3 group">
+                      <a href={creator.tiktok} target="_blank" rel="noopener noreferrer">
+                        <svg className="h-5 w-5 fill-white" viewBox="0 0 24 24"><path d="M12.525.02c1.31-.02 2.61-.01 3.91-.02.08 1.53.63 3.09 1.75 4.17 1.12 1.11 2.7 1.62 4.24 1.79v4.03c-1.44-.05-2.89-.35-4.2-.97-.57-.26-1.1-.59-1.62-.93-.01 2.92.01 5.84-.02 8.75-.08 1.4-.54 2.79-1.35 3.94-1.31 1.92-3.58 3.17-5.91 3.21-1.43.08-2.86-.31-4.08-1.03-2.02-1.19-3.44-3.37-3.65-5.71-.28-2.26.74-4.63 2.58-5.91 1.64-1.15 3.7-1.49 5.66-1.02v4.53c-.31-.19-.71-.24-1.07-.23-.39.03-.77.17-1.02.47-.5.62-.14 1.53.55 1.81.47.24 1.13.14 1.51-.25.23-.27.35-.63.35-.98.01-3.55-.01-7.1.02-10.65z"/></svg>
+                        <span className="font-black text-xs uppercase tracking-widest">TikTok Profile</span>
+                      </a>
+                    </Button>
+                  )}
+                  {creator.instagramLive && (
+                    <Button asChild className="rounded-2xl bg-gradient-to-tr from-[#f09433] via-[#e6683c] to-[#bc1888] h-12 px-6 gap-3 group">
+                      <a href={creator.instagramLive} target="_blank" rel="noopener noreferrer">
+                        <Instagram className="h-5 w-5" />
+                        <span className="font-black text-xs uppercase tracking-widest">IG Live</span>
+                      </a>
+                    </Button>
+                  )}
+                </div>
+              )}
+
               <div className="space-y-4">
                 <div className="flex items-center justify-between">
                   <h3 className="text-xs font-black uppercase tracking-[0.3em] text-white/30">About</h3>
@@ -233,13 +278,13 @@ const CreatorProfile = () => {
               </div>
 
               {/* Media Section */}
-              {(creator.mediaEmbed || creator.videoUrl) && (
+              {(creator.mediaEmbed || creator.videoUrl || creator.twitch) && (
                 <div className="space-y-6 pt-4">
                   <div className="flex items-center gap-3">
-                    <Music className="h-4 w-4 text-purple-500" />
-                    <h3 className="text-xs font-black uppercase tracking-[0.3em] text-white/30">Featured Content</h3>
+                    <Radio className="h-4 w-4 text-purple-500" />
+                    <h3 className="text-xs font-black uppercase tracking-[0.3em] text-white/30">Featured Stream / Media</h3>
                   </div>
-                  <EmbedPlayer url={creator.mediaEmbed || creator.videoUrl || ""} />
+                  <EmbedPlayer url={creator.mediaEmbed || creator.videoUrl || creator.twitch || ""} />
                 </div>
               )}
 
@@ -362,6 +407,16 @@ const CreatorProfile = () => {
       </main>
 
       <MembershipModal isOpen={isMembershipOpen} onOpenChange={setIsMembershipOpen} />
+
+      <style>{`
+        @keyframes pulse-slow {
+          0%, 100% { opacity: 1; transform: scale(1); }
+          50% { opacity: 0.8; transform: scale(0.98); }
+        }
+        .animate-pulse-slow {
+          animation: pulse-slow 3s ease-in-out infinite;
+        }
+      `}</style>
     </div>
   );
 };

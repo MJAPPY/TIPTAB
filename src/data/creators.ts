@@ -14,6 +14,11 @@ export interface Creator {
   videoUrl?: string;
   instagram?: string;
   mediaEmbed?: string; // Specific field for the player
+  // Live Stream Links
+  twitch?: string;
+  tiktok?: string;
+  youtubeLive?: string;
+  instagramLive?: string;
 }
 
 export const CREATORS: Creator[] = [
