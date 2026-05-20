@@ -43,11 +43,12 @@ export const LiveReactions = () => {
   const renderReaction = (reaction: Reaction) => {
     switch (reaction.type) {
       case 'firework':
-        return <span className="text-5xl drop-shadow-[0_0_20px_rgba(255,255,255,0.6)]">🎆</span>;
+        // Using Sparkler 🎇 which has a better burst profile on most systems
+        return <span className="text-6xl drop-shadow-[0_0_30px_rgba(255,165,0,0.8)] brightness-125">🎇</span>;
       case 'applause':
-        return <span className="text-5xl drop-shadow-[0_0_20px_rgba(255,255,255,0.6)]">👏</span>;
+        return <span className="text-6xl drop-shadow-[0_0_20px_rgba(255,255,255,0.6)]">👏</span>;
       default:
-        return <Heart className="text-red-500 fill-red-500 drop-shadow-[0_0_15px_rgba(239,68,68,0.7)]" size={48} />;
+        return <Heart className="text-red-500 fill-red-500 drop-shadow-[0_0_15px_rgba(239,68,68,0.7)]" size={56} />;
     }
   };
 

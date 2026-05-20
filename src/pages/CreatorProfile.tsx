@@ -374,9 +374,9 @@ const CreatorProfile = () => {
                     <Button 
                       variant="ghost" 
                       onClick={() => handleReaction('firework')}
-                      className="h-10 px-3 rounded-xl bg-white/5 border border-white/10 hover:bg-purple-500/15 hover:border-purple-500/40 group transition-all flex items-center gap-2"
+                      className="h-10 px-3 rounded-xl bg-white/5 border border-white/10 hover:bg-orange-500/15 hover:border-orange-500/40 group transition-all flex items-center gap-2"
                     >
-                      <span className="text-base group-hover:scale-110 group-hover:rotate-12 transition-transform">🎆</span>
+                      <span className="text-base group-hover:scale-110 group-hover:rotate-12 transition-transform">🎇</span>
                       <span className="font-black text-[11px] text-slate-100">{fireworkCount}</span>
                     </Button>
 
