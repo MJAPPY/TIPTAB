@@ -34,19 +34,12 @@ export const Hero = ({ creators, onJoin }: HeroProps) => {
               <span className="text-transparent bg-clip-text bg-gradient-to-r from-orange-400 via-pink-500 to-purple-600">Appreciation Hub</span>
             </h1>
             
-            <div className="space-y-6">
-              <p className="text-xl md:text-2xl text-white/80 max-w-2xl leading-relaxed font-medium">
-                Whether you're a delivery pro, a fitness coach, or a digital creator—TIPTAB connects you directly to the people who value your hustle via the <span className="text-purple-400 font-black">XPR Network</span>. Zero fees. Instant TAB rewards.
-              </p>
-              
-              <div className="relative inline-block">
-                {/* Silver Glow Backdrop */}
-                <div className="absolute -inset-1 bg-gradient-to-r from-slate-400 via-white to-slate-400 blur-md opacity-20" />
-                <span className="relative inline-block text-transparent bg-clip-text bg-gradient-to-br from-slate-200 via-slate-400 to-slate-600 italic font-black text-2xl md:text-3xl tracking-tight drop-shadow-[0_0_25px_rgba(148,163,184,0.5)]">
-                  “Tipping is the value of appreciation.”
-                </span>
-              </div>
-            </div>
+            <p className="text-xl md:text-2xl text-white/80 max-w-2xl leading-relaxed font-medium">
+              Whether you're a delivery pro, a fitness coach, or a digital creator—TIPTAB connects you directly to the people who value your hustle via the <span className="text-purple-400 font-black">XPR Network</span>. Zero fees. Instant TAB rewards. <br />
+              <span className="inline-block mt-4 text-transparent bg-clip-text bg-gradient-to-b from-white via-slate-200 to-slate-500 italic drop-shadow-[0_0_15px_rgba(255,255,255,0.3)] font-black">
+                “Tipping is the value of appreciation.”
+              </span>
+            </p>
 
             <div className="flex flex-col sm:flex-row items-center gap-4 pt-4">
               {!isMember && (
