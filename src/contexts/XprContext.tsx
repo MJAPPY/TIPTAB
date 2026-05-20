@@ -2,7 +2,7 @@
 
 import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import ProtonWebSDK, { LinkSession } from '@proton/web-sdk';
-import { Creator, CREATORS } from '@/data/creators';
+import { Creator } from '@/data/creators';
 
 interface Balances {
   xpr: string;
@@ -44,6 +44,8 @@ const PROTON_ENDPOINTS = [
 ];
 
 const APP_IDENTIFIER = 'tiptab';
+const APP_NAME = 'TIPTAB';
+const APP_LOGO = 'https://explorer.xprnetwork.org/api/account/tiptab/avatar';
 
 export const XprProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [session, setSession] = useState<LinkSession | null>(null);
@@ -203,7 +205,8 @@ export const XprProvider: React.FC<{ children: React.ReactNode }> = ({ children 
           backoff: 1000,
         },
         selectorOptions: {
-          appName: 'TIP TAB',
+          appName: APP_NAME,
+          appLogo: APP_LOGO,
           customStyleOptions: {
             modalBackgroundColor: '#0a0514',
             logoBackgroundColor: '#0a0514',
@@ -232,8 +235,8 @@ export const XprProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         linkOptions: { endpoints: PROTON_ENDPOINTS },
         transportOptions: { requestAccount: APP_IDENTIFIER },
         selectorOptions: {
-          appName: 'TIP TAB',
-          appLogo: 'https://explorer.xprnetwork.org/api/account/tiptab/avatar',
+          appName: APP_NAME,
+          appLogo: APP_LOGO,
         },
       });
 

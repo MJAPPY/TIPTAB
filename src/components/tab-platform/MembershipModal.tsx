@@ -35,21 +35,12 @@ export const MembershipModal = ({ isOpen, onOpenChange }: MembershipModalProps) 
         setStep("intro");
       }
     }
-  }, [isOpen]); // Run only on open to set initial state
-
-  // ACTIVE WATCHER: If the user connects while the modal is open on the intro screen,
-  // automatically advance them to the payment screen.
-  useEffect(() => {
-    if (isOpen && isConnected && step === "intro") {
-      setStep("payment");
-    }
-  }, [isOpen, isConnected, step]);
+  }, [isOpen, isConnected]); 
 
   const handleNextStep = async () => {
     if (!isConnected) {
       try {
         const newSession = await login();
-        // Explicitly set step for immediate UI response after login
         if (newSession) {
           setStep("payment");
         }
@@ -84,7 +75,14 @@ export const MembershipModal = ({ isOpen, onOpenChange }: MembershipModalProps) 
         },
       };
 
-      await session.transact({ actions: [membershipAction] }, { broadcast: true });
+      await session.transact(
+        { actions: [membershipAction] }, 
+        { 
+          broadcast: true,
+          title: isMember ? 'Renew TIPTAB Membership' : 'Activate TIPTAB Membership',
+          description: `Fee: ${formattedFee}`
+        }
+      );
       
       const now = new Date().toISOString();
       const membershipKey = `tiptab_membership_${actor}`;
@@ -113,7 +111,6 @@ export const MembershipModal = ({ isOpen, onOpenChange }: MembershipModalProps) 
 
   const handleClose = () => {
     onOpenChange(false);
-    // Short delay before resetting to avoid visual jump during close
     setTimeout(() => setStep("intro"), 300);
   };
 

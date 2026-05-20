@@ -76,7 +76,14 @@ export const TippingModal = ({ creator, onClose }: TippingModalProps) => {
         },
       };
 
-      await session.transact({ actions: [transferAction] }, { broadcast: true });
+      await session.transact(
+        { actions: [transferAction] }, 
+        { 
+          broadcast: true,
+          title: `Tip ${creator.name}`,
+          description: `Sending ${quantityString} to ${creator.handle}`
+        }
+      );
       
       if (asset === "TAB") {
         recordTip(Math.floor(amountNum));
