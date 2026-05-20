@@ -69,19 +69,19 @@ export const FeaturedCreators = ({ creators, onSelectCreator, onAddYourself }: F
         </Button>
       </div>
       
-      <div className="space-y-6 mb-12">
-        <div className="flex flex-col lg:flex-row items-center gap-4 bg-white/[0.05] p-3 rounded-[32px] border border-white/20 backdrop-blur-3xl shadow-2xl">
-          <div className="relative flex-1 w-full group">
-            <Search className="absolute left-7 top-1/2 -translate-y-1/2 h-5 w-5 text-white/40 group-focus-within:text-purple-500 transition-colors" />
+      <div className="space-y-8 mb-16">
+        <div className="flex flex-col gap-6 bg-white/[0.05] p-6 md:p-8 rounded-[40px] border border-white/20 backdrop-blur-3xl shadow-2xl">
+          <div className="relative w-full group">
+            <Search className="absolute left-6 top-1/2 -translate-y-1/2 h-5 w-5 text-white/40 group-focus-within:text-purple-500 transition-colors" />
             <Input 
               placeholder="Search by name, handle, or city..." 
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-16 bg-transparent border-transparent h-16 rounded-[24px] text-xl focus-visible:ring-0 placeholder:text-white/30 text-white font-bold tracking-tight"
+              className="pl-16 bg-white/5 border-white/10 h-16 rounded-[24px] text-xl focus-visible:ring-2 focus-visible:ring-purple-500/50 placeholder:text-white/30 text-white font-bold tracking-tight"
             />
           </div>
           
-          <div className="flex items-center gap-2 overflow-x-auto no-scrollbar py-1 px-1 w-full lg:w-auto">
+          <div className="flex flex-wrap items-center gap-2.5">
             {CATEGORIES.map(cat => (
               <Button
                 key={cat.name}
@@ -91,7 +91,7 @@ export const FeaturedCreators = ({ creators, onSelectCreator, onAddYourself }: F
                   "rounded-2xl h-12 px-6 whitespace-nowrap font-black text-[11px] uppercase tracking-[0.15em] transition-all border-2",
                   activeCategory === cat.name 
                   ? "bg-purple-500/20 border-purple-500/60 text-purple-400 shadow-[0_0_20px_rgba(168,85,247,0.3)]" 
-                  : "bg-white/10 border-transparent text-white/60 hover:text-purple-400 hover:bg-purple-500/10"
+                  : "bg-white/5 border-transparent text-white/60 hover:text-purple-400 hover:bg-purple-500/10"
                 )}
               >
                 {cat.name}
@@ -110,7 +110,6 @@ export const FeaturedCreators = ({ creators, onSelectCreator, onAddYourself }: F
               onClick={() => onSelectCreator(creator)}
               className="group bg-[#130b21]/60 border border-white/10 rounded-[48px] p-8 hover:border-purple-500/50 hover:bg-[#1a102d]/80 transition-all duration-500 cursor-pointer relative overflow-hidden flex flex-col min-h-[340px] shadow-2xl"
             >
-              {/* Dynamic Neon Glow Overlay */}
               <div 
                 className="absolute -top-24 -right-24 w-64 h-64 blur-[100px] rounded-full opacity-0 group-hover:opacity-30 transition-opacity duration-700 pointer-events-none"
                 style={{ backgroundColor: theme.color }}

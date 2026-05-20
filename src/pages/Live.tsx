@@ -87,43 +87,22 @@ const Live = () => {
         </div>
 
         {/* Filter Bar */}
-        <div className="bg-white/5 border border-white/10 p-4 rounded-[32px] mb-12 flex flex-col lg:flex-row items-center gap-6 backdrop-blur-xl">
-          <div className="relative flex-1 w-full group">
-            <Search className="absolute left-6 top-1/2 -translate-y-1/2 h-5 w-5 text-white/20 group-focus-within:text-purple-500 transition-colors" />
-            <Input 
-              placeholder="Search by name, handle, or city..." 
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-16 bg-transparent border-none h-14 text-lg font-bold placeholder:text-white/20 focus-visible:ring-0"
-            />
-          </div>
-
-          <div className="flex items-center gap-4 w-full lg:w-auto px-2">
-            <div className="flex items-center gap-2 overflow-x-auto no-scrollbar flex-1 lg:flex-initial">
-              {CATEGORIES.map((cat) => (
-                <Button
-                  key={cat.name}
-                  variant="ghost"
-                  onClick={() => setSelectedCategory(cat.name)}
-                  className={cn(
-                    "h-12 px-6 rounded-2xl gap-2 font-black text-[11px] uppercase tracking-widest transition-all",
-                    selectedCategory === cat.name 
-                      ? "bg-purple-600 text-white shadow-lg" 
-                      : "text-white/40 hover:text-white hover:bg-white/5"
-                  )}
-                >
-                  <cat.icon className="h-4 w-4" />
-                  {cat.name}
-                </Button>
-              ))}
+        <div className="bg-white/5 border border-white/10 p-6 md:p-8 rounded-[40px] mb-12 flex flex-col gap-8 backdrop-blur-xl">
+          <div className="flex flex-col lg:flex-row items-center gap-6">
+            <div className="relative flex-1 w-full group">
+              <Search className="absolute left-6 top-1/2 -translate-y-1/2 h-5 w-5 text-white/20 group-focus-within:text-purple-500 transition-colors" />
+              <Input 
+                placeholder="Search by name, handle, or city..." 
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="pl-16 bg-white/5 border-white/10 h-14 text-lg font-bold placeholder:text-white/20 focus-visible:ring-2 focus-visible:ring-purple-500/50"
+              />
             </div>
 
-            <div className="h-8 w-px bg-white/10 hidden lg:block" />
-
             <Select value={sortBy} onValueChange={setSortBy}>
-              <SelectTrigger className="w-[140px] h-12 bg-white/10 border-white/10 rounded-2xl font-black text-[10px] uppercase tracking-widest text-white focus:ring-purple-500">
+              <SelectTrigger className="w-full lg:w-[180px] h-14 bg-white/10 border-white/10 rounded-2xl font-black text-xs uppercase tracking-widest text-white focus:ring-purple-500">
                 <div className="flex items-center gap-2">
-                  <ArrowUpDown className="h-3 w-3" />
+                  <ArrowUpDown className="h-4 w-4" />
                   <SelectValue placeholder="Sort" />
                 </div>
               </SelectTrigger>
@@ -134,6 +113,25 @@ const Live = () => {
                 <SelectItem value="random" className="font-black text-[10px] uppercase tracking-widest py-3">Random Mix</SelectItem>
               </SelectContent>
             </Select>
+          </div>
+
+          <div className="flex flex-wrap items-center gap-2.5">
+            {CATEGORIES.map((cat) => (
+              <Button
+                key={cat.name}
+                variant="ghost"
+                onClick={() => setSelectedCategory(cat.name)}
+                className={cn(
+                  "h-12 px-6 rounded-2xl gap-2 font-black text-[11px] uppercase tracking-widest transition-all border-2",
+                  selectedCategory === cat.name 
+                    ? "bg-purple-600 border-purple-500 text-white shadow-lg" 
+                    : "bg-white/5 border-transparent text-white/40 hover:text-white hover:bg-white/10"
+                )}
+              >
+                <cat.icon className="h-4 w-4" />
+                {cat.name}
+              </Button>
+            ))}
           </div>
         </div>
 
@@ -146,14 +144,12 @@ const Live = () => {
                 onClick={() => navigate(`/tip/${creator.handle}`)}
                 className="group relative bg-[#130b21] border border-white/10 rounded-[40px] overflow-hidden hover:border-purple-500/50 transition-all duration-500 cursor-pointer shadow-2xl"
               >
-                {/* Thumbnail Preview Area */}
                 <div className="aspect-video relative overflow-hidden bg-black/40">
                   <div className={cn("absolute inset-0 opacity-20 blur-2xl", creator.color)} />
                   <div className="absolute inset-0 flex items-center justify-center">
                     <Radio className="h-12 w-12 text-white/20 group-hover:scale-110 transition-transform duration-500" />
                   </div>
                   
-                  {/* Status Badges */}
                   <div className="absolute top-4 left-4 flex gap-2">
                     <Badge className="bg-red-600 hover:bg-red-600 text-[10px] font-black tracking-widest rounded-lg border-none">LIVE</Badge>
                     <Badge className="bg-black/60 backdrop-blur-md text-[10px] font-black tracking-widest rounded-lg border-white/10">
@@ -169,7 +165,6 @@ const Live = () => {
                   </div>
                 </div>
 
-                {/* Info Area */}
                 <div className="p-8 space-y-4">
                   <div className="flex items-center gap-4">
                     <div className={cn("h-14 w-14 rounded-2xl flex items-center justify-center text-xl font-black border-2 border-white/10", creator.color)}>
@@ -212,5 +207,3 @@ const Live = () => {
     </div>
   );
 };
-
-export default Live;
