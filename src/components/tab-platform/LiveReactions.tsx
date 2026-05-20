@@ -20,10 +20,9 @@ export const LiveReactions = () => {
   const addReaction = useCallback((type?: ReactionType) => {
     const id = Date.now() + Math.random();
     const x = Math.random() * 80 + 10; // 10% to 90%
-    const scale = Math.random() * 0.8 + 1.2; // Increased scale range: 1.2 to 2.0
-    const duration = Math.random() * 1000 + 2500; // Slightly slower float for better visibility
+    const scale = Math.random() * 0.6 + 1.1; // Reduced scale range: 1.1 to 1.7
+    const duration = Math.random() * 1000 + 2500; 
     
-    // If no type is provided, pick one randomly
     const types: ReactionType[] = ['heart', 'firework', 'applause'];
     const selectedType = type || types[Math.floor(Math.random() * types.length)];
     
@@ -34,7 +33,6 @@ export const LiveReactions = () => {
     }, duration);
   }, []);
 
-  // Expose the trigger globally for this session
   useEffect(() => {
     (window as any).triggerReaction = addReaction;
     return () => delete (window as any).triggerReaction;
@@ -43,12 +41,11 @@ export const LiveReactions = () => {
   const renderReaction = (reaction: Reaction) => {
     switch (reaction.type) {
       case 'firework':
-        // Using Sparkler 🎇 which has a better burst profile on most systems
-        return <span className="text-6xl drop-shadow-[0_0_30px_rgba(255,165,0,0.8)] brightness-125">🎇</span>;
+        return <span className="text-5xl drop-shadow-[0_0_20px_rgba(255,165,0,0.6)] brightness-110">🎇</span>;
       case 'applause':
-        return <span className="text-6xl drop-shadow-[0_0_20px_rgba(255,255,255,0.6)]">👏</span>;
+        return <span className="text-5xl drop-shadow-[0_0_15px_rgba(255,255,255,0.4)]">👏</span>;
       default:
-        return <Heart className="text-red-500 fill-red-500 drop-shadow-[0_0_15px_rgba(239,68,68,0.7)]" size={56} />;
+        return <Heart className="text-red-500 fill-red-500 drop-shadow-[0_0_12px_rgba(239,68,68,0.5)]" size={48} />;
     }
   };
 
@@ -81,7 +78,7 @@ export const LiveReactions = () => {
             opacity: 0.8;
           }
           100% {
-            transform: translateY(-800px) scale(1.8) rotate(25deg);
+            transform: translateY(-800px) scale(1.6) rotate(20deg);
             opacity: 0;
           }
         }
