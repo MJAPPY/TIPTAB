@@ -55,7 +55,7 @@ const Live = () => {
               PERFORMANCE <span className="text-orange-500">HUB</span>
             </h1>
             <p className="text-white/40 text-lg font-medium max-w-xl">
-              Real-time appreciation for creators, artists, and pros currently broadcasting across the XPR network.
+              Real-time appreciation for creators, artists, and pros currently broadcasting with XPR network integration.
             </p>
           </div>
         </div>
