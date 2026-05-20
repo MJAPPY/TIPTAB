@@ -71,10 +71,12 @@ const CreatorProfile = () => {
     }
   }, [handle, navigate]);
 
-  const handleLike = () => {
-    setLikeCount(prev => prev + 1);
+  const handleReaction = (type: 'heart' | 'firework' | 'applause') => {
+    if (type === 'heart') {
+      setLikeCount(prev => prev + 1);
+    }
     if ((window as any).triggerReaction) {
-      (window as any).triggerReaction('heart');
+      (window as any).triggerReaction(type);
     }
   };
 
@@ -192,9 +194,6 @@ const CreatorProfile = () => {
 
   const quickAmounts = asset === "TAB" ? ["10", "50", "100", "250"] : ["100", "500", "1000", "5000"];
 
-  const hasLiveLinks = creator.twitch || creator.youtubeLive || creator.tiktok || creator.instagramLive;
-  
-  // Identify all available embeddable live streams
   const liveStreams = [
     { type: 'YouTube', url: creator.youtubeLive, icon: Youtube, color: 'text-red-500' },
     { type: 'Twitch', url: creator.twitch, icon: Twitch, color: 'text-[#9146FF]' }
@@ -294,14 +293,34 @@ const CreatorProfile = () => {
                 </div>
               )}
 
-              <div className="space-y-4">
-                <div className="flex items-center justify-between">
+              <div className="space-y-6">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6">
                   <h3 className="text-xs font-black uppercase tracking-[0.3em] text-white/30">About</h3>
-                  <div className="flex items-center gap-4">
-                    <div className="flex items-center gap-2 px-4 py-2 rounded-2xl bg-white/5 border border-white/10">
-                      <Heart className="h-4 w-4 text-red-500 fill-red-500" />
-                      <span className="font-black text-sm">{likeCount}</span>
-                    </div>
+                  
+                  {/* Interactive Reaction Buttons */}
+                  <div className="flex items-center gap-3">
+                    <Button 
+                      variant="ghost" 
+                      onClick={() => handleReaction('heart')}
+                      className="h-12 px-5 rounded-2xl bg-white/5 border border-white/10 hover:bg-red-500/10 hover:border-red-500/30 group transition-all flex items-center gap-3"
+                    >
+                      <Heart className="h-5 w-5 text-red-500 fill-red-500 group-hover:scale-110 transition-transform" />
+                      <span className="font-black text-sm text-slate-100">{likeCount}</span>
+                    </Button>
+                    <Button 
+                      variant="ghost" 
+                      onClick={() => handleReaction('firework')}
+                      className="h-12 w-14 rounded-2xl bg-white/5 border border-white/10 hover:bg-purple-500/10 hover:border-purple-500/30 text-xl flex items-center justify-center group transition-all"
+                    >
+                      <span className="group-hover:scale-110 transition-transform">🎆</span>
+                    </Button>
+                    <Button 
+                      variant="ghost" 
+                      onClick={() => handleReaction('applause')}
+                      className="h-12 w-14 rounded-2xl bg-white/5 border border-white/10 hover:bg-yellow-500/10 hover:border-yellow-500/30 text-xl flex items-center justify-center group transition-all"
+                    >
+                      <span className="group-hover:scale-110 transition-transform">👏</span>
+                    </Button>
                   </div>
                 </div>
                 <p className="text-xl md:text-2xl text-white/80 leading-relaxed font-medium">{creator.bio}</p>
@@ -364,7 +383,7 @@ const CreatorProfile = () => {
                 <div className="flex items-center justify-between mb-10">
                   <h2 className="text-3xl font-black tracking-tight">Support <br /> {creator.name.split(' ')[0]}</h2>
                   <div className="flex gap-2">
-                    <Button variant="ghost" size="icon" onClick={handleLike} className="h-12 w-12 rounded-2xl bg-white/5 border border-white/10 hover:bg-red-500/20 group">
+                    <Button variant="ghost" size="icon" onClick={() => handleReaction('heart')} className="h-12 w-12 rounded-2xl bg-white/5 border border-white/10 hover:bg-red-500/20 group">
                       <Heart className="h-5 w-5 text-red-500 group-hover:fill-red-500 transition-all" />
                     </Button>
                     <Button variant="ghost" size="icon" onClick={handleShare} className="h-12 w-12 rounded-2xl bg-white/5 border border-white/10 hover:bg-white/10">
