@@ -1,4 +1,5 @@
 import { Zap, ShieldCheck, Wallet, Globe, ArrowRight } from "lucide-react";
+import React from "react";
 
 export const HowItWorks = () => {
   const steps = [
@@ -53,7 +54,18 @@ export const HowItWorks = () => {
               
               <div className="space-y-4">
                 <div className="flex items-center gap-4">
-                  <span className="text-4xl font-black text-white/10">{i + 1}</span>
+                  <span 
+                    className="text-4xl font-black text-white/10 transition-all duration-500 group-hover:opacity-100"
+                    style={{ color: `var(--step-color-${i}, rgba(255,255,255,0.1))` } as React.CSSProperties}
+                  >
+                    <style>{`
+                      .group:hover [data-step-id="${i}"] {
+                        color: ${step.color} !important;
+                        text-shadow: 0 0 20px ${step.color}40;
+                      }
+                    `}</style>
+                    <span data-step-id={i}>{i + 1}</span>
+                  </span>
                   <h3 className="text-2xl font-black">{step.title}</h3>
                 </div>
                 <p className="text-white/50 leading-relaxed font-medium">
