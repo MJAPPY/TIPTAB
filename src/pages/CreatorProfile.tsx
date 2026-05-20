@@ -467,7 +467,7 @@ const CreatorProfile = () => {
               <div className="p-8 rounded-[40px] bg-white/[0.02] border border-white/5 space-y-4">
                 <div className="flex items-center gap-3">
                   <Tv className="h-5 w-5 text-orange-500" />
-                  <p className="text-sm font-black uppercase tracking-widest text-white/60">Live Support Node</p>
+                  <p className="text-sm font-black uppercase tracking-widest text-white/60">Live Support</p>
                 </div>
                 <p className="text-sm text-white/40 font-medium">
                   Tips sent to this creator are settled instantly on the XPR Network. Zero fees applied.
