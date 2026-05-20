@@ -184,6 +184,9 @@ const CreatorProfile = () => {
   const quickAmounts = asset === "TAB" ? ["10", "50", "100", "250"] : ["100", "500", "1000", "5000"];
 
   const hasLiveLinks = creator.twitch || creator.youtubeLive || creator.tiktok || creator.instagramLive;
+  
+  // Prioritize active live stream URLs for the main player
+  const playerUrl = creator.youtubeLive || creator.twitch || creator.mediaEmbed || creator.videoUrl || "";
 
   return (
     <div className="min-h-screen bg-[#0a0514] text-white selection:bg-purple-500/30">
@@ -278,13 +281,15 @@ const CreatorProfile = () => {
               </div>
 
               {/* Media Section */}
-              {(creator.mediaEmbed || creator.videoUrl || creator.twitch) && (
+              {playerUrl && (
                 <div className="space-y-6 pt-4">
                   <div className="flex items-center gap-3">
                     <Radio className="h-4 w-4 text-purple-500" />
-                    <h3 className="text-xs font-black uppercase tracking-[0.3em] text-white/30">Featured Stream / Media</h3>
+                    <h3 className="text-xs font-black uppercase tracking-[0.3em] text-white/30">
+                      {creator.youtubeLive || creator.twitch ? "Live Stream Broadcast" : "Featured Media"}
+                    </h3>
                   </div>
-                  <EmbedPlayer url={creator.mediaEmbed || creator.videoUrl || creator.twitch || ""} />
+                  <EmbedPlayer url={playerUrl} />
                 </div>
               )}
 

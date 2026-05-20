@@ -13,31 +13,37 @@ interface EmbedPlayerProps {
 export const EmbedPlayer = ({ url, className }: EmbedPlayerProps) => {
   if (!url) return null;
 
-  // Detect YouTube
-  const youtubeMatch = url.match(/(?:https?:\/\/)?(?:www\.)?(?:youtube\.com\/watch\?v=|youtu\.be\/)([^& \n<]+)/);
+  // Robust YouTube Detection (handles /watch, /live, /embed, and youtu.be)
+  const youtubeMatch = url.match(/(?:https?:\/\/)?(?:www\.)?(?:youtube\.com\/(?:[^\/\n\s]+\/\S+\/|(?:v|e(?:mbed)?)\/|\S*?[?&]v=|live\/)|youtu\.be\/)([a-zA-Z0-9_-]{11})/);
+  
   if (youtubeMatch) {
     return (
       <div className={cn("relative aspect-video rounded-[32px] overflow-hidden border border-white/10 shadow-2xl bg-black", className)}>
         <iframe
-          src={`https://www.youtube.com/embed/${youtubeMatch[1]}`}
+          src={`https://www.youtube.com/embed/${youtubeMatch[1]}?autoplay=0&rel=0`}
           className="absolute inset-0 w-full h-full"
           allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
           allowFullScreen
+          title="YouTube Video Player"
         />
       </div>
     );
   }
 
-  // Detect Twitch
+  // Detect Twitch (standard channel or specific video)
   const twitchMatch = url.match(/(?:https?:\/\/)?(?:www\.)?twitch\.tv\/([a-zA-Z0-9_]+)/);
   if (twitchMatch) {
+    // Determine the parent domain for Twitch embed security
     const parent = typeof window !== "undefined" ? window.location.hostname : "localhost";
+    const channel = twitchMatch[1];
+    
     return (
       <div className={cn("relative aspect-video rounded-[32px] overflow-hidden border border-white/10 shadow-2xl bg-black", className)}>
         <iframe
-          src={`https://player.twitch.tv/?channel=${twitchMatch[1]}&parent=${parent}&autoplay=false`}
+          src={`https://player.twitch.tv/?channel=${channel}&parent=${parent}&autoplay=false`}
           className="absolute inset-0 w-full h-full"
           allowFullScreen
+          title="Twitch Stream Player"
         />
       </div>
     );
@@ -55,6 +61,7 @@ export const EmbedPlayer = ({ url, className }: EmbedPlayerProps) => {
           allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
           loading="lazy"
           className="rounded-xl"
+          title="Spotify Player"
         />
       </div>
     );
@@ -71,6 +78,7 @@ export const EmbedPlayer = ({ url, className }: EmbedPlayerProps) => {
           className="w-full max-w-full overflow-hidden bg-transparent"
           sandbox="allow-forms allow-popups allow-same-origin allow-scripts allow-storage-access-by-user-activation allow-top-navigation-by-user-activation"
           src={`https://embed.music.apple.com/${appleMatch[1]}/${appleMatch[2]}/${appleMatch[3]}/${appleMatch[4]}`}
+          title="Apple Music Player"
         />
       </div>
     );
@@ -84,7 +92,7 @@ export const EmbedPlayer = ({ url, className }: EmbedPlayerProps) => {
           <Radio className="h-6 w-6 text-purple-400" />
         </div>
         <div>
-          <p className="font-black text-sm uppercase tracking-widest text-white/40">External Link</p>
+          <p className="font-black text-sm uppercase tracking-widest text-white/40">External Media</p>
           <p className="font-bold text-white truncate max-w-[200px]">{url}</p>
         </div>
       </div>
