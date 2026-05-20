@@ -19,26 +19,40 @@ export const TipTabCard = ({ creator }: TipTabCardProps) => {
   const [isCopied, setIsCopied] = React.useState(false);
   const [isDownloading, setIsDownloading] = React.useState(false);
 
-  const tippingUrl = `${window.location.origin}/tip/${creator.handle}`;
+  // Use a clean handle for the URL
+  const cleanHandle = creator.handle.replace(/^@/, "").toLowerCase().trim();
+  const tippingUrl = `${window.location.origin}/tip/${cleanHandle}`;
 
   const handleShare = async () => {
-    if (navigator.share) {
+    const shareData = {
+      title: `Tip ${creator.name} on TIPTAB`,
+      text: `Support my work on the XPR Network using TIPTAB!`,
+      url: tippingUrl,
+    };
+
+    if (navigator.share && navigator.canShare && navigator.canShare(shareData)) {
       try {
-        await navigator.share({
-          title: `Tip ${creator.name} on TIPTAB`,
-          text: `Support my work on the XPR Network using TIPTAB!`,
-          url: tippingUrl,
-        });
-      } catch (err) {}
+        await navigator.share(shareData);
+        toast({ title: "Shared Successfully" });
+      } catch (err) {
+        // Fallback if user cancels or it fails
+        if ((err as Error).name !== 'AbortError') {
+          copyFallback();
+        }
+      }
     } else {
-      navigator.clipboard.writeText(tippingUrl);
-      setIsCopied(true);
-      toast({
-        title: "Link Copied!",
-        description: "Your tipping link has been copied to your clipboard.",
-      });
-      setTimeout(() => setIsCopied(false), 2000);
+      copyFallback();
     }
+  };
+
+  const copyFallback = () => {
+    navigator.clipboard.writeText(tippingUrl);
+    setIsCopied(true);
+    toast({
+      title: "Link Copied!",
+      description: "Your tipping link has been copied to your clipboard.",
+    });
+    setTimeout(() => setIsCopied(false), 2000);
   };
 
   const handleDownload = async () => {
@@ -46,25 +60,30 @@ export const TipTabCard = ({ creator }: TipTabCardProps) => {
     
     setIsDownloading(true);
     try {
+      // Small delay to ensure any dynamic assets are settled
+      await new Promise(resolve => setTimeout(resolve, 100));
+
       const dataUrl = await toPng(cardRef.current, { 
         quality: 1, 
         pixelRatio: 3,
-        backgroundColor: '#0a0514' 
+        backgroundColor: '#0a0514',
+        cacheBust: true, // Prevents caching issues with dynamic images
       });
       
       const link = document.createElement('a');
-      link.download = `TipTab-${creator.handle}.png`;
+      link.download = `TipTab-${cleanHandle}.png`;
       link.href = dataUrl;
       link.click();
       
       toast({
-        title: "Card Downloaded",
-        description: "Your high-resolution silver-edition TipTab card has been saved.",
+        title: "Card Saved",
+        description: "Your high-resolution silver-edition TipTab card has been downloaded.",
       });
     } catch (err) {
+      console.error("Download error:", err);
       toast({
         title: "Download Failed",
-        description: "Could not generate card image.",
+        description: "Could not generate card image. This usually happens if the profile photo is protected.",
         variant: "destructive",
       });
     } finally {
@@ -74,7 +93,7 @@ export const TipTabCard = ({ creator }: TipTabCardProps) => {
 
   return (
     <div className="group relative w-full max-w-[480px] mx-auto transition-transform duration-500 hover:scale-[1.02]">
-      {/* Outer Glow Syncing with Creator Color */}
+      {/* Outer Glow */}
       <div className={cn(
         "absolute inset-0 blur-[60px] opacity-20 transition-opacity group-hover:opacity-40 rounded-[48px]",
         creator.color
@@ -86,12 +105,12 @@ export const TipTabCard = ({ creator }: TipTabCardProps) => {
         className="w-full aspect-[1.58/1] bg-[#0a0514] rounded-[48px] p-7 md:p-8 border border-white/20 shadow-[0_40px_80px_-20px_rgba(0,0,0,0.8)] relative overflow-hidden flex flex-col justify-between ring-1 ring-inset ring-white/10"
       >
         
-        {/* Intensified Background Glows */}
+        {/* Background Effects */}
         <div className="absolute inset-0 bg-gradient-to-br from-purple-500/20 via-transparent to-orange-500/20 pointer-events-none" />
         <div className={cn("absolute -top-24 -right-24 w-96 h-96 blur-[120px] rounded-full opacity-40", creator.color)} />
         <div className="absolute -bottom-24 -left-24 w-80 h-80 bg-orange-600/20 blur-[100px] rounded-full opacity-30" />
         
-        {/* Grid Texture Overlay */}
+        {/* Texture Overlay */}
         <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')] opacity-10 mix-blend-overlay pointer-events-none" />
         
         {/* Header Section */}
@@ -103,7 +122,12 @@ export const TipTabCard = ({ creator }: TipTabCardProps) => {
               creator.color
             )}>
               {creator.avatarImage ? (
-                <img src={creator.avatarImage} alt="Avatar" className="w-full h-full object-cover" />
+                <img 
+                  src={creator.avatarImage} 
+                  alt="Avatar" 
+                  className="w-full h-full object-cover" 
+                  crossOrigin="anonymous" // Crucial for html-to-image to work with external URLs
+                />
               ) : (
                 creator.avatar
               )}
@@ -113,7 +137,7 @@ export const TipTabCard = ({ creator }: TipTabCardProps) => {
                 {creator.name}
               </h3>
               <div className="flex items-center gap-1.5">
-                <p className="text-purple-400 font-black text-[13px] md:text-sm tracking-tight">@{creator.handle}</p>
+                <p className="text-purple-400 font-black text-[13px] md:text-sm tracking-tight">@{cleanHandle}</p>
                 <div className="h-0.5 w-0.5 rounded-full bg-white/20" />
                 <span className="text-white/40 text-[9px] font-black uppercase tracking-widest truncate">{creator.category}</span>
               </div>
@@ -123,7 +147,7 @@ export const TipTabCard = ({ creator }: TipTabCardProps) => {
           {/* Branding */}
           <div className="flex flex-col items-end shrink-0 -mt-1">
              <div className="flex items-center gap-0.5 -mr-2">
-               <img src="/src/assets/logo.png" alt="TAB" className="h-14 w-14 md:h-16 md:w-16 object-contain drop-shadow-[0_0_15px_rgba(168,85,247,0.3)]" />
+               <img src="/src/assets/logo.png" alt="" className="h-14 w-14 md:h-16 md:w-16 object-contain drop-shadow-[0_0_15px_rgba(168,85,247,0.3)]" />
                <span className="text-lg md:text-xl font-black italic tracking-tighter text-white">
                 TIP<span className="text-orange-500">TAB</span>
                </span>
@@ -162,14 +186,6 @@ export const TipTabCard = ({ creator }: TipTabCardProps) => {
                     size={110}
                     level="H"
                     includeMargin={false}
-                    imageSettings={{
-                      src: "/src/assets/logo.png",
-                      x: undefined,
-                      y: undefined,
-                      height: 22,
-                      width: 22,
-                      excavate: true,
-                    }}
                     className="w-full h-full"
                   />
                 </div>
@@ -187,7 +203,7 @@ export const TipTabCard = ({ creator }: TipTabCardProps) => {
           </div>
         </div>
         
-        {/* Subtle Bottom Border Glow */}
+        {/* Subtle Bottom Glow */}
         <div className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-white/20 to-transparent" />
       </div>
 
