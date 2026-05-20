@@ -34,8 +34,12 @@ export const CREATORS: Creator[] = [
     avatar: "TAB",
     avatarImage: "https://images.unsplash.com/photo-1633332755192-727a05c4013d?w=400&h=400&fit=crop",
     color: "bg-red-600",
-    twitter: "https://twitter.com/tabxpr",
-    mediaEmbed: "https://www.youtube.com/watch?v=dQw4w9WgXcQ"
+    twitter: "https://twitter.com/tabtokenxpr",
+    instagram: "https://instagram.com/tabtokenxpr",
+    website: "https://snipverse.com/tabxpr",
+    mediaEmbed: "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
+    youtubeLive: "https://www.youtube.com/watch?v=jfKfPfyJRdk", // Lofi Girl Live
+    tiktok: "https://www.tiktok.com/@xprnetwork"
   },
   {
     id: "2",
@@ -47,7 +51,9 @@ export const CREATORS: Creator[] = [
     category: "Service",
     avatar: "CM",
     avatarImage: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=400&fit=crop",
-    color: "bg-yellow-500"
+    color: "bg-yellow-500",
+    twitter: "https://twitter.com/elonmusk",
+    website: "https://uber.com"
   },
   {
     id: "3",
@@ -60,8 +66,9 @@ export const CREATORS: Creator[] = [
     avatar: "MC",
     avatarImage: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=400&h=400&fit=crop",
     color: "bg-emerald-500",
-    instagram: "https://instagram.com",
-    spotify: "https://spotify.com",
+    instagram: "https://instagram.com/nikefitness",
+    spotify: "https://open.spotify.com/playlist/37i9dQZF1DX76W92vslFCZ",
+    instagramLive: "https://www.instagram.com/therock/live/",
     mediaEmbed: "https://open.spotify.com/track/4cOdK2wGvWyR9p79hnIvov"
   },
   {
@@ -74,7 +81,9 @@ export const CREATORS: Creator[] = [
     category: "Dev",
     avatar: "KM",
     avatarImage: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=400&h=400&fit=crop",
-    color: "bg-blue-600"
+    color: "bg-blue-600",
+    twitter: "https://twitter.com/github",
+    website: "https://github.com/protonchain"
   },
   {
     id: "5",
@@ -86,7 +95,8 @@ export const CREATORS: Creator[] = [
     category: "Service",
     avatar: "SJ",
     avatarImage: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=400&h=400&fit=crop",
-    color: "bg-orange-400"
+    color: "bg-orange-400",
+    instagram: "https://instagram.com/starbucks"
   },
   {
     id: "6",
@@ -99,6 +109,8 @@ export const CREATORS: Creator[] = [
     avatar: "MW",
     avatarImage: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=400&h=400&fit=crop",
     color: "bg-sky-600",
+    twitter: "https://twitter.com/nba",
+    spotify: "https://open.spotify.com/artist/5K4W6rqBvSssUf7ZqWvO4S",
     mediaEmbed: "https://music.apple.com/us/album/the-box/1490466042?i=1490466047"
   },
   {
@@ -111,7 +123,9 @@ export const CREATORS: Creator[] = [
     category: "Art",
     avatar: "ER",
     avatarImage: "https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=400&h=400&fit=crop",
-    color: "bg-pink-600"
+    color: "bg-pink-600",
+    instagram: "https://instagram.com/adobe",
+    website: "https://behance.net"
   },
   {
     id: "8",
@@ -124,6 +138,9 @@ export const CREATORS: Creator[] = [
     avatar: "DP",
     avatarImage: "https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?w=400&h=400&fit=crop",
     color: "bg-indigo-600",
+    twitch: "https://twitch.tv/ninja",
+    youtubeLive: "https://www.youtube.com/watch?v=5qap5aO4i9A", // Lofi Girl
+    twitter: "https://twitter.com/Twitch",
     mediaEmbed: "https://www.youtube.com/watch?v=fKopy74weus"
   },
   {
@@ -136,6 +153,7 @@ export const CREATORS: Creator[] = [
     category: "Service",
     avatar: "LB",
     avatarImage: "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=400&h=400&fit=crop",
-    color: "bg-amber-700"
+    color: "bg-amber-700",
+    tiktok: "https://www.tiktok.com/@barista_jack"
   }
 ];
