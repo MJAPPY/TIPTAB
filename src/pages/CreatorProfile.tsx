@@ -18,7 +18,8 @@ import {
   Tv,
   Twitch,
   Youtube,
-  Radio
+  Radio,
+  ArrowLeft
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -214,6 +215,16 @@ const CreatorProfile = () => {
         <div className={cn("absolute inset-0 opacity-40 blur-[100px]", creator.color)} />
         <div className="absolute inset-0 bg-gradient-to-t from-[#0a0514] via-[#0a0514]/40 to-transparent" />
         <LiveReactions />
+        
+        {/* Secondary Page-Level Back Button */}
+        <div className="absolute top-24 left-6 z-20 md:hidden">
+          <Button 
+            onClick={() => navigate(-1)} 
+            className="h-10 w-10 rounded-full bg-black/40 border border-white/20 backdrop-blur-md p-0"
+          >
+            <ArrowLeft className="h-5 w-5" />
+          </Button>
+        </div>
       </div>
 
       <main className="container mx-auto px-6 -mt-32 relative z-10 pb-24">

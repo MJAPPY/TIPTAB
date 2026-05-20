@@ -51,6 +51,7 @@ export const Header = ({ onBecomeCreator }: HeaderProps) => {
   const { login, logout, actor, balances, isConnected, isLoading, refreshBalances, isAdmin, isMember, userProfile } = useXpr();
   const { toast } = useToast();
   const location = useLocation();
+  const navigate = useNavigate();
 
   const handleConnect = async () => {
     try {
@@ -97,7 +98,7 @@ export const Header = ({ onBecomeCreator }: HeaderProps) => {
     setIsOpen(false);
   };
 
-  const isDashboardOrAdmin = location.pathname.includes('/admin') || location.pathname.includes('/dashboard');
+  const isSubPage = location.pathname !== '/';
 
   const NavItems = ({ isMobile = false }) => (
     <>
@@ -192,33 +193,23 @@ export const Header = ({ onBecomeCreator }: HeaderProps) => {
           <div className="absolute inset-0 bg-gradient-to-r from-purple-500/10 via-transparent to-orange-500/5 pointer-events-none" />
           
           <div className="flex items-center gap-1.5 sm:gap-3 md:gap-4 shrink-0 relative z-10">
-            {location.pathname === '/admin' ? (
+            {isSubPage ? (
               <div className="flex items-center gap-1.5 sm:gap-4">
-                <Link to="/" onClick={handleHomeClick} className="flex items-center gap-1 sm:gap-2 text-white/40 hover:text-purple-400 transition-colors">
-                  <ArrowLeft className="h-4 w-4" />
-                  <span className="hidden xs:inline text-[8px] sm:text-xs font-black uppercase tracking-widest text-slate-300">Exit</span>
-                </Link>
-                <div className="h-6 w-px bg-white/10" />
-                <div className="flex items-center gap-1 sm:gap-2">
-                  <ShieldAlert className="h-4 w-4 sm:h-5 sm:w-5 text-orange-500" />
-                  <span className="text-xs sm:text-xl font-black italic tracking-tighter text-slate-100">
-                    ADMIN<span className="text-orange-500">HUB</span>
-                  </span>
-                </div>
-              </div>
-            ) : location.pathname === '/dashboard' ? (
-              <div className="flex items-center gap-1.5 sm:gap-4">
-                <Link to="/" onClick={handleHomeClick} className="flex items-center gap-1 sm:gap-2 text-white/40 hover:text-purple-400 transition-colors">
+                <Button 
+                  variant="ghost" 
+                  onClick={() => navigate(-1)} 
+                  className="flex items-center gap-1 sm:gap-2 text-white/40 hover:text-purple-400 transition-colors p-0 h-auto hover:bg-transparent"
+                >
                   <ArrowLeft className="h-4 w-4 sm:h-5 sm:w-5" />
-                  <span className="hidden xs:inline font-bold text-[10px] sm:text-base text-slate-300">Map</span>
-                </Link>
+                  <span className="hidden xs:inline font-bold text-[10px] sm:text-base text-slate-300">Back</span>
+                </Button>
                 <div className="h-6 w-px bg-white/10" />
-                <div className="flex items-center gap-1.5 sm:gap-2">
+                <Link to="/" onClick={handleHomeClick} className="flex items-center gap-1.5 sm:gap-2">
                   <img src="/src/assets/logo.png" alt="TIPTAB" className="h-5 w-5 sm:h-8 sm:w-8 object-contain" />
                   <span className="text-xs sm:text-xl font-black italic tracking-tighter text-slate-100">
-                    {isMember ? "CREATOR" : "SUPPORTER"}<span className="text-orange-500">HUB</span>
+                    TIP<span className="text-orange-500">TAB</span>
                   </span>
-                </div>
+                </Link>
               </div>
             ) : (
               <Link to="/" onClick={handleHomeClick} className="flex items-center gap-1 md:gap-3 lg:gap-4 group shrink-0">
@@ -238,7 +229,7 @@ export const Header = ({ onBecomeCreator }: HeaderProps) => {
             )}
           </div>
 
-          {!isDashboardOrAdmin && (
+          {!isSubPage && (
             <div className="hidden xl:flex items-center gap-2 mx-2 relative z-10">
               <NavItems />
             </div>
