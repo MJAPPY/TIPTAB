@@ -30,7 +30,7 @@ const CATEGORIES = [
 const Live = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("All");
-  const [sortBy, setSortBy] = useState("alphabetical");
+  const [sortBy, setSortBy] = useState("newest");
   const [isMembershipOpen, setIsMembershipOpen] = useState(false);
   const navigate = useNavigate();
 
@@ -50,6 +50,11 @@ const Live = () => {
       return [...filtered].sort((a, b) => a.name.localeCompare(b.name));
     } else if (sortBy === "random") {
       return [...filtered].sort(() => Math.random() - 0.5);
+    } else if (sortBy === "newest") {
+      // Assuming higher ID means newer registration
+      return [...filtered].sort((a, b) => Number(b.id) - Number(a.id));
+    } else if (sortBy === "oldest") {
+      return [...filtered].sort((a, b) => Number(a.id) - Number(b.id));
     }
 
     return filtered;
@@ -118,6 +123,8 @@ const Live = () => {
                 </div>
               </SelectTrigger>
               <SelectContent className="bg-[#1a102d] border-white/20 text-white rounded-xl">
+                <SelectItem value="newest" className="font-black text-[10px] uppercase tracking-widest py-3">Newest First</SelectItem>
+                <SelectItem value="oldest" className="font-black text-[10px] uppercase tracking-widest py-3">Oldest First</SelectItem>
                 <SelectItem value="alphabetical" className="font-black text-[10px] uppercase tracking-widest py-3">Name (A-Z)</SelectItem>
                 <SelectItem value="random" className="font-black text-[10px] uppercase tracking-widest py-3">Random Mix</SelectItem>
               </SelectContent>
