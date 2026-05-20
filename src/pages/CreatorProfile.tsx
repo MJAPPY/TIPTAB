@@ -46,6 +46,11 @@ const CreatorProfile = () => {
   const [isCopied, setIsCopied] = useState(false);
   const [likeCount, setLikeCount] = useState(128);
 
+  // Ensure page starts at top when handle changes
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [handle]);
+
   useEffect(() => {
     if (!handle) return;
     const cleanHandle = handle.replace(/^@/, "").toLowerCase().trim();
