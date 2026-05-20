@@ -142,10 +142,10 @@ export const XprProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         tipsSent: savedTips
       });
 
-      // Special case: Official Project account is always a member
+      // Special case: Official Project account is always a member with Lifetime status
       if (account === 'tiptab') {
         setIsMember(true);
-        setMembershipDate(new Date(2024, 0, 1).toISOString());
+        setMembershipDate(new Date(2099, 11, 31).toISOString()); // Permanent status
       } else {
         const membershipKey = `tiptab_membership_${account}`;
         const membershipDateKey = `tiptab_membership_date_${account}`;

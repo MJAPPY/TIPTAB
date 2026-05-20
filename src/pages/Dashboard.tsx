@@ -119,6 +119,7 @@ const Dashboard = () => {
   };
 
   const getExpiryDate = () => {
+    if (actor === 'tiptab') return "Lifetime";
     if (!membershipDate) return null;
     const date = new Date(membershipDate);
     date.setFullYear(date.getFullYear() + 1);
@@ -126,6 +127,7 @@ const Dashboard = () => {
   };
 
   const isNearingExpiry = () => {
+    if (actor === 'tiptab') return false; // Lifetime never expires
     if (!membershipDate) return false;
     const expiry = new Date(membershipDate);
     expiry.setFullYear(expiry.getFullYear() + 1);
@@ -307,18 +309,20 @@ const Dashboard = () => {
                       </div>
                       <div className="mt-auto pt-4">
                         {isMember ? (
-                          <Button 
-                            onClick={() => setIsMembershipModalOpen(true)}
-                            className={cn(
-                              "w-full h-10 sm:h-12 rounded-xl font-black text-[10px] uppercase tracking-widest gap-2 transition-all",
-                              isNearingExpiry() 
-                                ? "bg-orange-500 hover:bg-orange-600 text-white shadow-lg" 
-                                : "bg-white/10 text-white/40 hover:bg-white/20 hover:text-white"
-                            )}
-                          >
-                            <RefreshCw className="h-3.5 w-3.5" />
-                            Renew Membership
-                          </Button>
+                          actor !== 'tiptab' && (
+                            <Button 
+                              onClick={() => setIsMembershipModalOpen(true)}
+                              className={cn(
+                                "w-full h-10 sm:h-12 rounded-xl font-black text-[10px] uppercase tracking-widest gap-2 transition-all",
+                                isNearingExpiry() 
+                                  ? "bg-orange-500 hover:bg-orange-600 text-white shadow-lg" 
+                                  : "bg-white/10 text-white/40 hover:bg-white/20 hover:text-white"
+                              )}
+                            >
+                              <RefreshCw className="h-3.5 w-3.5" />
+                              Renew Membership
+                            </Button>
+                          )
                         ) : (
                           <Button 
                             onClick={() => setIsMembershipModalOpen(true)}
