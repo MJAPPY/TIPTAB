@@ -12,7 +12,10 @@ import {
   ShieldCheck, 
   Share2,
   Check,
-  Wallet
+  Wallet,
+  Heart,
+  Music,
+  Tv
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -20,6 +23,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { CREATORS, Creator } from "@/data/creators";
 import { Header } from "@/components/tab-platform/Header";
 import { MembershipModal } from "@/components/tab-platform/MembershipModal";
+import { EmbedPlayer } from "@/components/tab-platform/EmbedPlayer";
+import { LiveReactions } from "@/components/tab-platform/LiveReactions";
 import { useToast } from "@/hooks/use-toast";
 import { useXpr } from "@/contexts/XprContext";
 import { cn } from "@/lib/utils";
@@ -36,6 +41,7 @@ const CreatorProfile = () => {
   const [isProcessing, setIsProcessing] = useState(false);
   const [isMembershipOpen, setIsMembershipOpen] = useState(false);
   const [isCopied, setIsCopied] = useState(false);
+  const [likeCount, setLikeCount] = useState(128);
 
   useEffect(() => {
     if (!handle) return;
@@ -56,6 +62,13 @@ const CreatorProfile = () => {
       navigate("/");
     }
   }, [handle, navigate]);
+
+  const handleLike = () => {
+    setLikeCount(prev => prev + 1);
+    if ((window as any).triggerReaction) {
+      (window as any).triggerReaction();
+    }
+  };
 
   const formatValue = (val: string) => {
     const numericValue = parseFloat(val);
@@ -116,6 +129,11 @@ const CreatorProfile = () => {
         title: "Tip Sent!",
         description: `Successfully sent ${quantityString} to ${creator?.name}.`,
       });
+      
+      // Trigger a bunch of hearts on successful tip
+      for(let i=0; i<5; i++) {
+        setTimeout(() => (window as any).triggerReaction?.(), i * 100);
+      }
     } catch (error: any) {
       toast({
         title: "Transaction Failed",
@@ -169,6 +187,7 @@ const CreatorProfile = () => {
       <div className="relative h-[40vh] md:h-[50vh] w-full overflow-hidden">
         <div className={cn("absolute inset-0 opacity-40 blur-[100px]", creator.color)} />
         <div className="absolute inset-0 bg-gradient-to-t from-[#0a0514] via-[#0a0514]/40 to-transparent" />
+        <LiveReactions />
       </div>
 
       <main className="container mx-auto px-6 -mt-32 relative z-10 pb-24">
@@ -201,9 +220,28 @@ const CreatorProfile = () => {
 
             <div className="bg-white/[0.03] border border-white/10 rounded-[40px] p-8 md:p-12 space-y-8">
               <div className="space-y-4">
-                <h3 className="text-xs font-black uppercase tracking-[0.3em] text-white/30">About</h3>
+                <div className="flex items-center justify-between">
+                  <h3 className="text-xs font-black uppercase tracking-[0.3em] text-white/30">About</h3>
+                  <div className="flex items-center gap-4">
+                    <div className="flex items-center gap-2 px-4 py-2 rounded-2xl bg-white/5 border border-white/10">
+                      <Heart className="h-4 w-4 text-red-500 fill-red-500" />
+                      <span className="font-black text-sm">{likeCount}</span>
+                    </div>
+                  </div>
+                </div>
                 <p className="text-xl md:text-2xl text-white/80 leading-relaxed font-medium">{creator.bio}</p>
               </div>
+
+              {/* Media Section */}
+              {(creator.mediaEmbed || creator.videoUrl) && (
+                <div className="space-y-6 pt-4">
+                  <div className="flex items-center gap-3">
+                    <Music className="h-4 w-4 text-purple-500" />
+                    <h3 className="text-xs font-black uppercase tracking-[0.3em] text-white/30">Featured Content</h3>
+                  </div>
+                  <EmbedPlayer url={creator.mediaEmbed || creator.videoUrl || ""} />
+                </div>
+              )}
 
               <div className="flex flex-wrap gap-8">
                 <div className="space-y-2">
@@ -211,6 +249,27 @@ const CreatorProfile = () => {
                   <div className="flex items-center gap-2 text-lg font-bold text-white/60">
                     <MapPin className="h-5 w-5 text-purple-500" />
                     {creator.location}
+                  </div>
+                </div>
+                
+                <div className="space-y-2">
+                  <h3 className="text-xs font-black uppercase tracking-[0.3em] text-white/30">Connect</h3>
+                  <div className="flex items-center gap-4">
+                    {creator.twitter && (
+                      <a href={creator.twitter} target="_blank" rel="noopener noreferrer" className="h-10 w-10 rounded-xl bg-white/5 flex items-center justify-center hover:bg-purple-500 transition-all">
+                        <Twitter className="h-5 w-5" />
+                      </a>
+                    )}
+                    {creator.instagram && (
+                      <a href={creator.instagram} target="_blank" rel="noopener noreferrer" className="h-10 w-10 rounded-xl bg-white/5 flex items-center justify-center hover:bg-pink-500 transition-all">
+                        <Instagram className="h-5 w-5" />
+                      </a>
+                    )}
+                    {creator.website && (
+                      <a href={creator.website} target="_blank" rel="noopener noreferrer" className="h-10 w-10 rounded-xl bg-white/5 flex items-center justify-center hover:bg-cyan-500 transition-all">
+                        <Globe className="h-5 w-5" />
+                      </a>
+                    )}
                   </div>
                 </div>
               </div>
@@ -222,9 +281,14 @@ const CreatorProfile = () => {
               <div className="bg-[#130b21] border border-white/10 rounded-[48px] p-10 shadow-[0_30px_60px_-15px_rgba(0,0,0,0.5)] relative overflow-hidden">
                 <div className="flex items-center justify-between mb-10">
                   <h2 className="text-3xl font-black tracking-tight">Support <br /> {creator.name.split(' ')[0]}</h2>
-                  <Button variant="ghost" size="icon" onClick={handleShare} className="h-12 w-12 rounded-2xl bg-white/5 border border-white/10 hover:bg-white/10">
-                    {isCopied ? <Check className="h-5 w-5 text-green-500" /> : <Share2 className="h-5 w-5 text-white/40" />}
-                  </Button>
+                  <div className="flex gap-2">
+                    <Button variant="ghost" size="icon" onClick={handleLike} className="h-12 w-12 rounded-2xl bg-white/5 border border-white/10 hover:bg-red-500/20 group">
+                      <Heart className="h-5 w-5 text-red-500 group-hover:fill-red-500 transition-all" />
+                    </Button>
+                    <Button variant="ghost" size="icon" onClick={handleShare} className="h-12 w-12 rounded-2xl bg-white/5 border border-white/10 hover:bg-white/10">
+                      {isCopied ? <Check className="h-5 w-5 text-green-500" /> : <Share2 className="h-5 w-5 text-white/40" />}
+                    </Button>
+                  </div>
                 </div>
 
                 <div className="space-y-8">
@@ -280,6 +344,17 @@ const CreatorProfile = () => {
                     )}
                   </div>
                 </div>
+              </div>
+
+              {/* Quick Info Box */}
+              <div className="p-8 rounded-[40px] bg-white/[0.02] border border-white/5 space-y-4">
+                <div className="flex items-center gap-3">
+                  <Tv className="h-5 w-5 text-orange-500" />
+                  <p className="text-sm font-black uppercase tracking-widest text-white/60">Live Support Node</p>
+                </div>
+                <p className="text-sm text-white/40 font-medium">
+                  Tips sent to this creator are settled instantly on the XPR Network. Zero fees applied.
+                </p>
               </div>
             </div>
           </div>

@@ -13,13 +13,14 @@ export interface Creator {
   website?: string;
   videoUrl?: string;
   instagram?: string;
+  mediaEmbed?: string; // Specific field for the player
 }
 
 export const CREATORS: Creator[] = [
   {
     id: "1",
     name: "TAB Project",
-    handle: "tiptab", // Updated handle to @tiptab
+    handle: "tiptab",
     bio: "The official TAB project account. Supporting the TAB ecosystem on XPR Network.",
     location: "London, UK",
     coordinates: [-0.1276, 51.5074],
@@ -27,7 +28,8 @@ export const CREATORS: Creator[] = [
     avatar: "TAB",
     avatarImage: "https://images.unsplash.com/photo-1633332755192-727a05c4013d?w=400&h=400&fit=crop",
     color: "bg-red-600",
-    twitter: "https://twitter.com/tabxpr"
+    twitter: "https://twitter.com/tabxpr",
+    mediaEmbed: "https://www.youtube.com/watch?v=dQw4w9WgXcQ"
   },
   {
     id: "2",
@@ -52,7 +54,8 @@ export const CREATORS: Creator[] = [
     avatar: "MC",
     avatarImage: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=400&h=400&fit=crop",
     color: "bg-emerald-500",
-    instagram: "https://instagram.com"
+    instagram: "https://instagram.com",
+    mediaEmbed: "https://open.spotify.com/track/4cOdK2wGvWyR9p79hnIvov"
   },
   {
     id: "4",
@@ -88,7 +91,8 @@ export const CREATORS: Creator[] = [
     category: "Sports",
     avatar: "MW",
     avatarImage: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=400&h=400&fit=crop",
-    color: "bg-sky-600"
+    color: "bg-sky-600",
+    mediaEmbed: "https://music.apple.com/us/album/the-box/1490466042?i=1490466047"
   },
   {
     id: "7",
@@ -112,7 +116,8 @@ export const CREATORS: Creator[] = [
     category: "Gaming",
     avatar: "DP",
     avatarImage: "https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?w=400&h=400&fit=crop",
-    color: "bg-indigo-600"
+    color: "bg-indigo-600",
+    mediaEmbed: "https://www.youtube.com/watch?v=fKopy74weus"
   },
   {
     id: "9",

@@ -1,5 +1,5 @@
 import { useState, useMemo } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Header } from "./tab-platform/Header";
 import { Hero } from "./tab-platform/Hero";
 import { StatsBanner } from "./tab-platform/Sections";
@@ -16,7 +16,8 @@ import { useXpr } from "@/contexts/XprContext";
 export const Tab = () => {
   const [isMembershipOpen, setIsMembershipOpen] = useState(false);
   const [selectedCreator, setSelectedCreator] = useState<Creator | null>(null);
-  const { actor } = useXpr();
+  const { actor, isConnected } = useXpr();
+  const navigate = useNavigate();
 
   // Sync local user profile updates to the display list (Map is for Creators only)
   const displayCreators = useMemo(() => {
@@ -39,6 +40,14 @@ export const Tab = () => {
     return [localUser, ...CREATORS];
   }, [actor]);
 
+  const handleSelectCreator = (creator: Creator) => {
+    if (isConnected) {
+      navigate(`/tip/${creator.handle}`);
+    } else {
+      setSelectedCreator(creator);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-[#0a0514] text-white selection:bg-purple-500/30">
       <Header onBecomeCreator={() => setIsMembershipOpen(true)} />
@@ -56,14 +65,14 @@ export const Tab = () => {
             <h2 className="text-base sm:text-lg font-bold">Live on XPR Network</h2>
             <span className="text-white/40 text-[10px] sm:text-xs">— click a pin to tip instantly</span>
           </div>
-          <WorldMap creators={displayCreators} onSelectCreator={setSelectedCreator} />
+          <WorldMap creators={displayCreators} onSelectCreator={handleSelectCreator} />
         </section>
 
         <HowItWorks />
 
         <FeaturedCreators 
           creators={displayCreators}
-          onSelectCreator={setSelectedCreator} 
+          onSelectCreator={handleSelectCreator} 
           onAddYourself={() => setIsMembershipOpen(true)} 
         />
       </main>
