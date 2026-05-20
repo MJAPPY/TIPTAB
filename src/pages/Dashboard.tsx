@@ -17,7 +17,8 @@ import {
   ShoppingCart,
   ExternalLink,
   Calendar,
-  Clock
+  Clock,
+  Activity
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
@@ -50,6 +51,7 @@ const Dashboard = () => {
 
   const alcorUrl = "https://alcor.exchange/v/xpr/swap?input=xpr-eosio.token&output=tab-tokencreate";
   const metalPayUrl = "https://onramp.metalpay.com/buy/xpr";
+  const userExplorerUrl = `https://explorer.xprnetwork.org/account/${actor}`;
 
   const formatPrecision = (val: string) => {
     const num = parseFloat(val);
@@ -307,7 +309,17 @@ const Dashboard = () => {
                           </>
                         )}
                       </div>
-                      <div className="mt-auto pt-4">
+                      <div className="mt-auto pt-4 flex flex-col gap-2">
+                         <Button 
+                          asChild
+                          variant="ghost"
+                          className="w-full h-10 rounded-xl text-white/40 hover:text-purple-400 font-black text-[9px] uppercase tracking-widest gap-2"
+                        >
+                          <a href={userExplorerUrl} target="_blank" rel="noopener noreferrer">
+                            <Activity className="h-3.5 w-3.5" />
+                            View on Explorer
+                          </a>
+                        </Button>
                         {isMember ? (
                           actor !== 'tiptab' && (
                             <Button 
