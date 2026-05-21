@@ -22,6 +22,7 @@ const CATEGORIES = [
   { name: "Gaming", color: "#8b5cf6" },
   { name: "Gardening & Farming", color: "#22c55e" },
   { name: "Hospitality", color: "#eab308" }, 
+  { name: "Local News", color: "#60a5fa" },
   { name: "Music", color: "#ef4444" },
   { name: "Other", color: "#ffffff" },
   { name: "Property Reno", color: "#94a3b8" },

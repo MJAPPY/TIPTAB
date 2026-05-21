@@ -4,7 +4,7 @@ import React, { useState, useMemo } from "react";
 import { Header } from "@/components/tab-platform/Header";
 import { MembershipModal } from "@/components/tab-platform/MembershipModal";
 import { CREATORS, Creator } from "@/data/creators";
-import { Search, MapPin, Tv, Radio, Music, Gamepad2, Zap, LayoutGrid, Users, ArrowUpDown, Truck, Coffee, Dumbbell, Trophy, Fish, Hammer, Car, Building, Utensils, Star, Sprout, Briefcase, Link as LinkIcon, Landmark } from "lucide-react";
+import { Search, MapPin, Tv, Radio, Music, Gamepad2, Zap, LayoutGrid, Users, ArrowUpDown, Truck, Coffee, Dumbbell, Trophy, Fish, Hammer, Car, Building, Utensils, Star, Sprout, Briefcase, Link as LinkIcon, Landmark, Newspaper } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -35,6 +35,7 @@ const CATEGORIES = [
   { name: "Gaming", icon: Gamepad2 },
   { name: "Gardening & Farming", icon: Sprout },
   { name: "Hospitality", icon: Coffee },
+  { name: "Local News", icon: Newspaper },
   { name: "Music", icon: Music },
   { name: "Other", icon: Users },
   { name: "Property Reno", icon: Hammer },
@@ -49,7 +50,7 @@ const Live = () => {
   const [selectedCategory, setSelectedCategory] = useState("All");
   const [sortBy, setSortBy] = useState("newest");
   const [isMembershipOpen, setIsMembershipOpen] = useState(false);
-  navigate = useNavigate();
+  const navigate = useNavigate();
 
   // Filter and Sort creators
   const liveCreators = useMemo(() => {
@@ -184,7 +185,7 @@ const Live = () => {
                       {creator.avatar}
                     </div>
                     <div>
-                      <h3 className="text-xl font-black tracking-tight group-hover:text-purple-400 transition-colors">{creator.name}</h3>
+                      <h3 className="text-xl font-black tracking-tight group-hover:text-red-400 transition-colors">{creator.name}</h3>
                       <p className="text-sm font-bold text-white/40">@{creator.handle}</p>
                     </div>
                   </div>

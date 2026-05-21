@@ -331,6 +331,7 @@ export const ProfileEditor = ({ initialData, onSave, minimal = false }: ProfileE
                           "Gaming",
                           "Gardening & Farming",
                           "Hospitality",
+                          "Local News",
                           "Music",
                           "Other",
                           "Property Reno",
