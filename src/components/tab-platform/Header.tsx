@@ -266,27 +266,27 @@ export const Header = ({ onBecomeCreator }: HeaderProps) => {
                 <DropdownMenuTrigger asChild>
                   <Button 
                     className={cn(
-                      "flex items-center gap-1 sm:gap-1.5 md:gap-2.5 rounded-xl sm:rounded-2xl h-8 sm:h-10 lg:h-11 2xl:h-12 px-1 sm:px-1.5 md:px-3 lg:px-3 2xl:px-6 font-black text-[8px] sm:text-[10px] md:text-xs xl:text-sm transition-all active:scale-95 group shrink-0 bg-white/5 border border-white/10 text-slate-200 hover:bg-purple-500/10 hover:text-purple-400 shadow-xl",
-                      isAdmin && "border-orange-500/60 bg-orange-500/10"
+                      "flex items-center gap-2 sm:gap-3 rounded-xl sm:rounded-2xl h-9 sm:h-11 lg:h-12 2xl:h-13 px-2 sm:px-3 md:px-4 lg:px-4 2xl:px-6 font-black transition-all active:scale-95 group shrink-0 bg-white/5 border border-white/10 text-slate-200 hover:bg-purple-500/10 hover:text-purple-400 shadow-xl",
+                      isAdmin && "border-orange-500/40 bg-orange-500/10"
                     )}
                   >
-                    <div className={cn("hidden sm:flex h-6 w-6 md:h-7 lg:h-7.5 md:w-7 lg:w-7.5 rounded-full items-center justify-center text-[8px] md:text-[9px] font-black border border-white/10 overflow-hidden shrink-0", userProfile?.color)}>
+                    <div className={cn("flex h-7 w-7 sm:h-8 sm:w-8 md:h-9 md:w-9 rounded-full items-center justify-center text-[10px] sm:text-xs font-black border-2 border-white/10 overflow-hidden shrink-0 shadow-lg", userProfile?.color)}>
                       {userProfile?.avatarImage ? (
                         <img src={userProfile.avatarImage} alt="Avatar" className="w-full h-full object-cover" />
                       ) : (
                         userProfile?.avatar
                       )}
                     </div>
-                    <div className="flex flex-col items-start -space-y-0.5 sm:-space-y-1 text-left">
-                      <div className="flex items-center gap-1">
-                        <span className="text-[9px] sm:text-[11px] md:text-xs xl:text-xs font-black text-purple-400 truncate max-w-[35px] xs:max-w-[50px] sm:max-w-none">@{actor}</span>
-                        {isAdmin && <ShieldCheck className="h-2 w-2 sm:h-3 w-3 md:h-3.5 md:w-3.5 text-orange-500" />}
+                    <div className="flex flex-col items-start justify-center gap-0.5 text-left">
+                      <div className="flex items-center gap-1.5 leading-none">
+                        <span className="text-[10px] sm:text-xs md:text-sm font-black text-purple-400 truncate max-w-[60px] sm:max-w-none">@{actor}</span>
+                        {isAdmin && <ShieldCheck className="h-3 w-3 sm:h-3.5 sm:w-3.5 md:h-4 md:w-4 text-orange-500 drop-shadow-[0_0_5px_rgba(249,115,22,0.5)]" />}
                       </div>
-                      <span className="hidden xl:block text-[8px] md:text-[9px] font-black text-slate-400 uppercase tracking-widest leading-none">
-                        {isAdmin ? "Admin" : "User"}
+                      <span className="hidden sm:block text-[8px] md:text-[9px] font-black text-slate-500 uppercase tracking-[0.15em] leading-none">
+                        {isAdmin ? "Admin Access" : "Network User"}
                       </span>
                     </div>
-                    <ChevronDown className="h-2 w-2 sm:h-3 w-3 md:h-4 md:w-4 text-white/30 group-data-[state=open]:rotate-180 transition-transform" />
+                    <ChevronDown className="h-3 w-3 sm:h-4 sm:w-4 text-white/20 group-data-[state=open]:rotate-180 transition-transform ml-1" />
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end" className="w-64 bg-[#1a102d]/95 backdrop-blur-xl border-white/10 text-white rounded-2xl p-2 mt-2 shadow-2xl">
