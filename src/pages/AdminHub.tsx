@@ -37,7 +37,9 @@ import {
   MousePointerClick,
   Heart,
   Timer,
-  Server
+  Server,
+  LineChart,
+  UserRoundCheck
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
@@ -576,112 +578,80 @@ const AdminHub = () => {
                   </CardContent>
                 </Card>
 
-                {/* Improved System Metrics - Enhanced Grid */}
+                {/* Network Growth Analytics Section */}
                 <div className="md:col-span-12 lg:col-span-6 space-y-6">
                   <Card className="bg-[#1a112d] border border-white/10 rounded-[40px] p-8 space-y-6 overflow-hidden relative">
                     <div className="absolute top-0 right-0 p-8 opacity-5">
-                      <BarChart3 className="h-48 w-48 text-white" />
+                      <TrendingUp className="h-48 w-48 text-white" />
                     </div>
                     <CardHeader className="p-0 relative z-10">
                       <CardTitle className="text-xl font-black flex items-center gap-3 text-white uppercase italic">
-                        <Laptop className="h-5 w-5 text-orange-400" /> System Metrics
+                        <LineChart className="h-5 w-5 text-cyan-400" /> Growth & Adoption
                       </CardTitle>
-                      <CardDescription className="text-white/40">Performance indicators and network scaling</CardDescription>
+                      <CardDescription className="text-white/40">Member totals and network expansion velocity</CardDescription>
                     </CardHeader>
                     <CardContent className="p-0 grid grid-cols-1 sm:grid-cols-2 gap-4 relative z-10">
-                      <div className="p-5 rounded-2xl bg-white/5 border border-white/5 space-y-2 group hover:border-purple-500/30 transition-all">
-                        <span className="text-[10px] font-black uppercase tracking-widest text-slate-500 flex items-center gap-2">
-                          <Users className="h-3 w-3" /> New Nodes (24h)
-                        </span>
-                        <div className="flex items-end gap-2">
-                          <span className="text-3xl font-black text-purple-400">+42</span>
-                          <span className="text-[9px] font-bold text-green-400 mb-1 flex items-center gap-0.5"><TrendingUp className="h-2.5 w-2.5" /> 12%</span>
-                        </div>
-                      </div>
                       <div className="p-5 rounded-2xl bg-white/5 border border-white/5 space-y-2 group hover:border-orange-500/30 transition-all">
                         <span className="text-[10px] font-black uppercase tracking-widest text-slate-500 flex items-center gap-2">
-                          <Timer className="h-3 w-3" /> Node Sync Time
+                          <UserRoundCheck className="h-3.5 w-3.5 text-orange-400" /> Total Verified Members
                         </span>
                         <div className="flex items-end gap-2">
-                          <span className="text-3xl font-black text-orange-400">1.2s</span>
-                          <span className="text-[9px] font-bold text-slate-500 mb-1 uppercase tracking-tighter italic">Optimized</span>
+                          <span className="text-3xl font-black text-white">1,240</span>
+                          <span className="text-[9px] font-black text-orange-400 mb-1 flex items-center gap-0.5"><TrendingUp className="h-2.5 w-2.5" /> 14%</span>
                         </div>
+                        <p className="text-[8px] font-bold text-slate-600 uppercase tracking-tighter">Growth (MoM)</p>
                       </div>
+
+                      <div className="p-5 rounded-2xl bg-white/5 border border-white/5 space-y-2 group hover:border-purple-500/30 transition-all">
+                        <span className="text-[10px] font-black uppercase tracking-widest text-slate-500 flex items-center gap-2">
+                          <Users className="h-3.5 w-3.5 text-purple-400" /> Supporter Network
+                        </span>
+                        <div className="flex items-end gap-2">
+                          <span className="text-3xl font-black text-white">4,812</span>
+                          <span className="text-[9px] font-black text-purple-400 mb-1 flex items-center gap-0.5"><TrendingUp className="h-2.5 w-2.5" /> 8%</span>
+                        </div>
+                        <p className="text-[8px] font-bold text-slate-600 uppercase tracking-tighter">Total unique wallets</p>
+                      </div>
+
                       <div className="p-5 rounded-2xl bg-white/5 border border-white/5 space-y-2 group hover:border-green-500/30 transition-all">
                         <span className="text-[10px] font-black uppercase tracking-widest text-slate-500 flex items-center gap-2">
-                          <Server className="h-3 w-3" /> API Response
+                          <Zap className="h-3.5 w-3.5 text-green-400" /> Member Conversion
                         </span>
                         <div className="flex items-end gap-2">
-                          <span className="text-3xl font-black text-green-400">99.9%</span>
-                          <span className="text-[9px] font-bold text-green-500/60 mb-1 uppercase tracking-tighter">Uptime</span>
+                          <span className="text-3xl font-black text-white">25.7%</span>
+                          <span className="text-[9px] font-black text-green-400 mb-1 uppercase tracking-tighter">Healthy</span>
                         </div>
+                        <p className="text-[8px] font-bold text-slate-600 uppercase tracking-tighter">Supporter to member ratio</p>
                       </div>
+
                       <div className="p-5 rounded-2xl bg-white/5 border border-white/5 space-y-2 group hover:border-cyan-500/30 transition-all">
                         <span className="text-[10px] font-black uppercase tracking-widest text-slate-500 flex items-center gap-2">
-                          <HandCoins className="h-3 w-3" /> Avg Tip Size
+                          <ShieldCheck className="h-3.5 w-3.5 text-cyan-400" /> Retention Rate
                         </span>
                         <div className="flex items-end gap-2">
-                          <span className="text-3xl font-black text-cyan-400">420</span>
-                          <span className="text-[9px] font-bold text-slate-500 mb-1 uppercase tracking-tighter">TAB</span>
+                          <span className="text-3xl font-black text-white">94%</span>
+                          <span className="text-[9px] font-black text-cyan-400 mb-1 uppercase tracking-tighter">Elite</span>
                         </div>
+                        <p className="text-[8px] font-bold text-slate-600 uppercase tracking-tighter">Yearly renewal velocity</p>
                       </div>
                     </CardContent>
                   </Card>
 
-                  {/* New Engagement Analytics Section */}
+                  {/* System Health Section */}
                   <Card className="bg-[#1a112d] border border-white/10 rounded-[40px] p-8 space-y-6 overflow-hidden">
                     <CardHeader className="p-0">
                       <CardTitle className="text-xl font-black flex items-center gap-3 text-white uppercase italic">
-                        <Sparkles className="h-5 w-5 text-purple-400" /> Engagement & Traffic
+                        <Laptop className="h-5 w-5 text-orange-400" /> Performance Status
                       </CardTitle>
                     </CardHeader>
-                    <CardContent className="p-0 space-y-4">
-                      <div className="flex items-center justify-between p-4 bg-white/5 rounded-2xl border border-white/5">
-                        <div className="flex items-center gap-4">
-                          <div className="h-10 w-10 rounded-xl bg-red-500/10 flex items-center justify-center border border-red-500/20">
-                            <Heart className="h-5 w-5 text-red-500" />
-                          </div>
-                          <div>
-                            <p className="text-[10px] font-black uppercase tracking-widest text-slate-500">Global Reactions</p>
-                            <p className="text-xl font-black text-white">15,242 <span className="text-[9px] font-bold opacity-30 tracking-normal">All time</span></p>
-                          </div>
-                        </div>
-                        <div className="text-right">
-                          <span className="text-[9px] font-black text-green-400 uppercase tracking-widest block">+24%</span>
-                          <span className="text-[8px] font-bold text-slate-600">vs last week</span>
-                        </div>
+                    <CardContent className="p-0 grid grid-cols-2 gap-4">
+                      <div className="p-4 bg-white/5 rounded-2xl border border-white/5">
+                        <p className="text-[10px] font-black uppercase tracking-widest text-slate-500 mb-1">API Latency</p>
+                        <p className="text-xl font-black text-green-400">142ms <span className="text-[8px] font-bold text-slate-600 uppercase tracking-tighter ml-1">avg</span></p>
                       </div>
-
-                      <div className="flex items-center justify-between p-4 bg-white/5 rounded-2xl border border-white/5">
-                        <div className="flex items-center gap-4">
-                          <div className="h-10 w-10 rounded-xl bg-blue-500/10 flex items-center justify-center border border-blue-500/20">
-                            <MousePointerClick className="h-5 w-5 text-blue-400" />
-                          </div>
-                          <div>
-                            <p className="text-[10px] font-black uppercase tracking-widest text-slate-500">Map Interactions</p>
-                            <p className="text-xl font-black text-white">8,105 <span className="text-[9px] font-bold opacity-30 tracking-normal">Pins clicked</span></p>
-                          </div>
-                        </div>
-                        <div className="text-right">
-                          <span className="text-[9px] font-black text-blue-400 uppercase tracking-widest block">Steady</span>
-                          <span className="text-[8px] font-bold text-slate-600">Conversion node</span>
-                        </div>
-                      </div>
-
-                      <div className="flex items-center justify-between p-4 bg-white/5 rounded-2xl border border-white/5">
-                        <div className="flex items-center gap-4">
-                          <div className="h-10 w-10 rounded-xl bg-orange-500/10 flex items-center justify-center border border-orange-500/20">
-                            <Zap className="h-5 w-5 text-orange-400" />
-                          </div>
-                          <div>
-                            <p className="text-[10px] font-black uppercase tracking-widest text-slate-500">Boost Redemption</p>
-                            <p className="text-xl font-black text-white">12.5% <span className="text-[9px] font-bold opacity-30 tracking-normal">Opt-in rate</span></p>
-                          </div>
-                        </div>
-                        <div className="text-right">
-                          <span className="text-[9px] font-black text-orange-400 uppercase tracking-widest block">Active</span>
-                          <span className="text-[8px] font-bold text-slate-600">Revenue growth</span>
-                        </div>
+                      <div className="p-4 bg-white/5 rounded-2xl border border-white/5">
+                        <p className="text-[10px] font-black uppercase tracking-widest text-slate-500 mb-1">Node Sync</p>
+                        <p className="text-xl font-black text-white">100% <span className="text-[8px] font-bold text-green-500 uppercase tracking-tighter ml-1">Live</span></p>
                       </div>
                     </CardContent>
                   </Card>
