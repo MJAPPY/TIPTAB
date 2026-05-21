@@ -4,7 +4,7 @@ import React, { useState, useMemo } from "react";
 import { Header } from "@/components/tab-platform/Header";
 import { MembershipModal } from "@/components/tab-platform/MembershipModal";
 import { CREATORS, Creator } from "@/data/creators";
-import { Search, MapPin, Tv, Radio, Music, Gamepad2, Zap, LayoutGrid, Users, ArrowUpDown, Truck, Coffee, Dumbbell, Trophy, Fish, Hammer, Car, Building, Utensils, Star, Sprout } from "lucide-react";
+import { Search, MapPin, Tv, Radio, Music, Gamepad2, Zap, LayoutGrid, Users, ArrowUpDown, Truck, Coffee, Dumbbell, Trophy, Fish, Hammer, Car, Building, Utensils, Star, Sprout, Briefcase, Link as LinkIcon, Landmark } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -22,10 +22,13 @@ const CATEGORIES = [
   { name: "All", icon: LayoutGrid },
   { name: "Art", icon: Zap },
   { name: "Automotive", icon: Car },
+  { name: "Blockchain", icon: LinkIcon },
+  { name: "Business", icon: Briefcase },
   { name: "Content", icon: Tv },
   { name: "Delivery", icon: Truck },
   { name: "Dev", icon: Zap },
   { name: "Education", icon: Zap },
+  { name: "Finance", icon: Landmark },
   { name: "Fishing", icon: Fish },
   { name: "Fitness", icon: Dumbbell },
   { name: "Food", icon: Utensils },
@@ -46,7 +49,7 @@ const Live = () => {
   const [selectedCategory, setSelectedCategory] = useState("All");
   const [sortBy, setSortBy] = useState("newest");
   const [isMembershipOpen, setIsMembershipOpen] = useState(false);
-  const navigate = useNavigate();
+  navigate = useNavigate();
 
   // Filter and Sort creators
   const liveCreators = useMemo(() => {
@@ -181,7 +184,7 @@ const Live = () => {
                       {creator.avatar}
                     </div>
                     <div>
-                      <h3 className="text-xl font-black tracking-tight group-hover:text-red-400 transition-colors">{creator.name}</h3>
+                      <h3 className="text-xl font-black tracking-tight group-hover:text-purple-400 transition-colors">{creator.name}</h3>
                       <p className="text-sm font-bold text-white/40">@{creator.handle}</p>
                     </div>
                   </div>

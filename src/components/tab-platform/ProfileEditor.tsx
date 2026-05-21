@@ -318,10 +318,13 @@ export const ProfileEditor = ({ initialData, onSave, minimal = false }: ProfileE
                         {[
                           "Art",
                           "Automotive",
+                          "Blockchain",
+                          "Business",
                           "Content",
                           "Delivery",
                           "Dev",
                           "Education",
+                          "Finance",
                           "Fishing",
                           "Fitness",
                           "Food",
