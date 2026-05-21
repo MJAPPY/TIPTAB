@@ -152,7 +152,7 @@ const Live = () => {
               <div 
                 key={creator.id}
                 onClick={() => navigate(`/tip/${creator.handle}`)}
-                className="group relative bg-[#130b21] border border-white/10 rounded-[40px] overflow-hidden hover:border-purple-500/50 transition-all duration-500 cursor-pointer shadow-2xl"
+                className="group relative bg-[#130b21] border border-white/10 rounded-[40px] overflow-hidden hover:border-red-500/50 hover:shadow-[0_0_60px_-15px_rgba(239,68,68,0.5)] transition-all duration-500 cursor-pointer shadow-2xl"
               >
                 <div className="aspect-video relative overflow-hidden bg-black/40">
                   <div className={cn("absolute inset-0 opacity-20 blur-2xl", creator.color)} />
@@ -181,7 +181,7 @@ const Live = () => {
                       {creator.avatar}
                     </div>
                     <div>
-                      <h3 className="text-xl font-black tracking-tight group-hover:text-purple-400 transition-colors">{creator.name}</h3>
+                      <h3 className="text-xl font-black tracking-tight group-hover:text-red-400 transition-colors">{creator.name}</h3>
                       <p className="text-sm font-bold text-white/40">@{creator.handle}</p>
                     </div>
                   </div>
@@ -190,7 +190,7 @@ const Live = () => {
                   </p>
                   <div className="pt-4 flex items-center justify-between border-t border-white/5">
                     <span className="text-[10px] font-black uppercase tracking-widest text-purple-400">{creator.category}</span>
-                    <Button variant="ghost" className="h-8 rounded-xl bg-purple-500/10 text-purple-400 hover:bg-purple-500 text-[10px] font-black uppercase tracking-widest px-4">
+                    <Button variant="ghost" className="h-8 rounded-xl bg-purple-500/10 text-purple-400 hover:bg-red-500 hover:text-white text-[10px] font-black uppercase tracking-widest px-4 transition-all">
                       Join Stream
                     </Button>
                   </div>
