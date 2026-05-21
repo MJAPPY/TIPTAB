@@ -21,10 +21,15 @@ const Assets = () => {
     setIsDownloading(true);
     try {
       // Use pixelRatio 4 for high-resolution print quality
+      // backgroundColor: null ensures transparency for the export
       const dataUrl = await toPng(ref.current, { 
         quality: 1, 
         pixelRatio: 4, 
-        backgroundColor: undefined // Transparent background
+        backgroundColor: null,
+        style: {
+          margin: '0',
+          padding: '40px', // Uniform padding for professional spacing
+        }
       });
       const link = document.createElement('a');
       link.download = `${fileName}.png`;
@@ -61,51 +66,54 @@ const Assets = () => {
 
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
             {/* Primary Logo Card */}
-            <div className="lg:col-span-7 bg-white/5 border border-white/10 rounded-[48px] p-12 flex flex-col items-center justify-center space-y-10 relative overflow-hidden group">
+            <div className="lg:col-span-7 bg-white/5 border border-white/10 rounded-[48px] p-8 md:p-12 flex flex-col items-center justify-center space-y-10 relative overflow-hidden group">
               <div className="absolute inset-0 bg-gradient-to-br from-purple-500/5 to-transparent pointer-events-none" />
               
-              {/* Static export container: No glows, no transitions, transparent bg */}
-              <div ref={logoRef} className="p-12 flex items-center justify-center">
-                <BrandLogo size="lg" isStatic={true} />
+              <div className="flex-1 flex items-center justify-center w-full min-h-[300px]">
+                {/* Tightly framed ref container for clean centering */}
+                <div ref={logoRef} className="inline-flex items-center justify-center bg-transparent">
+                  <BrandLogo size="lg" isStatic={true} />
+                </div>
               </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 w-full max-w-md">
-                <Button 
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 w-full max-w-md relative z-10">
+                <button 
                   onClick={() => downloadPng(logoRef, 'tiptab-full-logo')}
                   disabled={isDownloading}
-                  className="h-14 rounded-2xl bg-white text-black hover:bg-purple-500 hover:text-white font-black text-sm uppercase tracking-widest transition-all shadow-xl"
+                  className="h-14 rounded-2xl bg-white text-black hover:bg-purple-500 hover:text-white font-black text-sm uppercase tracking-widest transition-all shadow-xl flex items-center justify-center gap-2"
                 >
-                  <Download className="mr-2 h-4 w-4" /> Download PNG
-                </Button>
-                <Button 
-                  variant="outline"
-                  className="h-14 rounded-2xl border-white/10 bg-white/5 hover:bg-white/10 text-white font-black text-sm uppercase tracking-widest transition-all"
+                  <Download className="h-4 w-4" /> Download PNG
+                </button>
+                <button 
+                  className="h-14 rounded-2xl border border-white/10 bg-white/5 hover:bg-white/10 text-white font-black text-sm uppercase tracking-widest transition-all flex items-center justify-center gap-2"
                 >
-                  <FileCode className="mr-2 h-4 w-4" /> Request SVG
-                </Button>
+                  <FileCode className="h-4 w-4" /> Request SVG
+                </button>
               </div>
             </div>
 
             {/* Token Asset Card */}
-            <div className="lg:col-span-5 bg-white/5 border border-white/10 rounded-[48px] p-12 flex flex-col items-center justify-center space-y-10 relative overflow-hidden group">
+            <div className="lg:col-span-5 bg-white/5 border border-white/10 rounded-[48px] p-8 md:p-12 flex flex-col items-center justify-center space-y-10 relative overflow-hidden group">
               <div className="absolute inset-0 bg-gradient-to-br from-orange-500/5 to-transparent pointer-events-none" />
               
-              <div ref={tokenRef} className="p-12 flex items-center justify-center">
-                <BrandLogo size="lg" showText={false} isStatic={true} />
+              <div className="flex-1 flex items-center justify-center w-full min-h-[300px]">
+                <div ref={tokenRef} className="inline-flex items-center justify-center bg-transparent">
+                  <BrandLogo size="lg" showText={false} isStatic={true} />
+                </div>
               </div>
 
-              <div className="text-center space-y-4 w-full">
+              <div className="text-center space-y-4 w-full relative z-10">
                 <div className="space-y-1">
                   <h3 className="font-black text-xl uppercase tracking-tight italic text-orange-500">TAB TOKEN</h3>
                   <p className="text-xs text-white/40 font-bold uppercase tracking-widest">Master Icon</p>
                 </div>
-                <Button 
+                <button 
                   onClick={() => downloadPng(tokenRef, 'tab-token-logo')}
                   disabled={isDownloading}
-                  className="w-full h-14 rounded-2xl bg-white/10 border border-white/10 hover:bg-white/20 text-white font-black text-sm uppercase tracking-widest transition-all shadow-lg"
+                  className="w-full h-14 rounded-2xl bg-white/10 border border-white/10 hover:bg-white/20 text-white font-black text-sm uppercase tracking-widest transition-all shadow-lg flex items-center justify-center gap-2"
                 >
-                  <Download className="mr-2 h-4 w-4" /> Save Icon (PNG)
-                </Button>
+                  <Download className="h-4 w-4" /> Save Icon (PNG)
+                </button>
               </div>
             </div>
           </div>
@@ -115,7 +123,7 @@ const Assets = () => {
               <div className="h-16 w-16 rounded-2xl bg-white/10 border border-white/10 flex items-center justify-center">
                 <Coins className="h-8 w-8 text-orange-500" />
               </div>
-              <div className="space-y-1">
+              <div className="space-y-1 text-left">
                 <h4 className="text-2xl font-black italic uppercase tracking-tighter">Asset Standards</h4>
                 <p className="text-white/60 font-medium text-sm">Static assets are exported at high DPI with transparency for professional use.</p>
               </div>
