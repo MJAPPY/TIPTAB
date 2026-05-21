@@ -91,11 +91,9 @@ export const Header = ({ onBecomeCreator }: HeaderProps) => {
   };
 
   const handleBack = () => {
-    // If we have history within the app session, go back
     if (window.history.length > 1 && location.key !== 'default') {
       navigate(-1);
     } else {
-      // Otherwise, fallback to the safe home route
       navigate("/");
     }
   };
@@ -112,24 +110,24 @@ export const Header = ({ onBecomeCreator }: HeaderProps) => {
 
   const NavItems = ({ isMobile = false }) => (
     <>
-      <Link to="/" onClick={handleHomeClick} className={cn(isMobile ? "w-full" : "xl:w-auto")}>
+      <Link to="/" onClick={handleHomeClick} className={cn(isMobile ? "w-full" : "lg:w-auto")}>
         <Button 
           variant="ghost" 
           className={cn(
-            "w-full text-slate-200 hover:text-purple-400 hover:bg-purple-500/15 flex items-center justify-start xl:justify-center font-bold bg-white/5 border border-white/10 rounded-2xl px-4 transition-all",
-            isMobile ? "h-15 text-sm" : "h-10 xl:h-11 2xl:h-12 xl:px-3 2xl:px-5 xl:gap-2 2xl:gap-3 xl:text-xs 2xl:text-sm"
+            "w-full text-slate-200 hover:text-purple-400 hover:bg-purple-500/15 flex items-center justify-start lg:justify-center font-bold bg-white/5 border border-white/10 rounded-2xl px-4 transition-all",
+            isMobile ? "h-15 text-sm" : "h-10 xl:h-11 2xl:h-12 lg:px-3 2xl:px-5 lg:gap-2 2xl:gap-3 lg:text-xs 2xl:text-sm"
           )}
         >
           <Home className={cn(isMobile ? "h-5 w-5" : "h-4 w-4")} />
           Home
         </Button>
       </Link>
-      <Link to="/live" onClick={() => setIsOpen(false)} className={cn(isMobile ? "w-full" : "xl:w-auto")}>
+      <Link to="/live" onClick={() => setIsOpen(false)} className={cn(isMobile ? "w-full" : "lg:w-auto")}>
         <Button 
           variant="ghost" 
           className={cn(
-            "w-full text-slate-200 hover:text-red-400 hover:bg-red-500/15 flex items-center justify-start xl:justify-center font-bold bg-white/5 border border-white/10 rounded-2xl px-4 transition-all",
-            isMobile ? "h-15 text-sm" : "h-10 xl:h-11 2xl:h-12 xl:px-3 2xl:px-5 xl:gap-2 2xl:gap-3 xl:text-xs 2xl:text-sm",
+            "w-full text-slate-200 hover:text-red-400 hover:bg-red-500/15 flex items-center justify-start lg:justify-center font-bold bg-white/5 border border-white/10 rounded-2xl px-4 transition-all",
+            isMobile ? "h-15 text-sm" : "h-10 xl:h-11 2xl:h-12 lg:px-3 2xl:px-5 lg:gap-2 2xl:gap-3 lg:text-xs 2xl:text-sm",
             location.pathname === "/live" && "border-red-500/40 bg-red-500/10 text-red-400"
           )}
         >
@@ -138,12 +136,12 @@ export const Header = ({ onBecomeCreator }: HeaderProps) => {
         </Button>
       </Link>
       {isConnected && (
-        <Link to="/leaderboard" onClick={() => setIsOpen(false)} className={cn(isMobile ? "w-full" : "xl:w-auto")}>
+        <Link to="/leaderboard" onClick={() => setIsOpen(false)} className={cn(isMobile ? "w-full" : "lg:w-auto")}>
           <Button 
             variant="ghost" 
             className={cn(
-              "w-full text-slate-200 hover:text-yellow-400 hover:bg-purple-500/15 flex items-center justify-start xl:justify-center font-bold bg-white/5 border border-white/10 rounded-2xl px-4 transition-all",
-              isMobile ? "h-15 text-sm" : "h-10 xl:h-11 2xl:h-12 xl:px-3 2xl:px-5 xl:gap-2 2xl:gap-3 xl:text-xs 2xl:text-sm"
+              "w-full text-slate-200 hover:text-yellow-400 hover:bg-purple-500/15 flex items-center justify-start lg:justify-center font-bold bg-white/5 border border-white/10 rounded-2xl px-4 transition-all",
+              isMobile ? "h-15 text-sm" : "h-10 xl:h-11 2xl:h-12 lg:px-3 2xl:px-5 lg:gap-2 2xl:gap-3 lg:text-xs 2xl:text-sm"
             )}
           >
             <Trophy className={cn(isMobile ? "h-5 w-5" : "h-4 w-4")} />
@@ -151,12 +149,12 @@ export const Header = ({ onBecomeCreator }: HeaderProps) => {
           </Button>
         </Link>
       )}
-      <Link to="/calculator" onClick={() => setIsOpen(false)} className={cn(isMobile ? "w-full" : "xl:w-auto")}>
+      <Link to="/calculator" onClick={() => setIsOpen(false)} className={cn(isMobile ? "w-full" : "lg:w-auto")}>
         <Button 
           variant="ghost" 
           className={cn(
-            "w-full text-slate-200 hover:text-cyan-400 hover:bg-purple-500/15 flex items-center justify-start xl:justify-center font-bold bg-white/5 border border-white/10 rounded-2xl px-4 transition-all",
-            isMobile ? "h-15 text-sm" : "h-10 xl:h-11 2xl:h-12 xl:px-3 2xl:px-5 xl:gap-2 2xl:gap-3 xl:text-xs 2xl:text-sm"
+            "w-full text-slate-200 hover:text-cyan-400 hover:bg-purple-500/15 flex items-center justify-start lg:justify-center font-bold bg-white/5 border border-white/10 rounded-2xl px-4 transition-all",
+            isMobile ? "h-15 text-sm" : "h-10 xl:h-11 2xl:h-12 lg:px-3 2xl:px-5 lg:gap-2 2xl:gap-3 lg:text-xs 2xl:text-sm"
           )}
         >
           <CalcIcon className={cn(isMobile ? "h-5 w-5" : "h-4 w-4")} />
@@ -164,12 +162,12 @@ export const Header = ({ onBecomeCreator }: HeaderProps) => {
         </Button>
       </Link>
       {isConnected && (
-        <Link to="/dashboard" onClick={() => setIsOpen(false)} className={cn(isMobile ? "w-full" : "xl:w-auto")}>
+        <Link to="/dashboard" onClick={() => setIsOpen(false)} className={cn(isMobile ? "w-full" : "lg:w-auto")}>
           <Button 
             variant="ghost" 
             className={cn(
-              "w-full text-slate-200 hover:text-purple-400 hover:bg-purple-500/15 flex items-center justify-start xl:justify-center font-bold bg-white/5 border border-white/10 rounded-2xl px-4 transition-all",
-              isMobile ? "h-15 text-sm" : "h-10 xl:h-11 2xl:h-12 xl:px-3 2xl:px-5 xl:gap-2 2xl:gap-3 xl:text-xs 2xl:text-sm"
+              "w-full text-slate-200 hover:text-purple-400 hover:bg-purple-500/15 flex items-center justify-start lg:justify-center font-bold bg-white/5 border border-white/10 rounded-2xl px-4 transition-all",
+              isMobile ? "h-15 text-sm" : "h-10 xl:h-11 2xl:h-12 lg:px-3 2xl:px-5 lg:gap-2 2xl:gap-3 lg:text-xs 2xl:text-sm"
             )}
           >
             <LayoutDashboard className={cn(isMobile ? "h-5 w-5" : "h-4 w-4")} />
@@ -185,8 +183,8 @@ export const Header = ({ onBecomeCreator }: HeaderProps) => {
             setIsOpen(false);
           }}
           className={cn(
-            "w-full border-orange-500/50 bg-orange-500/10 text-orange-400 hover:bg-orange-500 hover:text-white flex items-center justify-start xl:justify-center font-black rounded-2xl px-4 transition-all shadow-[0_0_20px_rgba(249,115,22,0.25)] animate-pulse",
-            isMobile ? "h-15 text-sm" : "h-10 xl:h-11 2xl:h-12 xl:px-3 2xl:px-5 xl:gap-2 2xl:gap-3 xl:text-xs 2xl:text-sm"
+            "w-full border-orange-500/50 bg-orange-500/10 text-orange-400 hover:bg-orange-500 hover:text-white flex items-center justify-start lg:justify-center font-black rounded-2xl px-4 transition-all shadow-[0_0_20px_rgba(249,115,22,0.25)] animate-pulse",
+            isMobile ? "h-15 text-sm" : "h-10 xl:h-11 2xl:h-12 lg:px-3 2xl:px-5 lg:gap-2 2xl:gap-3 lg:text-xs 2xl:text-sm"
           )}
         >
           <Sparkles className={cn(isMobile ? "h-5 w-5" : "h-4 w-4")} />
@@ -239,15 +237,13 @@ export const Header = ({ onBecomeCreator }: HeaderProps) => {
             )}
           </div>
 
-          {!isSubPage && (
-            <div className="hidden xl:flex items-center gap-1.5 2xl:gap-2 mx-2 relative z-10">
-              <NavItems />
-            </div>
-          )}
+          <div className="hidden lg:flex items-center gap-1.5 2xl:gap-2 mx-2 relative z-10">
+            <NavItems />
+          </div>
 
           <div className="flex items-center gap-1 sm:gap-2 md:gap-4 relative z-10">
             {isConnected && (
-              <div className="flex items-center gap-1 sm:gap-2 bg-white/5 border border-white/10 rounded-xl sm:rounded-2xl p-0.5 sm:p-1 px-1 sm:px-3 h-8 sm:h-10 xl:h-11 2xl:h-12 shrink-0">
+              <div className="flex items-center gap-1 sm:gap-2 bg-white/5 border border-white/10 rounded-xl sm:rounded-2xl p-0.5 sm:p-1 px-1 sm:px-3 h-8 sm:h-10 lg:h-11 2xl:h-12 shrink-0">
                 <div className="flex flex-col items-end pr-1 sm:pr-2 md:pr-4 border-r border-white/10 py-0.5 sm:py-1">
                   <span className="text-[7px] sm:text-[10px] md:text-xs xl:text-sm font-black text-orange-500 flex items-center gap-0.5 sm:gap-1 leading-none mb-0.5 sm:mb-1">
                     <Zap className="h-2 w-2 sm:h-3 w-3 fill-orange-500" /> {Number(balances.tab).toLocaleString()} <span className="hidden md:inline">TAB</span>
@@ -270,7 +266,7 @@ export const Header = ({ onBecomeCreator }: HeaderProps) => {
                 <DropdownMenuTrigger asChild>
                   <Button 
                     className={cn(
-                      "flex items-center gap-1 sm:gap-2 md:gap-4 rounded-xl sm:rounded-2xl h-8 sm:h-10 xl:h-11 2xl:h-12 px-1 sm:px-2 md:px-4 xl:px-4 2xl:px-6 font-black text-[8px] sm:text-[10px] md:text-xs xl:text-sm transition-all active:scale-95 group shrink-0 bg-white/5 border border-white/10 text-slate-200 hover:bg-purple-500/10 hover:text-purple-400 shadow-xl",
+                      "flex items-center gap-1 sm:gap-2 md:gap-4 rounded-xl sm:rounded-2xl h-8 sm:h-10 lg:h-11 2xl:h-12 px-1 sm:px-2 md:px-4 lg:px-4 2xl:px-6 font-black text-[8px] sm:text-[10px] md:text-xs xl:text-sm transition-all active:scale-95 group shrink-0 bg-white/5 border border-white/10 text-slate-200 hover:bg-purple-500/10 hover:text-purple-400 shadow-xl",
                       isAdmin && "border-orange-500/60 bg-orange-500/10"
                     )}
                   >
@@ -337,7 +333,7 @@ export const Header = ({ onBecomeCreator }: HeaderProps) => {
                 <Button 
                   onClick={handleConnect}
                   disabled={isLoading}
-                  className="flex items-center gap-1 sm:gap-2 rounded-xl sm:rounded-2xl h-8 sm:h-10 xl:h-11 2xl:h-12 px-2 sm:px-10 font-black text-[8px] sm:text-[10px] md:text-sm xl:text-base transition-all active:scale-95 group shrink-0 bg-[#a855f7] hover:bg-[#9333ea] text-white shadow-2xl shadow-purple-500/40 animate-shimmer"
+                  className="flex items-center gap-1 sm:gap-2 rounded-xl sm:rounded-2xl h-8 sm:h-10 lg:h-11 2xl:h-12 px-2 sm:px-10 font-black text-[8px] sm:text-[10px] md:text-sm xl:text-base transition-all active:scale-95 group shrink-0 bg-[#a855f7] hover:bg-[#9333ea] text-white shadow-2xl shadow-purple-500/40 animate-shimmer"
                 >
                   <Wallet className="h-3 w-3 sm:h-5 sm:w-5 md:h-6 md:w-6 group-hover:rotate-12 transition-transform" />
                   <span className="whitespace-nowrap">{isLoading ? "Syncing..." : "Connect WebAuth"}</span>
@@ -347,7 +343,7 @@ export const Header = ({ onBecomeCreator }: HeaderProps) => {
 
             <Sheet open={isOpen} onOpenChange={setIsOpen}>
               <SheetTrigger asChild>
-                <Button variant="ghost" size="icon" className="text-white bg-white/5 border border-white/10 hover:bg-purple-500/15 h-10 w-10 sm:h-12 sm:w-12 xl:h-13 2xl:h-14 rounded-xl sm:rounded-2xl shrink-0 xl:hidden">
+                <Button variant="ghost" size="icon" className="text-white bg-white/5 border border-white/10 hover:bg-purple-500/15 h-10 w-10 sm:h-12 sm:w-12 lg:h-13 2xl:h-14 rounded-xl sm:rounded-2xl shrink-0 lg:hidden">
                   <Menu className="h-5 w-5 sm:h-6 sm:w-6 text-slate-200" />
                 </Button>
               </SheetTrigger>
