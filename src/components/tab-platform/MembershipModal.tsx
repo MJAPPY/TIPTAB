@@ -249,20 +249,18 @@ export const MembershipModal = ({ isOpen, onOpenChange }: MembershipModalProps) 
                 <Button variant="ghost" onClick={() => setStep("intro")} className="text-white/60 hover:text-purple-400 -ml-4 font-black tracking-widest uppercase text-xs">
                   ← Back to benefits
                 </Button>
-                <DialogHeader>
-                  <DialogTitle className="text-3xl font-black italic tracking-tighter">NETWORK ACTIVATION</DialogTitle>
-                  <DialogDescription className="text-white/70 font-bold">
-                    Yearly network entry fee to the XPR network node.
-                  </DialogDescription>
+                <DialogHeader className="pt-2">
+                  <div className="flex items-center gap-2 mb-2">
+                    <div className="px-3 py-1 rounded-full bg-orange-500 text-white text-[9px] font-black uppercase tracking-[0.2em] shadow-lg">
+                      Yearly Fee
+                    </div>
+                  </div>
+                  <DialogTitle className="text-4xl font-black italic tracking-tighter">NETWORK ACTIVATION</DialogTitle>
                 </DialogHeader>
               </div>
 
               <div className="bg-white/5 border-2 border-white/10 rounded-[40px] p-8 text-center relative overflow-hidden group hover:border-purple-500/50 transition-all">
-                <div className="absolute top-0 right-0 p-6">
-                  <div className="px-4 py-1.5 rounded-full bg-orange-500 text-white text-[10px] font-black uppercase tracking-[0.2em] shadow-lg group-hover:bg-purple-500 transition-colors">
-                    Yearly Fee
-                  </div>
-                </div>
+                <div className="absolute inset-0 bg-gradient-to-br from-purple-500/5 to-transparent pointer-events-none" />
                 <p className="text-white/40 font-black uppercase tracking-[0.3em] text-[10px] mb-3 group-hover:text-purple-400 transition-colors">Total Activation Amount</p>
                 
                 <div className="flex flex-col items-center justify-center gap-1">
