@@ -536,7 +536,7 @@ const AdminHub = () => {
                             type="button"
                             onClick={() => setNewPromoType("percent")}
                             className={cn(
-                              "h-12 rounded-xl font-black text-xs uppercase tracking-widest border transition-all",
+                              "h-12 rounded-xl font-black text-[9px] xs:text-[10px] uppercase tracking-normal border transition-all px-1.5 xs:px-2.5",
                               newPromoType === "percent" 
                                 ? "bg-purple-600 border-purple-500 text-white shadow-lg shadow-purple-500/20" 
                                 : "bg-white/5 border-transparent text-white/40 hover:bg-white/10"
@@ -548,7 +548,7 @@ const AdminHub = () => {
                             type="button"
                             onClick={() => setNewPromoType("free")}
                             className={cn(
-                              "h-12 rounded-xl font-black text-xs uppercase tracking-widest border transition-all",
+                              "h-12 rounded-xl font-black text-[9px] xs:text-[10px] uppercase tracking-normal border transition-all px-1.5 xs:px-2.5",
                               newPromoType === "free" 
                                 ? "bg-orange-500 border-orange-500 text-white shadow-lg shadow-orange-500/20" 
                                 : "bg-white/5 border-transparent text-white/40 hover:bg-white/10"
