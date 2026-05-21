@@ -483,6 +483,7 @@ export const ProfileEditor = ({ initialData, onSave, minimal = false }: ProfileE
                         {[
                           "Art",
                           "Automotive",
+                          "Biblical",
                           "Blockchain",
                           "Business",
                           "Content",
@@ -495,6 +496,7 @@ export const ProfileEditor = ({ initialData, onSave, minimal = false }: ProfileE
                           "Food",
                           "Gaming",
                           "Gardening & Farming",
+                          "Health",
                           "Hospitality",
                           "Local News",
                           "Music",
