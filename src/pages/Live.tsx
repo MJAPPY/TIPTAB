@@ -135,9 +135,9 @@ const Live = () => {
                 <div 
                   key={`featured-${creator.id}`}
                   onClick={() => navigate(`/tip/${creator.handle}`)}
-                  className="group relative bg-white/[0.03] border-2 border-orange-500/30 rounded-[40px] overflow-hidden hover:border-orange-500 transition-all duration-500 cursor-pointer shadow-[0_0_50px_rgba(249,115,22,0.15)] ring-4 ring-orange-500/5 flex flex-col h-full"
+                  className="group relative bg-white/[0.03] border-2 border-orange-500/30 rounded-[40px] overflow-hidden hover:border-orange-500 transition-all duration-500 cursor-pointer shadow-[0_0_50px_rgba(249,115,22,0.15)] ring-4 ring-orange-500/5"
                 >
-                  <div className="aspect-video relative overflow-hidden bg-black/40 shrink-0">
+                  <div className="aspect-video relative overflow-hidden bg-black/40">
                     <div className={cn("absolute inset-0 opacity-20 blur-2xl", creator.color)} />
                     <div className="absolute inset-0 flex items-center justify-center">
                       <Radio className="h-12 w-12 text-white/20 group-hover:scale-110 transition-transform duration-500" />
@@ -149,23 +149,21 @@ const Live = () => {
                     </div>
                   </div>
 
-                  <div className="p-8 relative flex-1 flex flex-col justify-between">
-                    <div className="absolute -top-12 right-8 h-20 w-20 rounded-[28px] bg-white border-4 border-[#0a0514] flex items-center justify-center overflow-hidden shadow-2xl group-hover:scale-110 transition-transform duration-500 z-10">
+                  <div className="p-8 space-y-4 relative">
+                    <div className="absolute -top-12 right-8 h-20 w-20 rounded-[28px] bg-white border-4 border-[#0a0514] flex items-center justify-center overflow-hidden shadow-2xl group-hover:scale-110 transition-transform duration-500">
                        <div className={cn("h-full w-full flex items-center justify-center text-xl font-black text-white", creator.color)}>
                         {creator.avatar}
                        </div>
                     </div>
                     
-                    <div className="space-y-4 flex-1">
-                      <div>
-                        <h3 className="text-xl font-black tracking-tight group-hover:text-orange-400 transition-colors">{creator.name}</h3>
-                        <p className="text-sm font-bold text-white/40">@{creator.handle}</p>
-                      </div>
-                      <p className="text-white/60 text-sm line-clamp-2 font-medium">
-                        {creator.bio}
-                      </p>
+                    <div>
+                      <h3 className="text-xl font-black tracking-tight group-hover:text-orange-400 transition-colors">{creator.name}</h3>
+                      <p className="text-sm font-bold text-white/40">@{creator.handle}</p>
                     </div>
-                    <div className="pt-4 flex items-center justify-between border-t border-white/5 mt-auto">
+                    <p className="text-white/60 text-sm line-clamp-2 font-medium">
+                      {creator.bio}
+                    </p>
+                    <div className="pt-4 flex items-center justify-between border-t border-white/5">
                       <span className="text-[10px] font-black uppercase tracking-widest text-orange-400">{creator.category}</span>
                       <div className="flex items-center gap-2 text-[10px] font-black text-white/40">
                         <MapPin className="h-3 w-3" />
@@ -238,9 +236,9 @@ const Live = () => {
               return (
                 <div 
                   key={creator.id}
-                  className="group relative bg-[#130b21] border border-white/10 rounded-[40px] overflow-hidden hover:border-purple-500/50 hover:shadow-[0_0_60px_-15px_rgba(168,85,247,0.3)] transition-all duration-500 shadow-2xl flex flex-col h-full"
+                  className="group relative bg-[#130b21] border border-white/10 rounded-[40px] overflow-hidden hover:border-purple-500/50 hover:shadow-[0_0_60px_-15px_rgba(168,85,247,0.3)] transition-all duration-500 shadow-2xl"
                 >
-                  <div className="aspect-video relative overflow-hidden bg-black/40 shrink-0" onClick={() => navigate(`/tip/${creator.handle}`)}>
+                  <div className="aspect-video relative overflow-hidden bg-black/40" onClick={() => navigate(`/tip/${creator.handle}`)}>
                     <div className={cn("absolute inset-0 opacity-20 blur-2xl", creator.color)} />
                     <div className="absolute inset-0 flex items-center justify-center">
                       <Radio className="h-12 w-12 text-white/20 group-hover:scale-110 transition-transform duration-500" />
@@ -254,26 +252,24 @@ const Live = () => {
                     </div>
                   </div>
 
-                  <div className="p-8 relative flex-1 flex flex-col justify-between">
-                    <div className="space-y-4 flex-1" onClick={() => navigate(`/tip/${creator.handle}`)}>
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-4">
-                          <div className={cn("h-14 w-14 rounded-2xl flex items-center justify-center text-xl font-black border-2 border-white/10 text-white shrink-0", creator.color)}>
-                            {creator.avatar}
-                          </div>
-                          <div>
-                            <h3 className="text-xl font-black tracking-tight group-hover:text-purple-400 transition-colors text-white">{creator.name}</h3>
-                            <p className="text-sm font-bold text-white/40">@{creator.handle}</p>
-                          </div>
+                  <div className="p-8 space-y-4">
+                    <div className="flex items-center justify-between" onClick={() => navigate(`/tip/${creator.handle}`)}>
+                      <div className="flex items-center gap-4">
+                        <div className={cn("h-14 w-14 rounded-2xl flex items-center justify-center text-xl font-black border-2 border-white/10 text-white", creator.color)}>
+                          {creator.avatar}
+                        </div>
+                        <div>
+                          <h3 className="text-xl font-black tracking-tight group-hover:text-purple-400 transition-colors text-white">{creator.name}</h3>
+                          <p className="text-sm font-bold text-white/40">@{creator.handle}</p>
                         </div>
                       </div>
-                      
-                      <p className="text-white/60 text-sm line-clamp-2 font-medium">
-                        {creator.bio}
-                      </p>
                     </div>
+                    
+                    <p className="text-white/60 text-sm line-clamp-2 font-medium" onClick={() => navigate(`/tip/${creator.handle}`)}>
+                      {creator.bio}
+                    </p>
 
-                    <div className="pt-4 flex items-center justify-between border-t border-white/5 mt-auto">
+                    <div className="pt-4 flex items-center justify-between border-t border-white/5">
                       <div className="flex flex-col gap-1">
                         <span className="text-[10px] font-black uppercase tracking-widest text-purple-400">{creator.category}</span>
                         <div className="flex items-center gap-2 text-[9px] font-bold text-white/20 uppercase tracking-tight">
