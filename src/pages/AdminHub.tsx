@@ -511,7 +511,7 @@ const AdminHub = () => {
           {activeTab === "treasury" && (adminRole === 'super' || adminRole === 'treasurer') && (
             <div className="space-y-8 animate-in fade-in duration-300">
               <div className="grid grid-cols-1 md:grid-cols-12 gap-8 items-start">
-                <Card className="md:col-span-6 bg-[#0d071a] border-[4px] border-slate-300/40 rounded-[40px] overflow-hidden shadow-[0_0_80px_rgba(0,0,0,0.8)] relative group ring-2 ring-white/10">
+                <Card className="md:col-span-6 bg-[#1a112d] border-[4px] border-slate-300/40 rounded-[40px] overflow-hidden shadow-[0_0_80px_rgba(0,0,0,0.8)] relative group ring-2 ring-white/10">
                   <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-white/[0.05] to-transparent pointer-events-none" />
                   <CardHeader className="p-8 pb-2 relative z-10">
                     <div className="flex items-center justify-between">
@@ -571,7 +571,7 @@ const AdminHub = () => {
                 </Card>
 
                 {/* Improved System Metrics */}
-                <Card className="md:col-span-6 bg-[#0d071a] border border-white/10 rounded-[40px] p-8 space-y-6">
+                <Card className="md:col-span-6 bg-[#1a112d] border border-white/10 rounded-[40px] p-8 space-y-6">
                   <CardHeader className="p-0">
                     <CardTitle className="text-xl font-black flex items-center gap-3 text-white uppercase italic">
                       <Laptop className="h-5 w-5 text-orange-400" /> System Metrics
@@ -610,7 +610,7 @@ const AdminHub = () => {
           {activeTab === "config" && (adminRole === 'super' || adminRole === 'moderator') && (
             <div className="space-y-8 animate-in fade-in duration-300">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                <Card className="bg-[#120a21] border-white/5 rounded-[40px] overflow-hidden shadow-2xl">
+                <Card className="bg-[#241a3d] border-white/5 rounded-[40px] overflow-hidden shadow-2xl">
                   <CardHeader className="p-10 pb-2">
                     <CardTitle className="text-xl font-black flex items-center gap-3 tracking-tight text-white uppercase italic">
                       <Settings className="h-5 w-5 text-orange-400" /> Fees & Pricing
@@ -626,7 +626,7 @@ const AdminHub = () => {
                           value={localFee} 
                           onChange={(e) => setLocalFee(e.target.value)}
                           disabled={adminRole !== 'super'}
-                          className="bg-[#1a112d] border-white/10 rounded-2xl font-black text-xl h-16 px-6 focus:ring-orange-500/50 text-white disabled:opacity-50"
+                          className="bg-[#2a1d4a] border-white/10 rounded-2xl font-black text-xl h-16 px-6 focus:ring-orange-500/50 text-white disabled:opacity-50"
                         />
                         <Button onClick={handleUpdateFee} disabled={adminRole !== 'super'} className="bg-orange-500 hover:bg-orange-600 rounded-2xl px-6 h-16 font-black text-white">Update</Button>
                       </div>
@@ -640,7 +640,7 @@ const AdminHub = () => {
                           value={localBoost} 
                           onChange={(e) => setLocalBoost(e.target.value)}
                           disabled={adminRole !== 'super'}
-                          className="bg-[#1a112d] border-white/10 rounded-2xl font-black text-xl h-16 px-6 focus:ring-orange-500/50 text-white disabled:opacity-50"
+                          className="bg-[#2a1d4a] border-white/10 rounded-2xl font-black text-xl h-16 px-6 focus:ring-orange-500/50 text-white disabled:opacity-50"
                         />
                         <Button onClick={handleUpdateBoost} disabled={adminRole !== 'super'} className="bg-purple-600 hover:bg-purple-700 rounded-2xl px-6 h-16 font-black text-white">Update</Button>
                       </div>
@@ -648,7 +648,7 @@ const AdminHub = () => {
                   </CardContent>
                 </Card>
 
-                <Card className="bg-[#120a21] border-white/5 rounded-[40px] overflow-hidden shadow-2xl p-10 space-y-6">
+                <Card className="bg-[#241a3d] border-white/5 rounded-[40px] overflow-hidden shadow-2xl p-10 space-y-6">
                   <h3 className="text-xl font-black text-white italic uppercase flex items-center gap-2"><Power className="h-5 w-5 text-red-500" /> Network Overrides</h3>
                   <p className="text-sm text-slate-400">Emergency controls for platform synchronization.</p>
                   
@@ -673,7 +673,7 @@ const AdminHub = () => {
                           <Bell className="h-5 w-5" /> Broadcast Network Alert
                         </Button>
                       </DialogTrigger>
-                      <DialogContent className="bg-[#1a102d] border-white/10 text-white rounded-3xl p-8 max-w-md">
+                      <DialogContent className="bg-[#2a1b4d] border-white/10 text-white rounded-3xl p-8 max-w-md shadow-2xl">
                         <DialogHeader className="space-y-3">
                           <DialogTitle className="text-2xl font-black italic tracking-tight">GLOBAL BROADCAST</DialogTitle>
                           <DialogDescription className="text-white/50 font-bold">This message will appear at the top for all users.</DialogDescription>
@@ -704,7 +704,7 @@ const AdminHub = () => {
             <div className="space-y-8 animate-in fade-in duration-300">
               <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
                 {/* Promo Generator Card */}
-                <Card className="lg:col-span-4 bg-[#120a21] border border-white/10 rounded-[32px] overflow-hidden shadow-2xl">
+                <Card className="lg:col-span-4 bg-[#241a3d] border border-white/10 rounded-[32px] overflow-hidden shadow-2xl">
                   <CardHeader className="p-8 pb-2">
                     <CardTitle className="text-xl font-black flex items-center gap-2 text-white italic uppercase">
                       <Gift className="h-5 w-5 text-purple-400" /> Promo Generator
@@ -719,7 +719,7 @@ const AdminHub = () => {
                           value={newPromoCode} 
                           onChange={(e) => setNewPromoCode(e.target.value)}
                           placeholder="e.g. SUMMER100" 
-                          className="bg-[#1a112d] border-white/10 rounded-xl h-12 px-4 focus:ring-purple-500/50 font-black text-white"
+                          className="bg-[#2a1d4a] border-white/10 rounded-xl h-12 px-4 focus:ring-purple-500/50 font-black text-white"
                         />
                       </div>
 
@@ -763,7 +763,7 @@ const AdminHub = () => {
                             placeholder="e.g. 50" 
                             min="1"
                             max="100"
-                            className="bg-[#1a112d] border-white/10 rounded-xl h-12 px-4 focus:ring-purple-500/50 font-black text-white"
+                            className="bg-[#2a1d4a] border-white/10 rounded-xl h-12 px-4 focus:ring-purple-500/50 font-black text-white"
                           />
                         </div>
                       )}
@@ -776,7 +776,7 @@ const AdminHub = () => {
                           onChange={(e) => setNewPromoUses(e.target.value)}
                           placeholder="e.g. 100" 
                           min="1"
-                          className="bg-[#1a112d] border-white/10 rounded-xl h-12 px-4 focus:ring-purple-500/50 font-black text-white"
+                          className="bg-[#2a1d4a] border-white/10 rounded-xl h-12 px-4 focus:ring-purple-500/50 font-black text-white"
                         />
                       </div>
 
@@ -788,7 +788,7 @@ const AdminHub = () => {
                 </Card>
 
                 {/* Active Promos List */}
-                <Card className="lg:col-span-8 bg-[#0d071a] border border-white/10 rounded-[32px] overflow-hidden shadow-2xl">
+                <Card className="lg:col-span-8 bg-[#1a112d] border border-white/10 rounded-[32px] overflow-hidden shadow-2xl">
                   <CardHeader className="p-8 border-b border-white/5">
                     <CardTitle className="text-xl font-black text-white italic uppercase">Active Promo Codes</CardTitle>
                     <CardDescription className="text-white/40 text-xs">Manage active discounts and distribution.</CardDescription>
@@ -860,7 +860,7 @@ const AdminHub = () => {
           {/* Rewards Tab */}
           {activeTab === "rewards" && (adminRole === 'super' || adminRole === 'treasurer') && (
             <div className="space-y-8 animate-in fade-in duration-300">
-              <Card className="bg-[#0d071a] border-white/10 rounded-[48px] overflow-hidden shadow-2xl relative">
+              <Card className="bg-[#1a112d] border-white/10 rounded-[48px] overflow-hidden shadow-2xl relative">
                 <div className="absolute top-0 right-0 p-12 opacity-5">
                   <Trophy className="h-64 w-64 text-white" />
                 </div>
@@ -943,7 +943,7 @@ const AdminHub = () => {
           {/* Moderation Tab */}
           {activeTab === "moderation" && (adminRole === 'super' || adminRole === 'moderator') && (
             <div className="space-y-8 animate-in fade-in duration-300">
-              <Card className="bg-[#0d071a] border-white/10 rounded-[48px] overflow-hidden shadow-2xl min-h-[600px]">
+              <Card className="bg-[#1a112d] border-white/10 rounded-[48px] overflow-hidden shadow-2xl min-h-[600px]">
                 <CardHeader className="p-12 border-b border-white/5">
                   <div className="flex flex-col md:flex-row md:items-center justify-between gap-8">
                     <div>
@@ -952,7 +952,7 @@ const AdminHub = () => {
                     </div>
                     <div className="relative w-full md:w-96">
                       <Search className="absolute left-6 top-1/2 -translate-y-1/2 h-5 w-5 text-white/30" />
-                      <Input placeholder="Search handles..." value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} className="pl-16 bg-[#1a112d] border-white/10 rounded-2xl h-14 focus:ring-purple-500/50 text-white" />
+                      <Input placeholder="Search handles..." value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} className="pl-16 bg-[#2a1d4a] border-white/10 rounded-2xl h-14 focus:ring-purple-500/50 text-white" />
                     </div>
                   </div>
                 </CardHeader>
@@ -1019,7 +1019,7 @@ const AdminHub = () => {
                                         <MoreVertical className="h-5 w-5" />
                                       </Button>
                                     </DropdownMenuTrigger>
-                                    <DropdownMenuContent align="end" className="w-64 bg-[#1a102d]/98 backdrop-blur-xl border-white/20 text-white rounded-[24px] p-2.5 shadow-2xl">
+                                    <DropdownMenuContent align="end" className="w-64 bg-[#2a1b4d]/98 backdrop-blur-xl border-white/20 text-white rounded-[24px] p-2.5 shadow-2xl">
                                       <DropdownMenuItem onClick={() => openTransactionHistory(creator)} className="rounded-xl cursor-pointer px-4 py-3 gap-4">
                                         <History className="h-5 w-5" />
                                         <span className="font-black text-sm uppercase">View History</span>
@@ -1073,7 +1073,7 @@ const AdminHub = () => {
 
               <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
                 {/* Add New Admin Form */}
-                <Card className="lg:col-span-4 bg-[#120a21] border border-white/10 rounded-[32px] overflow-hidden shadow-2xl">
+                <Card className="lg:col-span-4 bg-[#241a3d] border border-white/10 rounded-[32px] overflow-hidden shadow-2xl">
                   <CardHeader className="p-8 pb-2">
                     <CardTitle className="text-xl font-black flex items-center gap-2 text-white italic uppercase">
                       <UserPlus className="h-5 w-5 text-purple-400" /> Appoint Admin
@@ -1089,7 +1089,7 @@ const AdminHub = () => {
                           onChange={(e) => setNewAdminHandle(e.target.value)}
                           disabled={!isPermanentAdmin}
                           placeholder={isPermanentAdmin ? "e.g. kofibuilds" : "Permanent Admin Only"} 
-                          className="bg-[#1a112d] border-white/10 rounded-xl h-12 px-4 focus:ring-purple-500/50 font-black text-white disabled:opacity-50"
+                          className="bg-[#2a1d4a] border-white/10 rounded-xl h-12 px-4 focus:ring-purple-500/50 font-black text-white disabled:opacity-50"
                         />
                       </div>
 
@@ -1100,10 +1100,10 @@ const AdminHub = () => {
                           onValueChange={(val: any) => setNewAdminRole(val)}
                           disabled={!isPermanentAdmin}
                         >
-                          <SelectTrigger className="w-full bg-[#1a112d] border-white/10 h-12 rounded-xl font-bold text-xs text-white disabled:opacity-50">
+                          <SelectTrigger className="w-full bg-[#2a1d4a] border-white/10 h-12 rounded-xl font-bold text-xs text-white disabled:opacity-50">
                             <SelectValue />
                           </SelectTrigger>
-                          <SelectContent className="bg-[#1a102d] border-white/20 text-white rounded-xl">
+                          <SelectContent className="bg-[#2a1b4d] border-white/20 text-white rounded-xl">
                             <SelectItem value="super" className="font-bold py-2 cursor-pointer">Super Admin</SelectItem>
                             <SelectItem value="moderator" className="font-bold py-2 cursor-pointer">Moderator</SelectItem>
                             <SelectItem value="treasurer" className="font-bold py-2 cursor-pointer">Treasurer</SelectItem>
@@ -1111,7 +1111,6 @@ const AdminHub = () => {
                         </Select>
                       </div>
 
-                      {/* Display descriptions based on role */}
                       <div className="p-4 rounded-xl bg-white/5 border border-white/5 space-y-1.5">
                         <span className="text-[9px] font-black uppercase tracking-widest text-purple-400 flex items-center gap-1">
                           <HelpCircle className="h-3 w-3" /> Permissions Overview
@@ -1135,7 +1134,7 @@ const AdminHub = () => {
                 </Card>
 
                 {/* Admins Table List */}
-                <Card className="lg:col-span-8 bg-[#0d071a] border border-white/10 rounded-[32px] overflow-hidden shadow-2xl">
+                <Card className="lg:col-span-8 bg-[#1a112d] border border-white/10 rounded-[32px] overflow-hidden shadow-2xl">
                   <CardHeader className="p-8 border-b border-white/5">
                     <CardTitle className="text-xl font-black text-white italic uppercase">Authorized Administrators</CardTitle>
                     <CardDescription className="text-white/40 text-xs">Manage active team authorizations and modify security permissions.</CardDescription>
@@ -1174,7 +1173,7 @@ const AdminHub = () => {
                                   <SelectTrigger className="w-[140px] bg-white/5 border-white/10 h-10 rounded-xl font-bold text-xs text-white disabled:opacity-50">
                                     <SelectValue />
                                   </SelectTrigger>
-                                  <SelectContent className="bg-[#1a102d] border-white/20 text-white rounded-xl">
+                                  <SelectContent className="bg-[#2a1b4d] border-white/20 text-white rounded-xl">
                                     <SelectItem value="super" className="font-bold py-2 cursor-pointer">Super Admin</SelectItem>
                                     <SelectItem value="moderator" className="font-bold py-2 cursor-pointer">Moderator</SelectItem>
                                     <SelectItem value="treasurer" className="font-bold py-2 cursor-pointer">Treasurer</SelectItem>
@@ -1233,7 +1232,7 @@ const AdminHub = () => {
 
       {/* Audit Logs Dialog */}
       <Dialog open={isAuditModalOpen} onOpenChange={setIsAuditModalOpen}>
-        <DialogContent className="bg-[#0d071a]/95 backdrop-blur-3xl border-white/20 text-white rounded-[40px] p-0 max-w-2xl overflow-hidden">
+        <DialogContent className="bg-[#2a1b4d]/95 backdrop-blur-3xl border-white/20 text-white rounded-[40px] p-0 max-w-2xl overflow-hidden shadow-2xl">
           <div className="p-10 border-b border-white/10">
             <DialogHeader>
               <div className="flex items-center gap-5 mb-4">
@@ -1273,7 +1272,7 @@ const AdminHub = () => {
 
       {/* Transaction History Dialog */}
       <Dialog open={isHistoryModalOpen} onOpenChange={setIsHistoryModalOpen}>
-        <DialogContent className="bg-[#0d071a]/95 backdrop-blur-3xl border-white/20 text-white rounded-[40px] p-0 max-w-2xl overflow-hidden">
+        <DialogContent className="bg-[#2a1b4d]/95 backdrop-blur-3xl border-white/20 text-white rounded-[40px] p-0 max-w-2xl overflow-hidden shadow-2xl">
           <div className="p-10 border-b border-white/10">
             <DialogHeader>
               <div className="flex items-center gap-5 mb-4">
@@ -1297,7 +1296,7 @@ const AdminHub = () => {
 
       {/* Profile Delete Confirmation Dialog */}
       <Dialog open={isDeleteModalOpen} onOpenChange={setIsDeleteModalOpen}>
-        <DialogContent className="bg-[#120a21] border-2 border-red-500/30 text-white rounded-[40px] p-10 max-w-md shadow-[0_0_80px_rgba(239,68,68,0.15)] animate-in zoom-in-95 duration-300">
+        <DialogContent className="bg-[#241a3d] border-2 border-red-500/30 text-white rounded-[40px] p-10 max-w-md shadow-[0_0_80px_rgba(239,68,68,0.15)] animate-in zoom-in-95 duration-300">
           <div className="text-center space-y-6">
             <div className="mx-auto h-20 w-20 rounded-2xl bg-red-500/10 border border-red-500/30 flex items-center justify-center shadow-lg shadow-red-500/10">
               <Trash2 className="h-10 w-10 text-red-500 animate-pulse" />
@@ -1332,7 +1331,7 @@ const AdminHub = () => {
 
       {/* Double Self Removal Verification Modal - Step 1 */}
       <Dialog open={removalStep === "warning1"} onOpenChange={(open) => !open && setRemovalStep("closed")}>
-        <DialogContent className="bg-[#120a21] border-2 border-yellow-500/30 text-white rounded-[40px] p-10 max-w-md shadow-[0_0_80px_rgba(234,179,8,0.15)] animate-in zoom-in-95 duration-300">
+        <DialogContent className="bg-[#241a3d] border-2 border-yellow-500/30 text-white rounded-[40px] p-10 max-w-md shadow-[0_0_80px_rgba(234,179,8,0.15)] animate-in zoom-in-95 duration-300">
           <div className="text-center space-y-6">
             <div className="mx-auto h-20 w-20 rounded-2xl bg-yellow-500/10 border border-yellow-500/30 flex items-center justify-center shadow-lg shadow-yellow-500/10">
               <AlertTriangle className="h-10 w-10 text-yellow-500 animate-bounce" />
@@ -1364,7 +1363,7 @@ const AdminHub = () => {
 
       {/* Double Self Removal Verification Modal - Step 2 */}
       <Dialog open={removalStep === "warning2"} onOpenChange={(open) => !open && setRemovalStep("closed")}>
-        <DialogContent className="bg-[#0f071a] border-2 border-red-500/50 text-white rounded-[40px] p-10 max-w-md shadow-[0_0_100px_rgba(239,68,68,0.3)] animate-in zoom-in-95 duration-300">
+        <DialogContent className="bg-[#2d1b4a] border-2 border-red-500/50 text-white rounded-[40px] p-10 max-w-md shadow-[0_0_100px_rgba(239,68,68,0.3)] animate-in zoom-in-95 duration-300">
           <div className="text-center space-y-6">
             <div className="mx-auto h-20 w-20 rounded-2xl bg-red-500/10 border border-red-500/30 flex items-center justify-center shadow-lg shadow-red-500/20">
               <Lock className="h-10 w-10 text-red-500 animate-pulse" />

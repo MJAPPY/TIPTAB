@@ -112,16 +112,16 @@ export const TippingModal = ({ creator, onClose }: TippingModalProps) => {
 
   return (
     <Dialog open={!!creator} onOpenChange={(open) => !open && onClose()}>
-      <DialogContent className="bg-[#0d071a]/95 backdrop-blur-[32px] border-white/10 text-white sm:max-w-[460px] rounded-[40px] p-0 overflow-hidden shadow-[0_0_100px_rgba(0,0,0,0.8)] border-t-purple-500/20">
+      <DialogContent className="bg-[#1e1438]/95 backdrop-blur-[32px] border-white/10 text-white sm:max-w-[460px] rounded-[40px] p-0 overflow-hidden shadow-[0_0_100px_rgba(0,0,0,0.8)] border-t-purple-500/20">
         <div className="relative h-24 w-full overflow-hidden">
           <div className={cn("absolute inset-0 opacity-30", creator.color)} />
-          <div className="absolute inset-0 bg-gradient-to-t from-[#0d071a] to-transparent" />
+          <div className="absolute inset-0 bg-gradient-to-t from-[#1e1438] to-transparent" />
         </div>
         
         <div className="px-10 pb-10 -mt-10 relative z-10">
           <div className="flex items-end justify-between mb-6">
             <div className={cn(
-              "h-28 w-28 rounded-[36px] flex items-center justify-center text-4xl font-black border-[6px] border-[#0d071a] shadow-2xl overflow-hidden",
+              "h-28 w-28 rounded-[36px] flex items-center justify-center text-4xl font-black border-[6px] border-[#1e1438] shadow-2xl overflow-hidden",
               creator.color
             )}>
               {creator.avatarImage ? (
@@ -185,7 +185,7 @@ export const TippingModal = ({ creator, onClose }: TippingModalProps) => {
                 <SelectTrigger className="w-[100px] h-12 bg-white/5 border-2 border-white/10 rounded-2xl font-black text-xs text-white">
                   <SelectValue />
                 </SelectTrigger>
-                <SelectContent className="bg-[#1a102d] border-white/20 text-white rounded-xl">
+                <SelectContent className="bg-[#2a1b4d] border-white/20 text-white rounded-xl">
                   <SelectItem value="TAB" className="font-black py-2 cursor-pointer">TAB</SelectItem>
                   <SelectItem value="XPR" className="font-black py-2 cursor-pointer">XPR</SelectItem>
                 </SelectContent>

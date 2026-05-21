@@ -91,6 +91,7 @@ export const Tab = () => {
           </p>
           <div className="flex flex-wrap justify-center gap-6 sm:gap-10 text-white/60 font-bold text-sm sm:text-base">
             <Link to="/docs" className="hover:text-purple-400 transition-colors">Documentation</Link>
+            <Link to="/assets" className="hover:text-orange-400 transition-colors">Assets</Link>
             <a 
               href="https://x.com/tabtokenxpr" 
               target="_blank" 

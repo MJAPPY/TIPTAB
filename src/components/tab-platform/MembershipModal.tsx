@@ -190,7 +190,7 @@ export const MembershipModal = ({ isOpen, onOpenChange }: MembershipModalProps) 
 
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && handleClose()}>
-      <DialogContent className="bg-[#130b21] border-white/20 text-white sm:max-w-[480px] rounded-[40px] p-0 overflow-hidden shadow-[0_0_120px_rgba(0,0,0,0.9)]">
+      <DialogContent className="bg-[#1e1438] border-white/20 text-white sm:max-w-[480px] rounded-[40px] p-0 overflow-hidden shadow-[0_0_120px_rgba(0,0,0,0.9)]">
         
         <div className="absolute top-0 left-0 right-0 h-1.5 bg-white/5">
           <div 
@@ -234,12 +234,12 @@ export const MembershipModal = ({ isOpen, onOpenChange }: MembershipModalProps) 
                 ))}
               </div>
 
-              <Button 
+              <button 
                 onClick={handleNextStep}
                 className="w-full h-20 bg-white text-black hover:bg-purple-500 hover:text-white font-black text-2xl rounded-3xl shadow-[0_20px_40px_rgba(255,255,255,0.1)] transition-all group active:scale-95 animate-shimmer-silver"
               >
                 {isConnected ? "Continue to Payment" : "Connect WebAuth"} <ArrowRight className="ml-3 h-6 w-6 group-hover:translate-x-2 transition-transform" />
-              </Button>
+              </button>
             </div>
           )}
 
@@ -257,7 +257,6 @@ export const MembershipModal = ({ isOpen, onOpenChange }: MembershipModalProps) 
                 </DialogHeader>
               </div>
 
-              {/* Price display with optional discount representation */}
               <div className="bg-white/5 border-2 border-white/10 rounded-[40px] p-8 text-center relative overflow-hidden group hover:border-purple-500/50 transition-all">
                 <div className="absolute top-0 right-0 p-6">
                   <div className="px-4 py-1.5 rounded-full bg-orange-500 text-white text-[10px] font-black uppercase tracking-[0.2em] shadow-lg group-hover:bg-purple-500 transition-colors">
@@ -281,7 +280,6 @@ export const MembershipModal = ({ isOpen, onOpenChange }: MembershipModalProps) 
                 </div>
               </div>
 
-              {/* Promo code entry container */}
               <div className="space-y-3 bg-white/[0.03] p-5 border border-white/10 rounded-2xl">
                 <Label className="text-[10px] font-black uppercase tracking-widest text-white/50">Enter Promo Code</Label>
                 {appliedPromo ? (
