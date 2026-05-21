@@ -22,13 +22,14 @@ const Assets = () => {
     try {
       // Use pixelRatio 4 for high-resolution print quality
       // backgroundColor: null ensures transparency for the export
+      // Added more generous padding and explicit horizontal margin for the right side
       const dataUrl = await toPng(ref.current, { 
         quality: 1, 
         pixelRatio: 4, 
         backgroundColor: null,
         style: {
           margin: '0',
-          padding: '40px', // Uniform padding for professional spacing
+          padding: '60px 100px 60px 60px', // Extra padding on the right (100px)
         }
       });
       const link = document.createElement('a');
