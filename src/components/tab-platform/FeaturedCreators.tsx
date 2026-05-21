@@ -7,25 +7,25 @@ import { cn } from "@/lib/utils";
 
 const CATEGORIES = [
   { name: "All", color: "#a855f7" },
-  { name: "Delivery", color: "#f97316" }, 
-  { name: "Hospitality", color: "#eab308" }, 
-  { name: "Food", color: "#fbbf24" },
-  { name: "Reviewing", color: "#6366f1" },
-  { name: "Content", color: "#ec4899" },
-  { name: "Music", color: "#ef4444" },
-  { name: "Gaming", color: "#8b5cf6" },
   { name: "Art", color: "#22c55e" },
-  { name: "Dev", color: "#06b6d4" },
-  { name: "Sports", color: "#3b82f6" },
-  { name: "Fishing", color: "#0ea5e9" },
-  { name: "Property Reno", color: "#94a3b8" },
   { name: "Automotive", color: "#f43f5e" },
-  { name: "Realty", color: "#4f46e5" },
-  { name: "Fitness", color: "#10b981" },
-  { name: "Gardening & Farming", color: "#22c55e" },
+  { name: "Content", color: "#ec4899" },
+  { name: "Delivery", color: "#f97316" }, 
+  { name: "Dev", color: "#06b6d4" },
   { name: "Education", color: "#84cc16" },
+  { name: "Fishing", color: "#0ea5e9" },
+  { name: "Fitness", color: "#10b981" },
+  { name: "Food", color: "#fbbf24" },
+  { name: "Gaming", color: "#8b5cf6" },
+  { name: "Gardening & Farming", color: "#22c55e" },
+  { name: "Hospitality", color: "#eab308" }, 
+  { name: "Music", color: "#ef4444" },
+  { name: "Other", color: "#ffffff" },
+  { name: "Property Reno", color: "#94a3b8" },
+  { name: "Realty", color: "#4f46e5" },
+  { name: "Reviewing", color: "#6366f1" },
   { name: "Service", color: "#64748b" },
-  { name: "Other", color: "#ffffff" }
+  { name: "Sports", color: "#3b82f6" }
 ];
 
 interface FeaturedCreatorsProps {

@@ -20,22 +20,25 @@ import { cn } from "@/lib/utils";
 
 const CATEGORIES = [
   { name: "All", icon: LayoutGrid },
-  { name: "Delivery", icon: Truck },
-  { name: "Hospitality", icon: Coffee },
-  { name: "Food", icon: Utensils },
-  { name: "Reviewing", icon: Star },
-  { name: "Content", icon: Tv },
-  { name: "Music", icon: Music },
-  { name: "Gaming", icon: Gamepad2 },
-  { name: "Sports", icon: Trophy },
-  { name: "Fishing", icon: Fish },
-  { name: "Gardening & Farming", icon: Sprout },
-  { name: "Property Reno", icon: Hammer },
+  { name: "Art", icon: Zap }, // Fallback icon or specific one if available
   { name: "Automotive", icon: Car },
-  { name: "Realty", icon: Building },
+  { name: "Content", icon: Tv },
+  { name: "Delivery", icon: Truck },
+  { name: "Dev", icon: Zap },
+  { name: "Education", icon: Zap },
+  { name: "Fishing", icon: Fish },
   { name: "Fitness", icon: Dumbbell },
+  { name: "Food", icon: Utensils },
+  { name: "Gaming", icon: Gamepad2 },
+  { name: "Gardening & Farming", icon: Sprout },
+  { name: "Hospitality", icon: Coffee },
+  { name: "Music", icon: Music },
+  { name: "Other", icon: Users },
+  { name: "Property Reno", icon: Hammer },
+  { name: "Realty", icon: Building },
+  { name: "Reviewing", icon: Star },
   { name: "Service", icon: Zap },
-  { name: "Other", icon: Users }
+  { name: "Sports", icon: Trophy }
 ];
 
 const Live = () => {

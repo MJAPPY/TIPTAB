@@ -314,8 +314,28 @@ export const ProfileEditor = ({ initialData, onSave, minimal = false }: ProfileE
                       <SelectTrigger className="bg-white/5 border-white/10 h-14 rounded-2xl focus:ring-purple-500 focus:bg-white/10 transition-all text-white">
                         <SelectValue placeholder="Select a category" />
                       </SelectTrigger>
-                      <SelectContent className="bg-[#1a102d] border-white/10 text-white rounded-xl">
-                        {["Delivery", "Hospitality", "Fitness", "Food", "Reviewing", "Content", "Dev", "Art", "Education", "Gaming", "Music", "Sports", "Fishing", "Gardening & Farming", "Property Reno", "Automotive", "Realty", "Service", "Other"].map((cat) => (
+                      <SelectContent className="bg-[#1a102d] border-white/20 text-white rounded-xl">
+                        {[
+                          "Art",
+                          "Automotive",
+                          "Content",
+                          "Delivery",
+                          "Dev",
+                          "Education",
+                          "Fishing",
+                          "Fitness",
+                          "Food",
+                          "Gaming",
+                          "Gardening & Farming",
+                          "Hospitality",
+                          "Music",
+                          "Other",
+                          "Property Reno",
+                          "Realty",
+                          "Reviewing",
+                          "Service",
+                          "Sports"
+                        ].map((cat) => (
                           <SelectItem key={cat} value={cat} className="focus:bg-purple-500 focus:text-white cursor-pointer font-bold">
                             {cat}
                           </SelectItem>
