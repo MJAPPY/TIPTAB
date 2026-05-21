@@ -132,6 +132,10 @@ const AdminHub = () => {
   const [bannedHandles, setBannedHandles] = useState<string[]>([]);
   const [isDistributing, setIsDistributing] = useState(false);
 
+  // Profile Delete Confirmation Flow
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [creatorToDelete, setCreatorToDelete] = useState<Creator | null>(null);
+
   // New Admin creation states
   const [newAdminHandle, setNewAdminHandle] = useState("");
   const [newAdminRole, setNewAdminRole] = useState<'super' | 'moderator' | 'treasurer'>("moderator");
@@ -390,6 +394,38 @@ const AdminHub = () => {
   const openTransactionHistory = (creator: Creator) => {
     setSelectedCreator(creator);
     setIsHistoryModalOpen(true);
+  };
+
+  // Permanent purge of a moderated profile
+  const confirmDeleteProfile = () => {
+    if (!creatorToDelete) return;
+    
+    const handle = creatorToDelete.handle.replace('@', '').toLowerCase();
+    
+    // Update local state in AdminHub list
+    setModeratedCreators(prev => prev.filter(c => c.id !== creatorToDelete.id));
+    
+    // Purge local storage records so they are removed from interactive map on reload
+    localStorage.removeItem(`tiptab_profile_${handle}`);
+    localStorage.removeItem(`tiptab_membership_${handle}`);
+    localStorage.removeItem(`tiptab_membership_date_${handle}`);
+    
+    const savedUser = localStorage.getItem("tiptab_user_profile");
+    if (savedUser) {
+      const parsed = JSON.parse(savedUser) as Creator;
+      if (parsed.handle.replace('@', '').toLowerCase() === handle) {
+        localStorage.removeItem("tiptab_user_profile");
+      }
+    }
+
+    toast({
+      title: "Profile Purged Successfully",
+      description: `@${handle}'s profile and map registrations have been completely removed.`,
+      variant: "destructive"
+    });
+
+    setIsDeleteModalOpen(false);
+    setCreatorToDelete(null);
   };
 
   const filteredCreators = moderatedCreators.filter(c => 
@@ -992,6 +1028,16 @@ const AdminHub = () => {
                                         <FileText className="h-5 w-5" />
                                         <span className="font-black text-sm uppercase">Audit Logs</span>
                                       </DropdownMenuItem>
+                                      <DropdownMenuItem 
+                                        onClick={() => {
+                                          setCreatorToDelete(creator);
+                                          setIsDeleteModalOpen(true);
+                                        }} 
+                                        className="rounded-xl cursor-pointer px-4 py-3 gap-4 text-red-500 focus:bg-red-500/10 focus:text-red-500"
+                                      >
+                                        <Trash2 className="h-5 w-5" />
+                                        <span className="font-black text-sm uppercase">Delete Profile</span>
+                                      </DropdownMenuItem>
                                     </DropdownMenuContent>
                                   </DropdownMenu>
                                 </div>
@@ -1125,7 +1171,7 @@ const AdminHub = () => {
                                     toast({ title: "Role Modified", description: `@${admin.handle} changed to ${val}.` });
                                   }}
                                 >
-                                  <SelectTrigger className="w-[140px] bg-white/5 border-white/10 h-10 rounded-xl font-bold text-xs text-white">
+                                  <SelectTrigger className="w-[140px] bg-white/5 border-white/10 h-10 rounded-xl font-bold text-xs text-white disabled:opacity-50">
                                     <SelectValue />
                                   </SelectTrigger>
                                   <SelectContent className="bg-[#1a102d] border-white/20 text-white rounded-xl">
@@ -1246,6 +1292,41 @@ const AdminHub = () => {
               NO ACTIVITY FOUND
             </div>
           </ScrollArea>
+        </DialogContent>
+      </Dialog>
+
+      {/* Profile Delete Confirmation Dialog */}
+      <Dialog open={isDeleteModalOpen} onOpenChange={setIsDeleteModalOpen}>
+        <DialogContent className="bg-[#120a21] border-2 border-red-500/30 text-white rounded-[40px] p-10 max-w-md shadow-[0_0_80px_rgba(239,68,68,0.15)] animate-in zoom-in-95 duration-300">
+          <div className="text-center space-y-6">
+            <div className="mx-auto h-20 w-20 rounded-2xl bg-red-500/10 border border-red-500/30 flex items-center justify-center shadow-lg shadow-red-500/10">
+              <Trash2 className="h-10 w-10 text-red-500 animate-pulse" />
+            </div>
+            <DialogHeader className="space-y-2">
+              <DialogTitle className="text-3xl font-black italic tracking-tighter uppercase text-white">DELETE PROFILE</DialogTitle>
+              <DialogDescription className="text-slate-300 font-bold text-sm leading-relaxed">
+                Are you absolutely sure you want to permanently delete @{creatorToDelete?.handle}'s profile? This action will remove all map pins, local membership references, and is completely irreversible.
+              </DialogDescription>
+            </DialogHeader>
+            <div className="flex flex-col gap-3 pt-4">
+              <Button 
+                onClick={confirmDeleteProfile}
+                className="h-14 rounded-2xl bg-red-500 text-white hover:bg-red-600 font-black text-sm uppercase tracking-widest"
+              >
+                Yes, Purge Profile
+              </Button>
+              <Button 
+                variant="ghost" 
+                onClick={() => {
+                  setIsDeleteModalOpen(false);
+                  setCreatorToDelete(null);
+                }}
+                className="h-12 text-white/40 hover:text-white"
+              >
+                Cancel Action
+              </Button>
+            </div>
+          </div>
         </DialogContent>
       </Dialog>
 
