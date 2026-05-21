@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
-import { User, AtSign, MapPin, Globe, Twitter, Save, Image as ImageIcon, Upload, X, Video, Instagram, CheckCircle2, Music, Radio, Youtube, Twitch, ShieldCheck } from "lucide-react";
+import { User, AtSign, MapPin, Globe, Twitter, Save, Image as ImageIcon, Upload, X, Video, Instagram, CheckCircle2, Music, Radio, Youtube, Twitch, ShieldCheck, Move } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -68,6 +68,7 @@ export const ProfileEditor = ({ initialData, onSave, minimal = false }: ProfileE
     spotify: initialData.spotify || "",
     avatarImage: initialData.avatarImage || "",
     coverImage: initialData.coverImage || "",
+    coverPosition: initialData.coverPosition ?? 50,
     twitch: initialData.twitch || "",
     tiktok: initialData.tiktok || "",
     youtubeLive: initialData.youtubeLive || "",
@@ -91,6 +92,7 @@ export const ProfileEditor = ({ initialData, onSave, minimal = false }: ProfileE
       spotify: initialData.spotify || "",
       avatarImage: initialData.avatarImage || "",
       coverImage: initialData.coverImage || "",
+      coverPosition: initialData.coverPosition ?? 50,
       twitch: initialData.twitch || "",
       tiktok: initialData.tiktok || "",
       youtubeLive: initialData.youtubeLive || "",
@@ -183,7 +185,7 @@ export const ProfileEditor = ({ initialData, onSave, minimal = false }: ProfileE
     }
     const reader = new FileReader();
     reader.onloadend = () => {
-      setFormData(prev => ({ ...prev, coverImage: reader.result as string }));
+      setFormData(prev => ({ ...prev, coverImage: reader.result as string, coverPosition: 50 }));
       setHasChanged(true);
       toast({
         title: "Cover Image Loaded",
@@ -223,7 +225,13 @@ export const ProfileEditor = ({ initialData, onSave, minimal = false }: ProfileE
   };
 
   const removeCoverImage = () => {
-    setFormData(prev => ({ ...prev, coverImage: "" }));
+    setFormData(prev => ({ ...prev, coverImage: "", coverPosition: 50 }));
+    setHasChanged(true);
+  };
+
+  const handlePositionChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const pos = parseInt(e.target.value);
+    setFormData(prev => ({ ...prev, coverPosition: pos }));
     setHasChanged(true);
   };
 
@@ -273,7 +281,12 @@ export const ProfileEditor = ({ initialData, onSave, minimal = false }: ProfileE
               >
                 {formData.coverImage ? (
                   <>
-                    <img src={formData.coverImage} alt="Profile Cover" className="w-full h-full object-cover select-none pointer-events-none" />
+                    <img 
+                      src={formData.coverImage} 
+                      alt="Profile Cover" 
+                      className="w-full h-full object-cover select-none pointer-events-none" 
+                      style={{ objectPosition: `50% ${formData.coverPosition}%` }}
+                    />
                     {/* Drag-over indicator overlay when an image is already uploaded */}
                     {isDraggingCover && (
                       <div className="absolute inset-0 bg-purple-600/80 backdrop-blur-sm flex flex-col items-center justify-center gap-3 animate-in fade-in duration-200">
@@ -324,6 +337,25 @@ export const ProfileEditor = ({ initialData, onSave, minimal = false }: ProfileE
                   </div>
                 )}
               </div>
+
+              {formData.coverImage && (
+                <div className="p-4 bg-white/[0.03] border border-white/10 rounded-2xl space-y-3 animate-in fade-in slide-in-from-top-2 duration-300">
+                  <div className="flex items-center justify-between text-xs font-bold text-white/60">
+                    <span className="flex items-center gap-2">
+                      <Move className="h-3.5 w-3.5 text-purple-400" /> Adjust Cover Position (Vertical Offset)
+                    </span>
+                    <span className="font-mono text-purple-400">{formData.coverPosition}%</span>
+                  </div>
+                  <input 
+                    type="range" 
+                    min="0" 
+                    max="100" 
+                    value={formData.coverPosition} 
+                    onChange={handlePositionChange} 
+                    className="w-full h-1 bg-white/10 rounded-lg appearance-none cursor-pointer accent-purple-500 focus:outline-none"
+                  />
+                </div>
+              )}
             </div>
 
             {/* Avatar Section */}

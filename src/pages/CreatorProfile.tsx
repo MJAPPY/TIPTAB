@@ -225,7 +225,12 @@ const CreatorProfile = () => {
       <div className="relative h-[40vh] md:h-[50vh] w-full overflow-hidden bg-black/60">
         {creator.coverImage ? (
           <>
-            <img src={creator.coverImage} alt="Cover banner" className="w-full h-full object-cover select-none pointer-events-none" />
+            <img 
+              src={creator.coverImage} 
+              alt="Cover banner" 
+              className="w-full h-full object-cover select-none pointer-events-none" 
+              style={{ objectPosition: `50% ${creator.coverPosition || 50}%` }}
+            />
             <div className="absolute inset-0 bg-gradient-to-t from-[#0a0514] via-[#0a0514]/65 to-transparent" />
           </>
         ) : (

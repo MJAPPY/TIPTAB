@@ -9,6 +9,7 @@ export interface Creator {
   avatar: string;
   avatarImage?: string; // Base64 or URL
   coverImage?: string; // Base64 or URL
+  coverPosition?: number; // Vertical offset percentage (0 to 100)
   color: string;
   twitter?: string;
   website?: string;
@@ -35,6 +36,7 @@ export const CREATORS: Creator[] = [
     avatar: "TAB",
     avatarImage: "https://images.unsplash.com/photo-1633332755192-727a05c4013d?w=400&h=400&fit=crop",
     coverImage: "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=1200&h=400&fit=crop",
+    coverPosition: 50,
     color: "bg-red-600",
     twitter: "https://twitter.com/tabtokenxpr",
     instagram: "https://instagram.com/tabtokenxpr",
