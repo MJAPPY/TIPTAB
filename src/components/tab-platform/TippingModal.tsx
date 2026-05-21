@@ -19,9 +19,18 @@ interface TippingModalProps {
   onClose: () => void;
 }
 
+const ASSET_CONFIGS: Record<string, { code: string; precision: number }> = {
+  TAB: { code: 'tokencreate', precision: 0 },
+  XPR: { code: 'eosio.token', precision: 4 },
+  XMD: { code: 'monedatoken', precision: 6 },
+  XUSDC: { code: 'xtokens', precision: 6 },
+  METAL: { code: 'token.metal', precision: 8 },
+  LOAN: { code: 'loan.token', precision: 4 },
+};
+
 export const TippingModal = ({ creator, onClose }: TippingModalProps) => {
   const [tipAmount, setTipAmount] = useState<string>("50");
-  const [asset, setAsset] = useState<"TAB" | "XPR">("TAB");
+  const [asset, setAsset] = useState<string>("TAB");
   const [isProcessing, setIsProcessing] = useState(false);
   const { toast } = useToast();
   const { session, actor, login, isConnected, recordTip } = useXpr();
@@ -29,8 +38,9 @@ export const TippingModal = ({ creator, onClose }: TippingModalProps) => {
   const formatValue = (val: string) => {
     const numericValue = parseFloat(val);
     if (isNaN(numericValue)) return "0";
-    if (asset === "TAB") return Math.floor(numericValue).toString();
-    return numericValue.toFixed(4);
+    const config = ASSET_CONFIGS[asset];
+    if (config.precision === 0) return Math.floor(numericValue).toString();
+    return numericValue.toFixed(config.precision);
   };
 
   const handleConnect = async () => {
@@ -57,12 +67,15 @@ export const TippingModal = ({ creator, onClose }: TippingModalProps) => {
     setIsProcessing(true);
     try {
       const recipient = creator.handle.replace(/^@/, "").toLowerCase().trim();
-      const contract = asset === "TAB" ? "tokencreate" : "eosio.token";
-      const quantityString = asset === "TAB" ? `${Math.floor(amountNum)} TAB` : `${amountNum.toFixed(4)} XPR`;
+      const config = ASSET_CONFIGS[asset];
+      const quantityString = config.precision === 0 
+        ? `${Math.floor(amountNum)} ${asset}` 
+        : `${amountNum.toFixed(config.precision)} ${asset}`;
+      
       const permission = session.auth.permission || 'active';
 
       const transferAction = {
-        account: contract, 
+        account: config.code, 
         name: 'transfer',
         authorization: [{
           actor: actor,
@@ -108,7 +121,7 @@ export const TippingModal = ({ creator, onClose }: TippingModalProps) => {
 
   if (!creator) return null;
 
-  const quickAmounts = asset === "TAB" ? ["10", "50", "100", "250"] : ["100", "500", "1000", "5000"];
+  const quickAmounts = asset === "TAB" ? ["10", "50", "100", "250"] : ["1", "5", "10", "25"];
 
   return (
     <Dialog open={!!creator} onOpenChange={(open) => !open && onClose()}>
@@ -181,13 +194,14 @@ export const TippingModal = ({ creator, onClose }: TippingModalProps) => {
                   </Button>
                 ))}
               </div>
-              <Select value={asset} onValueChange={(val: "TAB" | "XPR") => setAsset(val)}>
+              <Select value={asset} onValueChange={(val) => setAsset(val)}>
                 <SelectTrigger className="w-[100px] h-12 bg-white/5 border-2 border-white/10 rounded-2xl font-black text-xs text-white">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent className="bg-[#2a1b4d] border-white/20 text-white rounded-xl">
-                  <SelectItem value="TAB" className="font-black py-2 cursor-pointer">TAB</SelectItem>
-                  <SelectItem value="XPR" className="font-black py-2 cursor-pointer">XPR</SelectItem>
+                  {Object.keys(ASSET_CONFIGS).map(s => (
+                    <SelectItem key={s} value={s} className="font-black py-2 cursor-pointer">{s}</SelectItem>
+                  ))}
                 </SelectContent>
               </Select>
             </div>

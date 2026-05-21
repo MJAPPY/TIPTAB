@@ -8,7 +8,7 @@ export interface PromoCode {
   id: string;
   code: string;
   type: 'free' | 'percent';
-  value: number; // e.g., 50 for 50% off
+  value: number; 
   maxUses: number;
   uses: number;
 }
@@ -17,12 +17,16 @@ export interface AdminUser {
   id: string;
   handle: string;
   role: 'super' | 'moderator' | 'treasurer';
-  isPermanent?: boolean; // New property for permanent super admin status
+  isPermanent?: boolean; 
 }
 
 interface Balances {
   xpr: string;
   tab: string;
+  xmd: string;
+  xusdc: string;
+  metal: string;
+  loan: string;
   tipsSent: number;
 }
 
@@ -41,12 +45,12 @@ interface XprContextType {
   isLoading: boolean;
   isAdmin: boolean;
   adminRole: 'super' | 'moderator' | 'treasurer' | null;
-  isPermanentAdmin: boolean; // Tells if active actor has supreme root privileges
+  isPermanentAdmin: boolean; 
   adminsList: AdminUser[];
   addAdmin: (handle: string, role: 'super' | 'moderator' | 'treasurer') => void;
   removeAdmin: (id: string) => void;
   updateAdminRole: (id: string, role: 'super' | 'moderator' | 'treasurer') => void;
-  makeAdminPermanent: (id: string, status: boolean) => void; // Promote/demote to permanent super admin
+  makeAdminPermanent: (id: string, status: boolean) => void; 
   userProfile: Creator | null;
   updateUserProfile: (profile: Creator) => void;
   isMaintenanceMode: boolean;
@@ -60,7 +64,6 @@ interface XprContextType {
   featuredHandles: string[];
   boostStream: (handle: string) => Promise<boolean>;
   distributeXprRewards: (winners: { account: string; amount: string }[]) => Promise<boolean>;
-  // Promo code system
   promoCodes: PromoCode[];
   createPromoCode: (code: string, type: 'free' | 'percent', value: number, maxUses: number) => void;
   deletePromoCode: (id: string) => void;
@@ -81,9 +84,27 @@ const APP_IDENTIFIER = 'tiptab';
 const APP_NAME = 'TIPTAB';
 const APP_LOGO = 'https://explorer.xprnetwork.org/api/account/tiptab/avatar';
 
+// Token Configurations
+const TOKENS = [
+  { symbol: 'XPR', code: 'eosio.token', precision: 4 },
+  { symbol: 'TAB', code: 'tokencreate', precision: 0 },
+  { symbol: 'XMD', code: 'monedatoken', precision: 6 },
+  { symbol: 'XUSDC', code: 'xtokens', precision: 6 },
+  { symbol: 'METAL', code: 'token.metal', precision: 8 },
+  { symbol: 'LOAN', code: 'loan.token', precision: 4 },
+];
+
 export const XprProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [session, setSession] = useState<LinkSession | null>(null);
-  const [balances, setBalances] = useState<Balances>({ xpr: '0.0000', tab: '0', tipsSent: 0 });
+  const [balances, setBalances] = useState<Balances>({ 
+    xpr: '0.0000', 
+    tab: '0', 
+    xmd: '0.000000', 
+    xusdc: '0.000000', 
+    metal: '0.00000000', 
+    loan: '0.0000', 
+    tipsSent: 0 
+  });
   const [isMember, setIsMember] = useState(false);
   const [membershipDate, setMembershipDate] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -125,7 +146,6 @@ export const XprProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     return false;
   });
 
-  // Persisted admin list with root tiptab super as isPermanent: true by default
   const [adminsList, setAdminsList] = useState<AdminUser[]>(() => {
     if (typeof window !== "undefined") {
       const saved = localStorage.getItem("tiptab_admins_list");
@@ -149,7 +169,6 @@ export const XprProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
   const activeActor = session ? session.auth.actor : null;
 
-  // Compute dynamic administrative privilege levels
   const currentAdminObj = activeActor ? adminsList.find(a => a.handle === activeActor) : null;
   const isCurrentAdminPermanent = currentAdminObj?.isPermanent === true;
 
@@ -177,13 +196,11 @@ export const XprProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     }
   };
 
-  // Admin Management Functions - strictly restricted to active permanent admins
   const addAdmin = (handle: string, role: 'super' | 'moderator' | 'treasurer') => {
     if (!isCurrentAdminPermanent) return;
     const cleanHandle = handle.toLowerCase().trim().replace('@', '');
     if (!cleanHandle) return;
     
-    // Check if already an admin
     if (adminsList.some(a => a.handle === cleanHandle)) return;
 
     const newAdmin: AdminUser = {
@@ -203,11 +220,10 @@ export const XprProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     const target = adminsList.find(a => a.id === id);
     if (!target) return;
 
-    // Prevent removing the last permanent admin
     if (target.isPermanent) {
       const permanentCount = adminsList.filter(a => a.isPermanent).length;
       if (permanentCount <= 1) {
-        return; // Safe locking fallback
+        return; 
       }
     }
 
@@ -222,7 +238,6 @@ export const XprProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     const target = adminsList.find(a => a.id === id);
     if (!target) return;
 
-    // If demoting a permanent admin to a non-super role, clear permanent flag
     const updated = adminsList.map(a => {
       if (a.id === id) {
         const isDemotingSuper = role !== 'super';
@@ -242,7 +257,6 @@ export const XprProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const makeAdminPermanent = (id: string, status: boolean) => {
     if (!isCurrentAdminPermanent) return;
 
-    // Promoting another admin requires them to be super first
     const updated = adminsList.map(a => {
       if (a.id === id) {
         return { 
@@ -257,8 +271,6 @@ export const XprProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     setAdminsList(updated);
     localStorage.setItem("tiptab_admins_list", JSON.stringify(updated));
   };
-
-  const [promoCodesState, setPromoCodesState] = useState<PromoCode[]>([]);
 
   const createPromoCode = (code: string, type: 'free' | 'percent', value: number, maxUses: number) => {
     const newCode: PromoCode = {
@@ -337,7 +349,6 @@ export const XprProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const distributeXprRewards = async (winners: { account: string; amount: string }[]): Promise<boolean> => {
     if (!session) return false;
     
-    // Allow any admin with super or treasurer access to distribute rewards
     const actorName = session.auth.actor;
     const currentAdmin = adminsList.find(a => a.handle === actorName);
     if (!currentAdmin || (currentAdmin.role !== 'super' && currentAdmin.role !== 'treasurer')) return false;
@@ -379,38 +390,40 @@ export const XprProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const fetchBalances = useCallback(async (account: string) => {
     if (!account) return;
     try {
-      const headers = { 'Content-Type': 'application/json' };
       const primaryEndpoint = PROTON_ENDPOINTS[0];
-      
-      const xprRes = await fetch(`${primaryEndpoint}/v1/chain/get_currency_balance`, {
-        method: 'POST',
-        headers,
-        body: JSON.stringify({
-          code: 'eosio.token',
-          account: account,
-          symbol: 'XPR'
-        })
-      });
-      
-      const tabRes = await fetch(`${primaryEndpoint}/v1/chain/get_currency_balance`, {
-        method: 'POST',
-        headers,
-        body: JSON.stringify({
-          code: 'tokencreate',
-          account: account,
-          symbol: 'TAB'
-        })
-      });
+      const headers = { 'Content-Type': 'application/json' };
 
-      const xprData = xprRes.ok ? await xprRes.json() : [];
-      const tabData = tabRes.ok ? await tabRes.json() : [];
+      const balanceRequests = TOKENS.map(token => 
+        fetch(`${primaryEndpoint}/v1/chain/get_currency_balance`, {
+          method: 'POST',
+          headers,
+          body: JSON.stringify({
+            code: token.code,
+            account: account,
+            symbol: token.symbol
+          })
+        }).then(res => res.ok ? res.json() : [])
+      );
+
+      const results = await Promise.all(balanceRequests);
+      
+      const newBalances: any = {};
+      results.forEach((data, index) => {
+        const token = TOKENS[index];
+        const key = token.symbol.toLowerCase();
+        if (data[0]) {
+          const val = data[0].split(' ')[0];
+          newBalances[key] = token.precision === 0 ? Math.floor(parseFloat(val)).toString() : parseFloat(val).toFixed(token.precision);
+        } else {
+          newBalances[key] = token.precision === 0 ? '0' : (0).toFixed(token.precision);
+        }
+      });
 
       const tipsSentKey = `tiptab_tips_sent_${account}`;
       const savedTips = parseInt(localStorage.getItem(tipsSentKey) || "0");
 
       setBalances({
-        xpr: xprData[0] ? parseFloat(xprData[0].split(' ')[0]).toFixed(4) : '0.0000',
-        tab: tabData[0] ? Math.floor(parseFloat(tabData[0].split(' ')[0])).toString() : '0',
+        ...newBalances,
         tipsSent: savedTips
       });
 
@@ -535,7 +548,7 @@ export const XprProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     if (session) {
       await session.remove();
       setSession(null);
-      setBalances({ xpr: '0.0000', tab: '0', tipsSent: 0 });
+      setBalances({ xpr: '0.0000', tab: '0', xmd: '0.000000', xusdc: '0.000000', metal: '0.00000000', loan: '0.0000', tipsSent: 0 });
       setIsMember(false);
       setMembershipDate(null);
       setUserProfile(null);
@@ -557,7 +570,6 @@ export const XprProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     }
   };
 
-  // Determine current active admin permissions
   const isAdminActive = !!currentAdminObj;
   const activeAdminRole = currentAdminObj ? currentAdminObj.role : null;
 
