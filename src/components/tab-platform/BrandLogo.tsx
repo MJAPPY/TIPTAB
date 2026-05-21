@@ -55,7 +55,14 @@ export const BrandLogo = ({ className, showText = true, size = "md", isStatic = 
           "font-black italic tracking-tighter leading-none flex items-center",
           textSizeClasses[size]
         )}>
-          <span className={cn("text-white transition-colors duration-300", !isStatic && "group-hover:text-purple-400")}>TIP</span>
+          {/* Added a text-shadow border for static mode to ensure visibility on white surfaces */}
+          <span className={cn(
+            "text-white transition-colors duration-300", 
+            !isStatic && "group-hover:text-purple-400",
+            isStatic && "[text-shadow:_-1px_-1px_0_#000,_1px_-1px_0_#000,_-1px_1px_0_#000,_1px_1px_0_#000]"
+          )}>
+            TIP
+          </span>
           <span className={cn("text-orange-500", !isStatic && "drop-shadow-[0_0_15px_rgba(249,115,22,0.3)]")}>TAB</span>
         </div>
       )}
