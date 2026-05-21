@@ -20,7 +20,7 @@ import { cn } from "@/lib/utils";
 
 const CATEGORIES = [
   { name: "All", icon: LayoutGrid },
-  { name: "Art", icon: Zap }, // Fallback icon or specific one if available
+  { name: "Art", icon: Zap },
   { name: "Automotive", icon: Car },
   { name: "Content", icon: Tv },
   { name: "Delivery", icon: Truck },
@@ -65,7 +65,6 @@ const Live = () => {
     } else if (sortBy === "random") {
       return [...filtered].sort(() => Math.random() - 0.5);
     } else if (sortBy === "newest") {
-      // Assuming higher ID means newer registration
       return [...filtered].sort((a, b) => Number(b.id) - Number(a.id));
     } else if (sortBy === "oldest") {
       return [...filtered].sort((a, b) => Number(a.id) - Number(b.id));
@@ -86,7 +85,7 @@ const Live = () => {
               PERFORMANCE <span className="text-orange-500">HUB</span>
             </h1>
             <p className="text-white/40 text-lg font-medium max-w-xl">
-              Real-time appreciation for creators, artists, and pros currently broadcasting live with XPR network integration.
+              Real-time appreciation for creators, artists, and pros currently broadcasting <span className="text-red-500 font-black animate-pulse drop-shadow-[0_0_10px_rgba(239,68,68,0.7)] italic">LIVE</span> with XPR network integration.
             </p>
           </div>
           <div className="pt-2 md:pt-4">
