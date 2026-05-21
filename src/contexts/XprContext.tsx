@@ -32,6 +32,11 @@ interface XprContextType {
   broadcastAlert: (message: string | null) => void;
   membershipFee: string;
   updateMembershipFee: (fee: string) => void;
+  boostPrice: string;
+  updateBoostPrice: (price: string) => void;
+  featuredHandles: string[];
+  boostStream: (handle: string) => Promise<boolean>;
+  distributeXprRewards: (winners: { account: string; amount: string }[]) => Promise<boolean>;
 }
 
 const XprContext = createContext<XprContextType | undefined>(undefined);
@@ -54,6 +59,7 @@ export const XprProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const [membershipDate, setMembershipDate] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [userProfile, setUserProfile] = useState<Creator | null>(null);
+  
   const [networkAlert, setNetworkAlert] = useState<string | null>(() => {
     if (typeof window !== "undefined") {
       return localStorage.getItem("tiptab_network_alert");
@@ -66,6 +72,21 @@ export const XprProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       return localStorage.getItem("tiptab_membership_fee") || "2500";
     }
     return "2500";
+  });
+
+  const [boostPrice, setBoostPrice] = useState(() => {
+    if (typeof window !== "undefined") {
+      return localStorage.getItem("tiptab_boost_price") || "500";
+    }
+    return "500";
+  });
+
+  const [featuredHandles, setFeaturedHandles] = useState<string[]>(() => {
+    if (typeof window !== "undefined") {
+      const saved = localStorage.getItem("tiptab_featured_handles");
+      return saved ? JSON.parse(saved) : [];
+    }
+    return [];
   });
 
   const [isMaintenanceMode, setIsMaintenanceMode] = useState(() => {
@@ -85,12 +106,77 @@ export const XprProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     localStorage.setItem("tiptab_membership_fee", fee);
   };
 
+  const updateBoostPrice = (price: string) => {
+    setBoostPrice(price);
+    localStorage.setItem("tiptab_boost_price", price);
+  };
+
   const broadcastAlert = (message: string | null) => {
     setNetworkAlert(message);
     if (message) {
       localStorage.setItem("tiptab_network_alert", message);
     } else {
       localStorage.removeItem("tiptab_network_alert");
+    }
+  };
+
+  const boostStream = async (handle: string): Promise<boolean> => {
+    if (!session || !isMember) return false;
+    
+    try {
+      const formattedAmount = `${parseFloat(boostPrice).toFixed(4)} XPR`;
+      const action = {
+        account: 'eosio.token',
+        name: 'transfer',
+        authorization: [{
+          actor: session.auth.actor,
+          permission: session.auth.permission,
+        }],
+        data: {
+          from: session.auth.actor,
+          to: 'tiptab',
+          quantity: formattedAmount,
+          memo: `Boost Performance: ${handle}`,
+        },
+      };
+
+      await session.transact({ actions: [action] }, { broadcast: true });
+      
+      const newFeatured = [...featuredHandles, handle.replace('@', '')];
+      setFeaturedHandles(newFeatured);
+      localStorage.setItem("tiptab_featured_handles", JSON.stringify(newFeatured));
+      
+      return true;
+    } catch (e) {
+      console.error("Boost failed", e);
+      return false;
+    }
+  };
+
+  const distributeXprRewards = async (winners: { account: string; amount: string }[]): Promise<boolean> => {
+    if (!session || session.auth.actor !== 'tiptab') return false;
+    
+    try {
+      const actions = winners.map(winner => ({
+        account: 'eosio.token',
+        name: 'transfer',
+        authorization: [{
+          actor: 'tiptab',
+          permission: session.auth.permission,
+        }],
+        data: {
+          from: 'tiptab',
+          to: winner.account,
+          quantity: `${parseFloat(winner.amount).toFixed(4)} XPR`,
+          memo: 'TIPTAB Reward: Network Leaderboard Winner',
+        },
+      }));
+
+      await session.transact({ actions }, { broadcast: true });
+      return true;
+    } catch (e) {
+      console.error("Reward distribution failed", e);
+      return false;
     }
   };
 
@@ -142,10 +228,9 @@ export const XprProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         tipsSent: savedTips
       });
 
-      // Special case: Official Project account is always a member with Lifetime status
       if (account === 'tiptab') {
         setIsMember(true);
-        setMembershipDate(new Date(2099, 11, 31).toISOString()); // Permanent status
+        setMembershipDate(new Date(2099, 11, 31).toISOString());
       } else {
         const membershipKey = `tiptab_membership_${account}`;
         const membershipDateKey = `tiptab_membership_date_${account}`;
@@ -181,9 +266,7 @@ export const XprProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       if (savedProfile) {
         setUserProfile(JSON.parse(savedProfile));
       } else {
-        // Try to find if this user is a seed creator
         const seedCreator = CREATORS.find(c => c.handle === account);
-        
         const newProfile: Creator = seedCreator ? { ...seedCreator } : {
           id: `user_${account}`,
           name: account,
@@ -196,8 +279,6 @@ export const XprProvider: React.FC<{ children: React.ReactNode }> = ({ children 
           color: "bg-purple-600"
         };
         setUserProfile(newProfile);
-        
-        // Save the profile locally for the session
         localStorage.setItem("tiptab_user_profile", JSON.stringify(newProfile));
       }
     } catch (error) {
@@ -311,7 +392,12 @@ export const XprProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     networkAlert,
     broadcastAlert,
     membershipFee,
-    updateMembershipFee
+    updateMembershipFee,
+    boostPrice,
+    updateBoostPrice,
+    featuredHandles,
+    boostStream,
+    distributeXprRewards
   };
 
   return <XprContext.Provider value={value}>{children}</XprContext.Provider>;
