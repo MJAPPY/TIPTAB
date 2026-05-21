@@ -23,8 +23,10 @@ import {
   TrendingUp,
   Trophy,
   Sparkles,
-  LayoutGrid,
-  Laptop
+  Laptop,
+  ArrowUpRight,
+  TrendingDown,
+  DollarSign
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
@@ -63,17 +65,17 @@ const MOCK_AUDIT_LOGS: Record<string, any[]> = {
   ]
 };
 
-const LEADERBOARD_WINNERS = [
-  { account: "whaleshark", role: "Supporter", rank: 1, reward: "5000" },
-  { account: "tiptab", role: "Creator", rank: 2, reward: "2500" },
-  { account: "carlos_delivery", role: "Creator", rank: 3, reward: "2000" },
-  { account: "early", role: "Supporter", rank: 4, reward: "1500" },
-  { account: "mayafit", role: "Creator", rank: 5, reward: "1250" },
-  { account: "fanatic", role: "Supporter", rank: 6, reward: "1000" },
-  { account: "cking", role: "Supporter", rank: 7, reward: "750" },
-  { account: "kofibuilds", role: "Creator", rank: 8, reward: "500" },
-  { account: "sarah_serves", role: "Creator", rank: 9, reward: "250" },
-  { account: "mwright", role: "Creator", rank: 10, reward: "100" },
+const INITIAL_LEADERBOARD_WINNERS = [
+  { account: "whaleshark", role: "Supporter", rank: 1, reward: "3000" },
+  { account: "tiptab", role: "Creator", rank: 2, reward: "1500" },
+  { account: "carlos_delivery", role: "Creator", rank: 3, reward: "1000" },
+  { account: "early", role: "Supporter", rank: 4, reward: "500" },
+  { account: "mayafit", role: "Creator", rank: 5, reward: "250" },
+  { account: "fanatic", role: "Supporter", rank: 6, reward: "0" },
+  { account: "cking", role: "Supporter", rank: 7, reward: "0" },
+  { account: "kofibuilds", role: "Creator", rank: 8, reward: "0" },
+  { account: "sarah_serves", role: "Creator", rank: 9, reward: "0" },
+  { account: "mwright", role: "Creator", rank: 10, reward: "0" },
 ];
 
 const AdminHub = () => {
@@ -107,6 +109,17 @@ const AdminHub = () => {
   const [moderatedCreators, setModeratedCreators] = useState<Creator[]>(CREATORS);
   const [bannedHandles, setBannedHandles] = useState<string[]>([]);
   const [isDistributing, setIsDistributing] = useState(false);
+  
+  // Editable Leaderboard Payouts State
+  const [winners, setWinners] = useState(INITIAL_LEADERBOARD_WINNERS);
+
+  // Financial Sourced Calculations
+  const boostRevenueTotal = 12500; // Static mock baseline for performance boosts
+  const activationRevenueTotal = 452500; // Static mock baseline for memberships
+  
+  const rewardsPool = useMemo(() => boostRevenueTotal * 0.5, []);
+  const adminBoostShare = useMemo(() => boostRevenueTotal * 0.5, []);
+  const totalAdminRevenue = useMemo(() => activationRevenueTotal + adminBoostShare, [activationRevenueTotal, adminBoostShare]);
 
   useEffect(() => {
     if (membershipFee) setLocalFee(membershipFee);
@@ -135,14 +148,34 @@ const AdminHub = () => {
   };
 
   const handleRewardWinners = async () => {
+    // Sum active awards configured
+    const payoutTotal = winners.reduce((sum, item) => sum + parseFloat(item.reward || "0"), 0);
+    if (payoutTotal > rewardsPool) {
+      toast({
+        title: "Over Limit",
+        description: `Sum of rewards (${payoutTotal.toLocaleString()} XPR) exceeds the Live Boost rewards pool (${rewardsPool.toLocaleString()} XPR).`,
+        variant: "destructive"
+      });
+      return;
+    }
+
     setIsDistributing(true);
     try {
-      const winners = LEADERBOARD_WINNERS.map(w => ({ account: w.account, amount: w.reward }));
-      const success = await distributeXprRewards(winners);
+      const activeWinners = winners
+        .filter(w => parseFloat(w.reward || "0") > 0)
+        .map(w => ({ account: w.account, amount: w.reward }));
+        
+      if (activeWinners.length === 0) {
+        toast({ title: "Payout Skipped", description: "No positive reward values configured." });
+        setIsDistributing(false);
+        return;
+      }
+
+      const success = await distributeXprRewards(activeWinners);
       if (success) {
         toast({
           title: "Rewards Distributed!",
-          description: `Successfully rewarded the Top 10 participants with XPR.`,
+          description: `Successfully paid out ${payoutTotal.toLocaleString()} XPR to the winners.`,
         });
       }
     } catch (e) {
@@ -150,6 +183,10 @@ const AdminHub = () => {
     } finally {
       setIsDistributing(false);
     }
+  };
+
+  const handleRewardValueChange = (index: number, value: string) => {
+    setWinners(prev => prev.map((w, idx) => idx === index ? { ...w, reward: value } : w));
   };
 
   const handleBroadcast = () => {
@@ -270,46 +307,49 @@ const AdminHub = () => {
                   </div>
                 </CardHeader>
                 <CardContent className="p-8 pt-0 space-y-8 relative z-10">
+                  
+                  {/* Rewards Sourced only from live boost 50% split */}
                   <div className="space-y-4 bg-white/5 p-6 rounded-[28px] border border-white/10">
                     <div className="flex items-center justify-between">
                       <div className="space-y-1">
-                        <p className="text-[11px] font-black text-orange-500 uppercase tracking-[0.4em]">Available Rewards</p>
-                        <p className="text-4xl font-black text-white tracking-tighter italic">{Number(balances.xpr).toLocaleString()} <span className="text-orange-500 text-lg">XPR</span></p>
+                        <p className="text-[11px] font-black text-orange-500 uppercase tracking-[0.4em]">Rewards Pool (50% Boost Split)</p>
+                        <p className="text-4xl font-black text-white tracking-tighter italic">{rewardsPool.toLocaleString()} <span className="text-orange-500 text-lg">XPR</span></p>
                       </div>
-                      <HandCoins className="h-8 w-8 text-orange-500" />
+                      <Trophy className="h-8 w-8 text-orange-500" />
                     </div>
                     <div className="pt-4 border-t border-white/5">
-                      <p className="text-[9px] font-bold text-white/30 uppercase tracking-[0.2em]">Source: 100% Membership & Boost Fees</p>
+                      <p className="text-[9px] font-bold text-white/30 uppercase tracking-[0.2em]">Live Boost Sourced Only</p>
                     </div>
                   </div>
 
-                  <div className="grid grid-cols-1 gap-2.5">
-                     <div className="bg-gradient-to-r from-purple-500/10 to-transparent p-5 rounded-2xl border border-white/10 flex items-center justify-between group/mini hover:border-purple-500/40 transition-all">
+                  <div className="grid grid-cols-1 gap-4">
+                     <div className="bg-gradient-to-r from-purple-500/10 to-transparent p-5 rounded-2xl border border-white/10 flex items-center justify-between">
                       <div>
-                        <span className="text-[11px] font-black text-white/40 uppercase tracking-[0.3em] block mb-0.5">Activation Revenue</span>
-                        <span className="text-xl font-black text-white italic">452,500 <span className="text-xs text-purple-400">XPR</span></span>
+                        <span className="text-[11px] font-black text-white/40 uppercase tracking-[0.3em] block mb-0.5">Admin Revenue (100% Membership + 50% Boost)</span>
+                        <span className="text-xl font-black text-purple-400 italic">{totalAdminRevenue.toLocaleString()} <span className="text-xs">XPR</span></span>
                       </div>
-                      <CheckCircle2 className="h-5 w-5 text-purple-400" />
+                      <HandCoins className="h-5 w-5 text-purple-400" />
                     </div>
-                    <div className="bg-gradient-to-r from-orange-500/10 to-transparent p-5 rounded-2xl border border-white/10 flex items-center justify-between group/mini hover:border-orange-500/40 transition-all">
+                    
+                    <div className="bg-gradient-to-r from-orange-500/10 to-transparent p-5 rounded-2xl border border-white/10 flex items-center justify-between">
                       <div>
-                        <span className="text-[11px] font-black text-white/40 uppercase tracking-[0.3em] block mb-0.5">Performance Boosts</span>
-                        <span className="text-xl font-black text-white italic">12,500 <span className="text-xs text-orange-500">XPR</span></span>
+                        <span className="text-[11px] font-black text-white/40 uppercase tracking-[0.3em] block mb-0.5">Performance Boost Revenue</span>
+                        <span className="text-xl font-black text-white italic">{boostRevenueTotal.toLocaleString()} <span className="text-xs text-orange-500">XPR</span></span>
                       </div>
                       <Zap className="h-5 w-5 text-orange-500 fill-orange-500" />
                     </div>
                   </div>
 
                   <Button 
-                    onClick={handleRewardWinners}
-                    disabled={isDistributing}
-                    className="w-full h-16 bg-white text-black hover:bg-orange-500 hover:text-white rounded-2xl font-black text-xs uppercase tracking-widest shadow-2xl transition-all active:scale-[0.98]"
+                    onClick={() => setActiveTab("rewards")}
+                    className="w-full h-16 bg-white text-black hover:bg-orange-500 hover:text-white rounded-2xl font-black text-xs uppercase tracking-widest shadow-2xl transition-all"
                   >
-                    {isDistributing ? "Processing Batch..." : "Distribute Weekly Rewards"}
+                    Go To Rewards Panel
                   </Button>
                 </CardContent>
               </Card>
 
+              {/* Improved System Metrics - Removed nodes bit, added members growth, weekly volume, active stream */}
               <Card className="md:col-span-6 bg-[#0d071a] border border-white/10 rounded-[40px] p-8 space-y-6">
                 <CardHeader className="p-0">
                   <CardTitle className="text-xl font-black flex items-center gap-3 text-white uppercase italic">
@@ -318,17 +358,26 @@ const AdminHub = () => {
                   <CardDescription className="text-white/40">Overview of node activity and transactions</CardDescription>
                 </CardHeader>
                 <CardContent className="p-0 space-y-6">
-                  <div className="p-5 rounded-2xl bg-white/5 border border-white/5 flex justify-between items-center">
-                    <span className="text-xs font-black uppercase tracking-wider text-slate-400">Total Verified Nodes</span>
-                    <span className="text-2xl font-black text-purple-400">124</span>
+                  <div className="p-5 rounded-2xl bg-white/5 border border-white/5 flex justify-between items-center group hover:border-purple-500/30 transition-all">
+                    <span className="text-xs font-black uppercase tracking-wider text-slate-400">Monthly Membership Growth</span>
+                    <div className="text-right">
+                      <span className="text-2xl font-black text-purple-400 block">+15%</span>
+                      <span className="text-[10px] font-bold text-purple-500/60 uppercase">MoM increase</span>
+                    </div>
                   </div>
-                  <div className="p-5 rounded-2xl bg-white/5 border border-white/5 flex justify-between items-center">
-                    <span className="text-xs font-black uppercase tracking-wider text-slate-400">Average Active Streams</span>
-                    <span className="text-2xl font-black text-orange-400">42 / hour</span>
+                  <div className="p-5 rounded-2xl bg-white/5 border border-white/5 flex justify-between items-center group hover:border-orange-500/30 transition-all">
+                    <span className="text-xs font-black uppercase tracking-wider text-slate-400">Active Streamers</span>
+                    <div className="text-right">
+                      <span className="text-2xl font-black text-orange-400 block">42 Active</span>
+                      <span className="text-[10px] font-bold text-orange-500/60 uppercase">Broadcasters live</span>
+                    </div>
                   </div>
-                  <div className="p-5 rounded-2xl bg-white/5 border border-white/5 flex justify-between items-center">
-                    <span className="text-xs font-black uppercase tracking-wider text-slate-400">Weekly TAB Tips volume</span>
-                    <span className="text-2xl font-black text-green-400">4,250,000 TAB</span>
+                  <div className="p-5 rounded-2xl bg-white/5 border border-white/5 flex justify-between items-center group hover:border-green-500/30 transition-all">
+                    <span className="text-xs font-black uppercase tracking-wider text-slate-400">Weekly Tip Volume</span>
+                    <div className="text-right">
+                      <span className="text-2xl font-black text-green-400 block">4,250,000 TAB</span>
+                      <span className="text-[10px] font-bold text-green-500/60 uppercase">Tipped globally</span>
+                    </div>
                   </div>
                 </CardContent>
               </Card>
@@ -423,19 +472,28 @@ const AdminHub = () => {
             </div>
           </TabsContent>
 
-          {/* Rewards Tab */}
+          {/* Rewards Tab - With editable rewards input column */}
           <TabsContent value="rewards" className="space-y-8 mt-0 animate-in fade-in slide-in-from-bottom-4 duration-500">
             <Card className="bg-[#0d071a] border-white/10 rounded-[48px] overflow-hidden shadow-2xl relative">
               <div className="absolute top-0 right-0 p-12 opacity-5">
                 <Trophy className="h-64 w-64 text-white" />
               </div>
-              <CardHeader className="p-12 border-b border-white/5 relative z-10">
+              <CardHeader className="p-12 border-b border-white/5 relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
                 <div>
                   <CardTitle className="text-3xl font-black tracking-tight uppercase italic text-white flex items-center gap-4">
                     <Sparkles className="h-8 w-8 text-yellow-400" /> Leaderboard Rewards
                   </CardTitle>
-                  <CardDescription className="text-white/40 font-medium text-sm">Top 10 participants pending verification for weekly rewards</CardDescription>
+                  <CardDescription className="text-white/40 font-medium text-sm">
+                    Enter custom reward payout amounts. Total cannot exceed rewards pool of {rewardsPool.toLocaleString()} XPR.
+                  </CardDescription>
                 </div>
+                <Button 
+                  onClick={handleRewardWinners}
+                  disabled={isDistributing}
+                  className="bg-white text-black hover:bg-orange-500 hover:text-white font-black h-14 px-8 rounded-2xl text-xs uppercase tracking-widest transition-all"
+                >
+                  {isDistributing ? "Processing Payouts..." : "Batch Distribute Rewards"}
+                </Button>
               </CardHeader>
               <CardContent className="p-0 relative z-10">
                 <div className="overflow-x-auto no-scrollbar">
@@ -445,11 +503,11 @@ const AdminHub = () => {
                         <th className="px-12 py-6 text-left text-[11px] font-black uppercase tracking-widest text-white/30">Rank</th>
                         <th className="px-12 py-6 text-left text-[11px] font-black uppercase tracking-widest text-white/30">Participant</th>
                         <th className="px-12 py-6 text-left text-[11px] font-black uppercase tracking-widest text-white/30">Role</th>
-                        <th className="px-12 py-6 text-right text-[11px] font-black uppercase tracking-widest text-white/30">Reward Amount</th>
+                        <th className="px-12 py-6 text-right text-[11px] font-black uppercase tracking-widest text-white/30">Edit Reward (XPR)</th>
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-white/5">
-                      {LEADERBOARD_WINNERS.map((winner) => (
+                      {winners.map((winner, index) => (
                         <tr key={winner.account} className="group hover:bg-white/[0.02] transition-colors">
                           <td className="px-12 py-8">
                             <span className={cn(
@@ -476,7 +534,15 @@ const AdminHub = () => {
                             </span>
                           </td>
                           <td className="px-12 py-8 text-right">
-                            <span className="text-xl font-black text-white italic">{winner.reward} <span className="text-[10px] text-orange-500 ml-1">XPR</span></span>
+                            <div className="flex items-center justify-end gap-3">
+                              <Input 
+                                type="number" 
+                                value={winner.reward}
+                                onChange={(e) => handleRewardValueChange(index, e.target.value)}
+                                className="w-[120px] bg-white/5 border-white/10 text-right font-black rounded-xl h-10 px-4 text-white focus:ring-orange-500/50"
+                              />
+                              <span className="text-[10px] font-black text-orange-500 uppercase">XPR</span>
+                            </div>
                           </td>
                         </tr>
                       ))}
