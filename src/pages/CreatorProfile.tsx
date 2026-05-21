@@ -78,11 +78,9 @@ const CreatorProfile = () => {
   }, [handle, navigate]);
 
   const handleBack = () => {
-    // If we have history within the app session, go back
     if (window.history.length > 1 && location.key !== 'default') {
       navigate(-1);
     } else {
-      // Otherwise, fallback to the safe home route
       navigate("/");
     }
   };
@@ -157,7 +155,6 @@ const CreatorProfile = () => {
         description: `Successfully sent ${quantityString} to ${creator?.name}.`,
       });
       
-      // Trigger celebration sequence
       const trigger = (window as any).triggerReaction;
       if (trigger) {
         const sequence = ['heart', 'firework', 'applause', 'firework', 'heart', 'applause', 'firework'];
@@ -222,12 +219,20 @@ const CreatorProfile = () => {
     <div className="min-h-screen bg-[#0a0514] text-white selection:bg-purple-500/30">
       <Header onBecomeCreator={() => setIsMembershipOpen(true)} />
 
-      <div className="relative h-[40vh] md:h-[50vh] w-full overflow-hidden">
-        <div className={cn("absolute inset-0 opacity-40 blur-[100px]", creator.color)} />
-        <div className="absolute inset-0 bg-gradient-to-t from-[#0a0514] via-[#0a0514]/40 to-transparent" />
+      <div className="relative h-[40vh] md:h-[50vh] w-full overflow-hidden bg-black/60">
+        {creator.coverImage ? (
+          <>
+            <img src={creator.coverImage} alt="Cover banner" className="w-full h-full object-cover select-none pointer-events-none" />
+            <div className="absolute inset-0 bg-gradient-to-t from-[#0a0514] via-[#0a0514]/65 to-transparent" />
+          </>
+        ) : (
+          <>
+            <div className={cn("absolute inset-0 opacity-40 blur-[100px]", creator.color)} />
+            <div className="absolute inset-0 bg-gradient-to-t from-[#0a0514] via-[#0a0514]/40 to-transparent" />
+          </>
+        )}
         <LiveReactions />
         
-        {/* Secondary Page-Level Back Button */}
         <div className="absolute top-24 left-6 z-20 md:hidden">
           <Button 
             onClick={handleBack} 
@@ -243,7 +248,7 @@ const CreatorProfile = () => {
           <div className="lg:col-span-7 space-y-8">
             <div className="flex flex-col md:flex-row items-center md:items-end gap-8">
               <div className={cn(
-                "h-48 w-48 rounded-[48px] flex items-center justify-center text-6xl font-black border-[8px] border-[#0a0514] shadow-2xl overflow-hidden relative group",
+                "h-48 w-48 rounded-[48px] flex items-center justify-center text-6xl font-black border-[8px] border-[#0a0514] shadow-2xl overflow-hidden relative group shrink-0",
                 creator.color
               )}>
                 {creator.avatarImage ? (
@@ -268,7 +273,6 @@ const CreatorProfile = () => {
 
             <div className="bg-white/[0.03] border border-white/10 rounded-[40px] p-8 md:p-12 space-y-8">
               
-              {/* Multi-Stream Section */}
               {liveStreams.length > 0 && (
                 <div className="space-y-10 animate-in fade-in slide-in-from-top-4 duration-700">
                   {liveStreams.map((stream, idx) => (
@@ -296,7 +300,6 @@ const CreatorProfile = () => {
                 </div>
               )}
 
-              {/* TikTok/Instagram specific Link Buttons (Non-Embeddable) */}
               {(creator.tiktok || creator.instagramLive) && (
                 <div className={cn("flex flex-wrap gap-4 pt-8", liveStreams.length > 0 ? "border-t border-white/5" : "")}>
                   {creator.tiktok && (
@@ -325,7 +328,6 @@ const CreatorProfile = () => {
                 <p className="text-xl md:text-2xl text-white/80 leading-relaxed font-medium">{creator.bio}</p>
               </div>
 
-              {/* Permanent Featured Media Section */}
               {featuredEmbedUrl && (
                 <div className="space-y-6 pt-8 border-t border-white/5">
                   <div className="flex items-center gap-3">
@@ -382,7 +384,6 @@ const CreatorProfile = () => {
                 <div className="flex items-center justify-between mb-10">
                   <h2 className="text-3xl font-black tracking-tight">Support <br /> {creator.name.split(' ')[0]}</h2>
                   <div className="flex flex-wrap items-center justify-end gap-2 max-w-[240px]">
-                    {/* Heart Reaction */}
                     <Button 
                       variant="ghost" 
                       onClick={() => handleReaction('heart')}
@@ -392,7 +393,6 @@ const CreatorProfile = () => {
                       <span className="font-black text-[11px] text-slate-100">{likeCount}</span>
                     </Button>
                     
-                    {/* Firework Reaction */}
                     <Button 
                       variant="ghost" 
                       onClick={() => handleReaction('firework')}
@@ -402,7 +402,6 @@ const CreatorProfile = () => {
                       <span className="font-black text-[11px] text-slate-100">{fireworkCount}</span>
                     </Button>
 
-                    {/* Applause Reaction */}
                     <Button 
                       variant="ghost" 
                       onClick={() => handleReaction('applause')}
@@ -412,7 +411,6 @@ const CreatorProfile = () => {
                       <span className="font-black text-[11px] text-slate-100">{applauseCount}</span>
                     </Button>
 
-                    {/* Share Button */}
                     <Button variant="ghost" size="icon" onClick={handleShare} className="h-10 w-10 rounded-xl bg-white/5 border border-white/10 hover:bg-white/10">
                       {isCopied ? <Check className="h-4 w-4 text-green-500" /> : <Share2 className="h-4 w-4 text-white/40" />}
                     </Button>
@@ -474,7 +472,6 @@ const CreatorProfile = () => {
                 </div>
               </div>
 
-              {/* Quick Info Box */}
               <div className="p-8 rounded-[40px] bg-white/[0.02] border border-white/5 space-y-4">
                 <div className="flex items-center gap-3">
                   <Tv className="h-5 w-5 text-orange-500" />

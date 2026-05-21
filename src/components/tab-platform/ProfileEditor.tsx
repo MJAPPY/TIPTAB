@@ -11,7 +11,6 @@ import { Creator } from "@/data/creators";
 import { EmbedPlayer } from "./EmbedPlayer";
 import { cn } from "@/lib/utils";
 
-// Expanded Mock Geocoder - The sole source for map placement
 const CITY_COORDINATES: Record<string, [number, number]> = {
   "london": [-0.1276, 51.5074],
   "new york": [-74.0060, 40.7128],
@@ -52,6 +51,7 @@ export const ProfileEditor = ({ initialData, onSave, minimal = false }: ProfileE
   const [hasChanged, setHasChanged] = useState(false);
   const [isCityRecognized, setIsCityRecognized] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const coverInputRef = useRef<HTMLInputElement>(null);
   
   const [formData, setFormData] = useState({
     name: initialData.name,
@@ -66,7 +66,7 @@ export const ProfileEditor = ({ initialData, onSave, minimal = false }: ProfileE
     instagram: initialData.instagram || "",
     spotify: initialData.spotify || "",
     avatarImage: initialData.avatarImage || "",
-    // Live Stream Links
+    coverImage: initialData.coverImage || "",
     twitch: initialData.twitch || "",
     tiktok: initialData.tiktok || "",
     youtubeLive: initialData.youtubeLive || "",
@@ -89,6 +89,7 @@ export const ProfileEditor = ({ initialData, onSave, minimal = false }: ProfileE
       instagram: initialData.instagram || "",
       spotify: initialData.spotify || "",
       avatarImage: initialData.avatarImage || "",
+      coverImage: initialData.coverImage || "",
       twitch: initialData.twitch || "",
       tiktok: initialData.tiktok || "",
       youtubeLive: initialData.youtubeLive || "",
@@ -97,7 +98,6 @@ export const ProfileEditor = ({ initialData, onSave, minimal = false }: ProfileE
     setHasChanged(false);
   }, [initialData]);
 
-  // Check if typed city is in our geocoding list for instant feedback (Case-Insensitive)
   useEffect(() => {
     const typedLocation = formData.location.split(',')[0].trim().toLowerCase();
     setIsCityRecognized(!!CITY_COORDINATES[typedLocation]);
@@ -111,7 +111,6 @@ export const ProfileEditor = ({ initialData, onSave, minimal = false }: ProfileE
       let finalCoordinates = formData.coordinates;
       const typedLocation = formData.location.split(',')[0].trim().toLowerCase();
       
-      // Update coordinates based on recognized typed city
       if (CITY_COORDINATES[typedLocation]) {
         finalCoordinates = CITY_COORDINATES[typedLocation];
       }
@@ -129,7 +128,7 @@ export const ProfileEditor = ({ initialData, onSave, minimal = false }: ProfileE
         title: "Profile Updated",
         description: minimal 
           ? `Location saved as ${formData.location} for Leaderboard rankings.` 
-          : `Location saved as ${formData.location}. Map pin updated.`,
+          : `Location saved as ${formData.location}. Map pin and profile updated.`,
       });
     } catch (error) {
       toast({
@@ -165,8 +164,25 @@ export const ProfileEditor = ({ initialData, onSave, minimal = false }: ProfileE
     }
   };
 
+  const handleCoverChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setFormData(prev => ({ ...prev, coverImage: reader.result as string }));
+        setHasChanged(true);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
   const removeImage = () => {
     setFormData(prev => ({ ...prev, avatarImage: "" }));
+    setHasChanged(true);
+  };
+
+  const removeCoverImage = () => {
+    setFormData(prev => ({ ...prev, coverImage: "" }));
     setHasChanged(true);
   };
 
@@ -194,45 +210,89 @@ export const ProfileEditor = ({ initialData, onSave, minimal = false }: ProfileE
       </CardHeader>
       <CardContent className="p-8">
         <div className="space-y-12">
-          {/* Avatar Section */}
-          <div className="flex flex-col sm:flex-row items-center gap-6 pb-8 border-b border-white/5">
-            <div className="relative group">
-              <div className={cn("h-24 w-24 rounded-3xl flex items-center justify-center text-3xl font-black border-4 border-white/10 shadow-xl overflow-hidden", initialData.color)}>
-                {formData.avatarImage ? (
-                  <img src={formData.avatarImage} alt="Avatar" className="w-full h-full object-cover" />
+          
+          {/* Cover & Avatar Upload Section */}
+          <div className="space-y-6 pb-8 border-b border-white/5">
+            <h4 className="font-bold text-lg">Profile Graphics</h4>
+            
+            {/* Cover Image Upload Row */}
+            <div className="space-y-3">
+              <Label className="text-white/60 font-bold uppercase tracking-widest text-[10px]">Cover Banner</Label>
+              <div className="relative group rounded-3xl overflow-hidden border border-white/10 aspect-[3/1] bg-white/[0.02] flex items-center justify-center">
+                {formData.coverImage ? (
+                  <>
+                    <img src={formData.coverImage} alt="Profile Cover" className="w-full h-full object-cover" />
+                    <button 
+                      onClick={removeCoverImage}
+                      className="absolute top-4 right-4 bg-red-500 hover:bg-red-600 text-white rounded-full p-2 shadow-xl transition-colors z-10"
+                    >
+                      <X className="h-4 w-4" />
+                    </button>
+                  </>
                 ) : (
-                  initialData.avatar
+                  <div className="text-center p-6 flex flex-col items-center gap-3">
+                    <ImageIcon className="h-10 w-10 text-white/20" />
+                    <p className="text-xs text-white/40 font-bold">No cover banner uploaded. Best ratio is 3:1.</p>
+                    <input 
+                      type="file" 
+                      ref={coverInputRef} 
+                      className="hidden" 
+                      accept="image/*" 
+                      onChange={handleCoverChange} 
+                    />
+                    <Button 
+                      variant="outline" 
+                      size="sm" 
+                      onClick={() => coverInputRef.current?.click()}
+                      className="rounded-xl border-white/10 text-white/60 hover:text-white bg-white/5"
+                    >
+                      <Upload className="h-4 w-4 mr-2" /> Upload Cover Image
+                    </Button>
+                  </div>
                 )}
               </div>
-              {formData.avatarImage && (
-                <button 
-                  onClick={removeImage}
-                  className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-1 shadow-lg hover:bg-red-600 transition-colors"
-                >
-                  <X className="h-3 w-3" />
-                </button>
-              )}
             </div>
-            
-            <div className="space-y-2 text-center sm:text-left">
-              <h4 className="font-bold text-lg">Profile Avatar</h4>
-              <p className="text-sm text-white/40">Upload a custom photo or use your generated initials.</p>
-              <div className="flex justify-center sm:justify-start gap-2">
-                <input 
-                  type="file" 
-                  ref={fileInputRef} 
-                  className="hidden" 
-                  accept="image/*" 
-                  onChange={handleFileChange} 
-                />
-                <Button 
-                  variant="outline" 
-                  size="sm" 
-                  onClick={() => fileInputRef.current?.click()}
-                  className="rounded-lg border-white/10 text-white/60 hover:text-white h-9 bg-white/5"
-                >
-                  <Upload className="h-4 w-4 mr-2" /> Upload Photo
-                </Button>
+
+            {/* Avatar Section */}
+            <div className="flex flex-col sm:flex-row items-center gap-6 pt-4">
+              <div className="relative group">
+                <div className={cn("h-24 w-24 rounded-3xl flex items-center justify-center text-3xl font-black border-4 border-white/10 shadow-xl overflow-hidden", initialData.color)}>
+                  {formData.avatarImage ? (
+                    <img src={formData.avatarImage} alt="Avatar" className="w-full h-full object-cover" />
+                  ) : (
+                    initialData.avatar
+                  )}
+                </div>
+                {formData.avatarImage && (
+                  <button 
+                    onClick={removeImage}
+                    className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-1 shadow-lg hover:bg-red-600 transition-colors"
+                  >
+                    <X className="h-3 w-3" />
+                  </button>
+                )}
+              </div>
+              
+              <div className="space-y-2 text-center sm:text-left">
+                <h5 className="font-bold text-base">Profile Avatar</h5>
+                <p className="text-sm text-white/40">Upload a custom photo or use your generated initials.</p>
+                <div className="flex justify-center sm:justify-start gap-2">
+                  <input 
+                    type="file" 
+                    ref={fileInputRef} 
+                    className="hidden" 
+                    accept="image/*" 
+                    onChange={handleFileChange} 
+                  />
+                  <Button 
+                    variant="outline" 
+                    size="sm" 
+                    onClick={() => fileInputRef.current?.click()}
+                    className="rounded-lg border-white/10 text-white/60 hover:text-white h-9 bg-white/5"
+                  >
+                    <Upload className="h-4 w-4 mr-2" /> Upload Photo
+                  </Button>
+                </div>
               </div>
             </div>
           </div>
