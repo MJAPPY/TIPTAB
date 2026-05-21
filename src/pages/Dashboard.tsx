@@ -19,7 +19,8 @@ import {
   Calendar,
   Clock,
   Eye,
-  Users
+  Users,
+  Coins
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
@@ -52,6 +53,7 @@ const Dashboard = () => {
 
   // Analytics Metrics State
   const [tipsReceived, setTipsReceived] = useState(0);
+  const [xprReceived, setXprReceived] = useState(0);
   const [profileViews, setProfileViews] = useState(0);
   const [engagementRate, setEngagementRate] = useState(0);
 
@@ -65,10 +67,12 @@ const Dashboard = () => {
     // Seed consistent starting metrics based on user actor handle
     const viewsKey = `tiptab_views_${actor}`;
     const receivedKey = `tiptab_tips_received_${actor}`;
+    const xprReceivedKey = `tiptab_xpr_received_${actor}`;
     const engagementKey = `tiptab_engagement_${actor}`;
 
     let savedViews = localStorage.getItem(viewsKey);
     let savedReceived = localStorage.getItem(receivedKey);
+    let savedXprReceived = localStorage.getItem(xprReceivedKey);
     let savedEngagement = localStorage.getItem(engagementKey);
 
     if (!savedViews) {
@@ -81,6 +85,11 @@ const Dashboard = () => {
       localStorage.setItem(receivedKey, initialReceived.toString());
       savedReceived = initialReceived.toString();
     }
+    if (!savedXprReceived) {
+      const initialXprReceived = Math.floor(Math.random() * 12000) + 3400;
+      localStorage.setItem(xprReceivedKey, initialXprReceived.toString());
+      savedXprReceived = initialXprReceived.toString();
+    }
     if (!savedEngagement) {
       const initialEngagement = (Math.random() * 15 + 8).toFixed(1);
       localStorage.setItem(engagementKey, initialEngagement);
@@ -89,6 +98,7 @@ const Dashboard = () => {
 
     setProfileViews(parseInt(savedViews));
     setTipsReceived(parseInt(savedReceived));
+    setXprReceived(parseInt(savedXprReceived));
     setEngagementRate(parseFloat(savedEngagement));
   }, [actor]);
 
@@ -396,13 +406,13 @@ const Dashboard = () => {
                     <TrendingUp className="h-4 w-4 text-purple-400" /> Channel Metrics & Discovery
                   </h3>
                   
-                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
-                    {/* Tipped Received Analytics Card */}
-                    <Card className="bg-[#130b21]/40 border-white/10 text-white rounded-[32px] sm:rounded-[40px] p-6 sm:p-10 shadow-2xl relative overflow-hidden group hover:border-green-500/30 transition-all flex flex-col h-[220px]">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 sm:gap-8">
+                    {/* Tipped Received TAB Analytics Card */}
+                    <Card className="bg-[#130b21]/40 border-white/10 text-white rounded-[32px] sm:rounded-[40px] p-6 sm:p-8 shadow-2xl relative overflow-hidden group hover:border-green-500/30 transition-all flex flex-col h-[220px]">
                       <div className="absolute -top-12 -right-12 w-32 h-32 bg-green-500/5 blur-3xl rounded-full group-hover:bg-green-500/10 transition-all" />
                       <CardHeader className="p-0">
                         <div className="flex items-center justify-between">
-                          <CardDescription className="text-slate-400 font-black uppercase tracking-[0.2em] text-[9px] sm:text-[10px]">Total Tips Received</CardDescription>
+                          <CardDescription className="text-slate-400 font-black uppercase tracking-[0.2em] text-[9px] sm:text-[10px]">Total TAB Received</CardDescription>
                           <div className="h-8 w-8 rounded-xl bg-green-500/10 flex items-center justify-center border border-green-500/20">
                             <HandCoins className="h-4 w-4 text-green-400" />
                           </div>
@@ -410,17 +420,39 @@ const Dashboard = () => {
                       </CardHeader>
                       <CardContent className="p-0 mt-4 flex flex-col flex-1 justify-between">
                         <div className="flex flex-col items-start">
-                          <span className="text-3xl sm:text-5xl font-black tracking-tighter text-slate-100">
+                          <span className="text-3xl sm:text-4xl font-black tracking-tighter text-slate-100">
                             {tipsReceived.toLocaleString()}
                           </span>
                           <span className="text-xs font-black text-green-400 uppercase tracking-wider mt-1">TAB Earned</span>
                         </div>
-                        <p className="text-[10px] text-white/30 font-bold uppercase tracking-widest pt-2">Accumulated tip rewards</p>
+                        <p className="text-[10px] text-white/30 font-bold uppercase tracking-widest pt-2">Accumulated TAB rewards</p>
+                      </CardContent>
+                    </Card>
+
+                    {/* Tipped Received XPR Analytics Card */}
+                    <Card className="bg-[#130b21]/40 border-white/10 text-white rounded-[32px] sm:rounded-[40px] p-6 sm:p-8 shadow-2xl relative overflow-hidden group hover:border-purple-500/30 transition-all flex flex-col h-[220px]">
+                      <div className="absolute -top-12 -right-12 w-32 h-32 bg-purple-500/5 blur-3xl rounded-full group-hover:bg-purple-500/10 transition-all" />
+                      <CardHeader className="p-0">
+                        <div className="flex items-center justify-between">
+                          <CardDescription className="text-slate-400 font-black uppercase tracking-[0.2em] text-[9px] sm:text-[10px]">Total XPR Received</CardDescription>
+                          <div className="h-8 w-8 rounded-xl bg-purple-500/10 flex items-center justify-center border border-purple-500/20">
+                            <Coins className="h-4 w-4 text-purple-400" />
+                          </div>
+                        </div>
+                      </CardHeader>
+                      <CardContent className="p-0 mt-4 flex flex-col flex-1 justify-between">
+                        <div className="flex flex-col items-start">
+                          <span className="text-3xl sm:text-4xl font-black tracking-tighter text-slate-100">
+                            {xprReceived.toLocaleString()}
+                          </span>
+                          <span className="text-xs font-black text-purple-400 uppercase tracking-wider mt-1">XPR Earned</span>
+                        </div>
+                        <p className="text-[10px] text-white/30 font-bold uppercase tracking-widest pt-2">Accumulated XPR rewards</p>
                       </CardContent>
                     </Card>
 
                     {/* Profile Discovery Views Card */}
-                    <Card className="bg-[#130b21]/40 border-white/10 text-white rounded-[32px] sm:rounded-[40px] p-6 sm:p-10 shadow-2xl relative overflow-hidden group hover:border-cyan-500/30 transition-all flex flex-col h-[220px]">
+                    <Card className="bg-[#130b21]/40 border-white/10 text-white rounded-[32px] sm:rounded-[40px] p-6 sm:p-8 shadow-2xl relative overflow-hidden group hover:border-cyan-500/30 transition-all flex flex-col h-[220px]">
                       <div className="absolute -top-12 -right-12 w-32 h-32 bg-cyan-500/5 blur-3xl rounded-full group-hover:bg-cyan-500/10 transition-all" />
                       <CardHeader className="p-0">
                         <div className="flex items-center justify-between">
@@ -432,7 +464,7 @@ const Dashboard = () => {
                       </CardHeader>
                       <CardContent className="p-0 mt-4 flex flex-col flex-1 justify-between">
                         <div className="flex flex-col items-start">
-                          <span className="text-3xl sm:text-5xl font-black tracking-tighter text-slate-100">
+                          <span className="text-3xl sm:text-4xl font-black tracking-tighter text-slate-100">
                             {profileViews.toLocaleString()}
                           </span>
                           <span className="text-xs font-black text-cyan-400 uppercase tracking-wider mt-1">Unique views</span>
@@ -442,7 +474,7 @@ const Dashboard = () => {
                     </Card>
 
                     {/* Engagement / Conversion Rate Card */}
-                    <Card className="bg-[#130b21]/40 border-white/10 text-white rounded-[32px] sm:rounded-[40px] p-6 sm:p-10 shadow-2xl relative overflow-hidden group hover:border-pink-500/30 transition-all flex flex-col h-[220px]">
+                    <Card className="bg-[#130b21]/40 border-white/10 text-white rounded-[32px] sm:rounded-[40px] p-6 sm:p-8 shadow-2xl relative overflow-hidden group hover:border-pink-500/30 transition-all flex flex-col h-[220px]">
                       <div className="absolute -top-12 -right-12 w-32 h-32 bg-pink-500/5 blur-3xl rounded-full group-hover:bg-pink-500/10 transition-all" />
                       <CardHeader className="p-0">
                         <div className="flex items-center justify-between">
@@ -454,7 +486,7 @@ const Dashboard = () => {
                       </CardHeader>
                       <CardContent className="p-0 mt-4 flex flex-col flex-1 justify-between">
                         <div className="flex flex-col items-start">
-                          <span className="text-3xl sm:text-5xl font-black tracking-tighter text-slate-100">
+                          <span className="text-3xl sm:text-4xl font-black tracking-tighter text-slate-100">
                             {engagementRate}%
                           </span>
                           <span className="text-xs font-black text-pink-400 uppercase tracking-wider mt-1">Conversion Ratio</span>
