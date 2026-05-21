@@ -74,7 +74,7 @@ const Live = () => {
     <div className="min-h-screen bg-[#0a0514] text-white selection:bg-purple-500/30">
       <Header onBecomeCreator={() => setIsMembershipOpen(true)} />
 
-      <main className="container mx-auto px-6 pt-36 pb-24">
+      <main className="container mx-auto px-6 pt-44 pb-24">
         {/* Header Section */}
         <div className="flex flex-col md:flex-row md:items-start justify-between gap-8 mb-12">
           <div className="space-y-4">
@@ -82,7 +82,7 @@ const Live = () => {
               PERFORMANCE <span className="text-orange-500">HUB</span>
             </h1>
             <p className="text-white/40 text-lg font-medium max-w-xl">
-              Real-time appreciation for creators, artists, and pros currently broadcasting with XPR network integration.
+              Real-time appreciation for creators, artists, and pros currently broadcasting live with XPR network integration.
             </p>
           </div>
           <div className="pt-2 md:pt-4">
