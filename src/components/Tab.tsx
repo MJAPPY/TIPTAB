@@ -40,12 +40,12 @@ export const Tab = () => {
     return [localUser, ...CREATORS];
   }, [actor]);
 
-  const handleSelectCreator = (creator: Creator) => {
-    if (isConnected) {
-      navigate(`/tip/${creator.handle}`);
-    } else {
-      setSelectedCreator(creator);
-    }
+  const handleViewProfile = (creator: Creator) => {
+    navigate(`/tip/${creator.handle}`);
+  };
+
+  const handleOpenTipping = (creator: Creator) => {
+    setSelectedCreator(creator);
   };
 
   return (
@@ -63,16 +63,17 @@ export const Tab = () => {
               <div className="h-1.5 w-1.5 rounded-full bg-white animate-pulse" />
             </div>
             <h2 className="text-base sm:text-lg font-bold">Live on XPR Network</h2>
-            <span className="text-white/40 text-[10px] sm:text-xs">— click a pin to tip instantly</span>
+            <span className="text-white/40 text-[10px] sm:text-xs">— click a pin to view profile</span>
           </div>
-          <WorldMap creators={displayCreators} onSelectCreator={handleSelectCreator} />
+          <WorldMap creators={displayCreators} onSelectCreator={handleViewProfile} />
         </section>
 
         <HowItWorks />
 
         <FeaturedCreators 
           creators={displayCreators}
-          onSelectCreator={handleSelectCreator} 
+          onSelectCreator={handleOpenTipping} 
+          onViewProfile={handleViewProfile}
           onAddYourself={() => setIsMembershipOpen(true)} 
         />
       </main>

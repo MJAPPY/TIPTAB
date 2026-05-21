@@ -35,10 +35,11 @@ const CATEGORIES = [
 interface FeaturedCreatorsProps {
   creators: Creator[];
   onSelectCreator: (creator: Creator) => void;
+  onViewProfile: (creator: Creator) => void;
   onAddYourself: () => void;
 }
 
-export const FeaturedCreators = ({ creators, onSelectCreator, onAddYourself }: FeaturedCreatorsProps) => {
+export const FeaturedCreators = ({ creators, onSelectCreator, onViewProfile, onAddYourself }: FeaturedCreatorsProps) => {
   const [activeCategory, setActiveCategory] = useState("All");
   const [searchQuery, setSearchQuery] = useState("");
 
@@ -117,7 +118,7 @@ export const FeaturedCreators = ({ creators, onSelectCreator, onAddYourself }: F
           return (
             <div 
               key={creator.id} 
-              onClick={() => onSelectCreator(creator)}
+              onClick={() => onViewProfile(creator)}
               className="group bg-[#130b21]/60 border border-white/10 rounded-[48px] p-8 hover:border-purple-500/50 hover:bg-[#1a102d]/80 transition-all duration-500 cursor-pointer relative overflow-hidden flex flex-col min-h-[340px] shadow-2xl"
             >
               <div 
@@ -168,7 +169,13 @@ export const FeaturedCreators = ({ creators, onSelectCreator, onAddYourself }: F
                   </div>
                 </div>
                 
-                <div className="flex items-center gap-3 bg-white/10 border border-white/20 rounded-2xl px-6 py-3 group-hover:bg-purple-500 group-hover:border-purple-400 transition-all shadow-xl group-hover:shadow-purple-500/40">
+                <div 
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onSelectCreator(creator);
+                  }}
+                  className="flex items-center gap-3 bg-white/10 border border-white/20 rounded-2xl px-6 py-3 group-hover:bg-purple-500 group-hover:border-purple-400 transition-all shadow-xl group-hover:shadow-purple-500/40"
+                >
                   <span className="text-[11px] font-black uppercase tracking-[0.2em] text-white/70 group-hover:text-white">Tip Me</span>
                   <QrCode className="h-4 w-4 text-white/40 group-hover:text-white group-hover:scale-110 transition-all" />
                 </div>

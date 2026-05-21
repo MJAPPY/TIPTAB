@@ -207,6 +207,44 @@ const CreatorProfile = () => {
     );
   }
 
+  // Gate content for unlogged users
+  if (!isConnected) {
+    return (
+      <div className="min-h-screen bg-[#0a0514] text-white selection:bg-purple-500/30">
+        <Header onBecomeCreator={() => setIsMembershipOpen(true)} />
+        <div className="pt-44 flex flex-col items-center justify-center p-6 text-center space-y-10">
+           <div className="relative">
+             <div className="absolute inset-0 bg-purple-500/20 blur-[100px] rounded-full animate-pulse" />
+             <div className={cn("h-48 w-48 rounded-[48px] flex items-center justify-center text-6xl font-black border-4 border-white/10 shadow-[0_0_50px_rgba(0,0,0,0.8)] overflow-hidden relative", creator.color)}>
+               {creator.avatarImage ? (
+                 <img src={creator.avatarImage} alt="Avatar" className="w-full h-full object-cover" />
+               ) : (
+                 creator.avatar
+               )}
+             </div>
+           </div>
+           <div className="space-y-4">
+             <h2 className="text-5xl md:text-7xl font-black tracking-tighter italic uppercase text-slate-100">
+               Login to view <br /> <span className="text-transparent bg-clip-text bg-gradient-to-r from-orange-400 to-purple-500">@{creator.handle}</span>
+             </h2>
+             <p className="text-slate-400 font-bold text-xl max-w-lg mx-auto leading-relaxed">
+               Authentication is required to view full performance profiles, verified location data, and community reactions.
+             </p>
+           </div>
+           <div className="flex flex-col gap-4 w-full max-w-sm">
+             <Button onClick={handleConnect} className="h-24 px-12 bg-white text-black hover:bg-purple-500 hover:text-white rounded-[32px] font-black text-2xl shadow-2xl transition-all active:scale-95 animate-shimmer-silver">
+               <Wallet className="h-6 w-6 mr-3" /> Connect WebAuth
+             </Button>
+             <Button variant="ghost" onClick={handleBack} className="text-white/40 hover:text-white font-bold text-sm uppercase tracking-widest h-12">
+               Return to Global Map
+             </Button>
+           </div>
+        </div>
+        <MembershipModal isOpen={isMembershipOpen} onOpenChange={setIsMembershipOpen} />
+      </div>
+    );
+  }
+
   const quickAmounts = asset === "TAB" ? ["10", "50", "100", "250"] : ["100", "500", "1000", "5000"];
 
   const liveStreams = [
