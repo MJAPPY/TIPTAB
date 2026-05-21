@@ -29,7 +29,9 @@ import {
   UserPlus,
   ShieldCheck,
   UserCheck,
-  HelpCircle
+  HelpCircle,
+  ShieldAlert as AlertIcon,
+  AlertTriangle
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
@@ -91,10 +93,12 @@ const AdminHub = () => {
   const { 
     isAdmin, 
     adminRole,
+    isPermanentAdmin,
     adminsList,
     addAdmin,
     removeAdmin,
     updateAdminRole,
+    makeAdminPermanent,
     isConnected, 
     isMaintenanceMode, 
     setMaintenanceMode, 
@@ -108,7 +112,8 @@ const AdminHub = () => {
     promoCodes,
     createPromoCode,
     deletePromoCode,
-    actor
+    actor,
+    logout
   } = useXpr();
   
   const navigate = useNavigate();
@@ -131,6 +136,11 @@ const AdminHub = () => {
   const [newAdminHandle, setNewAdminHandle] = useState("");
   const [newAdminRole, setNewAdminRole] = useState<'super' | 'moderator' | 'treasurer'>("moderator");
   
+  // Double warning flow state for self-removal of a permanent admin
+  const [removalStep, setRemovalStep] = useState<"closed" | "warning1" | "warning2">("closed");
+  const [confirmInput, setConfirmInput] = useState("");
+  const [targetIdForRemoval, setTargetIdForRemoval] = useState<string | null>(null);
+
   // Editable Leaderboard Payouts State
   const [winners, setWinners] = useState(INITIAL_LEADERBOARD_WINNERS);
 
@@ -294,8 +304,8 @@ const AdminHub = () => {
   // Admin Add Handler
   const handleAddAdmin = (e: React.FormEvent) => {
     e.preventDefault();
-    if (actor !== 'tiptab') {
-      toast({ title: "Access Denied", description: "Only root admin @tiptab can manage administrators.", variant: "destructive" });
+    if (!isPermanentAdmin) {
+      toast({ title: "Access Denied", description: "Only permanent Super Admins can manage administrators.", variant: "destructive" });
       return;
     }
 
@@ -311,6 +321,65 @@ const AdminHub = () => {
       title: "Admin Added",
       description: `@${handle} is now authorized as a ${newAdminRole} admin.`,
     });
+  };
+
+  // Safe Removal Verification Flow
+  const handleRemoveClick = (admin: AdminUser) => {
+    if (!isPermanentAdmin) return;
+    
+    // Check if the administrator is trying to remove themselves
+    const isSelf = admin.handle === actor;
+
+    if (isSelf) {
+      // Prevent self removal if they are the ONLY permanent admin left
+      const permanentCount = adminsList.filter(a => a.isPermanent).length;
+      if (permanentCount <= 1) {
+        toast({
+          title: "Action Locked",
+          description: "You cannot revoke your own access because you are the only Permanent Super Admin remaining. Appoint another Permanent Super Admin first.",
+          variant: "destructive"
+        });
+        return;
+      }
+      setTargetIdForRemoval(admin.id);
+      setRemovalStep("warning1");
+    } else {
+      removeAdmin(admin.id);
+      toast({
+        title: "Permission Revoked",
+        description: `@${admin.handle}'s administrator privileges have been terminated.`
+      });
+    }
+  };
+
+  const handleWarning1Confirm = () => {
+    setRemovalStep("warning2");
+  };
+
+  const handleFinalSelfRemoval = async () => {
+    if (!targetIdForRemoval || !actor) return;
+    
+    if (confirmInput.toLowerCase().trim() !== actor.toLowerCase().trim()) {
+      toast({
+        title: "Mismatched Handle",
+        description: "Please type your account handle accurately to verify self-termination.",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    removeAdmin(targetIdForRemoval);
+    setRemovalStep("closed");
+    setConfirmInput("");
+    setTargetIdForRemoval(null);
+
+    toast({
+      title: "Self-Removal Verified",
+      description: "You have revoked your admin status. Logging out...",
+    });
+
+    await logout();
+    navigate("/");
   };
 
   const openAuditLogs = (creator: Creator) => {
@@ -357,8 +426,6 @@ const AdminHub = () => {
 
     return items;
   }, [adminRole]);
-
-  const isRootAdmin = actor === 'tiptab';
 
   if (!isAdmin) return null;
 
@@ -943,8 +1010,8 @@ const AdminHub = () => {
           {/* Admins Management Tab (Super Only) */}
           {activeTab === "admins" && adminRole === 'super' && (
             <div className="space-y-8 animate-in fade-in duration-300">
-              {/* Alert lock panel if logged in super admin is NOT root tiptab */}
-              {!isRootAdmin && (
+              {/* Alert lock panel if logged in super admin is NOT a Permanent Super Admin */}
+              {!isPermanentAdmin && (
                 <div className="p-6 rounded-[28px] bg-orange-500/10 border-2 border-orange-500/30 flex items-center gap-4 animate-in slide-in-from-top-4 duration-500">
                   <div className="h-12 w-12 rounded-2xl bg-orange-500/20 flex items-center justify-center shrink-0">
                     <Lock className="h-6 w-6 text-orange-400" />
@@ -952,7 +1019,7 @@ const AdminHub = () => {
                   <div className="flex-1">
                     <h4 className="font-black text-orange-400 uppercase tracking-wider text-sm">Permissions Restricted</h4>
                     <p className="text-slate-300 font-bold text-xs mt-0.5">
-                      You are authenticated as a Super Admin. However, only the absolute root account <span className="text-orange-400">@tiptab</span> possesses permissions to appoint, revoke, or modify administrator accounts.
+                      You are authenticated as a Super Admin. However, only **Permanent Super Admins** possess permissions to appoint, revoke, or modify administrator accounts.
                     </p>
                   </div>
                 </div>
@@ -974,8 +1041,8 @@ const AdminHub = () => {
                         <Input 
                           value={newAdminHandle} 
                           onChange={(e) => setNewAdminHandle(e.target.value)}
-                          disabled={!isRootAdmin}
-                          placeholder={isRootAdmin ? "e.g. kofibuilds" : "Restricted to @tiptab"} 
+                          disabled={!isPermanentAdmin}
+                          placeholder={isPermanentAdmin ? "e.g. kofibuilds" : "Permanent Admin Only"} 
                           className="bg-[#1a112d] border-white/10 rounded-xl h-12 px-4 focus:ring-purple-500/50 font-black text-white disabled:opacity-50"
                         />
                       </div>
@@ -985,7 +1052,7 @@ const AdminHub = () => {
                         <Select 
                           value={newAdminRole} 
                           onValueChange={(val: any) => setNewAdminRole(val)}
-                          disabled={!isRootAdmin}
+                          disabled={!isPermanentAdmin}
                         >
                           <SelectTrigger className="w-full bg-[#1a112d] border-white/10 h-12 rounded-xl font-bold text-xs text-white disabled:opacity-50">
                             <SelectValue />
@@ -1012,7 +1079,7 @@ const AdminHub = () => {
 
                       <Button 
                         type="submit" 
-                        disabled={!isRootAdmin}
+                        disabled={!isPermanentAdmin}
                         className="w-full h-12 bg-white text-black hover:bg-purple-500 hover:text-white rounded-xl font-black text-xs uppercase tracking-widest gap-2 mt-4 transition-all disabled:opacity-30 disabled:cursor-not-allowed"
                       >
                         <Plus className="h-4 w-4" /> Appoint Admin
@@ -1034,6 +1101,7 @@ const AdminHub = () => {
                           <tr>
                             <th className="px-8 py-5 text-left text-[10px] font-black uppercase tracking-widest text-white/30">Account</th>
                             <th className="px-8 py-5 text-left text-[10px] font-black uppercase tracking-widest text-white/30">Permission Scope</th>
+                            <th className="px-8 py-5 text-center text-[10px] font-black uppercase tracking-widest text-white/30">Type</th>
                             <th className="px-8 py-5 text-right text-[10px] font-black uppercase tracking-widest text-white/30">Management</th>
                           </tr>
                         </thead>
@@ -1049,39 +1117,56 @@ const AdminHub = () => {
                                 </div>
                               </td>
                               <td className="px-8 py-6">
-                                {admin.handle === 'tiptab' ? (
-                                  <span className="px-3.5 py-1.5 rounded-full text-[9px] font-black uppercase tracking-[0.2em] bg-orange-500/10 text-orange-400 border border-orange-500/20">
-                                    Root Super
-                                  </span>
-                                ) : (
-                                  <Select 
-                                    value={admin.role} 
-                                    disabled={!isRootAdmin}
-                                    onValueChange={(val: any) => {
-                                      updateAdminRole(admin.id, val);
-                                      toast({ title: "Role Modified", description: `@${admin.handle} changed to ${val}.` });
+                                <Select 
+                                  value={admin.role} 
+                                  disabled={!isPermanentAdmin}
+                                  onValueChange={(val: any) => {
+                                    updateAdminRole(admin.id, val);
+                                    toast({ title: "Role Modified", description: `@${admin.handle} changed to ${val}.` });
+                                  }}
+                                >
+                                  <SelectTrigger className="w-[140px] bg-white/5 border-white/10 h-10 rounded-xl font-bold text-xs text-white">
+                                    <SelectValue />
+                                  </SelectTrigger>
+                                  <SelectContent className="bg-[#1a102d] border-white/20 text-white rounded-xl">
+                                    <SelectItem value="super" className="font-bold py-2 cursor-pointer">Super Admin</SelectItem>
+                                    <SelectItem value="moderator" className="font-bold py-2 cursor-pointer">Moderator</SelectItem>
+                                    <SelectItem value="treasurer" className="font-bold py-2 cursor-pointer">Treasurer</SelectItem>
+                                  </SelectContent>
+                                </Select>
+                              </td>
+                              <td className="px-8 py-6 text-center">
+                                {admin.role === 'super' ? (
+                                  <Button
+                                    variant="ghost"
+                                    disabled={!isPermanentAdmin}
+                                    onClick={() => {
+                                      const nextStatus = !admin.isPermanent;
+                                      makeAdminPermanent(admin.id, nextStatus);
+                                      toast({
+                                        title: nextStatus ? "Owner Level Authorized" : "Owner Level Revoked",
+                                        description: `@${admin.handle} updated status.`,
+                                      });
                                     }}
+                                    className={cn(
+                                      "h-8 px-3.5 rounded-full text-[9px] font-black uppercase tracking-[0.2em] border transition-all",
+                                      admin.isPermanent 
+                                        ? "bg-orange-500/15 text-orange-400 border-orange-500/30 shadow-[0_0_15px_rgba(249,115,22,0.15)]" 
+                                        : "bg-white/5 text-white/30 border-transparent hover:text-white"
+                                    )}
                                   >
-                                    <SelectTrigger className="w-[140px] bg-white/5 border-white/10 h-10 rounded-xl font-bold text-xs text-white disabled:opacity-50">
-                                      <SelectValue />
-                                    </SelectTrigger>
-                                    <SelectContent className="bg-[#1a102d] border-white/20 text-white rounded-xl">
-                                      <SelectItem value="super" className="font-bold py-2 cursor-pointer">Super Admin</SelectItem>
-                                      <SelectItem value="moderator" className="font-bold py-2 cursor-pointer">Moderator</SelectItem>
-                                      <SelectItem value="treasurer" className="font-bold py-2 cursor-pointer">Treasurer</SelectItem>
-                                    </SelectContent>
-                                  </Select>
+                                    {admin.isPermanent ? "Permanent Super" : "Make Permanent"}
+                                  </Button>
+                                ) : (
+                                  <span className="text-[10px] font-black text-white/20 uppercase tracking-widest">Standard</span>
                                 )}
                               </td>
                               <td className="px-8 py-6 text-right">
                                 <Button 
                                   variant="ghost" 
                                   size="icon" 
-                                  disabled={admin.handle === 'tiptab' || !isRootAdmin}
-                                  onClick={() => {
-                                    removeAdmin(admin.id);
-                                    toast({ title: "Admin Revoked", description: `@${admin.handle}'s administrator permissions have been removed.` });
-                                  }}
+                                  disabled={!isPermanentAdmin}
+                                  onClick={() => handleRemoveClick(admin)}
                                   className="h-10 w-10 rounded-xl bg-red-500/10 hover:bg-red-500 text-red-500 hover:text-white transition-all border border-red-500/20 disabled:opacity-30 disabled:cursor-not-allowed"
                                 >
                                   <Trash2 className="h-4.5 w-4.5" />
@@ -1161,6 +1246,81 @@ const AdminHub = () => {
               NO ACTIVITY FOUND
             </div>
           </ScrollArea>
+        </DialogContent>
+      </Dialog>
+
+      {/* Double Self Removal Verification Modal - Step 1 */}
+      <Dialog open={removalStep === "warning1"} onOpenChange={(open) => !open && setRemovalStep("closed")}>
+        <DialogContent className="bg-[#120a21] border-2 border-yellow-500/30 text-white rounded-[40px] p-10 max-w-md shadow-[0_0_80px_rgba(234,179,8,0.15)] animate-in zoom-in-95 duration-300">
+          <div className="text-center space-y-6">
+            <div className="mx-auto h-20 w-20 rounded-2xl bg-yellow-500/10 border border-yellow-500/30 flex items-center justify-center shadow-lg shadow-yellow-500/10">
+              <AlertTriangle className="h-10 w-10 text-yellow-500 animate-bounce" />
+            </div>
+            <DialogHeader className="space-y-2">
+              <DialogTitle className="text-3xl font-black italic tracking-tighter uppercase text-white">WARNING (1/2)</DialogTitle>
+              <DialogDescription className="text-slate-300 font-bold text-sm leading-relaxed">
+                You are about to revoke your own administrative authorization. This means you will immediately lose access to this admin board.
+              </DialogDescription>
+            </DialogHeader>
+            <div className="flex flex-col gap-3 pt-4">
+              <Button 
+                onClick={handleWarning1Confirm}
+                className="h-14 rounded-2xl bg-yellow-500 text-black hover:bg-yellow-600 font-black text-sm uppercase tracking-widest"
+              >
+                Yes, Continue to Final Step
+              </Button>
+              <Button 
+                variant="ghost" 
+                onClick={() => setRemovalStep("closed")}
+                className="h-12 text-white/40 hover:text-white"
+              >
+                Cancel action
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Double Self Removal Verification Modal - Step 2 */}
+      <Dialog open={removalStep === "warning2"} onOpenChange={(open) => !open && setRemovalStep("closed")}>
+        <DialogContent className="bg-[#0f071a] border-2 border-red-500/50 text-white rounded-[40px] p-10 max-w-md shadow-[0_0_100px_rgba(239,68,68,0.3)] animate-in zoom-in-95 duration-300">
+          <div className="text-center space-y-6">
+            <div className="mx-auto h-20 w-20 rounded-2xl bg-red-500/10 border border-red-500/30 flex items-center justify-center shadow-lg shadow-red-500/20">
+              <Lock className="h-10 w-10 text-red-500 animate-pulse" />
+            </div>
+            <DialogHeader className="space-y-2">
+              <DialogTitle className="text-3xl font-black italic tracking-tighter uppercase text-red-500">CRITICAL ACTION (2/2)</DialogTitle>
+              <DialogDescription className="text-red-200 font-bold text-sm leading-relaxed">
+                This action is irreversible. To confirm you want to revoke your permanent Super Admin privileges, type your exact handle <span className="text-white font-black">@{actor}</span> below.
+              </DialogDescription>
+            </DialogHeader>
+            
+            <div className="space-y-4 pt-2 text-left">
+              <Label className="text-[10px] font-black uppercase tracking-widest text-red-400/80">Type your handle to authorize</Label>
+              <Input 
+                value={confirmInput} 
+                onChange={(e) => setConfirmInput(e.target.value)}
+                placeholder={actor || ""} 
+                className="bg-white/5 border-red-500/30 focus:border-red-500 h-14 rounded-xl text-center font-black text-lg text-white"
+              />
+            </div>
+
+            <div className="flex flex-col gap-3 pt-2">
+              <Button 
+                onClick={handleFinalSelfRemoval}
+                className="h-16 rounded-2xl bg-red-500 text-white hover:bg-red-600 font-black text-sm uppercase tracking-widest shadow-lg shadow-red-500/20"
+              >
+                Terminate Privileges
+              </Button>
+              <Button 
+                variant="ghost" 
+                onClick={() => setRemovalStep("closed")}
+                className="h-12 text-white/40 hover:text-white"
+              >
+                Cancel action
+              </Button>
+            </div>
+          </div>
         </DialogContent>
       </Dialog>
     </div>

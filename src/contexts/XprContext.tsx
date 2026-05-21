@@ -17,6 +17,7 @@ export interface AdminUser {
   id: string;
   handle: string;
   role: 'super' | 'moderator' | 'treasurer';
+  isPermanent?: boolean; // New property for permanent super admin status
 }
 
 interface Balances {
@@ -40,10 +41,12 @@ interface XprContextType {
   isLoading: boolean;
   isAdmin: boolean;
   adminRole: 'super' | 'moderator' | 'treasurer' | null;
+  isPermanentAdmin: boolean; // Tells if active actor has supreme root privileges
   adminsList: AdminUser[];
   addAdmin: (handle: string, role: 'super' | 'moderator' | 'treasurer') => void;
   removeAdmin: (id: string) => void;
   updateAdminRole: (id: string, role: 'super' | 'moderator' | 'treasurer') => void;
+  makeAdminPermanent: (id: string, status: boolean) => void; // Promote/demote to permanent super admin
   userProfile: Creator | null;
   updateUserProfile: (profile: Creator) => void;
   isMaintenanceMode: boolean;
@@ -122,15 +125,15 @@ export const XprProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     return false;
   });
 
-  // Persisted admin list
+  // Persisted admin list with root tiptab super as isPermanent: true by default
   const [adminsList, setAdminsList] = useState<AdminUser[]>(() => {
     if (typeof window !== "undefined") {
       const saved = localStorage.getItem("tiptab_admins_list");
       return saved ? JSON.parse(saved) : [
-        { id: "root", handle: "tiptab", role: "super" }
+        { id: "root", handle: "tiptab", role: "super", isPermanent: true }
       ];
     }
-    return [{ id: "root", handle: "tiptab", role: "super" }];
+    return [{ id: "root", handle: "tiptab", role: "super", isPermanent: true }];
   });
 
   const [promoCodes, setPromoCodes] = useState<PromoCode[]>(() => {
@@ -145,6 +148,10 @@ export const XprProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   });
 
   const activeActor = session ? session.auth.actor : null;
+
+  // Compute dynamic administrative privilege levels
+  const currentAdminObj = activeActor ? adminsList.find(a => a.handle === activeActor) : null;
+  const isCurrentAdminPermanent = currentAdminObj?.isPermanent === true;
 
   const setMaintenanceMode = (status: boolean) => {
     setIsMaintenanceMode(status);
@@ -170,9 +177,9 @@ export const XprProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     }
   };
 
-  // Admin Management Functions - strictly restricted to tiptab
+  // Admin Management Functions - strictly restricted to active permanent admins
   const addAdmin = (handle: string, role: 'super' | 'moderator' | 'treasurer') => {
-    if (activeActor !== 'tiptab') return; // Absolutely restricted to root creator
+    if (!isCurrentAdminPermanent) return;
     const cleanHandle = handle.toLowerCase().trim().replace('@', '');
     if (!cleanHandle) return;
     
@@ -191,9 +198,18 @@ export const XprProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   };
 
   const removeAdmin = (id: string) => {
-    if (activeActor !== 'tiptab') return; // Absolutely restricted to root creator
+    if (!isCurrentAdminPermanent) return;
+
     const target = adminsList.find(a => a.id === id);
-    if (target?.handle === 'tiptab') return; // Can never remove tiptab
+    if (!target) return;
+
+    // Prevent removing the last permanent admin
+    if (target.isPermanent) {
+      const permanentCount = adminsList.filter(a => a.isPermanent).length;
+      if (permanentCount <= 1) {
+        return; // Safe locking fallback
+      }
+    }
 
     const updated = adminsList.filter(a => a.id !== id);
     setAdminsList(updated);
@@ -201,11 +217,43 @@ export const XprProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   };
 
   const updateAdminRole = (id: string, role: 'super' | 'moderator' | 'treasurer') => {
-    if (activeActor !== 'tiptab') return; // Absolutely restricted to root creator
+    if (!isCurrentAdminPermanent) return;
+    
     const target = adminsList.find(a => a.id === id);
-    if (target?.handle === 'tiptab') return; // tiptab Super Admin role is permanent
+    if (!target) return;
 
-    const updated = adminsList.map(a => a.id === id ? { ...a, role } : a);
+    // If demoting a permanent admin to a non-super role, clear permanent flag
+    const updated = adminsList.map(a => {
+      if (a.id === id) {
+        const isDemotingSuper = role !== 'super';
+        return { 
+          ...a, 
+          role, 
+          isPermanent: isDemotingSuper ? false : a.isPermanent 
+        };
+      }
+      return a;
+    });
+
+    setAdminsList(updated);
+    localStorage.setItem("tiptab_admins_list", JSON.stringify(updated));
+  };
+
+  const makeAdminPermanent = (id: string, status: boolean) => {
+    if (!isCurrentAdminPermanent) return;
+
+    // Promoting another admin requires them to be super first
+    const updated = adminsList.map(a => {
+      if (a.id === id) {
+        return { 
+          ...a, 
+          isPermanent: status,
+          role: status ? ('super' as const) : a.role 
+        };
+      }
+      return a;
+    });
+
     setAdminsList(updated);
     localStorage.setItem("tiptab_admins_list", JSON.stringify(updated));
   };
@@ -510,7 +558,6 @@ export const XprProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   };
 
   // Determine current active admin permissions
-  const currentAdminObj = activeActor ? adminsList.find(a => a.handle === activeActor) : null;
   const isAdminActive = !!currentAdminObj;
   const activeAdminRole = currentAdminObj ? currentAdminObj.role : null;
 
@@ -529,10 +576,12 @@ export const XprProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     isLoading,
     isAdmin: isAdminActive,
     adminRole: activeAdminRole,
+    isPermanentAdmin: isCurrentAdminPermanent,
     adminsList,
     addAdmin,
     removeAdmin,
     updateAdminRole,
+    makeAdminPermanent,
     userProfile,
     updateUserProfile,
     isMaintenanceMode,
