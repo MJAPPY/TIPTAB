@@ -8,10 +8,11 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { Zap, ShieldCheck, CheckCircle2, Wallet, ArrowRight, Sparkles, Calendar } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { Zap, ShieldCheck, CheckCircle2, Wallet, ArrowRight, Sparkles, Calendar, Gift, Tag, Percent } from "lucide-react";
 import { useState, useEffect } from "react";
 import { useToast } from "@/hooks/use-toast";
-import { useXpr } from "@/contexts/XprContext";
+import { useXpr, PromoCode } from "@/contexts/XprContext";
 
 interface MembershipModalProps {
   isOpen: boolean;
@@ -24,7 +25,11 @@ export const MembershipModal = ({ isOpen, onOpenChange }: MembershipModalProps) 
   const [step, setStep] = useState<OnboardingStep>("intro");
   const [isProcessing, setIsProcessing] = useState(false);
   const { toast } = useToast();
-  const { session, actor, login, isConnected, setIsMember, isMember, membershipFee } = useXpr();
+  const { session, actor, login, isConnected, setIsMember, isMember, membershipFee, applyPromoCode, usePromoCode } = useXpr();
+
+  // Promo code system states
+  const [promoInput, setPromoInput] = useState("");
+  const [appliedPromo, setAppliedPromo] = useState<PromoCode | null>(null);
 
   // Reset or initialize step whenever the modal opens
   useEffect(() => {
@@ -52,13 +57,70 @@ export const MembershipModal = ({ isOpen, onOpenChange }: MembershipModalProps) 
     }
   };
 
+  const handleApplyPromo = () => {
+    if (!promoInput.trim()) return;
+    const promo = applyPromoCode(promoInput);
+    if (promo) {
+      setAppliedPromo(promo);
+      toast({
+        title: "Promo Code Applied!",
+        description: promo.type === "free" ? "Free 1-year pass applied!" : `${promo.value}% discount applied to membership.`,
+      });
+    } else {
+      toast({
+        title: "Invalid Code",
+        description: "The code entered is invalid or has expired.",
+        variant: "destructive"
+      });
+    }
+  };
+
+  const handleRemovePromo = () => {
+    setAppliedPromo(null);
+    setPromoInput("");
+    toast({
+      title: "Promo Code Removed",
+    });
+  };
+
+  const calculateDiscountedFee = () => {
+    const original = parseFloat(membershipFee);
+    if (!appliedPromo) return original;
+    if (appliedPromo.type === 'free') return 0;
+    return original * (1 - appliedPromo.value / 100);
+  };
+
   const handleJoin = async () => {
     if (!session || !actor) return;
     
     setIsProcessing(true);
     try {
+      const discountedVal = calculateDiscountedFee();
+      
+      // If code grants 100% free access, bypass blockchain transact entirely
+      if (discountedVal === 0) {
+        const now = new Date().toISOString();
+        const membershipKey = `tiptab_membership_${actor}`;
+        const membershipDateKey = `tiptab_membership_date_${actor}`;
+        
+        localStorage.setItem(membershipKey, 'true');
+        localStorage.setItem(membershipDateKey, now);
+        setIsMember(true);
+        
+        if (appliedPromo) {
+          usePromoCode(appliedPromo.code);
+        }
+        
+        setStep("success");
+        toast({
+          title: "Membership Activated!",
+          description: "Welcome to the TIPTAB creator network.",
+        });
+        return;
+      }
+
       const permission = session.auth.permission || 'active';
-      const formattedFee = `${parseFloat(membershipFee).toFixed(4)} XPR`;
+      const formattedFee = `${discountedVal.toFixed(4)} XPR`;
       
       const membershipAction = {
         account: 'eosio.token', 
@@ -91,6 +153,10 @@ export const MembershipModal = ({ isOpen, onOpenChange }: MembershipModalProps) 
       localStorage.setItem(membershipKey, 'true');
       localStorage.setItem(membershipDateKey, now);
       setIsMember(true);
+
+      if (appliedPromo) {
+        usePromoCode(appliedPromo.code);
+      }
       
       setStep("success");
       toast({
@@ -111,8 +177,15 @@ export const MembershipModal = ({ isOpen, onOpenChange }: MembershipModalProps) 
 
   const handleClose = () => {
     onOpenChange(false);
-    setTimeout(() => setStep("intro"), 300);
+    setTimeout(() => {
+      setStep("intro");
+      setAppliedPromo(null);
+      setPromoInput("");
+    }, 300);
   };
+
+  const rawFee = parseFloat(membershipFee);
+  const finalFee = calculateDiscountedFee();
 
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && handleClose()}>
@@ -170,7 +243,7 @@ export const MembershipModal = ({ isOpen, onOpenChange }: MembershipModalProps) 
           )}
 
           {step === "payment" && isConnected && (
-            <div className="space-y-10 animate-in fade-in slide-in-from-right-4 duration-500">
+            <div className="space-y-8 animate-in fade-in slide-in-from-right-4 duration-500">
               <div className="space-y-2">
                 <Button variant="ghost" onClick={() => setStep("intro")} className="text-white/60 hover:text-purple-400 -ml-4 font-black tracking-widest uppercase text-xs">
                   ← Back to benefits
@@ -183,17 +256,55 @@ export const MembershipModal = ({ isOpen, onOpenChange }: MembershipModalProps) 
                 </DialogHeader>
               </div>
 
-              <div className="bg-white/5 border-2 border-white/10 rounded-[40px] p-10 text-center relative overflow-hidden group hover:border-purple-500/50 transition-all">
-                <div className="absolute top-0 right-0 p-6 sm:p-10">
+              {/* Price display with optional discount representation */}
+              <div className="bg-white/5 border-2 border-white/10 rounded-[40px] p-8 text-center relative overflow-hidden group hover:border-purple-500/50 transition-all">
+                <div className="absolute top-0 right-0 p-6">
                   <div className="px-4 py-1.5 rounded-full bg-orange-500 text-white text-[10px] font-black uppercase tracking-[0.2em] shadow-lg group-hover:bg-purple-500 transition-colors">
                     Yearly Fee
                   </div>
                 </div>
                 <p className="text-white/40 font-black uppercase tracking-[0.3em] text-[10px] mb-3 group-hover:text-purple-400 transition-colors">Total Activation Amount</p>
-                <div className="flex items-center justify-center gap-4">
-                  <span className="text-7xl font-black tracking-tighter drop-shadow-[0_0_20px_rgba(255,255,255,0.2)] group-hover:text-purple-100 transition-colors">{Number(membershipFee).toLocaleString()}</span>
-                  <span className="text-3xl font-black text-orange-500 italic group-hover:text-purple-400 transition-colors">XPR</span>
+                
+                <div className="flex flex-col items-center justify-center gap-1">
+                  {appliedPromo && (
+                    <span className="text-2xl text-white/30 line-through font-black">
+                      {rawFee.toLocaleString()} XPR
+                    </span>
+                  )}
+                  <div className="flex items-center justify-center gap-4">
+                    <span className="text-5xl sm:text-6xl font-black tracking-tighter drop-shadow-[0_0_20px_rgba(255,255,255,0.2)] group-hover:text-purple-100 transition-colors">
+                      {finalFee.toLocaleString()}
+                    </span>
+                    <span className="text-2xl font-black text-orange-500 italic group-hover:text-purple-400 transition-colors">XPR</span>
+                  </div>
                 </div>
+              </div>
+
+              {/* Promo code entry container */}
+              <div className="space-y-3 bg-white/[0.03] p-5 border border-white/10 rounded-2xl">
+                <Label className="text-[10px] font-black uppercase tracking-widest text-white/50">Enter Promo Code</Label>
+                {appliedPromo ? (
+                  <div className="flex items-center justify-between bg-purple-500/10 border border-purple-500/30 p-3 rounded-xl">
+                    <div className="flex items-center gap-3">
+                      <Gift className="h-5 w-5 text-purple-400" />
+                      <div>
+                        <p className="text-xs font-black text-white">{appliedPromo.code}</p>
+                        <p className="text-[10px] text-purple-400 font-bold uppercase">{appliedPromo.type === 'free' ? 'Free Pass' : `${appliedPromo.value}% Off`}</p>
+                      </div>
+                    </div>
+                    <Button variant="ghost" size="sm" onClick={handleRemovePromo} className="h-8 px-3 rounded-lg text-red-400 hover:bg-red-500/10 font-bold text-xs uppercase">Remove</Button>
+                  </div>
+                ) : (
+                  <div className="flex gap-2">
+                    <Input 
+                      placeholder="e.g. WELCOME100" 
+                      value={promoInput} 
+                      onChange={(e) => setPromoInput(e.target.value)} 
+                      className="bg-white/5 border-white/10 h-11 rounded-xl px-4 text-white font-black"
+                    />
+                    <Button onClick={handleApplyPromo} className="h-11 bg-purple-600 hover:bg-purple-700 text-white font-black px-5 rounded-xl text-xs uppercase">Apply</Button>
+                  </div>
+                )}
               </div>
 
               <div className="space-y-6">
@@ -219,7 +330,7 @@ export const MembershipModal = ({ isOpen, onOpenChange }: MembershipModalProps) 
                       <span>AUTHORIZING...</span>
                     </div>
                   ) : (
-                    isMember ? "RENEW WITH WEBAUTH" : "PAY WITH WEBAUTH"
+                    finalFee === 0 ? "CLAIM FREE SLOT" : (isMember ? "RENEW WITH WEBAUTH" : "PAY WITH WEBAUTH")
                   )}
                 </Button>
               </div>
