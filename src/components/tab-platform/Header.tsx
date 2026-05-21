@@ -347,8 +347,8 @@ export const Header = ({ onBecomeCreator }: HeaderProps) => {
 
             <Sheet open={isOpen} onOpenChange={setIsOpen}>
               <SheetTrigger asChild>
-                <Button variant="ghost" size="icon" className="text-white bg-white/5 border border-white/10 hover:bg-purple-500/15 h-8 w-8 sm:h-10 xl:h-11 2xl:h-12 md:w-16 rounded-xl sm:rounded-2xl shrink-0 xl:hidden">
-                  <Menu className="h-3.5 w-3.5 sm:h-5 sm:w-5 md:h-6 md:w-6 text-slate-200" />
+                <Button variant="ghost" size="icon" className="text-white bg-white/5 border border-white/10 hover:bg-purple-500/15 h-10 w-10 sm:h-12 sm:w-12 xl:h-13 2xl:h-14 rounded-xl sm:rounded-2xl shrink-0 xl:hidden">
+                  <Menu className="h-5 w-5 sm:h-6 sm:w-6 text-slate-200" />
                 </Button>
               </SheetTrigger>
               <SheetContent side="right" className="bg-[#0a0514]/98 backdrop-blur-3xl border-white/10 p-8 pt-16 w-[320px]">
