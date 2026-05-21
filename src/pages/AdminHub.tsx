@@ -107,7 +107,8 @@ const AdminHub = () => {
     distributeXprRewards,
     promoCodes,
     createPromoCode,
-    deletePromoCode
+    deletePromoCode,
+    actor
   } = useXpr();
   
   const navigate = useNavigate();
@@ -293,6 +294,11 @@ const AdminHub = () => {
   // Admin Add Handler
   const handleAddAdmin = (e: React.FormEvent) => {
     e.preventDefault();
+    if (actor !== 'tiptab') {
+      toast({ title: "Access Denied", description: "Only root admin @tiptab can manage administrators.", variant: "destructive" });
+      return;
+    }
+
     const handle = newAdminHandle.trim().replace('@', '');
     if (!handle) {
       toast({ title: "Error", description: "Please provide a valid account handle.", variant: "destructive" });
@@ -351,6 +357,8 @@ const AdminHub = () => {
 
     return items;
   }, [adminRole]);
+
+  const isRootAdmin = actor === 'tiptab';
 
   if (!isAdmin) return null;
 
@@ -935,6 +943,21 @@ const AdminHub = () => {
           {/* Admins Management Tab (Super Only) */}
           {activeTab === "admins" && adminRole === 'super' && (
             <div className="space-y-8 animate-in fade-in duration-300">
+              {/* Alert lock panel if logged in super admin is NOT root tiptab */}
+              {!isRootAdmin && (
+                <div className="p-6 rounded-[28px] bg-orange-500/10 border-2 border-orange-500/30 flex items-center gap-4 animate-in slide-in-from-top-4 duration-500">
+                  <div className="h-12 w-12 rounded-2xl bg-orange-500/20 flex items-center justify-center shrink-0">
+                    <Lock className="h-6 w-6 text-orange-400" />
+                  </div>
+                  <div className="flex-1">
+                    <h4 className="font-black text-orange-400 uppercase tracking-wider text-sm">Permissions Restricted</h4>
+                    <p className="text-slate-300 font-bold text-xs mt-0.5">
+                      You are authenticated as a Super Admin. However, only the absolute root account <span className="text-orange-400">@tiptab</span> possesses permissions to appoint, revoke, or modify administrator accounts.
+                    </p>
+                  </div>
+                </div>
+              )}
+
               <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
                 {/* Add New Admin Form */}
                 <Card className="lg:col-span-4 bg-[#120a21] border border-white/10 rounded-[32px] overflow-hidden shadow-2xl">
@@ -951,15 +974,20 @@ const AdminHub = () => {
                         <Input 
                           value={newAdminHandle} 
                           onChange={(e) => setNewAdminHandle(e.target.value)}
-                          placeholder="e.g. kofibuilds" 
-                          className="bg-[#1a112d] border-white/10 rounded-xl h-12 px-4 focus:ring-purple-500/50 font-black text-white"
+                          disabled={!isRootAdmin}
+                          placeholder={isRootAdmin ? "e.g. kofibuilds" : "Restricted to @tiptab"} 
+                          className="bg-[#1a112d] border-white/10 rounded-xl h-12 px-4 focus:ring-purple-500/50 font-black text-white disabled:opacity-50"
                         />
                       </div>
 
                       <div className="space-y-2">
                         <Label className="text-[10px] font-black uppercase tracking-widest text-white/50">Permission Role</Label>
-                        <Select value={newAdminRole} onValueChange={(val: any) => setNewAdminRole(val)}>
-                          <SelectTrigger className="w-full bg-[#1a112d] border-white/10 h-12 rounded-xl font-bold text-xs text-white">
+                        <Select 
+                          value={newAdminRole} 
+                          onValueChange={(val: any) => setNewAdminRole(val)}
+                          disabled={!isRootAdmin}
+                        >
+                          <SelectTrigger className="w-full bg-[#1a112d] border-white/10 h-12 rounded-xl font-bold text-xs text-white disabled:opacity-50">
                             <SelectValue />
                           </SelectTrigger>
                           <SelectContent className="bg-[#1a102d] border-white/20 text-white rounded-xl">
@@ -982,7 +1010,11 @@ const AdminHub = () => {
                         </p>
                       </div>
 
-                      <Button type="submit" className="w-full h-12 bg-white text-black hover:bg-purple-500 hover:text-white rounded-xl font-black text-xs uppercase tracking-widest gap-2 mt-4 transition-all">
+                      <Button 
+                        type="submit" 
+                        disabled={!isRootAdmin}
+                        className="w-full h-12 bg-white text-black hover:bg-purple-500 hover:text-white rounded-xl font-black text-xs uppercase tracking-widest gap-2 mt-4 transition-all disabled:opacity-30 disabled:cursor-not-allowed"
+                      >
                         <Plus className="h-4 w-4" /> Appoint Admin
                       </Button>
                     </form>
@@ -1024,12 +1056,13 @@ const AdminHub = () => {
                                 ) : (
                                   <Select 
                                     value={admin.role} 
+                                    disabled={!isRootAdmin}
                                     onValueChange={(val: any) => {
                                       updateAdminRole(admin.id, val);
                                       toast({ title: "Role Modified", description: `@${admin.handle} changed to ${val}.` });
                                     }}
                                   >
-                                    <SelectTrigger className="w-[140px] bg-white/5 border-white/10 h-10 rounded-xl font-bold text-xs text-white">
+                                    <SelectTrigger className="w-[140px] bg-white/5 border-white/10 h-10 rounded-xl font-bold text-xs text-white disabled:opacity-50">
                                       <SelectValue />
                                     </SelectTrigger>
                                     <SelectContent className="bg-[#1a102d] border-white/20 text-white rounded-xl">
@@ -1044,7 +1077,7 @@ const AdminHub = () => {
                                 <Button 
                                   variant="ghost" 
                                   size="icon" 
-                                  disabled={admin.handle === 'tiptab'}
+                                  disabled={admin.handle === 'tiptab' || !isRootAdmin}
                                   onClick={() => {
                                     removeAdmin(admin.id);
                                     toast({ title: "Admin Revoked", description: `@${admin.handle}'s administrator permissions have been removed.` });

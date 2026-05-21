@@ -144,6 +144,8 @@ export const XprProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     return [];
   });
 
+  const activeActor = session ? session.auth.actor : null;
+
   const setMaintenanceMode = (status: boolean) => {
     setIsMaintenanceMode(status);
     localStorage.setItem("tiptab_maintenance", status.toString());
@@ -168,8 +170,9 @@ export const XprProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     }
   };
 
-  // Admin Management Functions
+  // Admin Management Functions - strictly restricted to tiptab
   const addAdmin = (handle: string, role: 'super' | 'moderator' | 'treasurer') => {
+    if (activeActor !== 'tiptab') return; // Absolutely restricted to root creator
     const cleanHandle = handle.toLowerCase().trim().replace('@', '');
     if (!cleanHandle) return;
     
@@ -188,9 +191,9 @@ export const XprProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   };
 
   const removeAdmin = (id: string) => {
-    // Root creator tiptab is permanent and can never be removed
+    if (activeActor !== 'tiptab') return; // Absolutely restricted to root creator
     const target = adminsList.find(a => a.id === id);
-    if (target?.handle === 'tiptab') return;
+    if (target?.handle === 'tiptab') return; // Can never remove tiptab
 
     const updated = adminsList.filter(a => a.id !== id);
     setAdminsList(updated);
@@ -198,8 +201,9 @@ export const XprProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   };
 
   const updateAdminRole = (id: string, role: 'super' | 'moderator' | 'treasurer') => {
+    if (activeActor !== 'tiptab') return; // Absolutely restricted to root creator
     const target = adminsList.find(a => a.id === id);
-    if (target?.handle === 'tiptab') return; // root super admin role is permanent
+    if (target?.handle === 'tiptab') return; // tiptab Super Admin role is permanent
 
     const updated = adminsList.map(a => a.id === id ? { ...a, role } : a);
     setAdminsList(updated);
@@ -506,7 +510,6 @@ export const XprProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   };
 
   // Determine current active admin permissions
-  const activeActor = session ? session.auth.actor : null;
   const currentAdminObj = activeActor ? adminsList.find(a => a.handle === activeActor) : null;
   const isAdminActive = !!currentAdminObj;
   const activeAdminRole = currentAdminObj ? currentAdminObj.role : null;
