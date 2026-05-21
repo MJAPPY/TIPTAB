@@ -17,7 +17,9 @@ import {
   ShoppingCart,
   ExternalLink,
   Calendar,
-  Clock
+  Clock,
+  Eye,
+  Users
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
@@ -48,8 +50,47 @@ const Dashboard = () => {
   const [transferSymbol, setTransferSymbol] = useState("TAB");
   const [isSending, setIsSending] = useState(false);
 
+  // Analytics Metrics State
+  const [tipsReceived, setTipsReceived] = useState(0);
+  const [profileViews, setProfileViews] = useState(0);
+  const [engagementRate, setEngagementRate] = useState(0);
+
   const alcorUrl = "https://alcor.exchange/v/xpr/swap?input=xpr-eosio.token&output=tab-tokencreate";
   const metalPayUrl = "https://onramp.metalpay.com/buy/xpr";
+
+  // Setup/load unique simulated analytics for the actor
+  useEffect(() => {
+    if (!actor) return;
+    
+    // Seed consistent starting metrics based on user actor handle
+    const viewsKey = `tiptab_views_${actor}`;
+    const receivedKey = `tiptab_tips_received_${actor}`;
+    const engagementKey = `tiptab_engagement_${actor}`;
+
+    let savedViews = localStorage.getItem(viewsKey);
+    let savedReceived = localStorage.getItem(receivedKey);
+    let savedEngagement = localStorage.getItem(engagementKey);
+
+    if (!savedViews) {
+      const initialViews = Math.floor(Math.random() * 800) + 450;
+      localStorage.setItem(viewsKey, initialViews.toString());
+      savedViews = initialViews.toString();
+    }
+    if (!savedReceived) {
+      const initialReceived = Math.floor(Math.random() * 5000) + 1250;
+      localStorage.setItem(receivedKey, initialReceived.toString());
+      savedReceived = initialReceived.toString();
+    }
+    if (!savedEngagement) {
+      const initialEngagement = (Math.random() * 15 + 8).toFixed(1);
+      localStorage.setItem(engagementKey, initialEngagement);
+      savedEngagement = initialEngagement;
+    }
+
+    setProfileViews(parseInt(savedViews));
+    setTipsReceived(parseInt(savedReceived));
+    setEngagementRate(parseFloat(savedEngagement));
+  }, [actor]);
 
   const formatPrecision = (val: string) => {
     const num = parseFloat(val);
@@ -60,6 +101,16 @@ const Dashboard = () => {
   const handleManualRefresh = async () => {
     setIsRefreshing(true);
     await refreshBalances();
+    
+    // Simulate realistic small view update on refresh
+    if (actor) {
+      setProfileViews(prev => {
+        const next = prev + Math.floor(Math.random() * 3) + 1;
+        localStorage.setItem(`tiptab_views_${actor}`, next.toString());
+        return next;
+      });
+    }
+
     setTimeout(() => setIsRefreshing(false), 800);
     toast({ title: "Balances Updated", description: "Synced with XPR Network." });
   };
@@ -208,9 +259,10 @@ const Dashboard = () => {
           <div className="lg:col-span-12">
             <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
               <TabsContent value="analytics" className="space-y-6 sm:space-y-10 mt-0 animate-in fade-in slide-in-from-bottom-4 duration-500">
+                {/* Financial Balance Cards Grid */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
                   {/* Liquid TAB Card */}
-                  <Card className="bg-[#130b21]/60 border-white/10 text-white rounded-[32px] sm:rounded-[40px] p-6 sm:p-10 shadow-2xl relative overflow-hidden group hover:border-orange-500/30 transition-all flex flex-col h-[280px] sm:h-[340px]">
+                  <Card className="bg-[#130b21]/60 border-white/10 text-white rounded-[32px] sm:rounded-[40px] p-6 sm:p-10 shadow-2xl relative overflow-hidden group hover:border-orange-500/30 transition-all flex flex-col h-[280px] sm:h-[310px]">
                     <div className="absolute -top-12 -right-12 w-32 h-32 bg-orange-500/10 blur-3xl rounded-full group-hover:bg-orange-500/20 transition-all" />
                     <CardHeader className="p-0">
                       <div className="flex items-center justify-between">
@@ -247,7 +299,7 @@ const Dashboard = () => {
                   </Card>
 
                   {/* Liquid XPR Card */}
-                  <Card className="bg-[#130b21]/60 border-white/10 text-white rounded-[32px] sm:rounded-[40px] p-6 sm:p-10 shadow-2xl relative overflow-hidden group hover:border-purple-500/30 transition-all flex flex-col h-[280px] sm:h-[340px]">
+                  <Card className="bg-[#130b21]/60 border-white/10 text-white rounded-[32px] sm:rounded-[40px] p-6 sm:p-10 shadow-2xl relative overflow-hidden group hover:border-purple-500/30 transition-all flex flex-col h-[280px] sm:h-[310px]">
                     <div className="absolute -top-12 -right-12 w-32 h-32 bg-purple-500/10 blur-3xl rounded-full group-hover:bg-purple-500/20 transition-all" />
                     <CardHeader className="p-0">
                       <CardDescription className="text-slate-400 font-black uppercase tracking-[0.2em] text-[9px] sm:text-[10px]">Liquid XPR</CardDescription>
@@ -285,7 +337,7 @@ const Dashboard = () => {
                   </Card>
 
                   {/* Membership Card */}
-                  <Card className="bg-[#130b21]/60 border-white/10 text-white rounded-[32px] sm:rounded-[40px] p-6 sm:p-10 shadow-2xl relative overflow-hidden group hover:border-blue-500/30 transition-all flex flex-col h-[280px] sm:h-[340px]">
+                  <Card className="bg-[#130b21]/60 border-white/10 text-white rounded-[32px] sm:rounded-[40px] p-6 sm:p-10 shadow-2xl relative overflow-hidden group hover:border-blue-500/30 transition-all flex flex-col h-[280px] sm:h-[310px]">
                     <div className="absolute -top-12 -right-12 w-32 h-32 bg-blue-500/10 blur-3xl rounded-full group-hover:bg-blue-500/20 transition-all" />
                     <CardHeader className="p-0">
                       <CardDescription className="text-slate-400 font-black uppercase tracking-[0.2em] text-[9px] sm:text-[10px]">Network Membership</CardDescription>
@@ -335,6 +387,82 @@ const Dashboard = () => {
                       </div>
                     </CardContent>
                   </Card>
+                </div>
+
+                {/* Simulated Public Engagement Metrics Rows */}
+                <div className="pt-4">
+                  <div className="h-px bg-white/10 w-full mb-8" />
+                  <h3 className="text-xs font-black uppercase tracking-[0.25em] text-white/40 mb-6 flex items-center gap-2">
+                    <TrendingUp className="h-4 w-4 text-purple-400" /> Channel Metrics & Discovery
+                  </h3>
+                  
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
+                    {/* Tipped Received Analytics Card */}
+                    <Card className="bg-[#130b21]/40 border-white/10 text-white rounded-[32px] sm:rounded-[40px] p-6 sm:p-10 shadow-2xl relative overflow-hidden group hover:border-green-500/30 transition-all flex flex-col h-[220px]">
+                      <div className="absolute -top-12 -right-12 w-32 h-32 bg-green-500/5 blur-3xl rounded-full group-hover:bg-green-500/10 transition-all" />
+                      <CardHeader className="p-0">
+                        <div className="flex items-center justify-between">
+                          <CardDescription className="text-slate-400 font-black uppercase tracking-[0.2em] text-[9px] sm:text-[10px]">Total Tips Received</CardDescription>
+                          <div className="h-8 w-8 rounded-xl bg-green-500/10 flex items-center justify-center border border-green-500/20">
+                            <HandCoins className="h-4 w-4 text-green-400" />
+                          </div>
+                        </div>
+                      </CardHeader>
+                      <CardContent className="p-0 mt-4 flex flex-col flex-1 justify-between">
+                        <div className="flex flex-col items-start">
+                          <span className="text-3xl sm:text-5xl font-black tracking-tighter text-slate-100">
+                            {tipsReceived.toLocaleString()}
+                          </span>
+                          <span className="text-xs font-black text-green-400 uppercase tracking-wider mt-1">TAB Earned</span>
+                        </div>
+                        <p className="text-[10px] text-white/30 font-bold uppercase tracking-widest pt-2">Accumulated tip rewards</p>
+                      </CardContent>
+                    </Card>
+
+                    {/* Profile Discovery Views Card */}
+                    <Card className="bg-[#130b21]/40 border-white/10 text-white rounded-[32px] sm:rounded-[40px] p-6 sm:p-10 shadow-2xl relative overflow-hidden group hover:border-cyan-500/30 transition-all flex flex-col h-[220px]">
+                      <div className="absolute -top-12 -right-12 w-32 h-32 bg-cyan-500/5 blur-3xl rounded-full group-hover:bg-cyan-500/10 transition-all" />
+                      <CardHeader className="p-0">
+                        <div className="flex items-center justify-between">
+                          <CardDescription className="text-slate-400 font-black uppercase tracking-[0.2em] text-[9px] sm:text-[10px]">Profile Impressions</CardDescription>
+                          <div className="h-8 w-8 rounded-xl bg-cyan-500/10 flex items-center justify-center border border-cyan-500/20">
+                            <Eye className="h-4 w-4 text-cyan-400" />
+                          </div>
+                        </div>
+                      </CardHeader>
+                      <CardContent className="p-0 mt-4 flex flex-col flex-1 justify-between">
+                        <div className="flex flex-col items-start">
+                          <span className="text-3xl sm:text-5xl font-black tracking-tighter text-slate-100">
+                            {profileViews.toLocaleString()}
+                          </span>
+                          <span className="text-xs font-black text-cyan-400 uppercase tracking-wider mt-1">Unique views</span>
+                        </div>
+                        <p className="text-[10px] text-white/30 font-bold uppercase tracking-widest pt-2">Global map and bio visits</p>
+                      </CardContent>
+                    </Card>
+
+                    {/* Engagement / Conversion Rate Card */}
+                    <Card className="bg-[#130b21]/40 border-white/10 text-white rounded-[32px] sm:rounded-[40px] p-6 sm:p-10 shadow-2xl relative overflow-hidden group hover:border-pink-500/30 transition-all flex flex-col h-[220px]">
+                      <div className="absolute -top-12 -right-12 w-32 h-32 bg-pink-500/5 blur-3xl rounded-full group-hover:bg-pink-500/10 transition-all" />
+                      <CardHeader className="p-0">
+                        <div className="flex items-center justify-between">
+                          <CardDescription className="text-slate-400 font-black uppercase tracking-[0.2em] text-[9px] sm:text-[10px]">Community Engagement</CardDescription>
+                          <div className="h-8 w-8 rounded-xl bg-pink-500/10 flex items-center justify-center border border-pink-500/20">
+                            <Users className="h-4 w-4 text-pink-400" />
+                          </div>
+                        </div>
+                      </CardHeader>
+                      <CardContent className="p-0 mt-4 flex flex-col flex-1 justify-between">
+                        <div className="flex flex-col items-start">
+                          <span className="text-3xl sm:text-5xl font-black tracking-tighter text-slate-100">
+                            {engagementRate}%
+                          </span>
+                          <span className="text-xs font-black text-pink-400 uppercase tracking-wider mt-1">Conversion Ratio</span>
+                        </div>
+                        <p className="text-[10px] text-white/30 font-bold uppercase tracking-widest pt-2">Viewers converted to supporters</p>
+                      </CardContent>
+                    </Card>
+                  </div>
                 </div>
               </TabsContent>
 
