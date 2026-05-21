@@ -16,26 +16,21 @@ import {
   Zap,
   Power,
   X,
-  UserX,
-  History,
   FileText,
-  UserMinus,
-  ArrowUpRight,
-  ArrowDownLeft,
+  History,
   HandCoins,
   Users,
   TrendingUp,
-  Coins,
-  Calendar,
-  Clock,
-  Sparkles,
   Trophy,
-  Heart
+  Sparkles,
+  LayoutGrid,
+  Laptop
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useXpr } from "@/contexts/XprContext";
 import { Header } from "@/components/tab-platform/Header";
 import { CREATORS, Creator } from "@/data/creators";
@@ -53,8 +48,6 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -70,20 +63,6 @@ const MOCK_AUDIT_LOGS: Record<string, any[]> = {
   ]
 };
 
-const MOCK_TRANSACTIONS: Record<string, any[]> = {
-  "tiptab": [
-    { date: "2024-05-19", amount: "1,200", asset: "TAB", type: "received", counterparty: "whaleshark" },
-    { date: "2024-05-18", amount: "500", asset: "TAB", type: "received", counterparty: "early" },
-    { date: "2024-05-17", amount: "250", asset: "XPR", type: "received", counterparty: "fanatic" },
-  ],
-  "carlos_delivery": [
-    { date: "2024-05-19", amount: "50", asset: "TAB", type: "received", counterparty: "anonymous" },
-    { date: "2024-05-18", amount: "100", asset: "TAB", type: "received", counterparty: "local_fan" },
-    { date: "2024-05-15", amount: "10.5000", asset: "XPR", type: "received", counterparty: "cking" },
-  ]
-};
-
-// Mock ranking data for Admin Rewards
 const LEADERBOARD_WINNERS = [
   { account: "whaleshark", role: "Supporter", rank: 1, reward: "5000" },
   { account: "tiptab", role: "Creator", rank: 2, reward: "2500" },
@@ -116,6 +95,7 @@ const AdminHub = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
   
+  const [activeTab, setActiveTab] = useState("treasury");
   const [localFee, setLocalFee] = useState(membershipFee || "2500");
   const [localBoost, setLocalBoost] = useState(boostPrice || "500");
   const [searchQuery, setSearchQuery] = useState("");
@@ -220,111 +200,185 @@ const AdminHub = () => {
     c.handle.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
+  const adminNavItems = [
+    { id: "treasury", label: "Treasury", icon: Activity },
+    { id: "config", label: "Node Config", icon: Settings },
+    { id: "rewards", label: "Rewards", icon: Trophy },
+    { id: "moderation", label: "Moderation", icon: Users },
+  ];
+
   if (!isAdmin) return null;
 
   return (
     <div className="min-h-screen bg-[#06030e] text-white overflow-x-hidden">
       <Header />
 
-      <main className="container mx-auto px-4 md:px-6 py-12 pt-36 md:pt-44">
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 md:gap-12 items-start">
+      {/* Background decoration */}
+      <div className="absolute top-0 left-1/4 w-[300px] md:w-[500px] h-[300px] md:h-[500px] bg-purple-500/10 blur-[120px] rounded-full -z-10 animate-pulse" />
+      <div className="absolute bottom-0 right-1/4 w-[400px] md:w-[600px] h-[400px] md:h-[600px] bg-cyan-500/5 blur-[150px] rounded-full -z-10" />
+
+      <main className="container mx-auto px-4 md:px-6 py-12 pt-36 md:pt-44 max-w-6xl">
+        <div className="flex flex-col xl:flex-row xl:items-end justify-between gap-8 mb-12">
+          <div className="space-y-3">
+            <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-orange-500/10 border border-orange-500/20 text-[9px] font-black uppercase tracking-[0.2em] text-orange-400">
+              <ShieldAlert className="h-3.5 w-3.5" />
+              Secure Administration
+            </div>
+            <h1 className="text-3xl sm:text-5xl md:text-6xl font-black tracking-tighter leading-none text-slate-100">
+              Admin <span className="text-transparent bg-clip-text bg-gradient-to-r from-orange-400 to-purple-500">Hub</span>
+            </h1>
+          </div>
           
-          <div className="lg:col-span-4 space-y-6">
-            
-            {/* Vitals Card */}
-            <Card className="bg-[#0d071a] border-[4px] border-slate-300/40 rounded-[40px] overflow-hidden shadow-[0_0_80px_rgba(0,0,0,0.8)] relative group ring-2 ring-white/10">
-              <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-white/[0.05] to-transparent pointer-events-none" />
-              <CardHeader className="p-8 pb-2 relative z-10">
-                <div className="flex items-center justify-between">
-                  <CardTitle className="text-xl md:text-2xl font-black italic tracking-tighter flex items-center gap-3 text-white">
-                    <Activity className="h-6 w-6 text-purple-500 animate-pulse" /> NETWORK TREASURY
-                  </CardTitle>
-                  <div className="flex items-center gap-2 px-3 py-1 rounded-full bg-green-500/20 border border-green-500/40">
-                    <span className="relative flex h-2 w-2">
-                      <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
-                      <span className="relative inline-flex rounded-full h-2 w-2 bg-green-500"></span>
-                    </span>
-                    <span className="text-[10px] font-black uppercase tracking-[0.2em] text-green-400">Synced</span>
-                  </div>
-                </div>
-              </CardHeader>
-              <CardContent className="p-8 pt-0 space-y-8 relative z-10">
-                <div className="space-y-4 bg-white/5 p-6 rounded-[28px] border border-white/10">
+          <div className="grid grid-cols-2 sm:flex items-center gap-2 sm:gap-4 bg-white/5 border border-white/10 p-2 rounded-3xl backdrop-blur-xl">
+             {adminNavItems.map((item) => (
+               <Button
+                key={item.id}
+                variant="ghost"
+                onClick={() => setActiveTab(item.id)}
+                className={cn(
+                  "h-12 sm:h-14 px-4 sm:px-6 rounded-2xl gap-2 sm:gap-3 font-black text-[10px] sm:text-xs uppercase tracking-widest transition-all",
+                  activeTab === item.id 
+                    ? "bg-purple-600 text-white shadow-[0_10px_30px_rgba(168,85,247,0.3)]" 
+                    : "text-slate-400 hover:text-purple-400 hover:bg-purple-500/5"
+                )}
+               >
+                 <item.icon className="h-3 w-3 sm:h-4 w-4" />
+                 <span>{item.label}</span>
+               </Button>
+             ))}
+          </div>
+        </div>
+
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+          {/* Treasury Tab */}
+          <TabsContent value="treasury" className="space-y-8 mt-0 animate-in fade-in slide-in-from-bottom-4 duration-500">
+            <div className="grid grid-cols-1 md:grid-cols-12 gap-8 items-start">
+              <Card className="md:col-span-6 bg-[#0d071a] border-[4px] border-slate-300/40 rounded-[40px] overflow-hidden shadow-[0_0_80px_rgba(0,0,0,0.8)] relative group ring-2 ring-white/10">
+                <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-white/[0.05] to-transparent pointer-events-none" />
+                <CardHeader className="p-8 pb-2 relative z-10">
                   <div className="flex items-center justify-between">
-                    <div className="space-y-1">
-                      <p className="text-[11px] font-black text-orange-500 uppercase tracking-[0.4em]">Available Rewards</p>
-                      <p className="text-4xl font-black text-white tracking-tighter italic">{Number(balances.xpr).toLocaleString()} <span className="text-orange-500 text-lg">XPR</span></p>
+                    <CardTitle className="text-xl md:text-2xl font-black italic tracking-tighter flex items-center gap-3 text-white">
+                      <Activity className="h-6 w-6 text-purple-500 animate-pulse" /> NETWORK TREASURY
+                    </CardTitle>
+                    <div className="flex items-center gap-2 px-3 py-1 rounded-full bg-green-500/20 border border-green-500/40">
+                      <span className="relative flex h-2 w-2">
+                        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
+                        <span className="relative inline-flex rounded-full h-2 w-2 bg-green-500"></span>
+                      </span>
+                      <span className="text-[10px] font-black uppercase tracking-[0.2em] text-green-400">Synced</span>
                     </div>
-                    <HandCoins className="h-8 w-8 text-orange-500" />
                   </div>
-                  <div className="pt-4 border-t border-white/5">
-                    <p className="text-[9px] font-bold text-white/30 uppercase tracking-[0.2em]">Source: 100% Membership & Boost Fees</p>
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-1 gap-2.5">
-                   <div className="bg-gradient-to-r from-purple-500/10 to-transparent p-5 rounded-2xl border border-white/10 flex items-center justify-between group/mini hover:border-purple-500/40 transition-all">
-                    <div>
-                      <span className="text-[11px] font-black text-white/40 uppercase tracking-[0.3em] block mb-0.5">Activation Revenue</span>
-                      <span className="text-xl font-black text-white italic">452,500 <span className="text-xs text-purple-400">XPR</span></span>
+                </CardHeader>
+                <CardContent className="p-8 pt-0 space-y-8 relative z-10">
+                  <div className="space-y-4 bg-white/5 p-6 rounded-[28px] border border-white/10">
+                    <div className="flex items-center justify-between">
+                      <div className="space-y-1">
+                        <p className="text-[11px] font-black text-orange-500 uppercase tracking-[0.4em]">Available Rewards</p>
+                        <p className="text-4xl font-black text-white tracking-tighter italic">{Number(balances.xpr).toLocaleString()} <span className="text-orange-500 text-lg">XPR</span></p>
+                      </div>
+                      <HandCoins className="h-8 w-8 text-orange-500" />
                     </div>
-                    <CheckCircle2 className="h-5 w-5 text-purple-400" />
-                  </div>
-                  <div className="bg-gradient-to-r from-orange-500/10 to-transparent p-5 rounded-2xl border border-white/10 flex items-center justify-between group/mini hover:border-orange-500/40 transition-all">
-                    <div>
-                      <span className="text-[11px] font-black text-white/40 uppercase tracking-[0.3em] block mb-0.5">Performance Boosts</span>
-                      <span className="text-xl font-black text-white italic">12,500 <span className="text-xs text-orange-500">XPR</span></span>
+                    <div className="pt-4 border-t border-white/5">
+                      <p className="text-[9px] font-bold text-white/30 uppercase tracking-[0.2em]">Source: 100% Membership & Boost Fees</p>
                     </div>
-                    <Zap className="h-5 w-5 text-orange-500 fill-orange-500" />
                   </div>
-                </div>
 
-                <Button 
-                  onClick={handleRewardWinners}
-                  disabled={isDistributing}
-                  className="w-full h-16 bg-white text-black hover:bg-orange-500 hover:text-white rounded-2xl font-black text-xs uppercase tracking-widest shadow-2xl transition-all active:scale-[0.98]"
-                >
-                  {isDistributing ? "Processing Batch..." : "Distribute Weekly Rewards"}
-                </Button>
-              </CardContent>
-            </Card>
-
-            {/* Config Card */}
-            <Card className="bg-[#120a21] border-white/5 rounded-[40px] overflow-hidden shadow-2xl">
-              <CardHeader className="p-10 pb-2">
-                <CardTitle className="text-xl font-black flex items-center gap-3 tracking-tight text-white uppercase italic">
-                  <Settings className="h-5 w-5 text-orange-400" /> Network Config
-                </CardTitle>
-                <CardDescription className="text-white/40 font-medium text-sm">Manage global node parameters</CardDescription>
-              </CardHeader>
-              <CardContent className="p-10 space-y-10">
-                <div className="space-y-4">
-                  <Label className="text-[11px] font-black uppercase tracking-widest text-white/40">Activation Fee (XPR)</Label>
-                  <div className="flex gap-4">
-                    <Input 
-                      type="number" 
-                      value={localFee} 
-                      onChange={(e) => setLocalFee(e.target.value)}
-                      className="bg-[#1a112d] border-white/10 rounded-2xl font-black text-xl h-16 px-6 focus:ring-orange-500/50 text-white"
-                    />
-                    <Button onClick={handleUpdateFee} className="bg-orange-500 hover:bg-orange-600 rounded-2xl px-6 h-16 font-black text-white">Update</Button>
+                  <div className="grid grid-cols-1 gap-2.5">
+                     <div className="bg-gradient-to-r from-purple-500/10 to-transparent p-5 rounded-2xl border border-white/10 flex items-center justify-between group/mini hover:border-purple-500/40 transition-all">
+                      <div>
+                        <span className="text-[11px] font-black text-white/40 uppercase tracking-[0.3em] block mb-0.5">Activation Revenue</span>
+                        <span className="text-xl font-black text-white italic">452,500 <span className="text-xs text-purple-400">XPR</span></span>
+                      </div>
+                      <CheckCircle2 className="h-5 w-5 text-purple-400" />
+                    </div>
+                    <div className="bg-gradient-to-r from-orange-500/10 to-transparent p-5 rounded-2xl border border-white/10 flex items-center justify-between group/mini hover:border-orange-500/40 transition-all">
+                      <div>
+                        <span className="text-[11px] font-black text-white/40 uppercase tracking-[0.3em] block mb-0.5">Performance Boosts</span>
+                        <span className="text-xl font-black text-white italic">12,500 <span className="text-xs text-orange-500">XPR</span></span>
+                      </div>
+                      <Zap className="h-5 w-5 text-orange-500 fill-orange-500" />
+                    </div>
                   </div>
-                </div>
 
-                <div className="space-y-4">
-                  <Label className="text-[11px] font-black uppercase tracking-widest text-white/40">Performance Boost (XPR)</Label>
-                  <div className="flex gap-4">
-                    <Input 
-                      type="number" 
-                      value={localBoost} 
-                      onChange={(e) => setLocalBoost(e.target.value)}
-                      className="bg-[#1a112d] border-white/10 rounded-2xl font-black text-xl h-16 px-6 focus:ring-orange-500/50 text-white"
-                    />
-                    <Button onClick={handleUpdateBoost} className="bg-purple-600 hover:bg-purple-700 rounded-2xl px-6 h-16 font-black text-white">Update</Button>
+                  <Button 
+                    onClick={handleRewardWinners}
+                    disabled={isDistributing}
+                    className="w-full h-16 bg-white text-black hover:bg-orange-500 hover:text-white rounded-2xl font-black text-xs uppercase tracking-widest shadow-2xl transition-all active:scale-[0.98]"
+                  >
+                    {isDistributing ? "Processing Batch..." : "Distribute Weekly Rewards"}
+                  </Button>
+                </CardContent>
+              </Card>
+
+              <Card className="md:col-span-6 bg-[#0d071a] border border-white/10 rounded-[40px] p-8 space-y-6">
+                <CardHeader className="p-0">
+                  <CardTitle className="text-xl font-black flex items-center gap-3 text-white uppercase italic">
+                    <Laptop className="h-5 w-5 text-orange-400" /> System Metrics
+                  </CardTitle>
+                  <CardDescription className="text-white/40">Overview of node activity and transactions</CardDescription>
+                </CardHeader>
+                <CardContent className="p-0 space-y-6">
+                  <div className="p-5 rounded-2xl bg-white/5 border border-white/5 flex justify-between items-center">
+                    <span className="text-xs font-black uppercase tracking-wider text-slate-400">Total Verified Nodes</span>
+                    <span className="text-2xl font-black text-purple-400">124</span>
                   </div>
-                </div>
+                  <div className="p-5 rounded-2xl bg-white/5 border border-white/5 flex justify-between items-center">
+                    <span className="text-xs font-black uppercase tracking-wider text-slate-400">Average Active Streams</span>
+                    <span className="text-2xl font-black text-orange-400">42 / hour</span>
+                  </div>
+                  <div className="p-5 rounded-2xl bg-white/5 border border-white/5 flex justify-between items-center">
+                    <span className="text-xs font-black uppercase tracking-wider text-slate-400">Weekly TAB Tips volume</span>
+                    <span className="text-2xl font-black text-green-400">4,250,000 TAB</span>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+          </TabsContent>
+
+          {/* Config Tab */}
+          <TabsContent value="config" className="space-y-8 mt-0 animate-in fade-in slide-in-from-bottom-4 duration-500">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+              <Card className="bg-[#120a21] border-white/5 rounded-[40px] overflow-hidden shadow-2xl">
+                <CardHeader className="p-10 pb-2">
+                  <CardTitle className="text-xl font-black flex items-center gap-3 tracking-tight text-white uppercase italic">
+                    <Settings className="h-5 w-5 text-orange-400" /> Fees & Pricing
+                  </CardTitle>
+                  <CardDescription className="text-white/40 font-medium text-sm">Manage global node parameters</CardDescription>
+                </CardHeader>
+                <CardContent className="p-10 space-y-8">
+                  <div className="space-y-4">
+                    <Label className="text-[11px] font-black uppercase tracking-widest text-white/40">Activation Fee (XPR)</Label>
+                    <div className="flex gap-4">
+                      <Input 
+                        type="number" 
+                        value={localFee} 
+                        onChange={(e) => setLocalFee(e.target.value)}
+                        className="bg-[#1a112d] border-white/10 rounded-2xl font-black text-xl h-16 px-6 focus:ring-orange-500/50 text-white"
+                      />
+                      <Button onClick={handleUpdateFee} className="bg-orange-500 hover:bg-orange-600 rounded-2xl px-6 h-16 font-black text-white">Update</Button>
+                    </div>
+                  </div>
+
+                  <div className="space-y-4">
+                    <Label className="text-[11px] font-black uppercase tracking-widest text-white/40">Performance Boost (XPR)</Label>
+                    <div className="flex gap-4">
+                      <Input 
+                        type="number" 
+                        value={localBoost} 
+                        onChange={(e) => setLocalBoost(e.target.value)}
+                        className="bg-[#1a112d] border-white/10 rounded-2xl font-black text-xl h-16 px-6 focus:ring-orange-500/50 text-white"
+                      />
+                      <Button onClick={handleUpdateBoost} className="bg-purple-600 hover:bg-purple-700 rounded-2xl px-6 h-16 font-black text-white">Update</Button>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+
+              <Card className="bg-[#120a21] border-white/5 rounded-[40px] overflow-hidden shadow-2xl p-10 space-y-6">
+                <h3 className="text-xl font-black text-white italic uppercase flex items-center gap-2"><Power className="h-5 w-5 text-red-500" /> Network Overrides</h3>
+                <p className="text-sm text-slate-400">Emergency controls for platform synchronization.</p>
                 
-                <div className="pt-6 border-t border-white/5 space-y-4">
+                <div className="space-y-4 pt-4">
                   <Button 
                     onClick={toggleMaintenance}
                     className={cn(
@@ -365,24 +419,22 @@ const AdminHub = () => {
                     </Button>
                   )}
                 </div>
-              </CardContent>
-            </Card>
-          </div>
+              </Card>
+            </div>
+          </TabsContent>
 
-          <div className="lg:col-span-8 space-y-8">
-            {/* Rewards Table Card */}
+          {/* Rewards Tab */}
+          <TabsContent value="rewards" className="space-y-8 mt-0 animate-in fade-in slide-in-from-bottom-4 duration-500">
             <Card className="bg-[#0d071a] border-white/10 rounded-[48px] overflow-hidden shadow-2xl relative">
               <div className="absolute top-0 right-0 p-12 opacity-5">
                 <Trophy className="h-64 w-64 text-white" />
               </div>
               <CardHeader className="p-12 border-b border-white/5 relative z-10">
-                <div className="flex flex-col md:flex-row md:items-center justify-between gap-8">
-                  <div>
-                    <CardTitle className="text-3xl font-black tracking-tight uppercase italic text-white flex items-center gap-4">
-                      <Sparkles className="h-8 w-8 text-yellow-400" /> Leaderboard Rewards
-                    </CardTitle>
-                    <CardDescription className="text-white/40 font-medium text-sm">Top 10 participants pending verification for weekly rewards</CardDescription>
-                  </div>
+                <div>
+                  <CardTitle className="text-3xl font-black tracking-tight uppercase italic text-white flex items-center gap-4">
+                    <Sparkles className="h-8 w-8 text-yellow-400" /> Leaderboard Rewards
+                  </CardTitle>
+                  <CardDescription className="text-white/40 font-medium text-sm">Top 10 participants pending verification for weekly rewards</CardDescription>
                 </div>
               </CardHeader>
               <CardContent className="p-0 relative z-10">
@@ -433,8 +485,10 @@ const AdminHub = () => {
                 </div>
               </CardContent>
             </Card>
+          </TabsContent>
 
-            {/* Moderation Card */}
+          {/* Moderation Tab */}
+          <TabsContent value="moderation" className="space-y-8 mt-0 animate-in fade-in slide-in-from-bottom-4 duration-500">
             <Card className="bg-[#0d071a] border-white/10 rounded-[48px] overflow-hidden shadow-2xl min-h-[600px]">
               <CardHeader className="p-12 border-b border-white/5">
                 <div className="flex flex-col md:flex-row md:items-center justify-between gap-8">
@@ -462,7 +516,6 @@ const AdminHub = () => {
                     <tbody className="divide-y divide-white/5">
                       {filteredCreators.map((creator) => {
                         const isBanned = bannedHandles.includes(creator.handle);
-                        // Check if creator is verified based on stored membership
                         const membershipKey = `tiptab_membership_${creator.handle.replace('@', '')}`;
                         const isPaidMember = localStorage.getItem(membershipKey) === 'true' || creator.handle === 'tiptab';
                         
@@ -533,11 +586,11 @@ const AdminHub = () => {
                 </div>
               </CardContent>
             </Card>
-          </div>
-        </div>
+          </TabsContent>
+        </Tabs>
       </main>
 
-      {/* Audit & History Dialogs remain similar */}
+      {/* Audit Logs Dialog */}
       <Dialog open={isAuditModalOpen} onOpenChange={setIsAuditModalOpen}>
         <DialogContent className="bg-[#0d071a]/95 backdrop-blur-3xl border-white/20 text-white rounded-[40px] p-0 max-w-2xl overflow-hidden">
           <div className="p-10 border-b border-white/10">
@@ -577,6 +630,7 @@ const AdminHub = () => {
         </DialogContent>
       </Dialog>
 
+      {/* Transaction History Dialog */}
       <Dialog open={isHistoryModalOpen} onOpenChange={setIsHistoryModalOpen}>
         <DialogContent className="bg-[#0d071a]/95 backdrop-blur-3xl border-white/20 text-white rounded-[40px] p-0 max-w-2xl overflow-hidden">
           <div className="p-10 border-b border-white/10">
