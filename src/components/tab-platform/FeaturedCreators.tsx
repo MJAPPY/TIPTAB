@@ -16,6 +16,9 @@ const CATEGORIES = [
   { name: "Dev", color: "#06b6d4" },
   { name: "Sports", color: "#3b82f6" },
   { name: "Fishing", color: "#0ea5e9" },
+  { name: "Property Reno", color: "#94a3b8" },
+  { name: "Automotive", color: "#f43f5e" },
+  { name: "Realty", color: "#4f46e5" },
   { name: "Fitness", color: "#10b981" },
   { name: "Education", color: "#84cc16" },
   { name: "Service", color: "#64748b" },
@@ -76,7 +79,7 @@ export const FeaturedCreators = ({ creators, onSelectCreator, onAddYourself }: F
             <Input 
               placeholder="Search by name, handle, or city..." 
               value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
+              onChange={(e) => setSearchQuery(setSearchQuery(e.target.value))}
               className="pl-16 bg-white/5 border-white/10 h-16 rounded-[24px] text-xl focus-visible:ring-2 focus-visible:ring-purple-500/50 placeholder:text-white/30 text-white font-bold tracking-tight"
             />
           </div>
