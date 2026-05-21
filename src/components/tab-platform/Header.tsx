@@ -91,9 +91,11 @@ export const Header = ({ onBecomeCreator }: HeaderProps) => {
   };
 
   const handleBack = () => {
-    if (window.history.length > 2) {
+    // If we have history within the app session, go back
+    if (window.history.length > 1 && location.key !== 'default') {
       navigate(-1);
     } else {
+      // Otherwise, fallback to the safe home route
       navigate("/");
     }
   };
@@ -206,7 +208,7 @@ export const Header = ({ onBecomeCreator }: HeaderProps) => {
                 <Button 
                   variant="ghost" 
                   onClick={handleBack} 
-                  className="flex items-center gap-1 sm:gap-2 text-white/40 hover:text-purple-400 transition-colors p-0 h-auto hover:bg-transparent"
+                  className="flex items-center gap-1.5 sm:gap-2 text-white/40 hover:text-purple-400 transition-colors p-2 h-10 rounded-xl hover:bg-white/5 active:scale-95"
                 >
                   <ArrowLeft className="h-4 w-4 sm:h-5 sm:w-5" />
                   <span className="hidden xs:inline font-bold text-[10px] sm:text-base text-slate-300">Back</span>

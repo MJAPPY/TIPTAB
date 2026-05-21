@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate, useLocation } from "react-router-dom";
 import { 
   Zap, 
   Twitter, 
@@ -36,6 +36,7 @@ import { cn } from "@/lib/utils";
 const CreatorProfile = () => {
   const { handle } = useParams<{ handle: string }>();
   const navigate = useNavigate();
+  const location = useLocation();
   const { toast } = useToast();
   const { session, actor, login, isConnected, recordTip } = useXpr();
   
@@ -77,9 +78,11 @@ const CreatorProfile = () => {
   }, [handle, navigate]);
 
   const handleBack = () => {
-    if (window.history.length > 2) {
+    // If we have history within the app session, go back
+    if (window.history.length > 1 && location.key !== 'default') {
       navigate(-1);
     } else {
+      // Otherwise, fallback to the safe home route
       navigate("/");
     }
   };
@@ -228,9 +231,9 @@ const CreatorProfile = () => {
         <div className="absolute top-24 left-6 z-20 md:hidden">
           <Button 
             onClick={handleBack} 
-            className="h-10 w-10 rounded-full bg-black/40 border border-white/20 backdrop-blur-md p-0"
+            className="h-12 w-12 rounded-full bg-black/40 border border-white/20 backdrop-blur-md p-0 flex items-center justify-center active:scale-95"
           >
-            <ArrowLeft className="h-5 w-5" />
+            <ArrowLeft className="h-6 w-6" />
           </Button>
         </div>
       </div>
