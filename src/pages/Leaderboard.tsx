@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useMemo } from "react";
-import { Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { Trophy, ArrowLeft, Zap, Star, Crown, Flame, Medal, Users, Heart } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Header } from "@/components/tab-platform/Header";
@@ -31,7 +31,16 @@ const Leaderboard = () => {
   const [isMembershipOpen, setIsMembershipOpen] = useState(false);
   const [activeTab, setActiveTab] = useState<"creators" | "supporters">("creators");
   const { actor, isMember } = useXpr();
+  const navigate = useNavigate();
   
+  const handleBack = () => {
+    if (window.history.length > 2) {
+      navigate(-1);
+    } else {
+      navigate("/");
+    }
+  };
+
   const currentData = useMemo(() => {
     if (activeTab === "creators") return CREATOR_LEADERBOARD;
 
@@ -71,6 +80,13 @@ const Leaderboard = () => {
       
       <main className="container mx-auto px-4 md:px-6 pt-48 pb-24 relative z-10">
         <div className="flex flex-col items-center text-center mb-12 md:mb-16">
+          <div className="w-full flex justify-start mb-8 lg:hidden">
+             <Button variant="ghost" onClick={handleBack} className="text-white/40 hover:text-purple-400 gap-2 p-0 h-auto">
+               <ArrowLeft className="h-5 w-5" />
+               <span className="font-bold">Back</span>
+             </Button>
+          </div>
+
           <div className="flex flex-col md:flex-row items-center gap-4 md:gap-6 mb-8">
             <Trophy className="h-12 w-12 md:h-16 md:w-16 text-yellow-400 drop-shadow-[0_0_20px_rgba(250,204,21,0.5)]" />
             <h1 className="text-4xl sm:text-6xl md:text-8xl font-black italic tracking-tighter leading-none">

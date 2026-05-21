@@ -90,6 +90,14 @@ export const Header = ({ onBecomeCreator }: HeaderProps) => {
     });
   };
 
+  const handleBack = () => {
+    if (window.history.length > 2) {
+      navigate(-1);
+    } else {
+      navigate("/");
+    }
+  };
+
   const handleHomeClick = (e: React.MouseEvent) => {
     if (location.pathname === "/") {
       e.preventDefault();
@@ -197,7 +205,7 @@ export const Header = ({ onBecomeCreator }: HeaderProps) => {
               <div className="flex items-center gap-1.5 sm:gap-4">
                 <Button 
                   variant="ghost" 
-                  onClick={() => navigate(-1)} 
+                  onClick={handleBack} 
                   className="flex items-center gap-1 sm:gap-2 text-white/40 hover:text-purple-400 transition-colors p-0 h-auto hover:bg-transparent"
                 >
                   <ArrowLeft className="h-4 w-4 sm:h-5 sm:w-5" />

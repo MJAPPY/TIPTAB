@@ -76,6 +76,14 @@ const CreatorProfile = () => {
     }
   }, [handle, navigate]);
 
+  const handleBack = () => {
+    if (window.history.length > 2) {
+      navigate(-1);
+    } else {
+      navigate("/");
+    }
+  };
+
   const handleReaction = (type: 'heart' | 'firework' | 'applause') => {
     if (type === 'heart') setLikeCount(prev => prev + 1);
     if (type === 'firework') setFireworkCount(prev => prev + 1);
@@ -219,7 +227,7 @@ const CreatorProfile = () => {
         {/* Secondary Page-Level Back Button */}
         <div className="absolute top-24 left-6 z-20 md:hidden">
           <Button 
-            onClick={() => navigate(-1)} 
+            onClick={handleBack} 
             className="h-10 w-10 rounded-full bg-black/40 border border-white/20 backdrop-blur-md p-0"
           >
             <ArrowLeft className="h-5 w-5" />
