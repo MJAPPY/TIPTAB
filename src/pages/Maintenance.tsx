@@ -49,25 +49,30 @@ const Maintenance = () => {
 
       <div className="relative z-10 max-w-3xl w-full text-center space-y-12">
         {/* Hidden Login Trigger Logo */}
-        <div 
-          className="relative inline-block cursor-pointer group"
-          onClick={handleHiddenLogin}
-        >
-          {/* Multi-layered glow */}
-          <div className="absolute inset-0 bg-purple-500/20 blur-[100px] rounded-full scale-150 animate-pulse" />
-          <div className="absolute inset-0 bg-orange-500/10 blur-[60px] rounded-full scale-125 animate-pulse-slow" />
-          
-          <div className="relative h-40 w-40 md:h-56 md:w-56 bg-black/40 backdrop-blur-3xl border-2 border-white/10 rounded-[60px] flex items-center justify-center shadow-[0_0_80px_rgba(168,85,247,0.15)] mx-auto transition-all active:scale-95 group-hover:border-purple-500/30">
-             <div className="absolute inset-4 rounded-[40px] border border-white/5 bg-gradient-to-br from-white/10 to-transparent" />
-             <img 
-              src="/src/assets/logo.png" 
-              alt="TIPTAB" 
-              className="h-24 w-24 md:h-36 md:w-36 object-contain drop-shadow-[0_0_30px_rgba(168,85,247,0.6)] group-hover:scale-105 transition-transform duration-500" 
-            />
-            <div className="absolute -bottom-3 left-1/2 -translate-x-1/2 bg-purple-600 text-white font-black text-[9px] px-5 py-1.5 rounded-full shadow-[0_10px_20px_rgba(168,85,247,0.3)] border border-white/20 whitespace-nowrap tracking-[0.2em]">
-              SYNCING NETWORK
+        <div className="space-y-4">
+          <div 
+            className="relative inline-block cursor-pointer group"
+            onClick={handleHiddenLogin}
+          >
+            {/* Multi-layered glow */}
+            <div className="absolute inset-0 bg-purple-500/20 blur-[100px] rounded-full scale-150 animate-pulse" />
+            <div className="absolute inset-0 bg-orange-500/10 blur-[60px] rounded-full scale-125 animate-pulse-slow" />
+            
+            <div className="relative h-40 w-40 md:h-56 md:w-56 bg-black/40 backdrop-blur-3xl border-2 border-white/10 rounded-[60px] flex items-center justify-center shadow-[0_0_80px_rgba(168,85,247,0.15)] mx-auto transition-all active:scale-95 group-hover:border-purple-500/30">
+               <div className="absolute inset-4 rounded-[40px] border border-white/5 bg-gradient-to-br from-white/10 to-transparent" />
+               <img 
+                src="/src/assets/logo.png" 
+                alt="TIPTAB" 
+                className="h-24 w-24 md:h-36 md:w-36 object-contain drop-shadow-[0_0_30px_rgba(168,85,247,0.6)] group-hover:scale-105 transition-transform duration-500" 
+              />
+              <div className="absolute -bottom-3 left-1/2 -translate-x-1/2 bg-purple-600 text-white font-black text-[9px] px-5 py-1.5 rounded-full shadow-[0_10px_20px_rgba(168,85,247,0.3)] border border-white/20 whitespace-nowrap tracking-[0.2em]">
+                SYNCING NETWORK
+              </div>
             </div>
           </div>
+          <p className="text-[10px] text-white/30 uppercase tracking-[0.3em] font-black mt-2">
+            Admin Bypass Portal (Click 3x to Authenticate)
+          </p>
         </div>
 
         <div className="space-y-6">
