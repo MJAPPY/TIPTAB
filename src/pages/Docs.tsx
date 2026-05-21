@@ -170,7 +170,7 @@ const Docs = () => {
                 <div className="relative">
                   {showEmail ? (
                     <div className="w-full h-14 bg-white/5 border border-orange-500/30 rounded-2xl flex items-center justify-center px-4 animate-in fade-in zoom-in-95">
-                      <span className="font-black text-orange-400 tracking-wider">support@tiptab.network</span>
+                      <span className="font-black text-orange-400 tracking-wider">tiptab@proton.me</span>
                     </div>
                   ) : (
                     <Button 
