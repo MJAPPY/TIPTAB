@@ -18,7 +18,8 @@ import {
   MessageCircle,
   Mail,
   Eye,
-  ShieldAlert
+  ShieldAlert,
+  Globe
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
@@ -142,17 +143,17 @@ const Docs = () => {
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-              {/* Community Card */}
+              {/* Snipverse Card */}
               <div className="bg-[#130b21] border border-white/10 rounded-[40px] p-10 space-y-6 group hover:border-purple-500/40 transition-all">
                 <div className="h-16 w-16 rounded-[24px] bg-purple-500/10 border border-purple-500/20 flex items-center justify-center">
-                  <MessageCircle className="h-8 w-8 text-purple-400" />
+                  <Globe className="h-8 w-8 text-purple-400" />
                 </div>
                 <div className="space-y-3">
-                  <h4 className="text-2xl font-black italic uppercase">Community Chat</h4>
-                  <p className="text-white/40 font-medium">Join our official Telegram for real-time support from the community and developers.</p>
+                  <h4 className="text-2xl font-black italic uppercase">Social Hub</h4>
+                  <p className="text-white/40 font-medium">Follow TIPTAB on Snipverse for updates, community discussions, and project milestones.</p>
                 </div>
                 <Button asChild className="w-full h-14 bg-white/5 hover:bg-purple-600 text-white font-black rounded-2xl border border-white/10 transition-all">
-                  <a href="https://t.me/tabtokenxpr" target="_blank" rel="noopener noreferrer">Join Telegram</a>
+                  <a href="https://snipverse.com/tabxpr" target="_blank" rel="noopener noreferrer">Visit Snipverse</a>
                 </Button>
               </div>
 
