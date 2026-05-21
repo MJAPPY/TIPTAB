@@ -10,7 +10,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Zap, ShieldCheck, CheckCircle2, Wallet, ArrowRight, Sparkles, Calendar, Gift } from "lucide-react";
+import { Zap, ShieldCheck, CheckCircle2, Wallet, ArrowRight, Sparkles, Calendar, Gift, Tag, Percent, Clock } from "lucide-react";
 import { useState, useEffect } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { useXpr, PromoCode } from "@/contexts/XprContext";
@@ -28,9 +28,11 @@ export const MembershipModal = ({ isOpen, onOpenChange }: MembershipModalProps) 
   const { toast } = useToast();
   const { session, actor, login, isConnected, setIsMember, isMember, membershipFee, applyPromoCode, usePromoCode } = useXpr();
 
+  // Promo code system states
   const [promoInput, setPromoInput] = useState("");
   const [appliedPromo, setAppliedPromo] = useState<PromoCode | null>(null);
 
+  // Reset or initialize step whenever the modal opens
   useEffect(() => {
     if (isOpen) {
       if (isConnected) {
@@ -61,15 +63,25 @@ export const MembershipModal = ({ isOpen, onOpenChange }: MembershipModalProps) 
     const promo = applyPromoCode(promoInput);
     if (promo) {
       setAppliedPromo(promo);
-      toast({ title: "Promo Code Applied!" });
+      toast({
+        title: "Promo Code Applied!",
+        description: promo.type === "free" ? "Free 1-year pass applied!" : `${promo.value}% discount applied to membership.`,
+      });
     } else {
-      toast({ title: "Invalid Code", variant: "destructive" });
+      toast({
+        title: "Invalid Code",
+        description: "The code entered is invalid or has expired.",
+        variant: "destructive"
+      });
     }
   };
 
   const handleRemovePromo = () => {
     setAppliedPromo(null);
     setPromoInput("");
+    toast({
+      title: "Promo Code Removed",
+    });
   };
 
   const calculateDiscountedFee = () => {
@@ -86,8 +98,25 @@ export const MembershipModal = ({ isOpen, onOpenChange }: MembershipModalProps) 
     try {
       const discountedVal = calculateDiscountedFee();
       
+      // If code grants 100% free access, bypass blockchain transact entirely
       if (discountedVal === 0) {
-        finalizeMembership();
+        const now = new Date().toISOString();
+        const membershipKey = `tiptab_membership_${actor}`;
+        const membershipDateKey = `tiptab_membership_date_${actor}`;
+        
+        localStorage.setItem(membershipKey, 'true');
+        localStorage.setItem(membershipDateKey, now);
+        setIsMember(true);
+        
+        if (appliedPromo) {
+          usePromoCode(appliedPromo.code);
+        }
+        
+        setStep("success");
+        toast({
+          title: "Membership Activated!",
+          description: "Welcome to the TIPTAB creator network.",
+        });
         return;
       }
 
@@ -97,32 +126,54 @@ export const MembershipModal = ({ isOpen, onOpenChange }: MembershipModalProps) 
       const membershipAction = {
         account: 'eosio.token', 
         name: 'transfer',
-        authorization: [{ actor, permission }],
+        authorization: [{
+          actor: actor,
+          permission: permission,
+        }],
         data: {
           from: actor,
           to: 'tiptab', 
           quantity: formattedFee,
-          memo: isMember ? 'TipTab Yearly Renewal' : 'TipTab Activation',
+          memo: isMember ? 'TipTab Yearly Membership Renewal' : 'TipTab Membership Activation',
         },
       };
 
-      await session.transact({ actions: [membershipAction] }, { broadcast: true });
-      finalizeMembership();
+      await session.transact(
+        { actions: [membershipAction] }, 
+        { 
+          broadcast: true,
+          title: isMember ? 'Renew TIPTAB Membership' : 'Activate TIPTAB Membership',
+          description: `Fee: ${formattedFee}`
+        }
+      );
+      
+      const now = new Date().toISOString();
+      const membershipKey = `tiptab_membership_${actor}`;
+      const membershipDateKey = `tiptab_membership_date_${actor}`;
+      
+      localStorage.setItem(membershipKey, 'true');
+      localStorage.setItem(membershipDateKey, now);
+      setIsMember(true);
+
+      if (appliedPromo) {
+        usePromoCode(appliedPromo.code);
+      }
+      
+      setStep("success");
+      toast({
+        title: isMember ? "Membership Renewed!" : "Membership Activated!",
+        description: "Welcome to the TIPTAB creator network.",
+      });
     } catch (error: any) {
-      toast({ title: "Transaction Failed", variant: "destructive" });
+      console.error("Transact error:", error);
+      toast({
+        title: "Transaction Failed",
+        description: error.message || "Please check your balance and try again.",
+        variant: "destructive"
+      });
     } finally {
       setIsProcessing(false);
     }
-  };
-
-  const finalizeMembership = () => {
-    const now = new Date().toISOString();
-    localStorage.setItem(`tiptab_membership_${actor}`, 'true');
-    localStorage.setItem(`tiptab_membership_date_${actor}`, now);
-    setIsMember(true);
-    if (appliedPromo) usePromoCode(appliedPromo.code);
-    setStep("success");
-    toast({ title: "Membership Activated!" });
   };
 
   const handleClose = () => {
@@ -134,47 +185,50 @@ export const MembershipModal = ({ isOpen, onOpenChange }: MembershipModalProps) 
     }, 300);
   };
 
+  const rawFee = parseFloat(membershipFee);
   const finalFee = calculateDiscountedFee();
 
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && handleClose()}>
-      <DialogContent className="bg-[#1e1438] border-white/20 text-white sm:max-w-[440px] rounded-[32px] p-0 overflow-hidden shadow-2xl">
-        <div className="absolute top-0 left-0 right-0 h-1 bg-white/5">
+      <DialogContent className="bg-[#1e1438] border-white/20 text-white sm:max-w-[480px] rounded-[40px] p-0 overflow-hidden shadow-[0_0_120px_rgba(0,0,0,0.9)]">
+        
+        <div className="absolute top-0 left-0 right-0 h-1.5 bg-white/5">
           <div 
             className="h-full bg-gradient-to-r from-orange-500 via-purple-500 to-cyan-500 transition-all duration-700"
             style={{ width: step === "intro" ? "33%" : step === "payment" ? "66%" : "100%" }}
           />
         </div>
 
-        <div className="p-6 sm:p-8">
+        <div className="p-10">
           {step === "intro" && (
-            <div className="space-y-6 animate-in fade-in slide-in-from-bottom-2">
-              <div className="space-y-3 text-center">
-                <div className="mx-auto h-16 w-16 rounded-2xl bg-gradient-to-br from-orange-500 to-pink-500 flex items-center justify-center shadow-lg">
-                  <Sparkles className="h-8 w-8 text-white fill-white" />
+            <div className="space-y-10 animate-in fade-in slide-in-from-bottom-4 duration-500">
+              <div className="space-y-4 text-center">
+                <div className="mx-auto h-24 w-24 rounded-[32px] bg-gradient-to-br from-orange-500 to-pink-500 flex items-center justify-center shadow-[0_0_50px_rgba(249,115,22,0.5)]">
+                  <Sparkles className="h-12 w-12 text-white fill-white" />
                 </div>
                 <DialogHeader>
-                  <DialogTitle className="text-3xl font-black tracking-tight italic">
-                    {isMember ? "RENEW SLOT" : "CLAIM SLOT"}
+                  <DialogTitle className="text-4xl font-black text-center tracking-tight italic">
+                    {isMember ? "RENEW YOUR SLOT" : "CLAIM YOUR SLOT"}
                   </DialogTitle>
-                  <DialogDescription className="text-white/60 text-sm font-medium">
-                    Maintain your interactive pin on the global map.
+                  <DialogDescription className="text-white/80 text-center text-lg font-medium">
+                    Maintain your presence on the global map and continue receiving tips directly.
                   </DialogDescription>
                 </DialogHeader>
               </div>
               
-              <div className="space-y-3">
+              <div className="space-y-4">
                 {[
-                  { title: "Network Status", desc: "Verified orange checkmark", icon: Calendar },
-                  { title: "Zero Fees", desc: "Keep 100% of tips", icon: Zap },
+                  { title: "Yearly Verification", desc: "Maintain your orange checkmark status", icon: Calendar },
+                  { title: "Zero Platform Fees", desc: "Keep 100% of everything you earn", icon: Zap },
+                  { title: "Global Discovery", desc: "Appear on the interactive creator map", icon: Sparkles },
                 ].map((item, i) => (
-                  <div key={i} className="flex items-center gap-4 p-4 rounded-2xl bg-white/5 border border-white/10">
-                    <div className="h-10 w-10 rounded-xl bg-purple-500/20 flex items-center justify-center shrink-0">
-                      <item.icon className="h-5 w-5 text-purple-400" />
+                  <div key={i} className="flex items-start gap-4 p-5 rounded-[24px] bg-white/5 border border-white/10 group hover:border-purple-500/50 transition-colors">
+                    <div className="mt-1 h-12 w-12 rounded-2xl bg-purple-500/20 flex items-center justify-center shrink-0 shadow-lg">
+                      <item.icon className="h-6 w-6 text-purple-400" />
                     </div>
                     <div>
-                      <h4 className="font-black text-sm">{item.title}</h4>
-                      <p className="text-xs text-white/40">{item.desc}</p>
+                      <h4 className="font-black text-white text-base tracking-tight group-hover:text-purple-400 transition-colors">{item.title}</h4>
+                      <p className="text-sm text-white/50 font-bold">{item.desc}</p>
                     </div>
                   </div>
                 ))}
@@ -182,71 +236,136 @@ export const MembershipModal = ({ isOpen, onOpenChange }: MembershipModalProps) 
 
               <button 
                 onClick={handleNextStep}
-                className="w-full h-16 bg-white text-black hover:bg-purple-500 hover:text-white font-black text-xl rounded-2xl transition-all group active:scale-95 animate-shimmer-silver"
+                className="w-full h-20 bg-white text-black hover:bg-purple-500 hover:text-white font-black text-2xl rounded-3xl shadow-[0_20px_40px_rgba(255,255,255,0.1)] transition-all group active:scale-95 animate-shimmer-silver"
               >
-                {isConnected ? "Next Step" : "Connect WebAuth"}
+                {isConnected ? "Continue to Payment" : "Connect WebAuth"} <ArrowRight className="ml-3 h-6 w-6 group-hover:translate-x-2 transition-transform" />
               </button>
             </div>
           )}
 
           {step === "payment" && isConnected && (
-            <div className="space-y-6 animate-in fade-in slide-in-from-right-2">
-              <DialogHeader>
-                <DialogTitle className="text-2xl font-black italic tracking-tighter uppercase">Payment</DialogTitle>
-              </DialogHeader>
+            <div className="space-y-8 animate-in fade-in slide-in-from-right-4 duration-500">
+              <div className="space-y-2">
+                <Button variant="ghost" onClick={() => setStep("intro")} className="text-white/60 hover:text-purple-400 -ml-4 font-black tracking-widest uppercase text-xs">
+                  ← Back to benefits
+                </Button>
+                <DialogHeader className="pt-2">
+                  <div className="flex items-center gap-2 mb-2">
+                    <div className="px-3 py-1 rounded-full bg-orange-500 text-white text-[9px] font-black uppercase tracking-[0.2em] shadow-lg">
+                      Annual Renewal
+                    </div>
+                  </div>
+                  <DialogTitle className="text-4xl font-black italic tracking-tighter uppercase">Network Activation</DialogTitle>
+                  <DialogDescription className="text-white/40 font-bold text-xs uppercase tracking-widest">
+                    This provides 12 months of full network status.
+                  </DialogDescription>
+                </DialogHeader>
+              </div>
 
-              <div className="bg-white/5 border border-white/10 rounded-3xl p-6 text-center">
-                <p className="text-white/40 font-black uppercase tracking-[0.3em] text-[9px] mb-2">ACCESS FEE</p>
-                <div className="flex items-center justify-center gap-3">
-                  <span className="text-4xl font-black tracking-tighter">{finalFee.toLocaleString()}</span>
-                  <span className="text-xl font-black text-orange-500 italic">XPR</span>
+              <div className="bg-white/5 border-2 border-white/10 rounded-[40px] p-8 text-center relative overflow-hidden group hover:border-purple-500/50 transition-all">
+                <div className="absolute inset-0 bg-gradient-to-br from-purple-500/5 to-transparent pointer-events-none" />
+                <p className="text-white/40 font-black uppercase tracking-[0.3em] text-[10px] mb-3 group-hover:text-purple-400 transition-colors">12 MONTH ACCESS FEE</p>
+                
+                <div className="flex flex-col items-center justify-center gap-1">
+                  {appliedPromo && (
+                    <span className="text-2xl text-white/30 line-through font-black">
+                      {rawFee.toLocaleString()} XPR
+                    </span>
+                  )}
+                  <div className="flex items-center justify-center gap-4">
+                    <span className="text-5xl sm:text-6xl font-black tracking-tighter drop-shadow-[0_0_20px_rgba(255,255,255,0.2)] group-hover:text-purple-100 transition-colors">
+                      {finalFee.toLocaleString()}
+                    </span>
+                    <span className="text-2xl font-black text-orange-500 italic group-hover:text-purple-400 transition-colors">XPR</span>
+                  </div>
                 </div>
               </div>
 
-              <div className="flex gap-2">
-                <Input 
-                  placeholder="Promo Code" 
-                  value={promoInput} 
-                  onChange={(e) => setPromoInput(e.target.value)} 
-                  className="bg-white/5 border-white/10 h-11 rounded-xl text-white font-black"
-                />
-                <Button onClick={handleApplyPromo} className="h-11 bg-purple-600 hover:bg-purple-700 font-black px-4 rounded-xl text-xs uppercase">Apply</Button>
+              <div className="space-y-3 bg-white/[0.03] p-5 border border-white/10 rounded-2xl">
+                <Label className="text-[10px] font-black uppercase tracking-widest text-white/50">Enter Promo Code</Label>
+                {appliedPromo ? (
+                  <div className="flex items-center justify-between bg-purple-500/10 border border-purple-500/30 p-3 rounded-xl">
+                    <div className="flex items-center gap-3">
+                      <Gift className="h-5 w-5 text-purple-400" />
+                      <div>
+                        <p className="text-xs font-black text-white">{appliedPromo.code}</p>
+                        <p className="text-[10px] text-purple-400 font-bold uppercase">{appliedPromo.type === 'free' ? 'Free Pass' : `${appliedPromo.value}% Off`}</p>
+                      </div>
+                    </div>
+                    <Button variant="ghost" size="sm" onClick={handleRemovePromo} className="h-8 px-3 rounded-lg text-red-400 hover:bg-red-500/10 font-bold text-xs uppercase">Remove</Button>
+                  </div>
+                ) : (
+                  <div className="flex gap-2">
+                    <Input 
+                      placeholder="e.g. WELCOME100" 
+                      value={promoInput} 
+                      onChange={(e) => setPromoInput(e.target.value)} 
+                      className="bg-white/5 border-white/10 h-11 rounded-xl px-4 text-white font-black"
+                    />
+                    <Button onClick={handleApplyPromo} className="h-11 bg-purple-600 hover:bg-purple-700 text-white font-black px-5 rounded-xl text-xs uppercase">Apply</Button>
+                  </div>
+                )}
               </div>
 
-              <div className="p-4 rounded-2xl bg-purple-500/10 border border-purple-500/20 flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                   <Wallet className="h-5 w-5 text-purple-400" />
-                   <span className="text-sm font-black text-purple-400 italic">@{actor}</span>
+              <div className="space-y-6">
+                <div className="flex items-center gap-4 p-5 rounded-[24px] bg-purple-500/10 border-2 border-purple-500/30">
+                  <div className="h-12 w-12 rounded-xl bg-purple-500/20 flex items-center justify-center shadow-lg">
+                    <Wallet className="h-6 w-6 text-purple-400" />
+                  </div>
+                  <div className="flex-1">
+                    <p className="text-xs font-black uppercase tracking-widest text-white/40 mb-1">Authenticated Wallet</p>
+                    <p className="text-lg font-black text-purple-400 italic">@{actor}</p>
+                  </div>
+                  <CheckCircle2 className="h-7 w-7 text-green-500 drop-shadow-[0_0_10px_rgba(34,197,94,0.4)]" />
                 </div>
-                <CheckCircle2 className="h-5 w-5 text-green-500" />
+
+                <Button 
+                  onClick={handleJoin} 
+                  disabled={isProcessing}
+                  className="w-full h-24 bg-gradient-to-r from-orange-500 to-purple-600 hover:from-purple-600 hover:to-purple-700 text-white font-black text-2xl rounded-[32px] shadow-[0_20px_50px_rgba(249,115,22,0.3)] border-b-4 border-black/20 transition-all active:translate-y-1 active:border-b-0"
+                >
+                  {isProcessing ? (
+                    <div className="flex items-center gap-4">
+                      <div className="h-8 w-8 border-4 border-white/20 border-t-white rounded-full animate-spin" />
+                      <span>AUTHORIZING...</span>
+                    </div>
+                  ) : (
+                    finalFee === 0 ? "CLAIM FREE SLOT" : (isMember ? "RENEW WITH WEBAUTH" : "PAY WITH WEBAUTH")
+                  )}
+                </Button>
               </div>
 
-              <Button 
-                onClick={handleJoin} 
-                disabled={isProcessing}
-                className="w-full h-20 bg-gradient-to-r from-orange-500 to-purple-600 text-white font-black text-xl rounded-3xl shadow-xl transition-all active:scale-95"
-              >
-                {isProcessing ? "Processing..." : (finalFee === 0 ? "CLAIM FREE SLOT" : "PAY WITH WEBAUTH")}
-              </Button>
-
-              <p className="text-[9px] text-center text-white/30 uppercase tracking-[0.2em] font-black">
-                Secured via XPR Network
+              <p className="text-[10px] text-center text-white/30 uppercase tracking-[0.3em] font-black leading-relaxed">
+                <ShieldCheck className="h-3 w-3 inline mr-2 text-orange-500" />
+                Secured via XPR Network • Destination: @tiptab
               </p>
             </div>
           )}
 
           {step === "success" && (
-            <div className="space-y-6 py-6 animate-in zoom-in-95 text-center">
-              <div className="mx-auto h-20 w-20 rounded-[28px] bg-green-500 flex items-center justify-center shadow-lg">
-                <CheckCircle2 className="h-10 w-10 text-white" />
+            <div className="space-y-10 py-10 animate-in zoom-in-95 duration-500 text-center">
+              <div className="relative">
+                <div className="mx-auto h-32 w-32 rounded-[40px] bg-green-500 flex items-center justify-center shadow-[0_0_60px_rgba(34,197,94,0.5)]">
+                  <CheckCircle2 className="h-16 w-16 text-white" />
+                </div>
+                <div className="absolute top-0 left-1/2 -translate-x-1/2 w-48 h-48 bg-green-500/20 blur-3xl -z-10" />
               </div>
-              <h2 className="text-4xl font-black tracking-tighter italic">YOU'RE IN!</h2>
-              <Button 
-                onClick={handleClose}
-                className="h-16 w-full bg-white text-black hover:bg-purple-500 hover:text-white font-black text-lg rounded-2xl"
-              >
-                DONE
-              </Button>
+
+              <div className="space-y-4">
+                <h2 className="text-5xl font-black tracking-tighter italic">YOU'RE IN!</h2>
+                <p className="text-white/80 text-xl max-w-[320px] mx-auto leading-relaxed font-bold">
+                  Your creator status is updated. Start sharing your link!
+                </p>
+              </div>
+
+              <div className="flex flex-col gap-4">
+                <Button 
+                  onClick={handleClose}
+                  className="h-20 bg-white text-black hover:bg-purple-500 hover:text-white font-black text-2xl rounded-3xl shadow-2xl transition-all"
+                >
+                  BACK TO DASHBOARD
+                </Button>
+              </div>
             </div>
           )}
         </div>
