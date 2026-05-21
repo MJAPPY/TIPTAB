@@ -20,16 +20,17 @@ const Assets = () => {
     if (!ref.current) return;
     setIsDownloading(true);
     try {
+      // Use pixelRatio 4 for high-resolution print quality
       const dataUrl = await toPng(ref.current, { 
         quality: 1, 
         pixelRatio: 4, 
-        backgroundColor: 'transparent'
+        backgroundColor: undefined // Transparent background
       });
       const link = document.createElement('a');
       link.download = `${fileName}.png`;
       link.href = dataUrl;
       link.click();
-      toast({ title: "PNG Downloaded", description: "High-resolution asset saved." });
+      toast({ title: "High-Res PNG Saved", description: "Production asset downloaded." });
     } catch (err) {
       toast({ title: "Download Failed", variant: "destructive" });
     } finally {
@@ -53,7 +54,7 @@ const Assets = () => {
                 BRAND <span className="text-orange-500">ASSETS</span>
               </h1>
               <p className="text-xl text-white/60 font-medium max-w-2xl">
-                Official visual identity for the TIPTAB platform. High-resolution logos and TAB token graphics.
+                Official high-resolution logos for print and digital media.
               </p>
             </div>
           </div>
@@ -63,23 +64,24 @@ const Assets = () => {
             <div className="lg:col-span-7 bg-white/5 border border-white/10 rounded-[48px] p-12 flex flex-col items-center justify-center space-y-10 relative overflow-hidden group">
               <div className="absolute inset-0 bg-gradient-to-br from-purple-500/5 to-transparent pointer-events-none" />
               
-              <div ref={logoRef} className="p-12 bg-black/20 rounded-3xl backdrop-blur-sm border border-white/5 shadow-2xl">
-                <BrandLogo size="lg" />
+              {/* Static export container: No glows, no transitions, transparent bg */}
+              <div ref={logoRef} className="p-12 flex items-center justify-center">
+                <BrandLogo size="lg" isStatic={true} />
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 w-full max-w-md">
                 <Button 
                   onClick={() => downloadPng(logoRef, 'tiptab-full-logo')}
                   disabled={isDownloading}
-                  className="h-14 rounded-2xl bg-white text-black hover:bg-purple-500 hover:text-white font-black text-sm uppercase tracking-widest transition-all"
+                  className="h-14 rounded-2xl bg-white text-black hover:bg-purple-500 hover:text-white font-black text-sm uppercase tracking-widest transition-all shadow-xl"
                 >
-                  <Download className="mr-2 h-4 w-4" /> PNG (4K)
+                  <Download className="mr-2 h-4 w-4" /> Download PNG
                 </Button>
                 <Button 
                   variant="outline"
                   className="h-14 rounded-2xl border-white/10 bg-white/5 hover:bg-white/10 text-white font-black text-sm uppercase tracking-widest transition-all"
                 >
-                  <FileCode className="mr-2 h-4 w-4" /> SVG Vector
+                  <FileCode className="mr-2 h-4 w-4" /> Request SVG
                 </Button>
               </div>
             </div>
@@ -88,21 +90,21 @@ const Assets = () => {
             <div className="lg:col-span-5 bg-white/5 border border-white/10 rounded-[48px] p-12 flex flex-col items-center justify-center space-y-10 relative overflow-hidden group">
               <div className="absolute inset-0 bg-gradient-to-br from-orange-500/5 to-transparent pointer-events-none" />
               
-              <div ref={tokenRef} className="p-12 bg-black/20 rounded-3xl backdrop-blur-sm border border-white/5 shadow-2xl">
-                <BrandLogo size="lg" showText={false} />
+              <div ref={tokenRef} className="p-12 flex items-center justify-center">
+                <BrandLogo size="lg" showText={false} isStatic={true} />
               </div>
 
               <div className="text-center space-y-4 w-full">
                 <div className="space-y-1">
                   <h3 className="font-black text-xl uppercase tracking-tight italic text-orange-500">TAB TOKEN</h3>
-                  <p className="text-xs text-white/40 font-bold uppercase tracking-widest">Standalone Identity</p>
+                  <p className="text-xs text-white/40 font-bold uppercase tracking-widest">Master Icon</p>
                 </div>
                 <Button 
                   onClick={() => downloadPng(tokenRef, 'tab-token-logo')}
                   disabled={isDownloading}
-                  className="w-full h-14 rounded-2xl bg-white/10 border border-white/10 hover:bg-white/20 text-white font-black text-sm uppercase tracking-widest transition-all"
+                  className="w-full h-14 rounded-2xl bg-white/10 border border-white/10 hover:bg-white/20 text-white font-black text-sm uppercase tracking-widest transition-all shadow-lg"
                 >
-                  <Download className="mr-2 h-4 w-4" /> Download Icon
+                  <Download className="mr-2 h-4 w-4" /> Save Icon (PNG)
                 </Button>
               </div>
             </div>
@@ -114,8 +116,8 @@ const Assets = () => {
                 <Coins className="h-8 w-8 text-orange-500" />
               </div>
               <div className="space-y-1">
-                <h4 className="text-2xl font-black italic uppercase tracking-tighter">Usage Guidelines</h4>
-                <p className="text-white/60 font-medium text-sm">Always maintain the high-contrast aesthetic and preserve clear spacing around the TAB token.</p>
+                <h4 className="text-2xl font-black italic uppercase tracking-tighter">Asset Standards</h4>
+                <p className="text-white/60 font-medium text-sm">Static assets are exported at high DPI with transparency for professional use.</p>
               </div>
             </div>
             <Button 
