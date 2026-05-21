@@ -19,7 +19,8 @@ import {
   Twitch,
   Youtube,
   Radio,
-  ArrowLeft
+  ArrowLeft,
+  Sparkles
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -38,7 +39,7 @@ const CreatorProfile = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const { toast } = useToast();
-  const { session, actor, login, isConnected, recordTip } = useXpr();
+  const { session, actor, login, isConnected, recordTip, isMember, featuredHandles, boostStream, boostPrice } = useXpr();
   
   const [creator, setCreator] = useState<Creator | null>(null);
   const [tipAmount, setTipAmount] = useState("50");
@@ -214,6 +215,8 @@ const CreatorProfile = () => {
   ].filter(s => s.url);
 
   const featuredEmbedUrl = creator.mediaEmbed || creator.videoUrl || "";
+  const isOwner = actor === creator.handle.replace('@', '');
+  const isBoosted = featuredHandles.includes(creator.handle.replace('@', ''));
 
   return (
     <div className="min-h-screen bg-[#0a0514] text-white selection:bg-purple-500/30">
@@ -380,6 +383,67 @@ const CreatorProfile = () => {
 
           <div className="lg:col-span-5">
             <div className="sticky top-40 space-y-6">
+              
+              {isOwner && (
+                <div className="bg-gradient-to-br from-orange-500/15 via-[#130b21] to-[#130b21] border border-orange-500/30 rounded-[48px] p-10 shadow-2xl relative overflow-hidden group">
+                  <div className="absolute top-0 right-0 p-8">
+                    <Sparkles className="h-6 w-6 text-orange-400 animate-pulse" />
+                  </div>
+                  <div className="space-y-1.5">
+                    <span className="text-[10px] font-black uppercase tracking-[0.3em] text-orange-400 flex items-center gap-1.5">
+                      <Zap className="h-3.5 w-3.5 fill-orange-500" /> Control Desk
+                    </span>
+                    <h3 className="text-2xl font-black italic uppercase text-white tracking-tight">Stream Controller</h3>
+                  </div>
+                  <p className="text-sm text-slate-400 font-medium leading-relaxed pt-2">
+                    Feature your performance at the top of the <span className="text-orange-400 font-bold">Live Hub</span> for maximum visibility and better tips.
+                  </p>
+                  
+                  <div className="p-5 rounded-2xl bg-white/5 border border-white/5 flex items-center justify-between">
+                    <span className="text-xs font-black uppercase tracking-wider text-slate-400">Hub Status</span>
+                    {isBoosted ? (
+                      <span className="text-xs font-black text-green-400 uppercase tracking-widest bg-green-500/10 px-3 py-1.5 rounded-xl border border-green-500/20 flex items-center gap-1.5">
+                        <div className="h-1.5 w-1.5 rounded-full bg-green-400 animate-ping" /> Boosted Live
+                      </span>
+                    ) : (
+                      <span className="text-xs font-black text-slate-400 uppercase tracking-widest bg-white/5 px-3 py-1.5 rounded-xl border border-white/10">
+                        Standard Live
+                      </span>
+                    )}
+                  </div>
+
+                  {!isBoosted && (
+                    <Button
+                      onClick={async () => {
+                        if (!isMember) {
+                          setIsMembershipOpen(true);
+                          return;
+                        }
+                        setIsProcessing(true);
+                        const success = await boostStream(creator.handle);
+                        setIsProcessing(false);
+                        if (success) {
+                          toast({
+                            title: "Performance Boosted!",
+                            description: `Your stream is now featured on the Live Hub.`,
+                          });
+                        } else {
+                          toast({
+                            title: "Boost Failed",
+                            description: "Please check your XPR balance and try again.",
+                            variant: "destructive"
+                          });
+                        }
+                      }}
+                      disabled={isProcessing}
+                      className="w-full h-16 bg-gradient-to-r from-orange-500 to-purple-600 hover:from-purple-600 hover:to-purple-700 text-white font-black text-sm uppercase tracking-widest rounded-2xl shadow-xl transition-all active:scale-95"
+                    >
+                      {isProcessing ? "Authorizing Boost..." : `Boost Performance (${boostPrice} XPR)`}
+                    </Button>
+                  )}
+                </div>
+              )}
+
               <div className="bg-[#130b21] border border-white/10 rounded-[48px] p-10 shadow-[0_30px_60px_-15px_rgba(0,0,0,0.5)] relative overflow-hidden">
                 <div className="flex items-center justify-between mb-10">
                   <h2 className="text-3xl font-black tracking-tight">Support <br /> {creator.name.split(' ')[0]}</h2>
