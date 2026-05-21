@@ -12,10 +12,10 @@ interface BrandLogoProps {
 
 export const BrandLogo = ({ className, showText = true, size = "md", isStatic = false }: BrandLogoProps) => {
   const containerSizeClasses = {
-    sm: "gap-2",
-    md: "gap-3",
-    lg: "gap-5",
-    xl: "gap-8",
+    sm: "gap-1",
+    md: "gap-1.5",
+    lg: "gap-2",
+    xl: "gap-3",
   };
 
   const imageSizeClasses = {
