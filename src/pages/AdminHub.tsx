@@ -266,7 +266,7 @@ const AdminHub = () => {
 
   const adminNavItems = [
     { id: "treasury", label: "Treasury", icon: Activity },
-    { id: "config", label: "Node Config", icon: Settings },
+    { id: "config", label: "Config", icon: Settings },
     { id: "codes", label: "Promo Codes", icon: Gift },
     { id: "rewards", label: "Rewards", icon: Trophy },
     { id: "moderation", label: "Moderation", icon: Users },
@@ -424,7 +424,7 @@ const AdminHub = () => {
                     <CardTitle className="text-xl font-black flex items-center gap-3 tracking-tight text-white uppercase italic">
                       <Settings className="h-5 w-5 text-orange-400" /> Fees & Pricing
                     </CardTitle>
-                    <CardDescription className="text-white/40 font-medium text-sm">Manage global node parameters</CardDescription>
+                    <CardDescription className="text-white/40 font-medium text-sm">Manage global parameters</CardDescription>
                   </CardHeader>
                   <CardContent className="p-10 space-y-8">
                     <div className="space-y-4">
