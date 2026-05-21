@@ -76,18 +76,20 @@ const Live = () => {
 
       <main className="container mx-auto px-6 pt-36 pb-24">
         {/* Header Section */}
-        <div className="flex flex-col md:flex-row md:items-end justify-between gap-8 mb-12">
+        <div className="flex flex-col md:flex-row md:items-start justify-between gap-8 mb-12">
           <div className="space-y-4">
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-red-500/10 border border-red-500/20 text-[10px] font-black uppercase tracking-[0.2em] text-red-500 animate-pulse">
-              <Radio className="h-3 w-3" />
-              Live on Network
-            </div>
             <h1 className="text-5xl md:text-7xl font-black tracking-tighter italic">
               PERFORMANCE <span className="text-orange-500">HUB</span>
             </h1>
             <p className="text-white/40 text-lg font-medium max-w-xl">
               Real-time appreciation for creators, artists, and pros currently broadcasting with XPR network integration.
             </p>
+          </div>
+          <div className="pt-2 md:pt-4">
+            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-red-500/10 border border-red-500/20 text-[11px] font-black uppercase tracking-[0.3em] text-red-500 animate-pulse shadow-[0_0_20px_rgba(239,68,68,0.2)]">
+              <Radio className="h-4 w-4" />
+              Live on Network
+            </div>
           </div>
         </div>
 
