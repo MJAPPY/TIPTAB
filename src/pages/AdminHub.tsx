@@ -25,13 +25,17 @@ import {
   Laptop,
   Gift,
   Plus,
-  Trash2
+  Trash2,
+  UserPlus,
+  ShieldCheck,
+  UserCheck,
+  HelpCircle
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { useXpr } from "@/contexts/XprContext";
+import { useXpr, AdminUser } from "@/contexts/XprContext";
 import { Header } from "@/components/tab-platform/Header";
 import { CREATORS, Creator } from "@/data/creators";
 import { useToast } from "@/hooks/use-toast";
@@ -51,6 +55,13 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 const MOCK_AUDIT_LOGS: Record<string, any[]> = {
   "tiptab": [
@@ -79,6 +90,11 @@ const INITIAL_LEADERBOARD_WINNERS = [
 const AdminHub = () => {
   const { 
     isAdmin, 
+    adminRole,
+    adminsList,
+    addAdmin,
+    removeAdmin,
+    updateAdminRole,
     isConnected, 
     isMaintenanceMode, 
     setMaintenanceMode, 
@@ -109,6 +125,10 @@ const AdminHub = () => {
   const [moderatedCreators, setModeratedCreators] = useState<Creator[]>(CREATORS);
   const [bannedHandles, setBannedHandles] = useState<string[]>([]);
   const [isDistributing, setIsDistributing] = useState(false);
+
+  // New Admin creation states
+  const [newAdminHandle, setNewAdminHandle] = useState("");
+  const [newAdminRole, setNewAdminRole] = useState<'super' | 'moderator' | 'treasurer'>("moderator");
   
   // Editable Leaderboard Payouts State
   const [winners, setWinners] = useState(INITIAL_LEADERBOARD_WINNERS);
@@ -143,12 +163,29 @@ const AdminHub = () => {
     }
   }, [isAdmin, isConnected, navigate, toast]);
 
+  // Adjust active tab if current admin permission is restricted
+  useEffect(() => {
+    if (adminRole === 'moderator' && activeTab !== 'moderation' && activeTab !== 'config') {
+      setActiveTab("moderation");
+    } else if (adminRole === 'treasurer' && activeTab !== 'treasury' && activeTab !== 'codes' && activeTab !== 'rewards') {
+      setActiveTab("treasury");
+    }
+  }, [adminRole, activeTab]);
+
   const handleUpdateFee = () => {
+    if (adminRole !== 'super') {
+      toast({ title: "Unauthorized", description: "Only Super Admins can update fees.", variant: "destructive" });
+      return;
+    }
     updateMembershipFee(localFee);
     toast({ title: "Activation Fee Updated", description: `Global rate set to ${localFee} XPR.` });
   };
 
   const handleUpdateBoost = () => {
+    if (adminRole !== 'super') {
+      toast({ title: "Unauthorized", description: "Only Super Admins can update boost rates.", variant: "destructive" });
+      return;
+    }
     updateBoostPrice(localBoost);
     toast({ title: "Boost Price Updated", description: `Performance rate set to ${localBoost} XPR.` });
   };
@@ -208,6 +245,10 @@ const AdminHub = () => {
   };
 
   const toggleMaintenance = () => {
+    if (adminRole !== 'super') {
+      toast({ title: "Unauthorized", description: "Only Super Admins can toggle maintenance mode.", variant: "destructive" });
+      return;
+    }
     const newState = !isMaintenanceMode;
     setMaintenanceMode(newState);
     toast({
@@ -249,6 +290,23 @@ const AdminHub = () => {
     toast({ title: "Promo Code Created", description: `Promo code ${newPromoCode.toUpperCase()} is now live.` });
   };
 
+  // Admin Add Handler
+  const handleAddAdmin = (e: React.FormEvent) => {
+    e.preventDefault();
+    const handle = newAdminHandle.trim().replace('@', '');
+    if (!handle) {
+      toast({ title: "Error", description: "Please provide a valid account handle.", variant: "destructive" });
+      return;
+    }
+
+    addAdmin(handle, newAdminRole);
+    setNewAdminHandle("");
+    toast({
+      title: "Admin Added",
+      description: `@${handle} is now authorized as a ${newAdminRole} admin.`,
+    });
+  };
+
   const openAuditLogs = (creator: Creator) => {
     setSelectedCreator(creator);
     setIsAuditModalOpen(true);
@@ -264,13 +322,35 @@ const AdminHub = () => {
     c.handle.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
-  const adminNavItems = [
-    { id: "treasury", label: "Treasury", icon: Activity },
-    { id: "config", label: "Config", icon: Settings },
-    { id: "codes", label: "Promo Codes", icon: Gift },
-    { id: "rewards", label: "Rewards", icon: Trophy },
-    { id: "moderation", label: "Moderation", icon: Users },
-  ];
+  // Filter administration tabs based on individual permissions
+  const adminNavItems = useMemo(() => {
+    const items = [];
+    
+    if (adminRole === 'super' || adminRole === 'treasurer') {
+      items.push({ id: "treasury", label: "Treasury", icon: Activity });
+    }
+    
+    // Config / Maintenance toggles are super / mod tasks
+    if (adminRole === 'super' || adminRole === 'moderator') {
+      items.push({ id: "config", label: "Config", icon: Settings });
+    }
+
+    if (adminRole === 'super' || adminRole === 'treasurer') {
+      items.push({ id: "codes", label: "Promo Codes", icon: Gift });
+      items.push({ id: "rewards", label: "Rewards", icon: Trophy });
+    }
+
+    if (adminRole === 'super' || adminRole === 'moderator') {
+      items.push({ id: "moderation", label: "Moderation", icon: Users });
+    }
+
+    // Only Super Admins can add or configure administrator slots
+    if (adminRole === 'super') {
+      items.push({ id: "admins", label: "Admins", icon: ShieldCheck });
+    }
+
+    return items;
+  }, [adminRole]);
 
   if (!isAdmin) return null;
 
@@ -317,7 +397,7 @@ const AdminHub = () => {
         {/* State-controlled tabs rendering for 100% robust rendering */}
         <div className="w-full">
           {/* Treasury Tab */}
-          {activeTab === "treasury" && (
+          {activeTab === "treasury" && (adminRole === 'super' || adminRole === 'treasurer') && (
             <div className="space-y-8 animate-in fade-in duration-300">
               <div className="grid grid-cols-1 md:grid-cols-12 gap-8 items-start">
                 <Card className="md:col-span-6 bg-[#0d071a] border-[4px] border-slate-300/40 rounded-[40px] overflow-hidden shadow-[0_0_80px_rgba(0,0,0,0.8)] relative group ring-2 ring-white/10">
@@ -416,7 +496,7 @@ const AdminHub = () => {
           )}
 
           {/* Config Tab */}
-          {activeTab === "config" && (
+          {activeTab === "config" && (adminRole === 'super' || adminRole === 'moderator') && (
             <div className="space-y-8 animate-in fade-in duration-300">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                 <Card className="bg-[#120a21] border-white/5 rounded-[40px] overflow-hidden shadow-2xl">
@@ -424,7 +504,7 @@ const AdminHub = () => {
                     <CardTitle className="text-xl font-black flex items-center gap-3 tracking-tight text-white uppercase italic">
                       <Settings className="h-5 w-5 text-orange-400" /> Fees & Pricing
                     </CardTitle>
-                    <CardDescription className="text-white/40 font-medium text-sm">Manage global parameters</CardDescription>
+                    <CardDescription className="text-white/40 font-medium text-sm">Manage global parameters (Super Only)</CardDescription>
                   </CardHeader>
                   <CardContent className="p-10 space-y-8">
                     <div className="space-y-4">
@@ -434,9 +514,10 @@ const AdminHub = () => {
                           type="number" 
                           value={localFee} 
                           onChange={(e) => setLocalFee(e.target.value)}
-                          className="bg-[#1a112d] border-white/10 rounded-2xl font-black text-xl h-16 px-6 focus:ring-orange-500/50 text-white"
+                          disabled={adminRole !== 'super'}
+                          className="bg-[#1a112d] border-white/10 rounded-2xl font-black text-xl h-16 px-6 focus:ring-orange-500/50 text-white disabled:opacity-50"
                         />
-                        <Button onClick={handleUpdateFee} className="bg-orange-500 hover:bg-orange-600 rounded-2xl px-6 h-16 font-black text-white">Update</Button>
+                        <Button onClick={handleUpdateFee} disabled={adminRole !== 'super'} className="bg-orange-500 hover:bg-orange-600 rounded-2xl px-6 h-16 font-black text-white">Update</Button>
                       </div>
                     </div>
 
@@ -447,9 +528,10 @@ const AdminHub = () => {
                           type="number" 
                           value={localBoost} 
                           onChange={(e) => setLocalBoost(e.target.value)}
-                          className="bg-[#1a112d] border-white/10 rounded-2xl font-black text-xl h-16 px-6 focus:ring-orange-500/50 text-white"
+                          disabled={adminRole !== 'super'}
+                          className="bg-[#1a112d] border-white/10 rounded-2xl font-black text-xl h-16 px-6 focus:ring-orange-500/50 text-white disabled:opacity-50"
                         />
-                        <Button onClick={handleUpdateBoost} className="bg-purple-600 hover:bg-purple-700 rounded-2xl px-6 h-16 font-black text-white">Update</Button>
+                        <Button onClick={handleUpdateBoost} disabled={adminRole !== 'super'} className="bg-purple-600 hover:bg-purple-700 rounded-2xl px-6 h-16 font-black text-white">Update</Button>
                       </div>
                     </div>
                   </CardContent>
@@ -462,14 +544,15 @@ const AdminHub = () => {
                   <div className="space-y-4 pt-4">
                     <Button 
                       onClick={toggleMaintenance}
+                      disabled={adminRole !== 'super'}
                       className={cn(
-                        "w-full h-16 rounded-[28px] border font-black text-sm flex items-center justify-between px-8 transition-all",
+                        "w-full h-16 rounded-[28px] border font-black text-sm flex items-center justify-between px-8 transition-all disabled:opacity-50",
                         isMaintenanceMode ? "bg-red-500 text-white border-red-600 shadow-[0_0_30px_rgba(239,68,68,0.3)]" : "bg-red-500/10 border-red-500/20 text-red-500"
                       )}
                     >
                       <div className="flex items-center gap-3">
                         <Power className={cn("h-4 w-4", isMaintenanceMode && "animate-pulse")} />
-                        {isMaintenanceMode ? "MAINTENANCE ACTIVE" : "MAINTENANCE MODE"}
+                        {isMaintenanceMode ? "MAINTENANCE ACTIVE" : "MAINTENANCE MODE (Super Only)"}
                       </div>
                     </Button>
 
@@ -506,7 +589,7 @@ const AdminHub = () => {
           )}
 
           {/* Promo Codes Tab */}
-          {activeTab === "codes" && (
+          {activeTab === "codes" && (adminRole === 'super' || adminRole === 'treasurer') && (
             <div className="space-y-8 animate-in fade-in duration-300">
               <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
                 {/* Promo Generator Card */}
@@ -664,7 +747,7 @@ const AdminHub = () => {
           )}
 
           {/* Rewards Tab */}
-          {activeTab === "rewards" && (
+          {activeTab === "rewards" && (adminRole === 'super' || adminRole === 'treasurer') && (
             <div className="space-y-8 animate-in fade-in duration-300">
               <Card className="bg-[#0d071a] border-white/10 rounded-[48px] overflow-hidden shadow-2xl relative">
                 <div className="absolute top-0 right-0 p-12 opacity-5">
@@ -747,7 +830,7 @@ const AdminHub = () => {
           )}
 
           {/* Moderation Tab */}
-          {activeTab === "moderation" && (
+          {activeTab === "moderation" && (adminRole === 'super' || adminRole === 'moderator') && (
             <div className="space-y-8 animate-in fade-in duration-300">
               <Card className="bg-[#0d071a] border-white/10 rounded-[48px] overflow-hidden shadow-2xl min-h-[600px]">
                 <CardHeader className="p-12 border-b border-white/5">
@@ -846,6 +929,139 @@ const AdminHub = () => {
                   </div>
                 </CardContent>
               </Card>
+            </div>
+          )}
+
+          {/* Admins Management Tab (Super Only) */}
+          {activeTab === "admins" && adminRole === 'super' && (
+            <div className="space-y-8 animate-in fade-in duration-300">
+              <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+                {/* Add New Admin Form */}
+                <Card className="lg:col-span-4 bg-[#120a21] border border-white/10 rounded-[32px] overflow-hidden shadow-2xl">
+                  <CardHeader className="p-8 pb-2">
+                    <CardTitle className="text-xl font-black flex items-center gap-2 text-white italic uppercase">
+                      <UserPlus className="h-5 w-5 text-purple-400" /> Appoint Admin
+                    </CardTitle>
+                    <CardDescription className="text-white/40 text-xs">Authorize another WebAuth address with specific network permissions.</CardDescription>
+                  </CardHeader>
+                  <CardContent className="p-8">
+                    <form onSubmit={handleAddAdmin} className="space-y-6">
+                      <div className="space-y-2">
+                        <Label className="text-[10px] font-black uppercase tracking-widest text-white/50">WebAuth Handle / Account Name</Label>
+                        <Input 
+                          value={newAdminHandle} 
+                          onChange={(e) => setNewAdminHandle(e.target.value)}
+                          placeholder="e.g. kofibuilds" 
+                          className="bg-[#1a112d] border-white/10 rounded-xl h-12 px-4 focus:ring-purple-500/50 font-black text-white"
+                        />
+                      </div>
+
+                      <div className="space-y-2">
+                        <Label className="text-[10px] font-black uppercase tracking-widest text-white/50">Permission Role</Label>
+                        <Select value={newAdminRole} onValueChange={(val: any) => setNewAdminRole(val)}>
+                          <SelectTrigger className="w-full bg-[#1a112d] border-white/10 h-12 rounded-xl font-bold text-xs text-white">
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent className="bg-[#1a102d] border-white/20 text-white rounded-xl">
+                            <SelectItem value="super" className="font-bold py-2 cursor-pointer">Super Admin</SelectItem>
+                            <SelectItem value="moderator" className="font-bold py-2 cursor-pointer">Moderator</SelectItem>
+                            <SelectItem value="treasurer" className="font-bold py-2 cursor-pointer">Treasurer</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+
+                      {/* Display descriptions based on role */}
+                      <div className="p-4 rounded-xl bg-white/5 border border-white/5 space-y-1.5">
+                        <span className="text-[9px] font-black uppercase tracking-widest text-purple-400 flex items-center gap-1">
+                          <HelpCircle className="h-3 w-3" /> Permissions Overview
+                        </span>
+                        <p className="text-[10px] text-white/50 font-bold leading-relaxed">
+                          {newAdminRole === 'super' && "All privileges. Modify activation fees, grant/revoke other admin accesses, toggle emergency locks, and distribute batch rewards."}
+                          {newAdminRole === 'moderator' && "Access to Moderation boards. Restored/ban network creators, audit logs, and toggle network overrides."}
+                          {newAdminRole === 'treasurer' && "Access to Financial Treasury. Distribute leaderboard batch rewards, edit payout lists, and create/manage promotion codes."}
+                        </p>
+                      </div>
+
+                      <Button type="submit" className="w-full h-12 bg-white text-black hover:bg-purple-500 hover:text-white rounded-xl font-black text-xs uppercase tracking-widest gap-2 mt-4 transition-all">
+                        <Plus className="h-4 w-4" /> Appoint Admin
+                      </Button>
+                    </form>
+                  </CardContent>
+                </Card>
+
+                {/* Admins Table List */}
+                <Card className="lg:col-span-8 bg-[#0d071a] border border-white/10 rounded-[32px] overflow-hidden shadow-2xl">
+                  <CardHeader className="p-8 border-b border-white/5">
+                    <CardTitle className="text-xl font-black text-white italic uppercase">Authorized Administrators</CardTitle>
+                    <CardDescription className="text-white/40 text-xs">Manage active team authorizations and modify security permissions.</CardDescription>
+                  </CardHeader>
+                  <CardContent className="p-0">
+                    <div className="overflow-x-auto no-scrollbar">
+                      <table className="w-full min-w-[500px]">
+                        <thead className="bg-white/[0.03]">
+                          <tr>
+                            <th className="px-8 py-5 text-left text-[10px] font-black uppercase tracking-widest text-white/30">Account</th>
+                            <th className="px-8 py-5 text-left text-[10px] font-black uppercase tracking-widest text-white/30">Permission Scope</th>
+                            <th className="px-8 py-5 text-right text-[10px] font-black uppercase tracking-widest text-white/30">Management</th>
+                          </tr>
+                        </thead>
+                        <tbody className="divide-y divide-white/5">
+                          {adminsList.map((admin) => (
+                            <tr key={admin.id} className="group hover:bg-white/[0.01] transition-colors">
+                              <td className="px-8 py-6">
+                                <div className="flex items-center gap-4">
+                                  <div className="h-10 w-10 rounded-full bg-purple-500/10 flex items-center justify-center border border-purple-500/30 text-[10px] font-black text-purple-400">
+                                    {admin.handle.slice(0, 2).toUpperCase()}
+                                  </div>
+                                  <span className="font-black text-base text-white">@{admin.handle}</span>
+                                </div>
+                              </td>
+                              <td className="px-8 py-6">
+                                {admin.handle === 'tiptab' ? (
+                                  <span className="px-3.5 py-1.5 rounded-full text-[9px] font-black uppercase tracking-[0.2em] bg-orange-500/10 text-orange-400 border border-orange-500/20">
+                                    Root Super
+                                  </span>
+                                ) : (
+                                  <Select 
+                                    value={admin.role} 
+                                    onValueChange={(val: any) => {
+                                      updateAdminRole(admin.id, val);
+                                      toast({ title: "Role Modified", description: `@${admin.handle} changed to ${val}.` });
+                                    }}
+                                  >
+                                    <SelectTrigger className="w-[140px] bg-white/5 border-white/10 h-10 rounded-xl font-bold text-xs text-white">
+                                      <SelectValue />
+                                    </SelectTrigger>
+                                    <SelectContent className="bg-[#1a102d] border-white/20 text-white rounded-xl">
+                                      <SelectItem value="super" className="font-bold py-2 cursor-pointer">Super Admin</SelectItem>
+                                      <SelectItem value="moderator" className="font-bold py-2 cursor-pointer">Moderator</SelectItem>
+                                      <SelectItem value="treasurer" className="font-bold py-2 cursor-pointer">Treasurer</SelectItem>
+                                    </SelectContent>
+                                  </Select>
+                                )}
+                              </td>
+                              <td className="px-8 py-6 text-right">
+                                <Button 
+                                  variant="ghost" 
+                                  size="icon" 
+                                  disabled={admin.handle === 'tiptab'}
+                                  onClick={() => {
+                                    removeAdmin(admin.id);
+                                    toast({ title: "Admin Revoked", description: `@${admin.handle}'s administrator permissions have been removed.` });
+                                  }}
+                                  className="h-10 w-10 rounded-xl bg-red-500/10 hover:bg-red-500 text-red-500 hover:text-white transition-all border border-red-500/20 disabled:opacity-30 disabled:cursor-not-allowed"
+                                >
+                                  <Trash2 className="h-4.5 w-4.5" />
+                                </Button>
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  </CardContent>
+                </Card>
+              </div>
             </div>
           )}
         </div>

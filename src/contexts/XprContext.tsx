@@ -13,6 +13,12 @@ export interface PromoCode {
   uses: number;
 }
 
+export interface AdminUser {
+  id: string;
+  handle: string;
+  role: 'super' | 'moderator' | 'treasurer';
+}
+
 interface Balances {
   xpr: string;
   tab: string;
@@ -33,6 +39,11 @@ interface XprContextType {
   isConnected: boolean;
   isLoading: boolean;
   isAdmin: boolean;
+  adminRole: 'super' | 'moderator' | 'treasurer' | null;
+  adminsList: AdminUser[];
+  addAdmin: (handle: string, role: 'super' | 'moderator' | 'treasurer') => void;
+  removeAdmin: (id: string) => void;
+  updateAdminRole: (id: string, role: 'super' | 'moderator' | 'treasurer') => void;
   userProfile: Creator | null;
   updateUserProfile: (profile: Creator) => void;
   isMaintenanceMode: boolean;
@@ -111,6 +122,17 @@ export const XprProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     return false;
   });
 
+  // Persisted admin list
+  const [adminsList, setAdminsList] = useState<AdminUser[]>(() => {
+    if (typeof window !== "undefined") {
+      const saved = localStorage.getItem("tiptab_admins_list");
+      return saved ? JSON.parse(saved) : [
+        { id: "root", handle: "tiptab", role: "super" }
+      ];
+    }
+    return [{ id: "root", handle: "tiptab", role: "super" }];
+  });
+
   const [promoCodes, setPromoCodes] = useState<PromoCode[]>(() => {
     if (typeof window !== "undefined") {
       const saved = localStorage.getItem("tiptab_promo_codes");
@@ -145,6 +167,46 @@ export const XprProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       localStorage.removeItem("tiptab_network_alert");
     }
   };
+
+  // Admin Management Functions
+  const addAdmin = (handle: string, role: 'super' | 'moderator' | 'treasurer') => {
+    const cleanHandle = handle.toLowerCase().trim().replace('@', '');
+    if (!cleanHandle) return;
+    
+    // Check if already an admin
+    if (adminsList.some(a => a.handle === cleanHandle)) return;
+
+    const newAdmin: AdminUser = {
+      id: "admin_" + Date.now(),
+      handle: cleanHandle,
+      role
+    };
+
+    const updated = [...adminsList, newAdmin];
+    setAdminsList(updated);
+    localStorage.setItem("tiptab_admins_list", JSON.stringify(updated));
+  };
+
+  const removeAdmin = (id: string) => {
+    // Root creator tiptab is permanent and can never be removed
+    const target = adminsList.find(a => a.id === id);
+    if (target?.handle === 'tiptab') return;
+
+    const updated = adminsList.filter(a => a.id !== id);
+    setAdminsList(updated);
+    localStorage.setItem("tiptab_admins_list", JSON.stringify(updated));
+  };
+
+  const updateAdminRole = (id: string, role: 'super' | 'moderator' | 'treasurer') => {
+    const target = adminsList.find(a => a.id === id);
+    if (target?.handle === 'tiptab') return; // root super admin role is permanent
+
+    const updated = adminsList.map(a => a.id === id ? { ...a, role } : a);
+    setAdminsList(updated);
+    localStorage.setItem("tiptab_admins_list", JSON.stringify(updated));
+  };
+
+  const [promoCodesState, setPromoCodesState] = useState<PromoCode[]>([]);
 
   const createPromoCode = (code: string, type: 'free' | 'percent', value: number, maxUses: number) => {
     const newCode: PromoCode = {
@@ -221,18 +283,23 @@ export const XprProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   };
 
   const distributeXprRewards = async (winners: { account: string; amount: string }[]): Promise<boolean> => {
-    if (!session || session.auth.actor !== 'tiptab') return false;
+    if (!session) return false;
+    
+    // Allow any admin with super or treasurer access to distribute rewards
+    const actorName = session.auth.actor;
+    const currentAdmin = adminsList.find(a => a.handle === actorName);
+    if (!currentAdmin || (currentAdmin.role !== 'super' && currentAdmin.role !== 'treasurer')) return false;
     
     try {
       const actions = winners.map(winner => ({
         account: 'eosio.token',
         name: 'transfer',
         authorization: [{
-          actor: 'tiptab',
+          actor: actorName,
           permission: session.auth.permission,
         }],
         data: {
-          from: 'tiptab',
+          from: actorName,
           to: winner.account,
           quantity: `${parseFloat(winner.amount).toFixed(4)} XPR`,
           memo: 'TIPTAB Reward: Network Leaderboard Winner',
@@ -438,9 +505,15 @@ export const XprProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     }
   };
 
+  // Determine current active admin permissions
+  const activeActor = session ? session.auth.actor : null;
+  const currentAdminObj = activeActor ? adminsList.find(a => a.handle === activeActor) : null;
+  const isAdminActive = !!currentAdminObj;
+  const activeAdminRole = currentAdminObj ? currentAdminObj.role : null;
+
   const value = {
     session,
-    actor: session ? session.auth.actor : null,
+    actor: activeActor,
     balances,
     isMember,
     membershipDate,
@@ -451,7 +524,12 @@ export const XprProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     recordTip,
     isConnected: !!session,
     isLoading,
-    isAdmin: session?.auth.actor === 'tiptab',
+    isAdmin: isAdminActive,
+    adminRole: activeAdminRole,
+    adminsList,
+    addAdmin,
+    removeAdmin,
+    updateAdminRole,
     userProfile,
     updateUserProfile,
     isMaintenanceMode,
