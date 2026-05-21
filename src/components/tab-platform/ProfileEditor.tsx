@@ -50,6 +50,7 @@ export const ProfileEditor = ({ initialData, onSave, minimal = false }: ProfileE
   const [isSaving, setIsSaving] = useState(false);
   const [hasChanged, setHasChanged] = useState(false);
   const [isCityRecognized, setIsCityRecognized] = useState(false);
+  const [isDraggingCover, setIsDraggingCover] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const coverInputRef = useRef<HTMLInputElement>(null);
   
@@ -167,12 +168,52 @@ export const ProfileEditor = ({ initialData, onSave, minimal = false }: ProfileE
   const handleCoverChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setFormData(prev => ({ ...prev, coverImage: reader.result as string }));
-        setHasChanged(true);
-      };
-      reader.readAsDataURL(file);
+      processCoverFile(file);
+    }
+  };
+
+  const processCoverFile = (file: File) => {
+    if (!file.type.startsWith("image/")) {
+      toast({
+        title: "Invalid file type",
+        description: "Please upload an image file (PNG, JPG, WEBP).",
+        variant: "destructive",
+      });
+      return;
+    }
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      setFormData(prev => ({ ...prev, coverImage: reader.result as string }));
+      setHasChanged(true);
+      toast({
+        title: "Cover Image Loaded",
+        description: "Your new cover preview is ready to save.",
+      });
+    };
+    reader.readAsDataURL(file);
+  };
+
+  // Drag and Drop Handlers
+  const handleDragOver = (e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDraggingCover(true);
+  };
+
+  const handleDragLeave = (e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDraggingCover(false);
+  };
+
+  const handleDrop = (e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDraggingCover(false);
+    
+    const file = e.dataTransfer.files?.[0];
+    if (file) {
+      processCoverFile(file);
     }
   };
 
@@ -215,38 +256,70 @@ export const ProfileEditor = ({ initialData, onSave, minimal = false }: ProfileE
           <div className="space-y-6 pb-8 border-b border-white/5">
             <h4 className="font-bold text-lg">Profile Graphics</h4>
             
-            {/* Cover Image Upload Row */}
+            {/* Interactive Drag & Drop Cover Image Upload Container */}
             <div className="space-y-3">
               <Label className="text-white/60 font-bold uppercase tracking-widest text-[10px]">Cover Banner</Label>
-              <div className="relative group rounded-3xl overflow-hidden border border-white/10 aspect-[3/1] bg-white/[0.02] flex items-center justify-center">
+              <div 
+                onDragOver={handleDragOver}
+                onDragLeave={handleDragLeave}
+                onDrop={handleDrop}
+                className={cn(
+                  "relative group rounded-[32px] overflow-hidden border-2 aspect-[3.2/1] flex flex-col items-center justify-center transition-all duration-300",
+                  formData.coverImage ? "border-white/10 bg-black/40" : "border-dashed bg-white/[0.01]",
+                  isDraggingCover 
+                    ? "border-purple-500 bg-purple-500/10 scale-[1.01] shadow-[0_0_30px_rgba(168,85,247,0.3)]" 
+                    : "border-white/20 hover:border-purple-500/50 hover:bg-white/[0.03]"
+                )}
+              >
                 {formData.coverImage ? (
                   <>
-                    <img src={formData.coverImage} alt="Profile Cover" className="w-full h-full object-cover" />
+                    <img src={formData.coverImage} alt="Profile Cover" className="w-full h-full object-cover select-none pointer-events-none" />
+                    {/* Drag-over indicator overlay when an image is already uploaded */}
+                    {isDraggingCover && (
+                      <div className="absolute inset-0 bg-purple-600/80 backdrop-blur-sm flex flex-col items-center justify-center gap-3 animate-in fade-in duration-200">
+                        <Upload className="h-10 w-10 text-white animate-bounce" />
+                        <span className="font-black text-sm uppercase tracking-widest text-white">Drop to Replace Cover</span>
+                      </div>
+                    )}
                     <button 
                       onClick={removeCoverImage}
-                      className="absolute top-4 right-4 bg-red-500 hover:bg-red-600 text-white rounded-full p-2 shadow-xl transition-colors z-10"
+                      className="absolute top-4 right-4 bg-red-500 hover:bg-red-600 text-white rounded-full p-2.5 shadow-xl transition-colors z-10"
                     >
                       <X className="h-4 w-4" />
                     </button>
                   </>
                 ) : (
-                  <div className="text-center p-6 flex flex-col items-center gap-3">
-                    <ImageIcon className="h-10 w-10 text-white/20" />
-                    <p className="text-xs text-white/40 font-bold">No cover banner uploaded. Best ratio is 3:1.</p>
+                  <div className="text-center p-6 flex flex-col items-center gap-4 select-none">
+                    <div className={cn(
+                      "h-14 w-14 rounded-2xl flex items-center justify-center transition-transform",
+                      isDraggingCover ? "scale-110 bg-purple-500 text-white" : "bg-white/5 text-purple-400"
+                    )}>
+                      {isDraggingCover ? <Upload className="h-7 w-7" /> : <ImageIcon className="h-7 w-7" />}
+                    </div>
+                    
+                    <div className="space-y-1">
+                      <p className="text-sm font-black text-slate-200">
+                        {isDraggingCover ? "Drop it here!" : "Drag & Drop cover photo here"}
+                      </p>
+                      <p className="text-xs text-white/30 font-bold">PNG, JPG or WEBP • Best ratio 3.2:1</p>
+                    </div>
+
                     <input 
                       type="file" 
+                      id="coverImageInput"
                       ref={coverInputRef} 
                       className="hidden" 
                       accept="image/*" 
                       onChange={handleCoverChange} 
                     />
+                    
                     <Button 
                       variant="outline" 
                       size="sm" 
                       onClick={() => coverInputRef.current?.click()}
-                      className="rounded-xl border-white/10 text-white/60 hover:text-white bg-white/5"
+                      className="rounded-xl border-white/10 text-white/60 hover:text-white bg-white/5 shadow-lg active:scale-95 transition-transform"
                     >
-                      <Upload className="h-4 w-4 mr-2" /> Upload Cover Image
+                      <Upload className="h-4 w-4 mr-2" /> Or Browse File
                     </Button>
                   </div>
                 )}
