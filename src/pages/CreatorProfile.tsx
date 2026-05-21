@@ -487,53 +487,53 @@ const CreatorProfile = () => {
                 </div>
               )}
 
-              <div className="bg-[#130b21] border border-white/10 rounded-[48px] p-10 shadow-[0_30px_60px_-15px_rgba(0,0,0,0.5)] relative overflow-hidden">
-                <div className="flex items-center justify-between mb-10">
-                  <h2 className="text-3xl font-black tracking-tight">Support <br /> {creator.name.split(' ')[0]}</h2>
-                  <div className="flex flex-wrap items-center justify-end gap-2 max-w-[240px]">
+              <div className="bg-[#130b21] border border-white/10 rounded-[48px] p-8 md:p-10 shadow-[0_30px_60px_-15px_rgba(0,0,0,0.5)] relative overflow-hidden">
+                <div className="flex items-center justify-between mb-8 md:mb-10">
+                  <h2 className="text-2xl md:text-3xl font-black tracking-tight leading-tight">Support <br /> {creator.name.split(' ')[0]}</h2>
+                  <div className="flex flex-wrap items-center justify-end gap-1.5 md:gap-2 max-w-[200px] md:max-w-[240px]">
                     <Button 
                       variant="ghost" 
                       onClick={() => handleReaction('heart')}
-                      className="h-10 px-3 rounded-xl bg-white/5 border border-white/10 hover:bg-red-500/15 hover:border-red-500/40 group transition-all flex items-center gap-2"
+                      className="h-9 px-2.5 rounded-xl bg-white/5 border border-white/10 hover:bg-red-500/15 hover:border-red-500/40 group transition-all flex items-center gap-2"
                     >
-                      <Heart className="h-4 w-4 text-red-500 fill-red-500 group-hover:scale-110 transition-transform" />
-                      <span className="font-black text-[11px] text-slate-100">{likeCount}</span>
+                      <Heart className="h-3.5 w-3.5 text-red-500 fill-red-500 group-hover:scale-110 transition-transform" />
+                      <span className="font-black text-[10px] text-slate-100">{likeCount}</span>
                     </Button>
                     
                     <Button 
                       variant="ghost" 
                       onClick={() => handleReaction('firework')}
-                      className="h-10 px-3 rounded-xl bg-white/5 border border-white/10 hover:bg-orange-500/15 hover:border-orange-500/40 group transition-all flex items-center gap-2"
+                      className="h-9 px-2.5 rounded-xl bg-white/5 border border-white/10 hover:bg-orange-500/15 hover:border-orange-500/40 group transition-all flex items-center gap-2"
                     >
-                      <span className="text-base group-hover:scale-110 group-hover:rotate-12 transition-transform">🎇</span>
-                      <span className="font-black text-[11px] text-slate-100">{fireworkCount}</span>
+                      <span className="text-sm group-hover:scale-110 group-hover:rotate-12 transition-transform">🎇</span>
+                      <span className="font-black text-[10px] text-slate-100">{fireworkCount}</span>
                     </Button>
 
                     <Button 
                       variant="ghost" 
                       onClick={() => handleReaction('applause')}
-                      className="h-10 px-3 rounded-xl bg-white/5 border border-white/10 hover:bg-yellow-500/15 hover:border-yellow-500/40 group transition-all flex items-center gap-2"
+                      className="h-9 px-2.5 rounded-xl bg-white/5 border border-white/10 hover:bg-yellow-500/15 hover:border-yellow-500/40 group transition-all flex items-center gap-2"
                     >
-                      <span className="text-base group-hover:scale-110 transition-transform">👏</span>
-                      <span className="font-black text-[11px] text-slate-100">{applauseCount}</span>
+                      <span className="text-sm group-hover:scale-110 transition-transform">👏</span>
+                      <span className="font-black text-[10px] text-slate-100">{applauseCount}</span>
                     </Button>
 
-                    <Button variant="ghost" size="icon" onClick={handleShare} className="h-10 w-10 rounded-xl bg-white/5 border border-white/10 hover:bg-white/10">
-                      {isCopied ? <Check className="h-4 w-4 text-green-500" /> : <Share2 className="h-4 w-4 text-white/40" />}
+                    <Button variant="ghost" size="icon" onClick={handleShare} className="h-9 w-9 rounded-xl bg-white/5 border border-white/10 hover:bg-white/10">
+                      {isCopied ? <Check className="h-3.5 w-3.5 text-green-500" /> : <Share2 className="h-3.5 w-3.5 text-white/40" />}
                     </Button>
                   </div>
                 </div>
 
-                <div className="space-y-8">
-                  <div className="flex gap-3">
-                    <div className="grid grid-cols-4 gap-3 flex-1">
+                <div className="space-y-6 md:space-y-8">
+                  <div className="flex flex-col sm:flex-row gap-3">
+                    <div className="grid grid-cols-4 gap-2 flex-1">
                       {quickAmounts.map(amount => (
                         <Button
                           key={amount}
                           variant="ghost"
                           onClick={() => setTipAmount(formatValue(amount))}
                           className={cn(
-                            "h-14 rounded-2xl border-2 font-black text-lg",
+                            "h-12 md:h-14 rounded-xl md:rounded-2xl border-2 font-black text-sm md:text-lg transition-all",
                             parseFloat(tipAmount) === parseFloat(amount) ? "border-orange-500 bg-orange-500/10 text-orange-500" : "bg-white/5 border-transparent text-white/60"
                           )}
                         >
@@ -542,7 +542,7 @@ const CreatorProfile = () => {
                       ))}
                     </div>
                     <Select value={asset} onValueChange={(val: "TAB" | "XPR") => setAsset(val)}>
-                      <SelectTrigger className="w-[90px] h-14 bg-white/5 border-2 border-white/10 rounded-2xl font-black text-xs text-white">
+                      <SelectTrigger className="w-full sm:w-[90px] h-12 md:h-14 bg-white/5 border-2 border-white/10 rounded-xl md:rounded-2xl font-black text-xs text-white">
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent className="bg-[#1a102d] border-white/20 text-white rounded-xl">
@@ -558,20 +558,20 @@ const CreatorProfile = () => {
                       value={tipAmount}
                       onChange={(e) => setTipAmount(e.target.value)}
                       onBlur={(e) => setTipAmount(formatValue(e.target.value))}
-                      className="bg-white/5 border-white/10 h-20 rounded-[32px] text-right text-3xl font-black pl-8 pr-24 focus:ring-orange-500/50 border-2"
+                      className="bg-white/5 border-white/10 h-16 md:h-20 rounded-2xl md:rounded-[32px] text-right text-2xl md:text-3xl font-black pl-8 pr-28 md:pr-32 focus:ring-orange-500/50 border-2"
                     />
-                    <div className="absolute inset-y-0 right-8 flex items-center pointer-events-none">
-                      <span className={cn("font-black text-xl", asset === "TAB" ? "text-orange-500" : "text-purple-400")}>{asset}</span>
+                    <div className="absolute inset-y-0 right-6 md:right-8 flex items-center pointer-events-none">
+                      <span className={cn("font-black text-lg md:text-xl", asset === "TAB" ? "text-orange-500" : "text-purple-400")}>{asset}</span>
                     </div>
                   </div>
 
                   <div className="space-y-4">
                     {isConnected ? (
-                      <Button onClick={handleSendTip} disabled={isProcessing} className="w-full h-24 bg-gradient-to-r from-orange-500 to-purple-600 text-white font-black text-2xl rounded-[32px] shadow-xl">
+                      <Button onClick={handleSendTip} disabled={isProcessing} className="w-full h-20 md:h-24 bg-gradient-to-r from-orange-500 to-purple-600 text-white font-black text-xl md:text-2xl rounded-2xl md:rounded-[32px] shadow-xl transition-all active:scale-95">
                         {isProcessing ? "Processing..." : "Send Appreciation"}
                       </Button>
                     ) : (
-                      <Button onClick={handleConnect} className="w-full h-24 bg-[#a855f7] text-white font-black text-2xl rounded-[32px] shadow-xl animate-shimmer">
+                      <Button onClick={handleConnect} className="w-full h-20 md:h-24 bg-[#a855f7] text-white font-black text-xl md:text-2xl rounded-2xl md:rounded-[32px] shadow-xl animate-shimmer">
                         Connect WebAuth
                       </Button>
                     )}
@@ -579,12 +579,12 @@ const CreatorProfile = () => {
                 </div>
               </div>
 
-              <div className="p-8 rounded-[40px] bg-white/[0.02] border border-white/5 space-y-4">
+              <div className="p-6 md:p-8 rounded-[32px] md:rounded-[40px] bg-white/[0.02] border border-white/5 space-y-4">
                 <div className="flex items-center gap-3">
                   <Tv className="h-5 w-5 text-orange-500" />
                   <p className="text-sm font-black uppercase tracking-widest text-white/60">Live Support</p>
                 </div>
-                <p className="text-sm text-white/40 font-medium">
+                <p className="text-xs md:text-sm text-white/40 font-medium">
                   Tips sent to this creator are settled instantly on the XPR Network. Zero fees applied.
                 </p>
               </div>
