@@ -108,7 +108,7 @@ export const Tab = () => {
             >
               Snipverse
             </a>
-            <Link to="/docs" className="hover:text-purple-400 transition-colors">Support</Link>
+            <Link to="/docs?section=support" className="hover:text-orange-400 transition-colors">Support Hub</Link>
           </div>
           <div className="mt-16 sm:mt-20 pt-8 sm:pt-10 border-t border-white/5 text-white/20 text-[10px] sm:text-xs font-black uppercase tracking-[0.3em] px-4">
             © {new Date().getFullYear()} TIPTAB Platform. SECURED BY XPR NETWORK.
