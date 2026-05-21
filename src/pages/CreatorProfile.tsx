@@ -34,6 +34,15 @@ import { useToast } from "@/hooks/use-toast";
 import { useXpr } from "@/contexts/XprContext";
 import { cn } from "@/lib/utils";
 
+const ASSET_CONFIGS: Record<string, { code: string; precision: number }> = {
+  TAB: { code: 'tokencreate', precision: 0 },
+  XPR: { code: 'eosio.token', precision: 4 },
+  XMD: { code: 'monedatoken', precision: 6 },
+  XUSDC: { code: 'xtokens', precision: 6 },
+  METAL: { code: 'token.metal', precision: 8 },
+  LOAN: { code: 'loan.token', precision: 4 },
+};
+
 const CreatorProfile = () => {
   const { handle } = useParams<{ handle: string }>();
   const navigate = useNavigate();
@@ -43,7 +52,7 @@ const CreatorProfile = () => {
   
   const [creator, setCreator] = useState<Creator | null>(null);
   const [tipAmount, setTipAmount] = useState("50");
-  const [asset, setAsset] = useState<"TAB" | "XPR">("TAB");
+  const [asset, setAsset] = useState<string>("TAB");
   const [isProcessing, setIsProcessing] = useState(false);
   const [isMembershipOpen, setIsMembershipOpen] = useState(false);
   const [isCopied, setIsCopied] = useState(false);
@@ -99,8 +108,9 @@ const CreatorProfile = () => {
   const formatValue = (val: string) => {
     const numericValue = parseFloat(val);
     if (isNaN(numericValue)) return "0";
-    if (asset === "TAB") return Math.floor(numericValue).toString();
-    return numericValue.toFixed(4);
+    const config = ASSET_CONFIGS[asset];
+    if (config.precision === 0) return Math.floor(numericValue).toString();
+    return numericValue.toFixed(config.precision);
   };
 
   const handleConnect = async () => {
@@ -112,7 +122,7 @@ const CreatorProfile = () => {
   };
 
   const handleSendTip = async () => {
-    if (!session || !actor) return;
+    if (!session || !actor || !creator) return;
     
     const amountNum = parseFloat(tipAmount);
     if (isNaN(amountNum) || amountNum <= 0) {
@@ -126,12 +136,14 @@ const CreatorProfile = () => {
 
     setIsProcessing(true);
     try {
-      const recipient = creator?.handle.replace(/^@/, "").toLowerCase().trim();
-      const contract = asset === "TAB" ? "tokencreate" : "eosio.token";
-      const quantityString = asset === "TAB" ? `${Math.floor(amountNum)} TAB` : `${amountNum.toFixed(4)} XPR`;
+      const recipient = creator.handle.replace(/^@/, "").toLowerCase().trim();
+      const config = ASSET_CONFIGS[asset];
+      const quantityString = config.precision === 0 
+        ? `${Math.floor(amountNum)} ${asset}` 
+        : `${amountNum.toFixed(config.precision)} ${asset}`;
 
       const actions = [{
-        account: contract, 
+        account: config.code, 
         name: 'transfer',
         authorization: [{
           actor: actor,
@@ -245,7 +257,8 @@ const CreatorProfile = () => {
     );
   }
 
-  const quickAmounts = asset === "TAB" ? ["10", "50", "100", "250"] : ["100", "500", "1000", "5000"];
+  // Adjusted quick tiers: TAB is high numeric, stablecoins/XPR are lower
+  const quickAmounts = asset === "TAB" ? ["10", "50", "100", "250"] : ["1", "5", "10", "25"];
 
   const liveStreams = [
     { type: 'YouTube', url: creator.youtubeLive, icon: Youtube, color: 'text-red-500' },
@@ -541,13 +554,14 @@ const CreatorProfile = () => {
                         </Button>
                       ))}
                     </div>
-                    <Select value={asset} onValueChange={(val: "TAB" | "XPR") => setAsset(val)}>
+                    <Select value={asset} onValueChange={(val: string) => setAsset(val)}>
                       <SelectTrigger className="w-full sm:w-[90px] h-12 md:h-14 bg-white/5 border-2 border-white/10 rounded-xl md:rounded-2xl font-black text-xs text-white">
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent className="bg-[#1a102d] border-white/20 text-white rounded-xl">
-                        <SelectItem value="TAB" className="font-black py-2 cursor-pointer">TAB</SelectItem>
-                        <SelectItem value="XPR" className="font-black py-2 cursor-pointer">XPR</SelectItem>
+                        {Object.keys(ASSET_CONFIGS).map(s => (
+                          <SelectItem key={s} value={s} className="font-black py-2 cursor-pointer">{s}</SelectItem>
+                        ))}
                       </SelectContent>
                     </Select>
                   </div>

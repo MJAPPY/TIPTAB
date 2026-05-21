@@ -18,7 +18,8 @@ import {
   ShieldCheck,
   ShieldAlert,
   ArrowLeft,
-  Radio
+  Radio,
+  Coins
 } from "lucide-react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useState } from "react";
@@ -248,7 +249,11 @@ export const Header = ({ onBecomeCreator }: HeaderProps) => {
                   <span className="text-[7px] sm:text-[9px] md:text-xs xl:text-sm font-black text-orange-500 flex items-center gap-0.5 sm:gap-1 leading-none mb-0.5 sm:mb-1">
                     <Zap className="h-2 w-2 sm:h-2.5 sm:w-2.5 fill-orange-500" /> {Number(balances.tab).toLocaleString()} <span className="hidden md:inline">TAB</span>
                   </span>
-                  <span className="text-[6px] sm:text-[7px] md:text-[9px] xl:text-xs font-bold text-slate-300 leading-none truncate max-w-[30px] xs:max-w-[40px] sm:max-w-none">{Number(balances.xpr).toLocaleString()} <span className="hidden md:inline">XPR</span></span>
+                  <div className="flex items-center gap-1.5">
+                    <span className="text-[6px] sm:text-[7px] md:text-[9px] xl:text-xs font-bold text-slate-300 leading-none truncate max-w-[30px] xs:max-w-[40px] sm:max-w-none">{Number(balances.xpr).toLocaleString()} XPR</span>
+                    <div className="h-1 w-1 rounded-full bg-white/10" />
+                    <span className="text-[6px] sm:text-[7px] md:text-[9px] xl:text-xs font-bold text-green-400 leading-none">{Number(balances.xusdc).toLocaleString()} $</span>
+                  </div>
                 </div>
                 <Button 
                   variant="ghost" 
@@ -297,14 +302,22 @@ export const Header = ({ onBecomeCreator }: HeaderProps) => {
                     </div>
                   </DropdownMenuLabel>
                   <DropdownMenuSeparator className="bg-white/5" />
-                  <div className="px-3 py-3 space-y-2">
+                  <div className="px-3 py-3 space-y-3">
                     <div className="flex items-center justify-between text-xs font-bold">
-                      <span className="text-slate-400">TAB Balance:</span>
+                      <span className="text-slate-400">TAB:</span>
                       <span className="text-orange-500">{Number(balances.tab).toLocaleString()}</span>
                     </div>
                     <div className="flex items-center justify-between text-xs font-bold">
-                      <span className="text-slate-400">XPR Balance:</span>
+                      <span className="text-slate-400">XPR:</span>
                       <span className="text-slate-200">{Number(balances.xpr).toLocaleString()}</span>
+                    </div>
+                    <div className="flex items-center justify-between text-xs font-bold border-t border-white/5 pt-2">
+                      <span className="text-slate-400 text-[10px]">XUSDC:</span>
+                      <span className="text-green-400">{Number(balances.xusdc).toLocaleString()}</span>
+                    </div>
+                    <div className="flex items-center justify-between text-xs font-bold">
+                      <span className="text-slate-400 text-[10px]">METAL:</span>
+                      <span className="text-slate-200">{Number(balances.metal).toLocaleString()}</span>
                     </div>
                   </div>
                   <DropdownMenuSeparator className="bg-white/5" />
