@@ -11,6 +11,7 @@ import CreatorProfile from "./pages/CreatorProfile";
 import Calculator from "./pages/Calculator";
 import AdminHub from "./pages/AdminHub";
 import Docs from "./pages/Docs";
+import Assets from "./pages/Assets";
 import NotFound from "./pages/NotFound";
 import Maintenance from "./pages/Maintenance";
 import { useXpr } from "./contexts/XprContext";
@@ -37,6 +38,7 @@ const AppRoutes = () => {
         <Route path="/calculator" element={<Calculator />} />
         <Route path="/admin" element={<AdminHub />} />
         <Route path="/docs" element={<Docs />} />
+        <Route path="/assets" element={<Assets />} />
         <Route path="/tip/:handle" element={<CreatorProfile />} />
         <Route path="*" element={<NotFound />} />
       </Routes>
