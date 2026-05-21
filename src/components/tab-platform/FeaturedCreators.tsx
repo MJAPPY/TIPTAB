@@ -22,6 +22,7 @@ const CATEGORIES = [
   { name: "Automotive", color: "#f43f5e" },
   { name: "Realty", color: "#4f46e5" },
   { name: "Fitness", color: "#10b981" },
+  { name: "Gardening & Farming", color: "#22c55e" },
   { name: "Education", color: "#84cc16" },
   { name: "Service", color: "#64748b" },
   { name: "Other", color: "#ffffff" }
