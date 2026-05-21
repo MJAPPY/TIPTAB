@@ -10,7 +10,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Zap, ShieldCheck, CheckCircle2, Wallet, ArrowRight, Sparkles, Calendar, Gift, Tag, Percent } from "lucide-react";
+import { Zap, ShieldCheck, CheckCircle2, Wallet, ArrowRight, Sparkles, Calendar, Gift, Tag, Percent, Clock } from "lucide-react";
 import { useState, useEffect } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { useXpr, PromoCode } from "@/contexts/XprContext";
@@ -252,16 +252,19 @@ export const MembershipModal = ({ isOpen, onOpenChange }: MembershipModalProps) 
                 <DialogHeader className="pt-2">
                   <div className="flex items-center gap-2 mb-2">
                     <div className="px-3 py-1 rounded-full bg-orange-500 text-white text-[9px] font-black uppercase tracking-[0.2em] shadow-lg">
-                      Yearly Fee
+                      Annual Renewal
                     </div>
                   </div>
-                  <DialogTitle className="text-4xl font-black italic tracking-tighter">NETWORK ACTIVATION</DialogTitle>
+                  <DialogTitle className="text-4xl font-black italic tracking-tighter uppercase">Network Activation</DialogTitle>
+                  <DialogDescription className="text-white/40 font-bold text-xs uppercase tracking-widest">
+                    This provides 12 months of full network status.
+                  </DialogDescription>
                 </DialogHeader>
               </div>
 
               <div className="bg-white/5 border-2 border-white/10 rounded-[40px] p-8 text-center relative overflow-hidden group hover:border-purple-500/50 transition-all">
                 <div className="absolute inset-0 bg-gradient-to-br from-purple-500/5 to-transparent pointer-events-none" />
-                <p className="text-white/40 font-black uppercase tracking-[0.3em] text-[10px] mb-3 group-hover:text-purple-400 transition-colors">Total Activation Amount</p>
+                <p className="text-white/40 font-black uppercase tracking-[0.3em] text-[10px] mb-3 group-hover:text-purple-400 transition-colors">12 MONTH ACCESS FEE</p>
                 
                 <div className="flex flex-col items-center justify-center gap-1">
                   {appliedPromo && (
