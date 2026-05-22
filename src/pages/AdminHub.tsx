@@ -190,13 +190,45 @@ const AdminHub = () => {
   const [newPromoValue, setNewPromoValue] = useState("50");
   const [newPromoUses, setNewPromoUses] = useState("100");
 
-  // Financial Sourced Calculations
-  const boostRevenueTotal = 12500; 
-  const activationRevenueTotal = 452500; 
-  
-  const rewardsPool = useMemo(() => boostRevenueTotal * 0.5, []);
-  const adminBoostShare = useMemo(() => boostRevenueTotal * 0.5, []);
-  const totalAdminRevenue = useMemo(() => activationRevenueTotal + adminBoostShare, [activationRevenueTotal, adminBoostShare]);
+  // Financial Sourced Calculations (Multi-token Mock Revenue Data)
+  const treasuryData = [
+    { 
+      symbol: "XPR", 
+      revenue: 458750, 
+      boostVolume: 12500, 
+      rewards: 6250, 
+      color: "text-orange-500", 
+      bg: "from-orange-500/10",
+      icon: Zap
+    },
+    { 
+      symbol: "TAB", 
+      revenue: 1250000, 
+      boostVolume: 50000, 
+      rewards: 25000, 
+      color: "text-purple-400", 
+      bg: "from-purple-500/10",
+      icon: Sparkles
+    },
+    { 
+      symbol: "XMD", 
+      revenue: 2450.50, 
+      boostVolume: 0, 
+      rewards: 0, 
+      color: "text-cyan-400", 
+      bg: "from-cyan-500/10",
+      icon: Globe
+    },
+    { 
+      symbol: "XUSDC", 
+      revenue: 1840.25, 
+      boostVolume: 0, 
+      rewards: 0, 
+      color: "text-green-400", 
+      bg: "from-green-500/10",
+      icon: HandCoins
+    }
+  ];
 
   useEffect(() => {
     if (membershipFee) setLocalFee(membershipFee);
@@ -348,16 +380,6 @@ const AdminHub = () => {
   };
 
   const handleRewardWinners = async () => {
-    const payoutTotal = winners.reduce((sum, item) => sum + parseFloat(item.reward || "0"), 0);
-    if (payoutTotal > rewardsPool) {
-      toast({
-        title: "Over Limit",
-        description: `Sum of rewards (${payoutTotal.toLocaleString()} XPR) exceeds the rewards pool.`,
-        variant: "destructive"
-      });
-      return;
-    }
-
     setIsDistributing(true);
     try {
       const activeWinners = winners
@@ -374,7 +396,7 @@ const AdminHub = () => {
       if (success) {
         toast({
           title: "Rewards Distributed!",
-          description: `Successfully paid out ${payoutTotal.toLocaleString()} XPR to the winners.`,
+          description: `Successfully paid out rewards to the winners.`,
         });
       }
     } catch (e) {
@@ -734,65 +756,75 @@ const AdminHub = () => {
           )}
 
           {activeTab === "treasury" && (adminRole === 'super' || adminRole === 'treasurer') && (
-            <div className="space-y-8 animate-in fade-in duration-300">
-              <div className="max-w-3xl mx-auto">
-                <Card className="bg-[#1a112d] border-[4px] border-slate-300/40 rounded-[40px] overflow-hidden shadow-[0_0_80px_rgba(0,0,0,0.8)] relative group ring-2 ring-white/10">
-                  <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-white/[0.05] to-transparent pointer-events-none" />
-                  <CardHeader className="p-10 pb-2 relative z-10">
+            <div className="space-y-10 animate-in fade-in duration-300">
+               <Card className="bg-[#1a112d] border-[4px] border-slate-300/40 rounded-[48px] overflow-hidden shadow-[0_0_100px_rgba(0,0,0,0.9)] relative ring-2 ring-white/10">
+                  <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-white/[0.03] to-transparent pointer-events-none" />
+                  <CardHeader className="p-12 pb-6 relative z-10">
                     <div className="flex items-center justify-between">
-                      <CardTitle className="text-2xl md:text-3xl font-black italic tracking-tighter flex items-center gap-3 text-white uppercase">
-                        <Activity className="h-8 w-8 text-purple-500 animate-pulse" /> NETWORK TREASURY
+                      <CardTitle className="text-3xl font-black italic tracking-tighter flex items-center gap-4 text-white uppercase">
+                        <Activity className="h-10 w-10 text-purple-500 animate-pulse" /> NETWORK TREASURY
                       </CardTitle>
-                      <div className="flex items-center gap-2 px-3 py-1 rounded-full bg-green-500/20 border border-green-500/40">
-                        <span className="relative flex h-2 w-2">
+                      <div className="flex items-center gap-3 px-4 py-1.5 rounded-full bg-green-500/20 border border-green-500/40 shadow-[0_0_20px_rgba(34,197,94,0.3)]">
+                        <span className="relative flex h-2.5 w-2.5">
                           <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
-                          <span className="relative inline-flex rounded-full h-2 w-2 bg-green-500"></span>
+                          <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-green-500"></span>
                         </span>
-                        <span className="text-[10px] font-black uppercase tracking-[0.2em] text-green-400">Synced</span>
+                        <span className="text-[11px] font-black uppercase tracking-[0.2em] text-green-400">Live Ledger Sync</span>
                       </div>
                     </div>
                   </CardHeader>
-                  <CardContent className="p-10 pt-0 space-y-10 relative z-10">
-                    <div className="space-y-6 bg-white/5 p-8 rounded-[36px] border border-white/10">
-                      <div className="flex items-center justify-between">
-                        <div className="space-y-1">
-                          <p className="text-[12px] font-black text-orange-500 uppercase tracking-[0.4em]">Rewards Pool (50% Boost Split)</p>
-                          <p className="text-5xl font-black text-white tracking-tighter italic">{rewardsPool.toLocaleString()} <span className="text-orange-500 text-xl">XPR</span></p>
-                        </div>
-                        <Trophy className="h-12 w-12 text-orange-500 drop-shadow-[0_0_15px_rgba(249,115,22,0.4)]" />
-                      </div>
-                      <div className="pt-6 border-t border-white/5">
-                        <p className="text-[10px] font-bold text-white/30 uppercase tracking-[0.2em]">Sourced from Performance Boost Revenue</p>
-                      </div>
+                  
+                  <CardContent className="p-12 pt-4 space-y-12 relative z-10">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                       {treasuryData.map((asset) => (
+                         <div key={asset.symbol} className={cn("p-8 rounded-[40px] bg-gradient-to-br border-2 border-white/5 group hover:border-white/20 transition-all shadow-2xl relative overflow-hidden", asset.bg)}>
+                            <div className="absolute top-0 right-0 p-8 opacity-10 group-hover:opacity-30 transition-opacity">
+                              <asset.icon className={cn("h-24 w-24", asset.color)} />
+                            </div>
+                            
+                            <div className="space-y-8 relative z-10">
+                               <div className="flex items-center justify-between">
+                                  <div className="space-y-1">
+                                    <p className="text-[11px] font-black text-white/40 uppercase tracking-[0.4em]">Net Admin Revenue</p>
+                                    <p className="text-4xl font-black text-white tracking-tighter italic">
+                                      {asset.revenue.toLocaleString()} <span className={cn("text-lg", asset.color)}>{asset.symbol}</span>
+                                    </p>
+                                  </div>
+                               </div>
+
+                               <div className="grid grid-cols-2 gap-6 pt-6 border-t border-white/5">
+                                  <div className="space-y-1">
+                                     <p className="text-[9px] font-black text-white/30 uppercase tracking-[0.2em]">Boost Volume</p>
+                                     <p className="text-xl font-black text-white/80">{asset.boostVolume.toLocaleString()} <span className="text-xs">{asset.symbol}</span></p>
+                                  </div>
+                                  <div className="space-y-1">
+                                     <p className="text-[9px] font-black text-orange-500/80 uppercase tracking-[0.2em]">Rewards Pool</p>
+                                     <p className="text-xl font-black text-orange-500">{asset.rewards.toLocaleString()} <span className="text-xs">{asset.symbol}</span></p>
+                                  </div>
+                               </div>
+                            </div>
+                         </div>
+                       ))}
                     </div>
 
-                    <div className="grid grid-cols-1 gap-6">
-                       <div className="bg-gradient-to-r from-purple-500/10 to-transparent p-7 rounded-[28px] border border-white/10 flex items-center justify-between group hover:border-purple-500/40 transition-all">
-                        <div className="space-y-1">
-                          <span className="text-[11px] font-black text-white/40 uppercase tracking-[0.3em] block mb-0.5">Admin Revenue (Net)</span>
-                          <span className="text-3xl font-black text-purple-400 italic tracking-tight">{totalAdminRevenue.toLocaleString()} <span className="text-sm">XPR</span></span>
-                        </div>
-                        <HandCoins className="h-8 w-8 text-purple-400 group-hover:scale-110 transition-transform" />
-                      </div>
-                      
-                      <div className="bg-gradient-to-r from-orange-500/10 to-transparent p-7 rounded-[28px] border border-white/10 flex items-center justify-between group hover:border-orange-500/40 transition-all">
-                        <div className="space-y-1">
-                          <span className="text-[11px] font-black text-white/40 uppercase tracking-[0.3em] block mb-0.5">Performance Boost Volume (Gross)</span>
-                          <span className="text-3xl font-black text-white italic tracking-tight">{boostRevenueTotal.toLocaleString()} <span className="text-sm text-orange-500">XPR</span></span>
-                        </div>
-                        <Zap className="h-8 w-8 text-orange-500 fill-orange-500 group-hover:scale-110 transition-transform" />
-                      </div>
+                    <div className="pt-6 border-t border-white/5 flex flex-col sm:flex-row gap-6">
+                      <Button 
+                        onClick={() => setActiveTab("rewards")}
+                        className="flex-1 h-24 bg-white text-black hover:bg-orange-500 hover:text-white rounded-[32px] font-black text-lg uppercase tracking-[0.2em] shadow-[0_20px_50px_rgba(255,255,255,0.1)] transition-all active:scale-95"
+                      >
+                        Process Network Rewards
+                      </Button>
+                      <Button 
+                        variant="ghost"
+                        onClick={() => handleSyncParity()}
+                        className="h-24 px-10 bg-white/5 border border-white/10 hover:bg-white/10 rounded-[32px] font-black text-sm uppercase tracking-[0.2em] text-white/40 hover:text-white transition-all"
+                      >
+                        <RefreshCw className={cn("h-6 w-6 mr-4", isSyncingPrices && "animate-spin")} />
+                        Hard Sync
+                      </Button>
                     </div>
-
-                    <Button 
-                      onClick={() => setActiveTab("rewards")}
-                      className="w-full h-20 bg-white text-black hover:bg-orange-500 hover:text-white rounded-[24px] font-black text-sm uppercase tracking-[0.2em] shadow-2xl transition-all active:scale-95"
-                    >
-                      Process Network Rewards
-                    </Button>
                   </CardContent>
-                </Card>
-              </div>
+               </Card>
             </div>
           )}
 
