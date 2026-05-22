@@ -16,20 +16,29 @@ import { useXpr } from "@/contexts/XprContext";
 export const Tab = () => {
   const [isMembershipOpen, setIsMembershipOpen] = useState(false);
   const [selectedCreator, setSelectedCreator] = useState<Creator | null>(null);
-  const { actor, isConnected, isMember, userProfile } = useXpr();
+  const { actor, isConnected } = useXpr();
   const navigate = useNavigate();
 
   // Sync local user profile updates to the display list (Map is for Creators only)
   const displayCreators = useMemo(() => {
-    // Only add the current user to the map/featured list if they are a member and have a profile
-    if (!isMember || !userProfile) return CREATORS;
+    const savedUser = localStorage.getItem("tiptab_user_profile");
+    if (!savedUser) return CREATORS;
+    
+    const localUser = JSON.parse(savedUser) as Creator;
+    
+    // Check if this specific actor has a membership activation record
+    const membershipKey = `tiptab_membership_${actor}`;
+    const isLocalUserMember = localStorage.getItem(membershipKey) === 'true';
 
-    const exists = CREATORS.find(c => c.handle.toLowerCase() === userProfile.handle.toLowerCase());
+    // Only add to the map/featured list if they are a member
+    if (!isLocalUserMember) return CREATORS;
+
+    const exists = CREATORS.find(c => c.id === localUser.id);
     if (exists) {
-      return CREATORS.map(c => c.handle.toLowerCase() === userProfile.handle.toLowerCase() ? userProfile : c);
+      return CREATORS.map(c => c.id === localUser.id ? localUser : c);
     }
-    return [userProfile, ...CREATORS];
-  }, [isMember, userProfile]);
+    return [localUser, ...CREATORS];
+  }, [actor]);
 
   const handleViewProfile = (creator: Creator) => {
     navigate(`/tip/${creator.handle}`);
