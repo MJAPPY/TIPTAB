@@ -259,26 +259,34 @@ const AdminHub = () => {
     if (marketData) {
       const { xprUsd, xprPerTab } = marketData;
       
+      // Determine which base values to use: local state (if manual) or context (if auto)
+      const targetFeeUsd = isAuto ? parseFloat(membershipFeeXusdc) : parseFloat(localFeeXusdc);
+      const targetBoostUsd = isAuto ? parseFloat(boostPriceXusdc) : parseFloat(localBoostXusdc);
+      
       // 1. Calculate Activation Parity
-      const targetFeeUsd = parseFloat(membershipFeeXusdc);
       if (!isNaN(targetFeeUsd)) {
         const calculatedXpr = (targetFeeUsd / xprUsd).toFixed(0);
         const calculatedXmd = targetFeeUsd.toFixed(2);
         
         updateMembershipFee(calculatedXpr, 'XPR');
         updateMembershipFee(calculatedXmd, 'XMD');
+        // If manual sync, also ensure the XUSDC master in context matches what's in the input
+        if (!isAuto) updateMembershipFee(localFeeXusdc, 'XUSDC');
+        
         setLocalFee(calculatedXpr);
         setLocalFeeXmd(calculatedXmd);
       }
 
       // 2. Calculate Boost Parity
-      const targetBoostUsd = parseFloat(boostPriceXusdc);
       if (!isNaN(targetBoostUsd)) {
         const boostXprVal = (targetBoostUsd / xprUsd).toFixed(0);
         const boostTabVal = (parseFloat(boostXprVal) / xprPerTab).toFixed(0);
         
         updateBoostPrice(boostXprVal);
         updateBoostTabPrice(boostTabVal);
+        // If manual sync, also ensure the XUSDC master in context matches what's in the input
+        if (!isAuto) updateBoostPriceXusdc(localBoostXusdc);
+
         setLocalBoost(boostXprVal);
         setLocalBoostTab(boostTabVal);
       }
@@ -299,7 +307,7 @@ const AdminHub = () => {
       });
     }
     setIsSyncingPrices(false);
-  }, [membershipFeeXusdc, boostPriceXusdc, updateMembershipFee, updateBoostPrice, updateBoostTabPrice, toast]);
+  }, [membershipFeeXusdc, boostPriceXusdc, localFeeXusdc, localBoostXusdc, updateMembershipFee, updateBoostPrice, updateBoostTabPrice, updateBoostPriceXusdc, toast]);
 
   // Passive Auto-Sync Logic: Runs once per 24h when a Super Admin opens the dashboard
   useEffect(() => {
@@ -866,6 +874,22 @@ const AdminHub = () => {
                         <div className="space-y-3 p-6 rounded-3xl bg-white/[0.03] border border-white/5">
                           <div className="flex items-center justify-between mb-4">
                              <Label className="text-[11px] font-black uppercase tracking-widest text-cyan-400">Master Asset: XUSDC (Boost)</Label>
+                             <div className="flex items-center gap-4">
+                               <div className="flex items-center gap-1.5 text-[8px] font-black text-white/20 uppercase tracking-widest">
+                                 <Clock className="h-3 w-3" />
+                                 {lastAutoSync > 0 ? new Date(lastAutoSync).toLocaleTimeString() : "Never"}
+                               </div>
+                               <Button 
+                                variant="ghost" 
+                                size="sm" 
+                                onClick={() => handleSyncParity()} 
+                                disabled={isSyncingPrices || adminRole !== 'super'}
+                                className="h-8 px-3 rounded-lg bg-white/5 border border-white/10 hover:bg-white/10 text-[9px] font-black uppercase tracking-widest gap-2 text-slate-300"
+                               >
+                                 <Scale className={cn("h-3.5 w-3.5", isSyncingPrices && "animate-spin")} />
+                                 Sync Parity
+                               </Button>
+                             </div>
                           </div>
                           <div className="flex gap-4">
                             <Input 
