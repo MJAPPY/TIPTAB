@@ -67,7 +67,6 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useXpr, AdminUser } from "@/contexts/XprContext";
 import { Header } from "@/components/tab-platform/Header";
-import { MembershipModal } from "@/components/tab-platform/MembershipModal";
 import { CREATORS, Creator } from "@/data/creators";
 import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
@@ -150,7 +149,8 @@ const AdminHub = () => {
     createPromoCode,
     deletePromoCode,
     actor,
-    logout
+    logout,
+    resetLiveTicker
   } = useXpr();
   
   const navigate = useNavigate();
@@ -480,6 +480,14 @@ const AdminHub = () => {
   const clearAlert = () => {
     broadcastAlert(null);
     toast({ title: "Alert Cleared", description: "Global broadcast banner removed." });
+  };
+
+  const handleResetTicker = () => {
+    resetLiveTicker();
+    toast({
+      title: "Live Feed Reset",
+      description: "Network activity ticker has been flushed and restored to default."
+    });
   };
 
   const toggleMaintenance = () => {
@@ -1455,6 +1463,13 @@ const AdminHub = () => {
                           <BellOff className="h-4 w-4" /> Clear Active Broadcast
                         </Button>
                       )}
+
+                      <Button 
+                        onClick={handleResetTicker}
+                        className="w-full h-16 rounded-[28px] bg-cyan-500/10 border border-cyan-500/20 text-cyan-300 hover:bg-cyan-500/20 font-black text-sm flex items-center justify-start gap-4 px-8"
+                      >
+                        <RotateCcw className="h-5 w-5" /> Reset Live Feed Ticker
+                      </Button>
                     </div>
                   </div>
                   
@@ -1606,7 +1621,7 @@ const AdminHub = () => {
                       </Select>
                     </div>
 
-                    <Button type="submit" className="w-full h-14 bg-white text-black hover:bg-purple-500 hover:text-white transition-all font-black uppercase tracking-[0.2em] text-xs rounded-2xl shadow-xl active:scale-95">
+                    <Button type="submit" className="w-full h-14 bg-white text-black hover:bg-purple-500 hover:text-purple-100 transition-all font-black uppercase tracking-[0.2em] text-xs rounded-2xl shadow-xl active:scale-95">
                       Confirm Authorization
                     </Button>
                   </form>

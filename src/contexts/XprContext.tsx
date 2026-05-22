@@ -30,6 +30,15 @@ interface Balances {
   tipsSent: number;
 }
 
+const DEFAULT_ACTIVITIES = [
+  { id: 1, icon: "Zap", text: "New Tip: 500 TAB sent to @alex_arts", color: "text-orange-500" },
+  { id: 2, icon: "Sparkles", text: "@sarahcodes just joined the global map!", color: "text-purple-400" },
+  { id: 3, icon: "TrendingUp", text: "Network Milestone: 1.2M TAB tipped globally", color: "text-green-400" },
+  { id: 4, icon: "Heart", text: "Top Supporter: 0x71...4F2a sent a 5,000 TAB tip!", color: "text-pink-500" },
+  { id: 5, icon: "Zap", text: "New Tip: 250 TAB sent to @priyatech", color: "text-orange-500" },
+  { id: 6, icon: "Sparkles", text: "@mwright is now a verified creator", color: "text-purple-400" },
+];
+
 interface XprContextType {
   session: LinkSession | null;
   actor: string | null;
@@ -79,6 +88,9 @@ interface XprContextType {
   favorites: string[];
   toggleFavorite: (handle: string) => void;
   isFavorite: (handle: string) => boolean;
+  // Live Ticker Feed
+  liveActivities: any[];
+  resetLiveTicker: () => void;
 }
 
 const XprContext = createContext<XprContextType | undefined>(undefined);
@@ -120,6 +132,18 @@ export const XprProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const [userProfile, setUserProfile] = useState<Creator | null>(null);
   
   const [favorites, setFavorites] = useState<string[]>([]);
+  const [liveActivities, setLiveActivities] = useState(() => {
+    if (typeof window !== "undefined") {
+      const saved = localStorage.getItem("tiptab_live_activities");
+      return saved ? JSON.parse(saved) : DEFAULT_ACTIVITIES;
+    }
+    return DEFAULT_ACTIVITIES;
+  });
+
+  const resetLiveTicker = () => {
+    setLiveActivities(DEFAULT_ACTIVITIES);
+    localStorage.setItem("tiptab_live_activities", JSON.stringify(DEFAULT_ACTIVITIES));
+  };
 
   useEffect(() => {
     if (session?.auth.actor) {
@@ -631,7 +655,9 @@ export const XprProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     usePromoCode,
     favorites,
     toggleFavorite,
-    isFavorite
+    isFavorite,
+    liveActivities,
+    resetLiveTicker
   };
 
   return <XprContext.Provider value={value}>{children}</XprContext.Provider>;

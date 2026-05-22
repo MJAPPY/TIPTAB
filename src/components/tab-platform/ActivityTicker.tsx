@@ -1,15 +1,16 @@
 import { Zap, Sparkles, TrendingUp, Heart } from "lucide-react";
+import { useXpr } from "@/contexts/XprContext";
 
-const ACTIVITIES = [
-  { icon: Zap, text: "New Tip: 500 TAB sent to @alex_arts", color: "text-orange-500" },
-  { icon: Sparkles, text: "@sarahcodes just joined the global map!", color: "text-purple-400" },
-  { icon: TrendingUp, text: "Network Milestone: 1.2M TAB tipped globally", color: "text-green-400" },
-  { icon: Heart, text: "Top Supporter: 0x71...4F2a sent a 5,000 TAB tip!", color: "text-pink-500" },
-  { icon: Zap, text: "New Tip: 250 TAB sent to @priyatech", color: "text-orange-500" },
-  { icon: Sparkles, text: "@mwright is now a verified creator", color: "text-purple-400" },
-];
+const ICON_MAP: Record<string, any> = {
+  Zap,
+  Sparkles,
+  TrendingUp,
+  Heart
+};
 
 export const ActivityTicker = () => {
+  const { liveActivities } = useXpr();
+
   // Helper to highlight handles in the text
   const formatText = (text: string, colorClass: string) => {
     const parts = text.split(/(@\w+)/g);
@@ -27,12 +28,9 @@ export const ActivityTicker = () => {
 
   return (
     <div className="fixed top-0 left-0 right-0 z-[60] bg-[#0a0514]/80 backdrop-blur-xl border-b border-white/10 h-10 flex items-center overflow-hidden shadow-[0_10px_30px_rgba(0,0,0,0.5)]">
-      {/* Live Indicator Badge with Enhanced Blend */}
+      {/* Live Indicator Badge */}
       <div className="relative z-30 flex items-center h-full pl-6 pr-32">
-        {/* Main Badge Background with Long Gradient Falloff */}
         <div className="absolute inset-y-0 left-0 w-full bg-gradient-to-r from-orange-600 via-orange-600 to-transparent opacity-100 shadow-[inset_-20px_0_40px_-20px_rgba(0,0,0,0.5)]" />
-        
-        {/* Extra glowing edge blur */}
         <div className="absolute inset-y-0 right-16 w-24 bg-orange-500/20 blur-xl pointer-events-none" />
         
         <div className="relative z-20 flex items-center gap-2.5">
@@ -48,25 +46,31 @@ export const ActivityTicker = () => {
 
       <div className="flex whitespace-nowrap animate-marquee items-center pl-4 relative z-10">
         {/* First set of activities */}
-        {ACTIVITIES.map((activity, i) => (
-          <div key={`a-${i}`} className="flex items-center gap-3 px-10 group cursor-default">
-            <div className={`h-1 w-1 rounded-full bg-white/20 group-hover:bg-white/60 transition-colors`} />
-            <activity.icon className={`h-3 w-3 ${activity.color} drop-shadow-[0_0_5px_currentColor]`} />
-            <span className="text-[10px] font-black uppercase tracking-[0.15em] text-white/80 group-hover:text-white transition-colors">
-              {formatText(activity.text, activity.color)}
-            </span>
-          </div>
-        ))}
+        {liveActivities.map((activity, i) => {
+          const Icon = ICON_MAP[activity.icon] || Zap;
+          return (
+            <div key={`a-${i}`} className="flex items-center gap-3 px-10 group cursor-default">
+              <div className={`h-1 w-1 rounded-full bg-white/20 group-hover:bg-white/60 transition-colors`} />
+              <Icon className={`h-3 w-3 ${activity.color} drop-shadow-[0_0_5px_currentColor]`} />
+              <span className="text-[10px] font-black uppercase tracking-[0.15em] text-white/80 group-hover:text-white transition-colors">
+                {formatText(activity.text, activity.color)}
+              </span>
+            </div>
+          );
+        })}
         {/* Duplicate set for seamless loop */}
-        {ACTIVITIES.map((activity, i) => (
-          <div key={`b-${i}`} className="flex items-center gap-3 px-10 group cursor-default">
-            <div className={`h-1 w-1 rounded-full bg-white/20 group-hover:bg-white/60 transition-colors`} />
-            <activity.icon className={`h-3 w-3 ${activity.color} drop-shadow-[0_0_5px_currentColor]`} />
-            <span className="text-[10px] font-black uppercase tracking-[0.15em] text-white/80 group-hover:text-white transition-colors">
-              {formatText(activity.text, activity.color)}
-            </span>
-          </div>
-        ))}
+        {liveActivities.map((activity, i) => {
+          const Icon = ICON_MAP[activity.icon] || Zap;
+          return (
+            <div key={`b-${i}`} className="flex items-center gap-3 px-10 group cursor-default">
+              <div className={`h-1 w-1 rounded-full bg-white/20 group-hover:bg-white/60 transition-colors`} />
+              <Icon className={`h-3 w-3 ${activity.color} drop-shadow-[0_0_5px_currentColor]`} />
+              <span className="text-[10px] font-black uppercase tracking-[0.15em] text-white/80 group-hover:text-white transition-colors">
+                {formatText(activity.text, activity.color)}
+              </span>
+            </div>
+          );
+        })}
       </div>
 
       <style>{`
