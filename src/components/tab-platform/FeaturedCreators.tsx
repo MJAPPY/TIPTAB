@@ -1,6 +1,6 @@
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Search, Plus, MapPin, QrCode, Twitter, Globe, Instagram, Video, Zap } from "lucide-react";
+import { Search, Plus, MapPin, QrCode, Twitter, Globe, Instagram, Video, Zap, MessageSquare, Facebook } from "lucide-react";
 import { useState, useMemo } from "react";
 import { Creator } from "@/data/creators";
 import { cn } from "@/lib/utils";
@@ -179,9 +179,11 @@ export const FeaturedCreators = ({ creators, onSelectCreator, onViewProfile, onA
                     <MapPin className="h-4 w-4" style={{ color: theme.color }} />
                     {creator.location}
                   </div>
-                  <div className="flex items-center gap-4">
+                  <div className="flex items-center gap-3">
                     {creator.twitter && <Twitter className="h-4 w-4 text-white/40 hover:text-purple-400 transition-colors" />}
                     {creator.instagram && <Instagram className="h-4 w-4 text-white/40 hover:text-purple-400 transition-colors" />}
+                    {creator.snipverse && <MessageSquare className="h-4 w-4 text-white/40 hover:text-purple-400 transition-colors" />}
+                    {creator.facebook && <Facebook className="h-4 w-4 text-white/40 hover:text-purple-400 transition-colors" />}
                     {creator.website && <Globe className="h-4 w-4 text-white/40 hover:text-purple-400 transition-colors" />}
                   </div>
                 </div>

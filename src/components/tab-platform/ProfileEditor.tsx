@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
-import { User, AtSign, MapPin, Globe, Twitter, Save, Image as ImageIcon, Upload, X, Video, Instagram, CheckCircle2, Music, Radio, Youtube, Twitch, ShieldCheck, Move } from "lucide-react";
+import { User, AtSign, MapPin, Globe, Twitter, Save, Image as ImageIcon, Upload, X, Video, Instagram, CheckCircle2, Music, Radio, Youtube, Twitch, ShieldCheck, Move, Facebook, MessageSquare } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -93,12 +93,14 @@ export const ProfileEditor = ({ initialData, onSave, minimal = false }: ProfileE
     bio: initialData.bio,
     location: initialData.location,
     coordinates: initialData.coordinates,
-    categories: initialData.categories || [initialData.category || "Other"],
+    categories: initialData.categories || [initialData.categories?.[0] || (initialData as any).category || "Other"],
     twitter: initialData.twitter || "",
     website: initialData.website || "",
     videoUrl: initialData.videoUrl || "",
     instagram: initialData.instagram || "",
     spotify: initialData.spotify || "",
+    snipverse: initialData.snipverse || "",
+    facebook: initialData.facebook || "",
     avatarImage: initialData.avatarImage || "",
     coverImage: initialData.coverImage || "",
     coverPosition: initialData.coverPosition ?? 50,
@@ -123,6 +125,8 @@ export const ProfileEditor = ({ initialData, onSave, minimal = false }: ProfileE
       videoUrl: initialData.videoUrl || "",
       instagram: initialData.instagram || "",
       spotify: initialData.spotify || "",
+      snipverse: initialData.snipverse || "",
+      facebook: initialData.facebook || "",
       avatarImage: initialData.avatarImage || "",
       coverImage: initialData.coverImage || "",
       coverPosition: initialData.coverPosition ?? 50,
@@ -427,6 +431,7 @@ export const ProfileEditor = ({ initialData, onSave, minimal = false }: ProfileE
                     className="hidden" 
                     accept="image/*" 
                     onChange={handleFileChange} 
+                    key={formData.avatarImage ? 'has-avatar' : 'no-avatar'}
                   />
                   <Button 
                     variant="outline" 
@@ -695,6 +700,34 @@ export const ProfileEditor = ({ initialData, onSave, minimal = false }: ProfileE
                         value={formData.instagram}
                         onChange={handleChange}
                         placeholder="https://instagram.com/username"
+                        className="pl-12 bg-white/5 border-white/10 h-14 rounded-2xl focus:ring-purple-500 focus:bg-white/10 transition-all text-white" 
+                      />
+                    </div>
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="snipverse" className="text-white/60 font-bold uppercase tracking-widest text-[10px]">Snipverse Profile URL</Label>
+                    <div className="relative">
+                      <MessageSquare className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-purple-400" />
+                      <Input 
+                        id="snipverse"
+                        value={formData.snipverse}
+                        onChange={handleChange}
+                        placeholder="https://snipverse.com/username"
+                        className="pl-12 bg-white/5 border-white/10 h-14 rounded-2xl focus:ring-purple-500 focus:bg-white/10 transition-all text-white" 
+                      />
+                    </div>
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="facebook" className="text-white/60 font-bold uppercase tracking-widest text-[10px]">Facebook Profile URL</Label>
+                    <div className="relative">
+                      <Facebook className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-[#1877F2]" />
+                      <Input 
+                        id="facebook"
+                        value={formData.facebook}
+                        onChange={handleChange}
+                        placeholder="https://facebook.com/username"
                         className="pl-12 bg-white/5 border-white/10 h-14 rounded-2xl focus:ring-purple-500 focus:bg-white/10 transition-all text-white" 
                       />
                     </div>

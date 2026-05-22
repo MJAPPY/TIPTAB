@@ -22,7 +22,8 @@ import {
   ArrowLeft,
   Sparkles,
   MessageSquare,
-  Star
+  Star,
+  Facebook
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -481,9 +482,9 @@ const CreatorProfile = () => {
                   </div>
                 </div>
                 
-                <div className="space-y-2">
+                <div className="space-y-2 flex-1 min-w-[200px]">
                   <h3 className="text-xs font-black uppercase tracking-[0.3em] text-white/30">Connect</h3>
-                  <div className="flex items-center gap-4">
+                  <div className="flex flex-wrap items-center gap-3">
                     {creator.twitter && (
                       <a href={creator.twitter} target="_blank" rel="noopener noreferrer" className="h-10 w-10 rounded-xl bg-white/5 flex items-center justify-center hover:bg-purple-500 transition-all">
                         <Twitter className="h-5 w-5" />
@@ -492,6 +493,16 @@ const CreatorProfile = () => {
                     {creator.instagram && (
                       <a href={creator.instagram} target="_blank" rel="noopener noreferrer" className="h-10 w-10 rounded-xl bg-white/5 flex items-center justify-center hover:bg-pink-500 transition-all">
                         <Instagram className="h-5 w-5" />
+                      </a>
+                    )}
+                    {creator.snipverse && (
+                      <a href={creator.snipverse} target="_blank" rel="noopener noreferrer" className="h-10 w-10 rounded-xl bg-white/5 flex items-center justify-center hover:bg-purple-600 transition-all">
+                        <MessageSquare className="h-5 w-5" />
+                      </a>
+                    )}
+                    {creator.facebook && (
+                      <a href={creator.facebook} target="_blank" rel="noopener noreferrer" className="h-10 w-10 rounded-xl bg-white/5 flex items-center justify-center hover:bg-[#1877F2] transition-all">
+                        <Facebook className="h-5 w-5" />
                       </a>
                     )}
                     {creator.spotify && (

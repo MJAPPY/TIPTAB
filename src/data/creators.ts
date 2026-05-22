@@ -16,6 +16,8 @@ export interface Creator {
   videoUrl?: string;
   instagram?: string;
   spotify?: string;
+  snipverse?: string;
+  facebook?: string;
   mediaEmbed?: string; // Specific field for the player
   // Live Stream Links
   twitch?: string;

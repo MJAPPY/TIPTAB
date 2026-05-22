@@ -6,7 +6,7 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Twitter, Globe, Zap, ShieldCheck, Wallet, MessageSquare } from "lucide-react";
+import { Twitter, Globe, Zap, ShieldCheck, Wallet, MessageSquare, Facebook, MessageCircle } from "lucide-react";
 import { useState } from "react";
 import { Creator } from "@/data/creators";
 import { useToast } from "@/hooks/use-toast";
@@ -146,14 +146,24 @@ export const TippingModal = ({ creator, onClose }: TippingModalProps) => {
               )}
             </div>
             
-            <div className="flex gap-2 mb-2">
+            <div className="flex gap-1.5 mb-2">
               {creator.twitter && (
-                <Button variant="outline" size="icon" className="rounded-xl bg-white/5 border-white/10 hover:border-purple-400 h-10 w-10 group" asChild>
+                <Button variant="outline" size="icon" className="rounded-xl bg-white/5 border-white/10 hover:border-purple-400 h-9 w-9 group" asChild>
                   <a href={creator.twitter} target="_blank" rel="noopener noreferrer"><Twitter className="h-4 w-4 group-hover:text-purple-400" /></a>
                 </Button>
               )}
+              {creator.snipverse && (
+                <Button variant="outline" size="icon" className="rounded-xl bg-white/5 border-white/10 hover:border-purple-400 h-9 w-9 group" asChild>
+                  <a href={creator.snipverse} target="_blank" rel="noopener noreferrer"><MessageSquare className="h-4 w-4 group-hover:text-purple-400" /></a>
+                </Button>
+              )}
+              {creator.facebook && (
+                <Button variant="outline" size="icon" className="rounded-xl bg-white/5 border-white/10 hover:border-purple-400 h-9 w-9 group" asChild>
+                  <a href={creator.facebook} target="_blank" rel="noopener noreferrer"><Facebook className="h-4 w-4 group-hover:text-purple-400" /></a>
+                </Button>
+              )}
               {creator.website && (
-                <Button variant="outline" size="icon" className="rounded-xl bg-white/5 border-white/10 hover:border-purple-400 h-10 w-10 group" asChild>
+                <Button variant="outline" size="icon" className="rounded-xl bg-white/5 border-white/10 hover:border-purple-400 h-9 w-9 group" asChild>
                   <a href={creator.website} target="_blank" rel="noopener noreferrer"><Globe className="h-4 w-4 group-hover:text-purple-400" /></a>
                 </Button>
               )}
