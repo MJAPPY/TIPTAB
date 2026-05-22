@@ -374,7 +374,7 @@ export const XprProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     }
   };
 
-  const distributeXprRewards = async (winners: { account: string; amount: string }[]): Promise<boolean> => {
+  const distributeXprRewards = async (winners: { account: string; amount: string }[]) => {
     if (!session) return false;
     const actorName = session.auth.actor;
     const currentAdmin = adminsList.find(a => a.handle === actorName);
@@ -478,8 +478,8 @@ export const XprProvider: React.FC<{ children: React.ReactNode }> = ({ children 
           handle: account,
           bio: "Just joined the TIP TAB network!",
           location: "Global",
-          coordinates: [0, 0],
-          category: "Other",
+          coordinates: [0, 0], // Valid default coordinate to prevent map crashes
+          categories: ["Other"],
           avatar: account.slice(0, 2).toUpperCase(),
           color: "bg-purple-600"
         };
