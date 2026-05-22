@@ -54,7 +54,9 @@ export const Tab = () => {
       <ActivityTicker />
       
       <main className="pt-24 md:pt-32">
-        <Hero creators={displayCreators} onJoin={() => setIsMembershipOpen(true)} />
+        <div className="relative">
+          <Hero creators={displayCreators} onJoin={() => setIsMembershipOpen(true)} />
+        </div>
         <StatsBanner />
         
         <section className="py-12 container mx-auto px-6">
@@ -86,9 +88,14 @@ export const Tab = () => {
               TIP<span className="text-orange-500">TAB</span>
             </span>
           </Link>
-          <p className="text-white/40 max-w-md mx-auto mb-10 sm:mb-12 text-sm sm:text-lg font-medium px-4">
-            Empowering the global workforce through direct, fee-free tipping on the <span className="text-purple-400">XPR Network</span>. Join the future of appreciation.
-          </p>
+          <div className="space-y-4 mb-10 sm:mb-12 max-w-xl mx-auto px-4">
+            <p className="text-white/40 text-sm sm:text-lg font-medium">
+              Empowering the global workforce through direct, fee-free tipping on the <span className="text-purple-400">XPR Network</span>. Join the future of appreciation.
+            </p>
+            <p className="text-orange-500/80 font-black italic tracking-tight text-lg sm:text-xl uppercase drop-shadow-[0_0_15px_rgba(249,115,22,0.2)]">
+              “Tipping is the appreciation of value”
+            </p>
+          </div>
           <div className="flex flex-wrap justify-center gap-6 sm:gap-10 text-white/60 font-bold text-sm sm:text-base">
             <Link to="/docs" className="hover:text-purple-400 transition-colors">Documentation</Link>
             <Link to="/assets" className="hover:text-orange-400 transition-colors">Assets</Link>

@@ -75,9 +75,14 @@ const Docs = () => {
               <BookOpen className="h-4 w-4" />
               Knowledge Base
             </div>
-            <h1 className="text-5xl md:text-7xl font-black tracking-tighter italic">
-              NETWORK <span className="text-orange-500">GUIDELINES</span>
-            </h1>
+            <div className="space-y-2">
+              <h1 className="text-5xl md:text-7xl font-black tracking-tighter italic">
+                NETWORK <span className="text-orange-500">GUIDELINES</span>
+              </h1>
+              <p className="text-orange-500/80 font-black italic tracking-[0.15em] text-lg md:text-xl uppercase drop-shadow-[0_0_10px_rgba(249,115,22,0.2)]">
+                “Tipping is the appreciation of value”
+              </p>
+            </div>
             <p className="text-xl text-white/60 max-w-2xl mx-auto font-medium">
               Everything you need to know about the most direct appreciation network available anywhere, built on the XPR Network.
             </p>
