@@ -467,7 +467,7 @@ const CreatorProfile = () => {
             <div className="sticky top-40 space-y-6">
               
               {isOwner && (
-                <div className="bg-gradient-to-br from-orange-500/15 via-[#130b21] to-[#130b21] border border-orange-500/30 rounded-[48px] p-10 shadow-2xl relative overflow-hidden group">
+                <div className="bg-[#130b21] border border-white/10 rounded-[48px] p-10 shadow-2xl relative overflow-hidden group">
                   <div className="absolute top-0 right-0 p-8">
                     <Sparkles className="h-6 w-6 text-orange-400 animate-pulse" />
                   </div>
@@ -495,20 +495,20 @@ const CreatorProfile = () => {
                   </div>
 
                   {!isBoosted && (
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div className="grid grid-cols-1 gap-4">
                       <Button
                         onClick={() => onBoost('XPR')}
                         disabled={isProcessing}
-                        className="h-16 bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white font-black text-[10px] uppercase tracking-widest rounded-2xl shadow-xl transition-all active:scale-95 border-b-4 border-black/20"
+                        className="h-16 bg-gradient-to-r from-orange-500 to-purple-600 text-white font-black text-xs md:text-sm uppercase tracking-widest rounded-2xl shadow-[0_10px_30px_rgba(168,85,247,0.3)] transition-all active:scale-95 border-b-4 border-black/20"
                       >
-                        {isProcessing ? "Wait..." : `Boost (${Number(boostPrice).toLocaleString()} XPR)`}
+                        {isProcessing ? "Wait..." : `BOOST PERFORMANCE (${Number(boostPrice).toLocaleString()} XPR)`}
                       </Button>
                       <Button
                         onClick={() => onBoost('TAB')}
                         disabled={isProcessing}
-                        className="h-16 bg-gradient-to-r from-purple-500 to-purple-600 hover:from-purple-600 hover:to-purple-700 text-white font-black text-[10px] uppercase tracking-widest rounded-2xl shadow-xl transition-all active:scale-95 border-b-4 border-black/20"
+                        className="h-16 bg-gradient-to-r from-orange-500 to-purple-600 text-white font-black text-xs md:text-sm uppercase tracking-widest rounded-2xl shadow-[0_10px_30px_rgba(168,85,247,0.3)] transition-all active:scale-95 border-b-4 border-black/20"
                       >
-                        {isProcessing ? "Wait..." : `Boost (${Number(boostTabPrice).toLocaleString()} TAB)`}
+                        {isProcessing ? "Wait..." : `BOOST PERFORMANCE (${Number(boostTabPrice).toLocaleString()} TAB)`}
                       </Button>
                     </div>
                   )}
