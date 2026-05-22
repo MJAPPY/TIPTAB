@@ -48,7 +48,7 @@ const CreatorProfile = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const { toast } = useToast();
-  const { session, actor, login, isConnected, recordTip, isMember, featuredHandles, boostStream, boostPrice } = useXpr();
+  const { session, actor, login, isConnected, recordTip, isMember, featuredHandles, boostStream, boostPrice, boostTabPrice } = useXpr();
   
   const [creator, setCreator] = useState<Creator | null>(null);
   const [tipAmount, setTipAmount] = useState("50");
@@ -211,6 +211,28 @@ const CreatorProfile = () => {
     }
   };
 
+  const onBoost = async (paymentAsset: 'XPR' | 'TAB') => {
+    if (!isMember) {
+      setIsMembershipOpen(true);
+      return;
+    }
+    setIsProcessing(true);
+    const success = await boostStream(creator!.handle, paymentAsset);
+    setIsProcessing(false);
+    if (success) {
+      toast({
+        title: "Performance Boosted!",
+        description: `Your stream is now featured on the Live Hub using ${paymentAsset}.`,
+      });
+    } else {
+      toast({
+        title: "Boost Failed",
+        description: `Please check your ${paymentAsset} balance and try again.`,
+        variant: "destructive"
+      });
+    }
+  };
+
   if (!creator) {
     return (
       <div className="min-h-screen bg-[#0a0514] flex items-center justify-center">
@@ -266,8 +288,8 @@ const CreatorProfile = () => {
   ].filter(s => s.url);
 
   const featuredEmbedUrl = creator.mediaEmbed || creator.videoUrl || "";
-  const isOwner = actor === creator.handle.replace('@', '');
-  const isBoosted = featuredHandles.includes(creator.handle.replace('@', ''));
+  const isOwner = actor === creator.handle.replace('@', '').toLowerCase();
+  const isBoosted = featuredHandles.includes(creator.handle.replace('@', '').toLowerCase());
 
   return (
     <div className="min-h-screen bg-[#0a0514] text-white selection:bg-purple-500/30">
@@ -459,7 +481,7 @@ const CreatorProfile = () => {
                     Feature your performance at the top of the <span className="text-orange-400 font-bold">Live Hub</span> for maximum visibility and better tips.
                   </p>
                   
-                  <div className="p-5 rounded-2xl bg-white/5 border border-white/5 flex items-center justify-between">
+                  <div className="p-5 rounded-2xl bg-white/5 border border-white/5 flex items-center justify-between mb-4">
                     <span className="text-xs font-black uppercase tracking-wider text-slate-400">Hub Status</span>
                     {isBoosted ? (
                       <span className="text-xs font-black text-green-400 uppercase tracking-widest bg-green-500/10 px-3 py-1.5 rounded-xl border border-green-500/20 flex items-center gap-1.5">
@@ -473,33 +495,22 @@ const CreatorProfile = () => {
                   </div>
 
                   {!isBoosted && (
-                    <Button
-                      onClick={async () => {
-                        if (!isMember) {
-                          setIsMembershipOpen(true);
-                          return;
-                        }
-                        setIsProcessing(true);
-                        const success = await boostStream(creator.handle);
-                        setIsProcessing(false);
-                        if (success) {
-                          toast({
-                            title: "Performance Boosted!",
-                            description: `Your stream is now featured on the Live Hub.`,
-                          });
-                        } else {
-                          toast({
-                            title: "Boost Failed",
-                            description: "Please check your XPR balance and try again.",
-                            variant: "destructive"
-                          });
-                        }
-                      }}
-                      disabled={isProcessing}
-                      className="w-full h-16 bg-gradient-to-r from-orange-500 to-purple-600 hover:from-purple-600 hover:to-purple-700 text-white font-black text-sm uppercase tracking-widest rounded-2xl shadow-xl transition-all active:scale-95"
-                    >
-                      {isProcessing ? "Authorizing Boost..." : `Boost Performance (${boostPrice} XPR)`}
-                    </Button>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                      <Button
+                        onClick={() => onBoost('XPR')}
+                        disabled={isProcessing}
+                        className="h-16 bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white font-black text-[10px] uppercase tracking-widest rounded-2xl shadow-xl transition-all active:scale-95 border-b-4 border-black/20"
+                      >
+                        {isProcessing ? "Wait..." : `Boost (${Number(boostPrice).toLocaleString()} XPR)`}
+                      </Button>
+                      <Button
+                        onClick={() => onBoost('TAB')}
+                        disabled={isProcessing}
+                        className="h-16 bg-gradient-to-r from-purple-500 to-purple-600 hover:from-purple-600 hover:to-purple-700 text-white font-black text-[10px] uppercase tracking-widest rounded-2xl shadow-xl transition-all active:scale-95 border-b-4 border-black/20"
+                      >
+                        {isProcessing ? "Wait..." : `Boost (${Number(boostTabPrice).toLocaleString()} TAB)`}
+                      </Button>
+                    </div>
                   )}
                 </div>
               )}
