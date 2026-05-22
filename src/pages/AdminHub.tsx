@@ -77,6 +77,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { Badge } from "@/components/ui/badge";
+import { DetailedReportModal } from "@/components/tab-platform/DetailedReportModal";
 
 const MOCK_AUDIT_LOGS: Record<string, any[]> = {
   "tiptab": [
@@ -143,6 +145,7 @@ const AdminHub = () => {
   const [isAlertModalOpen, setIsAlertModalOpen] = useState(false);
   const [isAuditModalOpen, setIsAuditModalOpen] = useState(false);
   const [isHistoryModalOpen, setIsHistoryModalOpen] = useState(false);
+  const [isDetailedReportOpen, setIsDetailedReportOpen] = useState(false);
   const [selectedCreator, setSelectedCreator] = useState<Creator | null>(null);
   const [moderatedCreators, setModeratedCreators] = useState<Creator[]>(CREATORS);
   const [bannedHandles, setBannedHandles] = useState<string[]>([]);
@@ -469,7 +472,7 @@ const AdminHub = () => {
               Secure Administration
             </div>
             <h1 className="text-3xl sm:text-5xl md:text-6xl font-black tracking-tighter leading-none text-slate-100">
-              Admin <span className="text-transparent bg-clip-text bg-gradient-to-r from-orange-400 to-purple-500">Hub</span>
+              Admin <span className="text-transparent bg-clip-text bg-gradient-to-r from-orange-400 via-purple-500 to-cyan-400">Hub</span>
             </h1>
           </div>
           
@@ -534,7 +537,11 @@ const AdminHub = () => {
                           </CardTitle>
                           <CardDescription className="text-white/40">Member totals and network expansion trends</CardDescription>
                         </div>
-                        <Button variant="ghost" className="h-10 rounded-xl bg-white/5 text-[9px] font-black uppercase tracking-widest text-white/40 gap-2">
+                        <Button 
+                          onClick={() => setIsDetailedReportOpen(true)}
+                          variant="ghost" 
+                          className="h-10 rounded-xl bg-white/5 text-[9px] font-black uppercase tracking-widest text-white/40 gap-2 hover:bg-white/10 hover:text-white transition-all"
+                        >
                            Detailed Report <ArrowUpRight className="h-3.5 w-3.5" />
                         </Button>
                       </div>
@@ -975,6 +982,11 @@ const AdminHub = () => {
           )}
         </div>
       </main>
+
+      <DetailedReportModal 
+        isOpen={isDetailedReportOpen} 
+        onOpenChange={setIsDetailedReportOpen} 
+      />
 
       <Dialog open={isAuditModalOpen} onOpenChange={setIsAuditModalOpen}>
         <DialogContent className="bg-[#1a102d] border-white/10 text-white rounded-[32px] p-8 max-w-2xl">
