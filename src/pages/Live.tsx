@@ -291,55 +291,57 @@ const Live = () => {
                   <div className="p-8 space-y-4">
                     <div className="flex items-center justify-between" onClick={() => navigate(`/tip/${creator.handle}`)}>
                       <div className="flex items-center gap-4">
-                        <div className={cn("h-16 w-16 md:h-20 md:w-20 rounded-2xl flex items-center justify-center text-xl font-black border-2 border-white/10 text-white overflow-hidden shrink-0 shadow-lg", creator.color)}>
+                        <div className={cn("h-14 w-14 rounded-2xl flex items-center justify-center text-xl font-black border-2 border-white/10 text-white", creator.color)}>
                           {creator.avatarImage ? <img src={creator.avatarImage} alt="" className="w-full h-full object-cover" /> : creator.avatar}
                         </div>
-                        <div className="min-w-0">
-                          <h3 className="text-xl md:text-2xl font-black tracking-tight group-hover:text-purple-400 transition-colors text-white truncate">{creator.name}</h3>
+                        <div>
+                          <h3 className="text-xl font-black tracking-tight group-hover:text-purple-400 transition-colors text-white">{creator.name}</h3>
                           <p className="text-sm font-bold text-white/40">@{creator.handle}</p>
                         </div>
                       </div>
                     </div>
                     
-                    <p className="text-white/60 text-sm line-clamp-2 font-medium h-10" onClick={() => navigate(`/tip/${creator.handle}`)}>
+                    <p className="text-white/60 text-sm line-clamp-2 font-medium" onClick={() => navigate(`/tip/${creator.handle}`)}>
                       {creator.bio}
                     </p>
 
-                    <div className="pt-6 flex items-center justify-between border-t border-white/5 gap-4">
-                      <div className="flex flex-col gap-1 min-w-0">
+                    <div className="pt-4 flex items-center justify-between border-t border-white/5">
+                      <div className="flex flex-col gap-1">
                         <div className="flex flex-wrap gap-1">
                           {creator.categories && creator.categories.map((cat, idx) => (
-                            <span key={idx} className="text-[10px] font-black uppercase tracking-widest text-purple-400 truncate">{cat}</span>
+                            <span key={idx} className="text-[10px] font-black uppercase tracking-widest text-purple-400">{cat}</span>
                           ))}
                         </div>
-                        <div className="flex items-center gap-2 text-[9px] font-bold text-white/20 uppercase tracking-tight truncate">
+                        <div className="flex items-center gap-2 text-[9px] font-bold text-white/20 uppercase tracking-tight">
                           <MapPin className="h-3 w-3" /> {creator.location}
                         </div>
                       </div>
                       
-                      {isOwner ? (
+                      {isOwner && (
                         <Button 
                           onClick={() => handleBoost(creator.handle)}
                           className={cn(
-                            "h-14 md:h-16 rounded-2xl font-black text-[10px] md:text-xs uppercase tracking-widest px-6 transition-all shadow-xl shrink-0",
+                            "h-10 rounded-xl font-black text-[10px] uppercase tracking-widest px-5 transition-all shadow-lg",
                             isMember 
                               ? "bg-orange-500 hover:bg-orange-600 text-white shadow-orange-500/20" 
                               : "bg-white/10 text-white/40 hover:bg-orange-500 hover:text-white"
                           )}
                         >
                           {isMember ? (
-                            <><Zap className="h-4 w-4 mr-2 fill-white" /> Boost Performance</>
+                            <><Zap className="h-3 w-3 mr-2 fill-white" /> Boost for {boostPrice} XPR</>
                           ) : (
-                            <><ShieldCheck className="h-4 w-4 mr-2" /> Verify Account</>
+                            <><ShieldCheck className="h-3 w-3 mr-2" /> Verify to Boost</>
                           )}
                         </Button>
-                      ) : (
+                      )}
+
+                      {!isOwner && (
                         <Button 
                           variant="ghost" 
                           onClick={() => navigate(`/tip/${creator.handle}`)}
-                          className="h-14 md:h-16 rounded-2xl bg-purple-500/10 text-purple-400 hover:bg-purple-500 hover:text-white text-[10px] md:text-xs font-black uppercase tracking-widest px-6 transition-all shrink-0 border border-purple-500/20"
+                          className="h-10 rounded-xl bg-purple-500/10 text-purple-400 hover:bg-purple-500 hover:text-white text-[10px] font-black uppercase tracking-widest px-5 transition-all"
                         >
-                          Join Performance
+                          Join Stream
                         </Button>
                       )}
                     </div>
