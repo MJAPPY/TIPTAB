@@ -34,9 +34,21 @@ export const Hero = ({ creators, onJoin }: HeroProps) => {
               <span className="text-transparent bg-clip-text bg-gradient-to-r from-orange-400 via-pink-500 to-purple-600">Appreciation Hub</span>
             </h1>
             
-            <p className="text-xl md:text-2xl text-white/80 max-w-2xl leading-relaxed font-medium">
-              Whether you're a delivery pro, a fitness coach, a musician, or a digital creator—TIPTAB connects you directly to the people who value your hustle via the <span className="text-purple-400 font-black">XPR Network</span>. Zero fees. Instant rewards. <span className="text-slate-400 italic font-black drop-shadow-[0_0_20px_rgba(148,163,184,0.35)]">“Tipping is the value of appreciation.”</span>
-            </p>
+            <div className="space-y-6">
+              <p className="text-xl md:text-2xl text-white/80 max-w-2xl leading-relaxed font-medium">
+                Whether you're a delivery pro, a fitness coach, a musician, or a digital creator—TIPTAB connects you directly to the people who value your hustle via the <span className="text-purple-400 font-black">XPR Network</span>. Zero fees.
+              </p>
+              
+              <div className="flex flex-wrap items-center gap-x-3 gap-y-2 text-xl md:text-2xl font-black italic tracking-tight">
+                <span className="text-white/40 not-italic font-medium">Instant rewards in</span>
+                <span className="text-orange-500 drop-shadow-[0_0_10px_rgba(249,115,22,0.3)]">TAB</span>
+                <span className="text-purple-400 drop-shadow-[0_0_10px_rgba(168,85,247,0.3)]">XPR</span>
+                <span className="text-green-400 drop-shadow-[0_0_10px_rgba(34,197,94,0.3)]">XUSDC</span>
+                <span className="text-cyan-400 drop-shadow-[0_0_10px_rgba(6,182,212,0.3)]">XMD</span>
+                <span className="text-slate-400 drop-shadow-[0_0_10px_rgba(148,163,184,0.3)]">METAL</span>
+                <span className="text-blue-500 drop-shadow-[0_0_10px_rgba(59,130,246,0.3)]">LOAN</span>
+              </div>
+            </div>
 
             <div className="flex flex-col sm:flex-row items-center gap-4 pt-4">
               {!isMember && (
