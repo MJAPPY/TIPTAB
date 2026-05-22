@@ -4,7 +4,7 @@ import React, { useState, useMemo } from "react";
 import { Header } from "@/components/tab-platform/Header";
 import { MembershipModal } from "@/components/tab-platform/MembershipModal";
 import { CREATORS, Creator } from "@/data/creators";
-import { Search, MapPin, Tv, Radio, Music, Gamepad2, Zap, LayoutGrid, Users, ArrowUpDown, Truck, Coffee, Dumbbell, Trophy, Fish, Hammer, Car, Building, Utensils, Star, Sprout, Briefcase, Link as LinkIcon, Landmark, Newspaper, Sparkles, ShieldCheck, Cloud, Plane, TrainFront } from "lucide-react";
+import { Search, MapPin, Tv, Radio, Music, Gamepad2, Zap, LayoutGrid, Users, ArrowUpDown, Truck, Coffee, Dumbbell, Trophy, Fish, Hammer, Car, Building, Utensils, Star, Sprout, Briefcase, Link as LinkIcon, Landmark, Newspaper, Sparkles, ShieldCheck, Cloud, Plane, TrainFront, Flame } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -59,7 +59,7 @@ const Live = () => {
   const { actor, isMember, featuredHandles, boostStream, boostPrice } = useXpr();
   const navigate = useNavigate();
 
-  // Combine hardcoded creators with local user profile
+  // Combined creator list including local updates
   const allCreators = useMemo(() => {
     const savedUser = localStorage.getItem("tiptab_user_profile");
     if (!savedUser) return CREATORS;
@@ -68,7 +68,6 @@ const Live = () => {
     const membershipKey = `tiptab_membership_${actor}`;
     const isLocalUserMember = localStorage.getItem(membershipKey) === 'true';
 
-    // Only add the local user to the Live hub if they are an active member
     if (!isLocalUserMember) return CREATORS;
 
     const exists = CREATORS.find(c => c.handle.toLowerCase() === localUser.handle.toLowerCase());
@@ -78,9 +77,9 @@ const Live = () => {
     return [localUser, ...CREATORS];
   }, [actor]);
 
-  // Filter and Sort creators
+  // Unified Filter logic
   const filteredCreators = useMemo(() => {
-    let filtered = allCreators.filter((c) => {
+    return allCreators.filter((c) => {
       const hasLiveLink = c.twitch || c.youtubeLive || c.tiktok || c.instagramLive;
       const matchesSearch = c.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
                            c.handle.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -91,25 +90,29 @@ const Live = () => {
       
       return hasLiveLink && matchesSearch && matchesCategory;
     });
+  }, [allCreators, searchQuery, selectedCategory]);
 
+  // Clean handles for accurate comparison
+  const boostedList = useMemo(() => 
+    featuredHandles.map(h => h.toLowerCase().replace('@', '')), 
+  [featuredHandles]);
+
+  const featuredCreators = useMemo(() => {
+    return filteredCreators.filter(c => boostedList.includes(c.handle.toLowerCase().replace('@', '')));
+  }, [filteredCreators, boostedList]);
+
+  const regularCreators = useMemo(() => {
+    let filtered = filteredCreators.filter(c => !boostedList.includes(c.handle.toLowerCase().replace('@', '')));
+    
+    // Sort regular grid
     if (sortBy === "alphabetical") {
       return [...filtered].sort((a, b) => a.name.localeCompare(b.name));
     } else if (sortBy === "random") {
       return [...filtered].sort(() => Math.random() - 0.5);
-    } else if (sortBy === "newest") {
+    } else {
       return [...filtered].sort((a, b) => Number(b.id) - Number(a.id));
     }
-
-    return filtered;
-  }, [allCreators, searchQuery, selectedCategory, sortBy]);
-
-  const featuredCreators = useMemo(() => {
-    return filteredCreators.filter(c => featuredHandles.includes(c.handle.replace('@', '').toLowerCase()));
-  }, [filteredCreators, featuredHandles]);
-
-  const regularCreators = useMemo(() => {
-    return filteredCreators.filter(c => !featuredHandles.includes(c.handle.replace('@', '').toLowerCase()));
-  }, [filteredCreators, featuredHandles]);
+  }, [filteredCreators, boostedList, sortBy]);
 
   const handleBoost = async (handle: string) => {
     if (!isMember) {
@@ -124,7 +127,6 @@ const Live = () => {
       <Header onBecomeCreator={() => setIsMembershipOpen(true)} />
 
       <main className="container mx-auto px-6 pt-44 pb-24">
-        {/* Header Section */}
         <div className="flex flex-col md:flex-row md:items-start justify-between gap-8 mb-12">
           <div className="space-y-4">
             <h1 className="text-5xl md:text-7xl font-black tracking-tighter italic text-white">
@@ -142,70 +144,76 @@ const Live = () => {
           </div>
         </div>
 
-        {/* Featured Section */}
+        {/* FEATURED / BOOSTED SECTION */}
         {featuredCreators.length > 0 && (
-          <div className="mb-16 space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
-            <div className="flex items-center gap-4">
-              <div className="h-px flex-1 bg-gradient-to-r from-transparent via-orange-500/50 to-transparent" />
-              <div className="flex items-center gap-2 px-4 py-1.5 rounded-full bg-orange-500/10 border border-orange-500/30">
-                <Sparkles className="h-3.5 w-3.5 text-orange-400 animate-pulse" />
-                <h2 className="text-[10px] font-black uppercase tracking-[0.4em] text-orange-400">Featured Performances</h2>
-              </div>
-              <div className="h-px flex-1 bg-gradient-to-r from-transparent via-orange-500/50 to-transparent" />
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-              {featuredCreators.map((creator) => (
-                <div 
-                  key={`featured-${creator.id}`}
-                  onClick={() => navigate(`/tip/${creator.handle}`)}
-                  className="group relative bg-white/[0.03] border-2 border-orange-500/30 rounded-[40px] overflow-hidden hover:border-orange-500 transition-all duration-500 cursor-pointer shadow-[0_0_50px_rgba(249,115,22,0.15)] ring-4 ring-orange-500/5"
-                >
-                  <div className="aspect-video relative overflow-hidden bg-black/40">
-                    <div className={cn("absolute inset-0 opacity-20 blur-2xl", creator.color)} />
-                    <div className="absolute inset-0 flex items-center justify-center">
-                      <Radio className="h-12 w-12 text-white/20 group-hover:scale-110 transition-transform duration-500" />
-                    </div>
-                    
-                    <div className="absolute top-4 left-4 flex gap-2">
-                      <Badge className="bg-orange-500 hover:bg-orange-600 text-[10px] font-black tracking-widest rounded-lg border-none">FEATURED</Badge>
-                      <Badge className="bg-red-600/80 backdrop-blur-md text-[10px] font-black tracking-widest rounded-lg border-white/10">LIVE</Badge>
-                    </div>
+          <div className="mb-20 space-y-10 animate-in fade-in slide-in-from-top-6 duration-1000">
+            <div className="relative p-1 rounded-[48px] bg-gradient-to-r from-orange-500/20 via-purple-500/20 to-orange-500/20 overflow-hidden">
+               <div className="bg-[#0f0a1f]/90 backdrop-blur-3xl rounded-[46px] p-8 md:p-12 border border-white/5 relative overflow-hidden">
+                  <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-px bg-gradient-to-r from-transparent via-orange-500 to-transparent" />
+                  
+                  <div className="flex items-center justify-center gap-4 mb-10">
+                    <Sparkles className="h-6 w-6 text-orange-400 animate-pulse" />
+                    <h2 className="text-2xl md:text-4xl font-black tracking-tight uppercase italic text-white text-center">
+                      <span className="text-orange-500">Featured</span> Performance Network
+                    </h2>
+                    <Sparkles className="h-6 w-6 text-orange-400 animate-pulse" />
                   </div>
 
-                  <div className="p-8 space-y-4 relative">
-                    <div className="absolute -top-12 right-8 h-20 w-20 rounded-[28px] bg-[#0a0514] border-4 border-[#0a0514] flex items-center justify-center overflow-hidden shadow-2xl group-hover:scale-110 transition-transform duration-500">
-                       <div className={cn("h-full w-full flex items-center justify-center text-xl font-black text-white", creator.color)}>
-                        {creator.avatarImage ? <img src={creator.avatarImage} alt="" className="w-full h-full object-cover" /> : creator.avatar}
-                       </div>
-                    </div>
-                    
-                    <div>
-                      <h3 className="text-xl font-black tracking-tight group-hover:text-orange-400 transition-colors">{creator.name}</h3>
-                      <p className="text-sm font-bold text-white/40">@{creator.handle}</p>
-                    </div>
-                    <p className="text-white/60 text-sm line-clamp-2 font-medium">
-                      {creator.bio}
-                    </p>
-                    <div className="pt-4 flex items-center justify-between border-t border-white/5">
-                      <div className="flex gap-2">
-                        {creator.categories && creator.categories.map((cat, idx) => (
-                          <span key={idx} className="text-[10px] font-black uppercase tracking-widest text-orange-400">{cat}</span>
-                        ))}
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 md:gap-10">
+                    {featuredCreators.map((creator) => (
+                      <div 
+                        key={`featured-${creator.id}`}
+                        onClick={() => navigate(`/tip/${creator.handle}`)}
+                        className="group relative bg-white/[0.04] border-2 border-orange-500/40 rounded-[40px] overflow-hidden hover:border-orange-500 transition-all duration-500 cursor-pointer shadow-[0_30px_70px_-15px_rgba(249,115,22,0.3)] hover:scale-[1.02] ring-8 ring-orange-500/[0.03]"
+                      >
+                        <div className="aspect-video relative overflow-hidden bg-black/40">
+                          <div className={cn("absolute inset-0 opacity-30 blur-3xl", creator.color)} />
+                          <div className="absolute inset-0 flex items-center justify-center">
+                            <Flame className="h-16 w-16 text-orange-500/30 group-hover:scale-125 transition-transform duration-700" />
+                          </div>
+                          
+                          <div className="absolute top-5 left-5 flex gap-2">
+                            <Badge className="bg-orange-500 text-white border-none shadow-[0_0_15px_rgba(249,115,22,0.6)] px-3 py-1 font-black italic rounded-xl text-[10px] tracking-widest uppercase">
+                              <Sparkles className="h-3 w-3 mr-1.5 inline fill-white" /> Featured
+                            </Badge>
+                            <Badge className="bg-red-600/90 backdrop-blur-md text-[10px] font-black tracking-widest rounded-xl border-white/10">LIVE</Badge>
+                          </div>
+                        </div>
+
+                        <div className="p-8 space-y-4 relative">
+                          <div className="absolute -top-12 right-8 h-20 w-20 rounded-[28px] bg-[#0a0514] border-4 border-orange-500 flex items-center justify-center overflow-hidden shadow-2xl group-hover:rotate-6 transition-transform duration-500">
+                             <div className={cn("h-full w-full flex items-center justify-center text-xl font-black text-white", creator.color)}>
+                              {creator.avatarImage ? <img src={creator.avatarImage} alt="" className="w-full h-full object-cover" /> : creator.avatar}
+                             </div>
+                          </div>
+                          
+                          <div>
+                            <h3 className="text-2xl font-black tracking-tight group-hover:text-orange-400 transition-colors">{creator.name}</h3>
+                            <p className="text-sm font-bold text-orange-400/60">@{creator.handle}</p>
+                          </div>
+                          <p className="text-white/70 text-sm line-clamp-2 font-medium leading-relaxed">
+                            {creator.bio}
+                          </p>
+                          <div className="pt-5 flex items-center justify-between border-t border-white/10">
+                            <div className="flex gap-2">
+                              {creator.categories && creator.categories.map((cat, idx) => (
+                                <span key={idx} className="text-[10px] font-black uppercase tracking-widest text-orange-400/80">{cat}</span>
+                              ))}
+                            </div>
+                            <div className="flex items-center gap-2 text-[10px] font-black text-white/30 uppercase tracking-widest">
+                              <MapPin className="h-3 w-3 text-orange-500" />
+                              {creator.location}
+                            </div>
+                          </div>
+                        </div>
                       </div>
-                      <div className="flex items-center gap-2 text-[10px] font-black text-white/40">
-                        <MapPin className="h-3 w-3" />
-                        {creator.location}
-                      </div>
-                    </div>
+                    ))}
                   </div>
-                </div>
-              ))}
+               </div>
             </div>
           </div>
         )}
 
-        {/* Filter Bar */}
         <div className="bg-white/5 border border-white/10 p-6 md:p-8 rounded-[40px] mb-12 flex flex-col gap-8 backdrop-blur-xl">
           <div className="flex flex-col lg:flex-row items-center gap-6">
             <div className="relative flex-1 w-full group">
@@ -227,7 +235,6 @@ const Live = () => {
               </SelectTrigger>
               <SelectContent className="bg-[#1a102d] border-white/20 text-white rounded-xl">
                 <SelectItem value="newest" className="font-black text-[10px] uppercase tracking-widest py-3">Newest First</SelectItem>
-                <SelectItem value="oldest" className="font-black text-[10px] uppercase tracking-widest py-3">Oldest First</SelectItem>
                 <SelectItem value="alphabetical" className="font-black text-[10px] uppercase tracking-widest py-3">Name (A-Z)</SelectItem>
                 <SelectItem value="random" className="font-black text-[10px] uppercase tracking-widest py-3">Random Mix</SelectItem>
               </SelectContent>
@@ -254,12 +261,11 @@ const Live = () => {
           </div>
         </div>
 
-        {/* Grid Section */}
+        {/* REGULAR GRID SECTION */}
         {regularCreators.length > 0 ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {regularCreators.map((creator) => {
-              const isOwner = actor === creator.handle.replace('@', '').toLowerCase();
-              const isBoosted = featuredHandles.includes(creator.handle.replace('@', '').toLowerCase());
+              const isOwner = actor === creator.handle.replace('@', '');
               
               return (
                 <div 
@@ -309,7 +315,7 @@ const Live = () => {
                         </div>
                       </div>
                       
-                      {isOwner && !isBoosted && (
+                      {isOwner && (
                         <Button 
                           onClick={() => handleBoost(creator.handle)}
                           className={cn(
