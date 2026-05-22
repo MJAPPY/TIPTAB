@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
-import { User, AtSign, MapPin, Globe, Twitter, Save, Image as ImageIcon, Upload, X, Video, Instagram, CheckCircle2, Music, Radio, Youtube, Twitch, ShieldCheck, Move, LayoutGrid } from "lucide-react";
+import { User, AtSign, MapPin, Globe, Twitter, Save, Image as ImageIcon, Upload, X, Video, Instagram, CheckCircle2, Music, Radio, Youtube, Twitch, ShieldCheck, Move } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -8,6 +8,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
 import { Creator } from "@/data/creators";
+import { EmbedPlayer } from "./EmbedPlayer";
 import { cn } from "@/lib/utils";
 
 const CITY_COORDINATES: Record<string, [number, number]> = {
@@ -53,6 +54,7 @@ export const ProfileEditor = ({ initialData, onSave, minimal = false }: ProfileE
   const [isSaving, setIsSaving] = useState(false);
   const [hasChanged, setHasChanged] = useState(false);
   const [isCityRecognized, setIsCityRecognized] = useState(false);
+  const [isDraggingCover, setIsDraggingCover] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const coverInputRef = useRef<HTMLInputElement>(null);
   
@@ -173,9 +175,8 @@ export const ProfileEditor = ({ initialData, onSave, minimal = false }: ProfileE
       </CardHeader>
       <CardContent className="p-8">
         <div className="space-y-12">
-          {/* Graphics Section */}
           <div className="space-y-6 pb-8 border-b border-white/5">
-            <h4 className="font-bold text-lg flex items-center gap-2"><ImageIcon className="h-5 w-5 text-purple-400" /> Profile Graphics</h4>
+            <h4 className="font-bold text-lg">Profile Graphics</h4>
             <div className="space-y-3">
               <Label className="text-white/60 font-bold uppercase tracking-widest text-[10px]">Cover Banner</Label>
               <div 
@@ -187,32 +188,31 @@ export const ProfileEditor = ({ initialData, onSave, minimal = false }: ProfileE
                 {formData.coverImage ? (
                   <>
                     <img src={formData.coverImage} className="w-full h-full object-cover" style={{ objectPosition: `50% ${formData.coverPosition}%` }} />
-                    <button onClick={() => setFormData(prev => ({...prev, coverImage: ""}))} className="absolute top-4 right-4 bg-red-500 text-white rounded-full p-2 hover:bg-red-600 transition-colors"><X className="h-4 w-4" /></button>
+                    <button onClick={() => setFormData(prev => ({...prev, coverImage: ""}))} className="absolute top-4 right-4 bg-red-500 text-white rounded-full p-2"><X className="h-4 w-4" /></button>
                   </>
                 ) : (
                   <div className="text-center p-6 flex flex-col items-center gap-2">
                     <ImageIcon className="h-8 w-8 text-purple-400/40" />
-                    <p className="text-xs text-white/30 font-bold">Recommended: 1200x400 PNG/JPG</p>
+                    <p className="text-xs text-white/30 font-bold">Drag & Drop or Click to Upload</p>
                     <input type="file" ref={coverInputRef} className="hidden" accept="image/*" onChange={handleCoverChange} />
-                    <Button variant="outline" size="sm" onClick={() => coverInputRef.current?.click()} className="rounded-xl border-white/10 h-8 bg-white/5">Browse Cover</Button>
+                    <Button variant="outline" size="sm" onClick={() => coverInputRef.current?.click()} className="rounded-xl border-white/10 h-8 bg-white/5">Browse</Button>
                   </div>
                 )}
               </div>
             </div>
             
             <div className="flex items-center gap-6">
-              <div className={cn("h-24 w-24 rounded-3xl flex items-center justify-center text-3xl font-black border-4 border-white/10 overflow-hidden shrink-0", initialData.color)}>
+              <div className={cn("h-24 w-24 rounded-3xl flex items-center justify-center text-3xl font-black border-4 border-white/10 overflow-hidden", initialData.color)}>
                 {formData.avatarImage ? <img src={formData.avatarImage} className="w-full h-full object-cover" /> : initialData.avatar}
               </div>
               <div className="space-y-2">
                 <h5 className="font-bold text-base">Avatar Photo</h5>
                 <input type="file" ref={fileInputRef} className="hidden" accept="image/*" onChange={handleFileChange} />
-                <Button variant="outline" size="sm" onClick={() => fileInputRef.current?.click()} className="rounded-lg border-white/10 h-9 bg-white/5">Change Avatar</Button>
+                <Button variant="outline" size="sm" onClick={() => fileInputRef.current?.click()} className="rounded-lg border-white/10 h-9 bg-white/5">Upload Photo</Button>
               </div>
             </div>
           </div>
 
-          {/* Core Info */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-10">
             <div className="space-y-2">
               <Label htmlFor="name" className="text-white/60 font-bold uppercase tracking-widest text-[10px]">Display Name</Label>
@@ -225,113 +225,12 @@ export const ProfileEditor = ({ initialData, onSave, minimal = false }: ProfileE
               </div>
               <Input id="location" value={formData.location} onChange={handleChange} placeholder="e.g. London" className="bg-white/5 border-white/10 h-14 rounded-2xl text-white" />
             </div>
-            <div className="md:col-span-2 space-y-2">
-              <Label htmlFor="bio" className="text-white/60 font-bold uppercase tracking-widest text-[10px]">Short Bio</Label>
-              <Textarea id="bio" value={formData.bio} onChange={handleChange} className="bg-white/5 border-white/10 min-h-[120px] rounded-2xl p-4 text-white" />
-            </div>
           </div>
 
-          {/* Social & Broadcast (Only for Members) */}
-          {!minimal && (
-            <>
-              <div className="space-y-8 pt-8 border-t border-white/5">
-                <h4 className="font-bold text-lg flex items-center gap-2"><LayoutGrid className="h-5 w-5 text-orange-500" /> Network Categories</h4>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                  <div className="space-y-3">
-                    <Label className="text-white/60 font-bold uppercase tracking-widest text-[10px]">Primary Category</Label>
-                    <Select value={formData.categories[0]} onValueChange={(val) => handleCategoryChange(0, val)}>
-                      <SelectTrigger className="bg-white/5 border-white/10 h-14 rounded-2xl">
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent className="bg-[#1a102d] border-white/20 text-white">
-                        {CATEGORIES.map(cat => <SelectItem key={cat} value={cat}>{cat}</SelectItem>)}
-                      </SelectContent>
-                    </Select>
-                  </div>
-                  <div className="space-y-3">
-                    <Label className="text-white/60 font-bold uppercase tracking-widest text-[10px]">Secondary Category</Label>
-                    <Select value={formData.categories[1] || "None"} onValueChange={(val) => handleCategoryChange(1, val)}>
-                      <SelectTrigger className="bg-white/5 border-white/10 h-14 rounded-2xl">
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent className="bg-[#1a102d] border-white/20 text-white">
-                        <SelectItem value="None">None</SelectItem>
-                        {CATEGORIES.map(cat => <SelectItem key={cat} value={cat}>{cat}</SelectItem>)}
-                      </SelectContent>
-                    </Select>
-                  </div>
-                </div>
-              </div>
-
-              <div className="space-y-8 pt-8 border-t border-white/5">
-                <h4 className="font-bold text-lg flex items-center gap-2"><Globe className="h-5 w-5 text-cyan-400" /> Social Identity</h4>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
-                  <div className="space-y-2">
-                    <Label htmlFor="twitter" className="text-white/60 font-bold uppercase tracking-widest text-[10px]">Twitter URL</Label>
-                    <div className="relative">
-                      <Twitter className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-white/20" />
-                      <Input id="twitter" value={formData.twitter} onChange={handleChange} className="pl-12 bg-white/5 border-white/10 h-12 rounded-xl" placeholder="https://twitter.com/..." />
-                    </div>
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="instagram" className="text-white/60 font-bold uppercase tracking-widest text-[10px]">Instagram URL</Label>
-                    <div className="relative">
-                      <Instagram className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-white/20" />
-                      <Input id="instagram" value={formData.instagram} onChange={handleChange} className="pl-12 bg-white/5 border-white/10 h-12 rounded-xl" placeholder="https://instagram.com/..." />
-                    </div>
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="website" className="text-white/60 font-bold uppercase tracking-widest text-[10px]">Website URL</Label>
-                    <div className="relative">
-                      <Globe className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-white/20" />
-                      <Input id="website" value={formData.website} onChange={handleChange} className="pl-12 bg-white/5 border-white/10 h-12 rounded-xl" placeholder="https://..." />
-                    </div>
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="spotify" className="text-white/60 font-bold uppercase tracking-widest text-[10px]">Spotify URL</Label>
-                    <div className="relative">
-                      <Music className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-white/20" />
-                      <Input id="spotify" value={formData.spotify} onChange={handleChange} className="pl-12 bg-white/5 border-white/10 h-12 rounded-xl" placeholder="https://open.spotify.com/..." />
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              <div className="space-y-8 pt-8 border-t border-white/5">
-                <h4 className="font-bold text-lg flex items-center gap-2"><Radio className="h-5 w-5 text-red-500" /> Live Broadcasts</h4>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
-                  <div className="space-y-2">
-                    <Label htmlFor="twitch" className="text-white/60 font-bold uppercase tracking-widest text-[10px]">Twitch Channel</Label>
-                    <div className="relative">
-                      <Twitch className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-white/20" />
-                      <Input id="twitch" value={formData.twitch} onChange={handleChange} className="pl-12 bg-white/5 border-white/10 h-12 rounded-xl" placeholder="https://twitch.tv/..." />
-                    </div>
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="youtubeLive" className="text-white/60 font-bold uppercase tracking-widest text-[10px]">YouTube Live</Label>
-                    <div className="relative">
-                      <Youtube className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-white/20" />
-                      <Input id="youtubeLive" value={formData.youtubeLive} onChange={handleChange} className="pl-12 bg-white/5 border-white/10 h-12 rounded-xl" placeholder="https://youtube.com/live/..." />
-                    </div>
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="tiktok" className="text-white/60 font-bold uppercase tracking-widest text-[10px]">TikTok Profile</Label>
-                    <div className="relative">
-                      <Video className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-white/20" />
-                      <Input id="tiktok" value={formData.tiktok} onChange={handleChange} className="pl-12 bg-white/5 border-white/10 h-12 rounded-xl" placeholder="https://tiktok.com/@..." />
-                    </div>
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="instagramLive" className="text-white/60 font-bold uppercase tracking-widest text-[10px]">Instagram Live</Label>
-                    <div className="relative">
-                      <Radio className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-white/20" />
-                      <Input id="instagramLive" value={formData.instagramLive} onChange={handleChange} className="pl-12 bg-white/5 border-white/10 h-12 rounded-xl" placeholder="Instagram Username" />
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </>
-          )}
+          <div className="space-y-2">
+            <Label htmlFor="bio" className="text-white/60 font-bold uppercase tracking-widest text-[10px]">Short Bio</Label>
+            <Textarea id="bio" value={formData.bio} onChange={handleChange} className="bg-white/5 border-white/10 min-h-[120px] rounded-2xl p-4 text-white" />
+          </div>
         </div>
       </CardContent>
     </Card>
