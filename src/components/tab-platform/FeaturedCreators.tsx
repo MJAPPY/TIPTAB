@@ -27,11 +27,14 @@ const CATEGORIES = [
   { name: "Local News", color: "#60a5fa" },
   { name: "Music", color: "#ef4444" },
   { name: "Other", color: "#ffffff" },
+  { name: "Plane Spot", color: "#38bdf8" },
   { name: "Property Reno", color: "#94a3b8" },
   { name: "Realty", color: "#4f46e5" },
   { name: "Reviewing", color: "#6366f1" },
   { name: "Service", color: "#64748b" },
-  { name: "Sports", color: "#3b82f6" }
+  { name: "Sports", color: "#3b82f6" },
+  { name: "Train Spot", color: "#94a3b8" },
+  { name: "Weather", color: "#60a5fa" }
 ];
 
 interface FeaturedCreatorsProps {

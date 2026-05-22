@@ -4,7 +4,7 @@ import React, { useState, useMemo } from "react";
 import { Header } from "@/components/tab-platform/Header";
 import { MembershipModal } from "@/components/tab-platform/MembershipModal";
 import { CREATORS, Creator } from "@/data/creators";
-import { Search, MapPin, Tv, Radio, Music, Gamepad2, Zap, LayoutGrid, Users, ArrowUpDown, Truck, Coffee, Dumbbell, Trophy, Fish, Hammer, Car, Building, Utensils, Star, Sprout, Briefcase, Link as LinkIcon, Landmark, Newspaper, Sparkles, ShieldCheck } from "lucide-react";
+import { Search, MapPin, Tv, Radio, Music, Gamepad2, Zap, LayoutGrid, Users, ArrowUpDown, Truck, Coffee, Dumbbell, Trophy, Fish, Hammer, Car, Building, Utensils, Star, Sprout, Briefcase, Link as LinkIcon, Landmark, Newspaper, Sparkles, ShieldCheck, Cloud, Plane, TrainFront } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -41,11 +41,14 @@ const CATEGORIES = [
   { name: "Local News", icon: Newspaper },
   { name: "Music", icon: Music },
   { name: "Other", icon: Users },
+  { name: "Plane Spot", icon: Plane },
   { name: "Property Reno", icon: Hammer },
   { name: "Realty", icon: Building },
   { name: "Reviewing", icon: Star },
   { name: "Service", icon: Zap },
-  { name: "Sports", icon: Trophy }
+  { name: "Sports", icon: Trophy },
+  { name: "Train Spot", icon: TrainFront },
+  { name: "Weather", icon: Cloud }
 ];
 
 const Live = () => {

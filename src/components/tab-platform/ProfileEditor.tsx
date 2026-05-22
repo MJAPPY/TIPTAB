@@ -61,11 +61,14 @@ const CATEGORIES = [
   "Local News",
   "Music",
   "Other",
+  "Plane Spot",
   "Property Reno",
   "Realty",
   "Reviewing",
   "Service",
-  "Sports"
+  "Sports",
+  "Train Spot",
+  "Weather"
 ];
 
 interface ProfileEditorProps {
