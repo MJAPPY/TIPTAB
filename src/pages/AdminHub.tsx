@@ -58,7 +58,8 @@ import {
   AlertCircle,
   TrendingDown,
   Eraser,
-  Dices
+  Dices,
+  Crown
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
@@ -1566,23 +1567,135 @@ const AdminHub = () => {
             <div className="space-y-8 animate-in fade-in duration-300">
               <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
                 <Card className="lg:col-span-4 bg-[#241a3d] border border-white/10 rounded-[32px] overflow-hidden shadow-2xl p-8">
+                  <CardHeader className="p-0 pb-6">
+                    <CardTitle className="text-xl font-black italic uppercase tracking-tight text-white flex items-center gap-3">
+                       <UserPlus className="h-5 w-5 text-purple-400" /> Add Team Member
+                    </CardTitle>
+                    <CardDescription className="text-white/40 font-bold text-xs uppercase tracking-widest">Authorize a new network administrator</CardDescription>
+                  </CardHeader>
                   <form onSubmit={handleAddAdmin} className="space-y-6">
-                    <Label className="text-[10px] font-black uppercase text-white/50">Handle</Label>
-                    <Input value={newAdminHandle} onChange={(e) => setNewAdminHandle(e.target.value)} placeholder="username" className="bg-[#2a1d4a] border-white/10 rounded-xl h-12 text-white" />
-                    <Button type="submit" className="w-full h-12 bg-white text-black font-black uppercase tracking-widest text-xs">Add Admin</Button>
+                    <div className="space-y-2">
+                      <Label className="text-[10px] font-black uppercase tracking-widest text-white/50">Actor Handle</Label>
+                      <div className="relative">
+                        <UserCheck className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-purple-500/50" />
+                        <Input value={newAdminHandle} onChange={(e) => setNewAdminHandle(e.target.value)} placeholder="username" className="bg-[#2a1d4a] border-white/10 rounded-xl h-12 pl-12 text-white font-bold" />
+                      </div>
+                    </div>
+                    
+                    <div className="space-y-2">
+                      <Label className="text-[10px] font-black uppercase tracking-widest text-white/50">Assigned Role</Label>
+                      <Select value={newAdminRole} onValueChange={(val: any) => setNewAdminRole(val)}>
+                         <SelectTrigger className="bg-[#2a1d4a] border-white/10 h-12 rounded-xl text-white font-bold">
+                            <SelectValue placeholder="Select Role" />
+                         </SelectTrigger>
+                         <SelectContent className="bg-[#1a102d] border-white/20 text-white rounded-xl">
+                            <SelectItem value="super" className="font-bold py-2.5">Super Admin</SelectItem>
+                            <SelectItem value="moderator" className="font-bold py-2.5">Moderator</SelectItem>
+                            <SelectItem value="treasurer" className="font-bold py-2.5">Treasurer</SelectItem>
+                         </SelectContent>
+                      </Select>
+                    </div>
+
+                    <Button type="submit" className="w-full h-14 bg-white text-black hover:bg-purple-500 hover:text-white transition-all font-black uppercase tracking-[0.2em] text-xs rounded-2xl shadow-xl active:scale-95">
+                      Confirm Authorization
+                    </Button>
                   </form>
                 </Card>
+
                 <Card className="lg:col-span-8 bg-[#1a112d] border border-white/10 rounded-[32px] overflow-hidden shadow-2xl">
-                  <table className="w-full">
-                    <tbody className="divide-y divide-white/5">
-                      {adminsList.map((admin) => (
-                        <tr key={admin.id} className="hover:bg-white/[0.01]">
-                          <td className="px-8 py-6 text-white font-black">@{admin.handle}</td>
-                          <td className="px-8 py-6 text-right"><Button variant="ghost" size="icon" onClick={() => handleRemoveClick(admin)} className="h-10 w-10 text-red-500"><Trash2 className="h-4.5 w-4.5" /></Button></td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
+                  <CardHeader className="p-8 border-b border-white/5 bg-white/[0.02]">
+                    <div className="flex items-center justify-between">
+                       <div className="flex items-center gap-3">
+                         <ShieldCheck className="h-6 w-6 text-purple-400" />
+                         <CardTitle className="text-xl font-black text-white italic uppercase">Authorized Team</CardTitle>
+                       </div>
+                       <Badge className="bg-purple-600/20 text-purple-400 border-none font-black text-[10px] h-6 px-3">{adminsList.length} ACTIVE</Badge>
+                    </div>
+                  </CardHeader>
+                  <CardContent className="p-0">
+                    <div className="overflow-x-auto no-scrollbar">
+                      <table className="w-full min-w-[600px]">
+                        <thead className="bg-white/[0.03]">
+                          <tr>
+                            <th className="px-8 py-5 text-left text-[9px] font-black uppercase tracking-widest text-white/30">Network Handle</th>
+                            <th className="px-8 py-5 text-center text-[9px] font-black uppercase tracking-widest text-white/30">Permission Level</th>
+                            <th className="px-8 py-5 text-center text-[9px] font-black uppercase tracking-widest text-white/30">Status</th>
+                            <th className="px-8 py-5 text-right text-[9px] font-black uppercase tracking-widest text-white/30">Registry Control</th>
+                          </tr>
+                        </thead>
+                        <tbody className="divide-y divide-white/5">
+                          {adminsList.map((admin) => (
+                            <tr key={admin.id} className="group hover:bg-white/[0.02] transition-colors">
+                              <td className="px-8 py-6">
+                                <div className="flex items-center gap-3">
+                                   <div className="h-10 w-10 rounded-xl bg-purple-500/10 flex items-center justify-center border border-purple-500/20">
+                                      <UserCheck className="h-5 w-5 text-purple-400" />
+                                   </div>
+                                   <span className="text-lg font-black text-white">@{admin.handle}</span>
+                                </div>
+                              </td>
+                              <td className="px-8 py-6 text-center">
+                                 <Badge className={cn(
+                                   "font-black text-[9px] uppercase tracking-widest rounded-lg h-7 px-3 border-none",
+                                   admin.role === 'super' ? "bg-orange-500 text-white" :
+                                   admin.role === 'moderator' ? "bg-purple-600 text-white" : "bg-cyan-500 text-white"
+                                 )}>
+                                   {admin.role}
+                                 </Badge>
+                              </td>
+                              <td className="px-8 py-6 text-center">
+                                 {admin.isPermanent ? (
+                                   <div className="flex items-center justify-center gap-2 text-green-400">
+                                      <Lock className="h-3 w-3" />
+                                      <span className="text-[10px] font-black uppercase tracking-widest">Permanent</span>
+                                   </div>
+                                 ) : (
+                                   <div className="flex items-center justify-center gap-2 text-white/30">
+                                      <Unlock className="h-3 w-3" />
+                                      <span className="text-[10px] font-bold uppercase tracking-widest">Standard</span>
+                                   </div>
+                                 )}
+                              </td>
+                              <td className="px-8 py-6 text-right">
+                                <DropdownMenu>
+                                  <DropdownMenuTrigger asChild>
+                                    <Button variant="ghost" size="icon" className="h-10 w-10 rounded-xl bg-white/5 hover:bg-white/10 transition-all text-white/20 hover:text-white"><MoreVertical className="h-5 w-5" /></Button>
+                                  </DropdownMenuTrigger>
+                                  <DropdownMenuContent align="end" className="bg-[#1a102d]/95 backdrop-blur-xl border-white/10 text-white rounded-2xl shadow-2xl p-2 min-w-[220px] mt-2">
+                                     <div className="px-3 py-2 border-b border-white/5 mb-1">
+                                        <p className="text-[10px] font-black uppercase tracking-widest text-white/20">Authorization Console</p>
+                                     </div>
+                                     <DropdownMenuItem onClick={() => updateAdminRole(admin.id, 'super')} className="font-bold rounded-xl cursor-pointer h-11 focus:bg-orange-500/10 focus:text-orange-500">
+                                        Set as Super Admin
+                                     </DropdownMenuItem>
+                                     <DropdownMenuItem onClick={() => updateAdminRole(admin.id, 'moderator')} className="font-bold rounded-xl cursor-pointer h-11 focus:bg-purple-500/10 focus:text-purple-400">
+                                        Set as Moderator
+                                     </DropdownMenuItem>
+                                     <DropdownMenuItem onClick={() => updateAdminRole(admin.id, 'treasurer')} className="font-bold rounded-xl cursor-pointer h-11 focus:bg-cyan-500/10 focus:text-cyan-400">
+                                        Set as Treasurer
+                                     </DropdownMenuItem>
+                                     <div className="h-px bg-white/5 my-1" />
+                                     {isPermanentAdmin && (
+                                       <DropdownMenuItem 
+                                        onClick={() => makeAdminPermanent(admin.id, !admin.isPermanent)} 
+                                        className={cn("font-bold rounded-xl cursor-pointer h-11", admin.isPermanent ? "text-yellow-500 focus:bg-yellow-500/10" : "text-green-500 focus:bg-green-500/10")}
+                                       >
+                                          {admin.isPermanent ? <Unlock className="mr-3 h-4 w-4" /> : <Lock className="mr-3 h-4 w-4" />}
+                                          {admin.isPermanent ? "Revoke Permanent" : "Grant Permanent"}
+                                       </DropdownMenuItem>
+                                     )}
+                                     <DropdownMenuItem onClick={() => handleRemoveClick(admin)} className="text-red-500 focus:text-red-500 focus:bg-red-500/10 font-bold rounded-xl cursor-pointer h-11">
+                                        <Trash2 className="mr-3 h-4 w-4" /> Revoke Access
+                                     </DropdownMenuItem>
+                                  </DropdownMenuContent>
+                                </DropdownMenu>
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  </CardContent>
                 </Card>
               </div>
             </div>
