@@ -30,7 +30,7 @@ const ASSET_CONFIGS: Record<string, { code: string; precision: number }> = {
 };
 
 export const TippingModal = ({ creator, onClose }: TippingModalProps) => {
-  const [tipAmount, setTipAmount] = useState<string>("50");
+  const [tipAmount, setTipAmount] = useState<string>("10");
   const [asset, setAsset] = useState<string>("TAB");
   const [message, setMessage] = useState("");
   const [isProcessing, setIsProcessing] = useState(false);
@@ -123,7 +123,7 @@ export const TippingModal = ({ creator, onClose }: TippingModalProps) => {
 
   if (!creator) return null;
 
-  const quickAmounts = asset === "TAB" ? ["10", "50", "100", "250"] : ["1", "5", "10", "25"];
+  const quickAmounts = ["1", "5", "10", "25"];
 
   return (
     <Dialog open={!!creator} onOpenChange={(open) => !open && onClose()}>
