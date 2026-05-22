@@ -52,7 +52,13 @@ import {
   Info,
   RotateCcw,
   Percent as PercentIcon,
-  Hash
+  Hash,
+  Filter,
+  CheckCircle,
+  AlertCircle,
+  TrendingDown,
+  Eraser,
+  Dices
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
@@ -158,6 +164,7 @@ const AdminHub = () => {
   const [localBoostXusdc, setLocalBoostXusdc] = useState(boostPriceXusdc || "1.00");
   
   const [searchQuery, setSearchQuery] = useState("");
+  const [modCategoryFilter, setModCategoryFilter] = useState("All");
   const [alertMessage, setAlertMessage] = useState("");
   const [isAlertModalOpen, setIsAlertModalOpen] = useState(false);
   const [isAuditModalOpen, setIsAuditModalOpen] = useState(false);
@@ -439,6 +446,27 @@ const AdminHub = () => {
     setWinners(prev => prev.map((w, idx) => idx === index ? { ...w, reward: value } : w));
   };
 
+  const handleClearRewards = () => {
+    setWinners(prev => prev.map(w => ({ ...w, reward: "0" })));
+    toast({ title: "Ledger Cleared", description: "All payout fields reset to zero." });
+  };
+
+  const handleAutoBalanceRewards = () => {
+    const pool = treasuryData.find(d => d.symbol === "XPR")?.rewards || 0;
+    if (pool <= 0) {
+      toast({ title: "Insufficient Pool", description: "XPR Reward pool is currently empty." });
+      return;
+    }
+    
+    // Simple distribution: 40% to 1st, 25% to 2nd, 15% to 3rd, 10% to 4th, 10% to 5th
+    const distribution = [0.4, 0.25, 0.15, 0.1, 0.1];
+    setWinners(prev => prev.map((w, idx) => ({
+      ...w,
+      reward: idx < 5 ? (pool * distribution[idx]).toFixed(0) : "0"
+    })));
+    toast({ title: "Rewards Balanced", description: "XPR Reward pool distributed via ranking algorithm." });
+  };
+
   const handleBroadcast = () => {
     if (!alertMessage.trim()) return;
     broadcastAlert(alertMessage);
@@ -597,10 +625,19 @@ const AdminHub = () => {
     setCreatorToDelete(null);
   };
 
-  const filteredCreators = moderatedCreators.filter(c => 
-    c.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
-    c.handle.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  const filteredCreators = useMemo(() => {
+    return moderatedCreators.filter(c => {
+      const matchesSearch = c.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
+                           c.handle.toLowerCase().includes(searchQuery.toLowerCase());
+      const matchesCategory = modCategoryFilter === "All" || (c.categories && c.categories.includes(modCategoryFilter));
+      return matchesSearch && matchesCategory;
+    });
+  }, [moderatedCreators, searchQuery, modCategoryFilter]);
+
+  const modCategories = useMemo(() => {
+    const allCats = moderatedCreators.flatMap(c => c.categories || []);
+    return ["All", ...Array.from(new Set(allCats)).sort()];
+  }, [moderatedCreators]);
 
   const adminNavItems = useMemo(() => {
     const items = [{ id: "analytics", label: "Analytics", icon: BarChart3 }];
@@ -616,6 +653,8 @@ const AdminHub = () => {
   }, [adminRole]);
 
   if (!isAdmin) return null;
+
+  const totalRewardsValue = winners.reduce((acc, curr) => acc + parseFloat(curr.reward || "0"), 0);
 
   return (
     <div className="min-h-screen bg-[#06030e] text-white overflow-x-hidden">
@@ -929,6 +968,302 @@ const AdminHub = () => {
             </div>
           )}
 
+          {activeTab === "rewards" && (adminRole === 'super' || adminRole === 'treasurer') && (
+            <div className="space-y-8 animate-in fade-in slide-in-from-bottom-6 duration-500">
+              <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-stretch">
+                {/* Reward Pool Summary */}
+                <Card className="lg:col-span-4 bg-[#1a112d] border border-white/10 rounded-[40px] overflow-hidden shadow-2xl p-8 relative flex flex-col justify-between">
+                   <div className="absolute top-0 right-0 p-6 opacity-5 pointer-events-none">
+                      <Trophy className="h-40 w-48 text-white" />
+                   </div>
+                   <div className="space-y-6 relative z-10">
+                      <div className="space-y-2">
+                        <Badge className="bg-yellow-500/20 text-yellow-500 border-yellow-500/30 px-3 py-1 font-black uppercase text-[9px] tracking-widest">Rewards Console</Badge>
+                        <h3 className="text-2xl font-black italic uppercase tracking-tight text-white">Active Pool</h3>
+                      </div>
+                      
+                      <div className="p-6 rounded-3xl bg-white/[0.03] border border-white/5 space-y-4">
+                         <div className="flex items-center justify-between">
+                            <span className="text-[10px] font-black uppercase tracking-widest text-white/40">Total XPR Pool</span>
+                            <span className="text-orange-500 font-black text-sm italic">50% Boost Split</span>
+                         </div>
+                         <p className="text-5xl font-black text-white tracking-tighter">
+                            {(treasuryData.find(d => d.symbol === "XPR")?.rewards || 0).toLocaleString()}
+                            <span className="text-sm text-orange-500 ml-2">XPR</span>
+                         </p>
+                      </div>
+
+                      <div className="p-5 rounded-2xl bg-white/[0.02] space-y-2">
+                         <div className="flex items-center justify-between text-xs font-bold text-white/40">
+                            <span>Pending Payouts</span>
+                            <span className="text-white">{totalRewardsValue.toLocaleString()} XPR</span>
+                         </div>
+                         <div className="h-1.5 w-full bg-white/5 rounded-full overflow-hidden">
+                            <div className="h-full bg-purple-500 transition-all" style={{ width: `${Math.min(100, (totalRewardsValue / (treasuryData.find(d => d.symbol === "XPR")?.rewards || 1)) * 100)}%` }} />
+                         </div>
+                      </div>
+                   </div>
+
+                   <div className="pt-10 flex flex-col gap-3 relative z-10">
+                      <Button 
+                        onClick={handleAutoBalanceRewards}
+                        className="h-14 bg-purple-600 hover:bg-purple-700 text-white font-black rounded-2xl gap-3 text-xs uppercase tracking-widest shadow-lg active:scale-95 transition-all"
+                      >
+                        <Dices className="h-4.5 w-4.5" /> Auto-Balance Top 5
+                      </Button>
+                      <Button 
+                        variant="ghost"
+                        onClick={handleClearRewards}
+                        className="h-14 bg-white/5 border border-white/10 hover:bg-white/10 text-white/60 font-black rounded-2xl gap-3 text-xs uppercase tracking-widest transition-all"
+                      >
+                        <Eraser className="h-4.5 w-4.5" /> Clear Ledger
+                      </Button>
+                   </div>
+                </Card>
+
+                {/* Ledger Table */}
+                <Card className="lg:col-span-8 bg-[#1a112d] border border-white/10 rounded-[40px] overflow-hidden shadow-2xl flex flex-col">
+                  <CardHeader className="p-8 border-b border-white/5 flex flex-row items-center justify-between bg-white/[0.02]">
+                    <div className="flex items-center gap-3">
+                      <Sparkles className="h-6 w-6 text-yellow-400" />
+                      <CardTitle className="text-xl font-black text-white italic uppercase">Payout Ledger</CardTitle>
+                    </div>
+                    <Button 
+                      onClick={handleRewardWinners} 
+                      disabled={isDistributing || totalRewardsValue === 0} 
+                      className="bg-white text-black hover:bg-orange-500 hover:text-white font-black h-12 px-8 rounded-xl text-[10px] uppercase tracking-widest transition-all active:scale-95 shadow-xl"
+                    >
+                      {isDistributing ? "Processing..." : "Process Batch Distribution"}
+                    </Button>
+                  </CardHeader>
+                  <CardContent className="p-0 flex-1">
+                    <div className="overflow-x-auto no-scrollbar">
+                      <table className="w-full min-w-[700px]">
+                        <thead className="bg-white/[0.04]">
+                          <tr>
+                            <th className="px-10 py-5 text-left text-[9px] font-black uppercase tracking-widest text-white/30">Rank</th>
+                            <th className="px-10 py-5 text-left text-[9px] font-black uppercase tracking-widest text-white/30">Network Actor</th>
+                            <th className="px-10 py-5 text-right text-[9px] font-black uppercase tracking-widest text-white/30">Target Reward (XPR)</th>
+                          </tr>
+                        </thead>
+                        <tbody className="divide-y divide-white/5">
+                          {winners.map((winner, index) => (
+                            <tr key={winner.account} className="group hover:bg-white/[0.02] transition-colors">
+                              <td className="px-10 py-6">
+                                <span className={cn(
+                                  "h-10 w-10 rounded-xl flex items-center justify-center font-black text-xs shadow-inner",
+                                  index === 0 ? "bg-yellow-500 text-black" : 
+                                  index === 1 ? "bg-slate-300 text-black" :
+                                  index === 2 ? "bg-orange-600 text-white" : "bg-white/5 text-white/40"
+                                )}>
+                                  #{winner.rank}
+                                </span>
+                              </td>
+                              <td className="px-10 py-6">
+                                <div className="flex flex-col">
+                                  <span className="font-black text-lg text-white group-hover:text-purple-400 transition-colors">@{winner.account}</span>
+                                  <span className="text-[9px] font-bold text-white/20 uppercase tracking-widest">{winner.role}</span>
+                                </div>
+                              </td>
+                              <td className="px-10 py-6 text-right">
+                                <div className="inline-flex items-center gap-4 bg-black/40 border border-white/5 p-1 rounded-2xl group-hover:border-purple-500/30 transition-all">
+                                  <Input 
+                                    type="number" 
+                                    value={winner.reward} 
+                                    onChange={(e) => handleRewardValueChange(index, e.target.value)} 
+                                    className="w-[120px] bg-transparent border-transparent text-right font-black rounded-xl h-10 px-4 text-white focus-visible:ring-0" 
+                                  />
+                                  <span className="text-[10px] font-black text-orange-500 mr-4">XPR</span>
+                                </div>
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  </CardContent>
+                </Card>
+              </div>
+            </div>
+          )}
+
+          {activeTab === "moderation" && (adminRole === 'super' || adminRole === 'moderator') && (
+            <div className="space-y-8 animate-in fade-in slide-in-from-bottom-6 duration-500">
+              {/* Mod Registry Header & Stats */}
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                 <Card className="bg-[#130b21] border border-white/10 p-6 rounded-[32px] flex items-center gap-6">
+                    <div className="h-14 w-14 rounded-2xl bg-purple-500/10 flex items-center justify-center border border-purple-500/20">
+                       <Users className="h-7 w-7 text-purple-400" />
+                    </div>
+                    <div>
+                       <p className="text-2xl font-black text-white">{moderatedCreators.length}</p>
+                       <p className="text-[10px] font-black uppercase tracking-widest text-white/40">Network Registry</p>
+                    </div>
+                 </Card>
+                 <Card className="bg-[#130b21] border border-white/10 p-6 rounded-[32px] flex items-center gap-6">
+                    <div className="h-14 w-14 rounded-2xl bg-orange-500/10 flex items-center justify-center border border-orange-500/20">
+                       <Zap className="h-7 w-7 text-orange-400" />
+                    </div>
+                    <div>
+                       <p className="text-2xl font-black text-white">{moderatedCreators.filter(c => c.videoUrl || c.youtubeLive || c.twitch).length}</p>
+                       <p className="text-[10px] font-black uppercase tracking-widest text-white/40">Rich Profiles</p>
+                    </div>
+                 </Card>
+                 <Card className="bg-[#130b21] border border-white/10 p-6 rounded-[32px] flex items-center gap-6">
+                    <div className="h-14 w-14 rounded-2xl bg-red-500/10 flex items-center justify-center border border-red-500/20">
+                       <Ban className="h-7 w-7 text-red-500" />
+                    </div>
+                    <div>
+                       <p className="text-2xl font-black text-white">{bannedHandles.length}</p>
+                       <p className="text-[10px] font-black uppercase tracking-widest text-white/40">Suppressed</p>
+                    </div>
+                 </Card>
+              </div>
+
+              <Card className="bg-[#1a112d] border border-white/10 rounded-[48px] overflow-hidden shadow-2xl relative">
+                <CardHeader className="p-10 border-b border-white/5 bg-white/[0.02]">
+                  <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-8">
+                    <div className="space-y-1">
+                      <CardTitle className="text-3xl font-black tracking-tight uppercase italic text-white">Registry Management</CardTitle>
+                      <p className="text-xs font-bold text-white/20 uppercase tracking-widest">Enforce network standards and verify locations</p>
+                    </div>
+                    <div className="flex flex-col sm:flex-row items-center gap-4">
+                      <div className="relative group w-full sm:w-80">
+                        <Search className="absolute left-5 top-1/2 -translate-y-1/2 h-4 w-4 text-white/20 group-focus-within:text-purple-500 transition-colors" />
+                        <Input 
+                          placeholder="Search Registry..." 
+                          value={searchQuery} 
+                          onChange={(e) => setSearchQuery(e.target.value)} 
+                          className="w-full bg-[#2a1d4a] border-white/10 rounded-2xl h-14 pl-12 text-white font-bold focus:ring-purple-500/50" 
+                        />
+                      </div>
+                      <Select value={modCategoryFilter} onValueChange={setModCategoryFilter}>
+                        <SelectTrigger className="w-full sm:w-48 h-14 bg-white/5 border-white/10 rounded-2xl font-black text-[10px] uppercase tracking-widest text-white">
+                          <div className="flex items-center gap-2">
+                             <Filter className="h-3.5 w-3.5 text-purple-400" />
+                             <SelectValue placeholder="Category" />
+                          </div>
+                        </SelectTrigger>
+                        <SelectContent className="bg-[#1a102d] border-white/20 text-white rounded-xl">
+                          {modCategories.map(cat => (
+                            <SelectItem key={cat} value={cat} className="font-black text-[10px] uppercase tracking-widest py-3">{cat}</SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  </div>
+                </CardHeader>
+                <CardContent className="p-0">
+                  <div className="overflow-x-auto no-scrollbar">
+                    <table className="w-full min-w-[900px]">
+                      <thead className="bg-white/[0.03]">
+                        <tr>
+                          <th className="px-10 py-5 text-left text-[9px] font-black uppercase tracking-widest text-white/20">Profile Overview</th>
+                          <th className="px-10 py-5 text-left text-[9px] font-black uppercase tracking-widest text-white/20">Location Data</th>
+                          <th className="px-10 py-5 text-center text-[9px] font-black uppercase tracking-widest text-white/20">Status Indicators</th>
+                          <th className="px-10 py-5 text-right text-[9px] font-black uppercase tracking-widest text-white/20">Mod Console</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-white/5">
+                        {filteredCreators.map((creator) => {
+                          const isBanned = bannedHandles.includes(creator.handle);
+                          const hasCoordinates = creator.coordinates && creator.coordinates[0] !== 0;
+
+                          return (
+                            <tr key={creator.id} className={cn("group hover:bg-white/[0.02] transition-colors relative", isBanned && "opacity-60 grayscale-[0.5]")}>
+                              <td className="px-10 py-8">
+                                <div className="flex items-center gap-6">
+                                  <div className={cn(
+                                    "h-16 w-16 rounded-[24px] flex items-center justify-center text-2xl font-black border-2 border-white/10 overflow-hidden shrink-0 shadow-2xl relative",
+                                    creator.color,
+                                    !isBanned && "after:absolute after:inset-0 after:shadow-[inset_0_0_15px_rgba(255,255,255,0.2)]"
+                                  )}>
+                                    {creator.avatarImage ? <img src={creator.avatarImage} alt="" className="w-full h-full object-cover" /> : creator.avatar}
+                                  </div>
+                                  <div className="flex flex-col">
+                                    <div className="flex items-center gap-2">
+                                      <span className="font-black text-2xl text-white tracking-tight italic">@{creator.handle}</span>
+                                      {creator.videoUrl && <Badge variant="secondary" className="bg-purple-500/20 text-purple-400 border-none font-black text-[7px] uppercase h-4">Rich</Badge>}
+                                    </div>
+                                    <span className="text-xs text-white/40 font-bold uppercase tracking-[0.15em]">{creator.name}</span>
+                                  </div>
+                                </div>
+                              </td>
+                              <td className="px-10 py-8">
+                                <div className="flex flex-col gap-1.5">
+                                   <div className="flex items-center gap-2 text-sm font-bold text-white/80">
+                                      <MapPin className="h-3.5 w-3.5 text-purple-400" />
+                                      {creator.location}
+                                   </div>
+                                   <div className={cn("flex items-center gap-1.5 text-[8px] font-black uppercase tracking-widest", hasCoordinates ? "text-green-500" : "text-orange-500")}>
+                                      {hasCoordinates ? <CheckCircle className="h-2.5 w-2.5" /> : <AlertCircle className="h-2.5 w-2.5" />}
+                                      {hasCoordinates ? `Lat/Lon Verified` : "Pending Geocode"}
+                                   </div>
+                                </div>
+                              </td>
+                              <td className="px-10 py-8 text-center">
+                                 <div className="flex flex-col items-center gap-2">
+                                    {isBanned ? (
+                                      <Badge className="bg-red-600/90 text-white font-black text-[8px] uppercase tracking-widest rounded-lg h-6 px-3">Suppressed</Badge>
+                                    ) : (
+                                      <Badge className="bg-green-600/90 text-white font-black text-[8px] uppercase tracking-widest rounded-lg h-6 px-3 shadow-[0_0_15px_rgba(34,197,94,0.3)]">Registry Active</Badge>
+                                    )}
+                                    <span className="text-[8px] font-bold text-white/10 uppercase tracking-widest">Network Node</span>
+                                 </div>
+                              </td>
+                              <td className="px-10 py-8 text-right">
+                                <div className="inline-flex items-center gap-3">
+                                  <div className="flex items-center p-1.5 bg-black/30 border border-white/5 rounded-2xl gap-2">
+                                    <Button 
+                                      variant="ghost" 
+                                      size="icon" 
+                                      onClick={() => toggleBan(creator.handle)} 
+                                      className={cn(
+                                        "h-11 w-11 rounded-xl transition-all shadow-xl", 
+                                        isBanned ? "bg-green-500/10 text-green-500 hover:bg-green-500 hover:text-white" : "bg-red-500/10 text-red-500 hover:bg-red-500 hover:text-white"
+                                      )}
+                                    >
+                                      {isBanned ? <Unlock className="h-5.5 w-5.5" /> : <Ban className="h-5.5 w-5.5" />}
+                                    </Button>
+                                    <Button variant="ghost" size="sm" onClick={() => openAuditLogs(creator)} className="h-11 rounded-xl bg-white/5 text-white/60 hover:text-purple-400 gap-2 font-black uppercase text-[9px] tracking-widest px-4 border border-white/5">
+                                      <Activity className="h-3.5 w-3.5" /> Audit
+                                    </Button>
+                                    <Button variant="ghost" size="sm" onClick={() => openTransactionHistory(creator)} className="h-11 rounded-xl bg-white/5 text-white/60 hover:text-cyan-400 gap-2 font-black uppercase text-[9px] tracking-widest px-4 border border-white/5">
+                                      <History className="h-3.5 w-3.5" /> Ledger
+                                    </Button>
+                                  </div>
+                                  <DropdownMenu>
+                                    <DropdownMenuTrigger asChild>
+                                      <Button variant="ghost" size="icon" className="h-11 w-11 rounded-xl bg-white/5 hover:bg-white/10 border border-white/5 text-white/20 hover:text-white transition-all"><MoreVertical className="h-5 w-5" /></Button>
+                                    </DropdownMenuTrigger>
+                                    <DropdownMenuContent align="end" className="bg-[#1a102d]/95 backdrop-blur-xl border-white/10 text-white rounded-2xl shadow-2xl p-2 min-w-[200px] mt-2">
+                                      <div className="px-3 py-2 border-b border-white/5 mb-1">
+                                        <p className="text-[10px] font-black uppercase tracking-widest text-white/20">Critical Actions</p>
+                                      </div>
+                                      <DropdownMenuItem onClick={() => { setCreatorToDelete(creator); setIsDeleteModalOpen(true); }} className="text-red-500 focus:text-red-500 focus:bg-red-500/10 font-bold rounded-xl cursor-pointer h-12">
+                                        <Trash2 className="mr-3 h-4.5 w-4.5" /> Purge Network Data
+                                      </DropdownMenuItem>
+                                    </DropdownMenuContent>
+                                  </DropdownMenu>
+                                </div>
+                              </td>
+                            </tr>
+                          );
+                        })}
+                      </tbody>
+                    </table>
+                    {filteredCreators.length === 0 && (
+                       <div className="py-32 text-center space-y-4">
+                          <AlertCircle className="h-12 w-12 mx-auto text-white/10" />
+                          <p className="text-sm font-black uppercase tracking-[0.3em] text-white/20">No Matching Registry Records</p>
+                       </div>
+                    )}
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+          )}
+
           {activeTab === "config" && (adminRole === 'super' || adminRole === 'moderator') && (
             <div className="space-y-8 animate-in fade-in duration-300">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
@@ -1227,99 +1562,6 @@ const AdminHub = () => {
             </div>
           )}
 
-          {activeTab === "rewards" && (adminRole === 'super' || adminRole === 'treasurer') && (
-            <div className="space-y-8 animate-in fade-in duration-300">
-              <Card className="bg-[#1a112d] border-white/10 rounded-[48px] overflow-hidden shadow-2xl relative">
-                <CardHeader className="p-12 border-b border-white/5 relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
-                  <div>
-                    <CardTitle className="text-3xl font-black tracking-tight uppercase italic text-white flex items-center gap-4">
-                      <Sparkles className="h-8 w-8 text-yellow-400" /> Leaderboard Rewards
-                    </CardTitle>
-                  </div>
-                  <Button onClick={handleRewardWinners} disabled={isDistributing} className="bg-white text-black hover:bg-orange-500 hover:text-white font-black h-14 px-8 rounded-2xl text-xs uppercase tracking-widest transition-all">{isDistributing ? "Wait..." : "Distribute"}</Button>
-                </CardHeader>
-                <CardContent className="p-0">
-                  <div className="overflow-x-auto no-scrollbar">
-                    <table className="w-full min-w-[700px]">
-                      <thead className="bg-white/[0.03]">
-                        <tr>
-                          <th className="px-12 py-6 text-left text-[11px] font-black uppercase tracking-widest text-white/30">Rank</th>
-                          <th className="px-12 py-6 text-left text-[11px] font-black uppercase tracking-widest text-white/30">Participant</th>
-                          <th className="px-12 py-6 text-right text-[11px] font-black uppercase tracking-widest text-white/30">Reward (XPR)</th>
-                        </tr>
-                      </thead>
-                      <tbody className="divide-y divide-white/5">
-                        {winners.map((winner, index) => (
-                          <tr key={winner.account} className="group hover:bg-white/[0.02] transition-colors">
-                            <td className="px-12 py-8"><span className="h-10 w-10 rounded-xl flex items-center justify-center font-black text-sm bg-white/5 text-white/40">#{winner.rank}</span></td>
-                            <td className="px-12 py-8"><span className="font-black text-lg text-white">@{winner.account}</span></td>
-                            <td className="px-12 py-8 text-right"><Input type="number" value={winner.reward} onChange={(e) => handleRewardValueChange(index, e.target.value)} className="w-[120px] bg-white/5 border-white/10 text-right font-black rounded-xl h-10 px-4 text-white" /></td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                  </div>
-                </CardContent>
-              </Card>
-            </div>
-          )}
-
-          {activeTab === "moderation" && (adminRole === 'super' || adminRole === 'moderator') && (
-            <div className="space-y-8 animate-in fade-in duration-300">
-              <Card className="bg-[#1a112d] border-white/10 rounded-[48px] overflow-hidden shadow-2xl">
-                <CardHeader className="p-12 border-b border-white/5">
-                  <div className="flex flex-col md:flex-row md:items-center justify-between gap-8">
-                    <CardTitle className="text-3xl font-black tracking-tight uppercase italic text-white">Moderation</CardTitle>
-                    <Input placeholder="Search creators..." value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} className="w-full md:w-96 bg-[#2a1d4a] border-white/10 rounded-2xl h-14 text-white font-bold" />
-                  </div>
-                </CardHeader>
-                <CardContent className="p-0">
-                  <div className="overflow-x-auto no-scrollbar">
-                    <table className="w-full min-w-[800px]">
-                      <tbody className="divide-y divide-white/5">
-                        {filteredCreators.map((creator) => (
-                          <tr key={creator.id} className={cn("group hover:bg-white/[0.02] transition-colors", bannedHandles.includes(creator.handle) && "opacity-50")}>
-                            <td className="px-10 py-8">
-                              <div className="flex items-center gap-5">
-                                <div className={cn("h-14 w-14 rounded-2xl flex items-center justify-center text-xl font-black border-2 border-white/10 overflow-hidden shrink-0 shadow-lg", creator.color)}>
-                                  {creator.avatarImage ? <img src={creator.avatarImage} alt="" className="w-full h-full object-cover" /> : creator.avatar}
-                                </div>
-                                <div className="flex flex-col">
-                                  <span className="font-black text-xl text-white tracking-tight">@{creator.handle}</span>
-                                  <span className="text-xs text-white/40 font-bold uppercase tracking-widest">{creator.name}</span>
-                                </div>
-                              </div>
-                            </td>
-                            <td className="px-10 py-8 text-right space-x-2">
-                              <Button 
-                                variant="ghost" 
-                                size="icon" 
-                                onClick={() => toggleBan(creator.handle)} 
-                                className={cn("h-11 w-11 rounded-xl transition-all", bannedHandles.includes(creator.handle) ? "bg-green-500/10 text-green-500 hover:bg-green-500 hover:text-white" : "bg-red-500/10 text-red-500 hover:bg-red-500 hover:text-white")}
-                              >
-                                {bannedHandles.includes(creator.handle) ? <Unlock className="h-5.5 w-5.5" /> : <Ban className="h-5.5 w-5.5" />}
-                              </Button>
-                              <Button variant="ghost" size="sm" onClick={() => openAuditLogs(creator)} className="h-11 rounded-xl bg-white/5 text-white/40 hover:text-purple-400 gap-2 border border-white/5 font-black uppercase text-[10px] tracking-widest"><Activity className="h-4 w-4" /> Logs</Button>
-                              <Button variant="ghost" size="sm" onClick={() => openTransactionHistory(creator)} className="h-11 rounded-xl bg-white/5 text-white/40 hover:text-cyan-400 gap-2 border border-white/5 font-black uppercase text-[10px] tracking-widest"><History className="h-4 w-4" /> History</Button>
-                              <DropdownMenu>
-                                <DropdownMenuTrigger asChild>
-                                  <Button variant="ghost" size="icon" className="h-11 w-11 text-white/20 hover:text-white"><MoreVertical className="h-5 w-5" /></Button>
-                                </DropdownMenuTrigger>
-                                <DropdownMenuContent align="end" className="bg-[#1a102d] border-white/10 text-white rounded-xl shadow-2xl p-2 min-w-[160px]">
-                                  <DropdownMenuItem onClick={() => { setCreatorToDelete(creator); setIsDeleteModalOpen(true); }} className="text-red-500 focus:text-red-500 font-bold rounded-lg cursor-pointer"><Trash2 className="mr-2 h-4 w-4" /> Delete Profile</DropdownMenuItem>
-                                </DropdownMenuContent>
-                              </DropdownMenu>
-                            </td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                  </div>
-                </CardContent>
-              </Card>
-            </div>
-          )}
-
           {activeTab === "admins" && adminRole === 'super' && (
             <div className="space-y-8 animate-in fade-in duration-300">
               <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
@@ -1406,26 +1648,6 @@ const AdminHub = () => {
             <div className="flex gap-4">
               <Button onClick={() => setIsDeleteModalOpen(false)} className="flex-1 h-14 bg-white/5 hover:bg-white/10 rounded-2xl font-black uppercase">Cancel</Button>
               <Button onClick={confirmDeleteProfile} className="flex-1 h-14 bg-red-500 hover:bg-red-600 rounded-2xl font-black uppercase">Yes, Purge</Button>
-            </div>
-          </div>
-        </DialogContent>
-      </Dialog>
-
-      <Dialog open={isResetAnalyticsOpen} onOpenChange={setIsResetAnalyticsOpen}>
-        <DialogContent className="bg-[#2a1b4d] border-2 border-red-500/50 text-white rounded-[40px] p-10 max-w-md">
-          <div className="text-center space-y-6">
-            <div className="h-20 w-20 rounded-full bg-red-500/10 flex items-center justify-center mx-auto border-2 border-red-500/20">
-              <AlertTriangle className="h-10 w-10 text-red-500" />
-            </div>
-            <DialogHeader>
-              <DialogTitle className="text-3xl font-black italic uppercase text-center tracking-tighter">RESET ANALYTICS?</DialogTitle>
-              <DialogDescription className="text-white/60 font-bold text-center">
-                This will zero out all platform velocity metrics, member growth counts, and engagement stats. This action is irreversible.
-              </DialogDescription>
-            </DialogHeader>
-            <div className="flex gap-4">
-              <Button onClick={() => setIsResetAnalyticsOpen(false)} className="flex-1 h-14 bg-white/5 hover:bg-white/10 rounded-2xl font-black uppercase">Cancel</Button>
-              <Button onClick={handleResetAnalytics} className="flex-1 h-14 bg-red-500 hover:bg-red-600 rounded-2xl font-black uppercase">Yes, Reset Metrics</Button>
             </div>
           </div>
         </DialogContent>
