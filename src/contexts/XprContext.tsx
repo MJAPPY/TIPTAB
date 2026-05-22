@@ -480,8 +480,8 @@ export const XprProvider: React.FC<{ children: React.ReactNode }> = ({ children 
           name: account,
           handle: account,
           bio: "Just joined the TIP TAB network!",
-          location: "Global",
-          coordinates: [0, 0],
+          location: "",
+          coordinates: null,
           categories: ["Other"],
           avatar: account.slice(0, 2).toUpperCase(),
           color: "bg-purple-600"
