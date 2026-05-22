@@ -4,7 +4,7 @@ import React, { useState, useMemo } from "react";
 import { Header } from "@/components/tab-platform/Header";
 import { MembershipModal } from "@/components/tab-platform/MembershipModal";
 import { CREATORS, Creator } from "@/data/creators";
-import { Search, MapPin, Tv, Radio, Music, Gamepad2, Zap, LayoutGrid, Users, ArrowUpDown, Truck, Coffee, Dumbbell, Trophy, Fish, Hammer, Car, Building, Utensils, Star, Sprout, Briefcase, Link as LinkIcon, Landmark, Newspaper, Sparkles, ShieldCheck, Cloud, Plane, TrainFront, Flame } from "lucide-react";
+import { Search, MapPin, Tv, Radio, Music, Gamepad2, Zap, LayoutGrid, Users, ArrowUpDown, Truck, Coffee, Dumbbell, Trophy, Fish, Hammer, Car, Building, Utensils, Star, Sprout, Briefcase, Link as LinkIcon, Landmark, Newspaper, Sparkles, ShieldCheck, Cloud, Plane, TrainFront, Flame, ShoppingBag } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -33,6 +33,7 @@ const CATEGORIES = [
   { name: "Finance", icon: Landmark },
   { name: "Fishing", icon: Fish },
   { name: "Fitness", icon: Dumbbell },
+  { name: "Flips & Thrifters", icon: ShoppingBag },
   { name: "Food", icon: Utensils },
   { name: "Gaming", icon: Gamepad2 },
   { name: "Gardening & Farming", icon: Sprout },

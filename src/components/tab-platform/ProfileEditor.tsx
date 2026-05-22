@@ -53,6 +53,7 @@ const CATEGORIES = [
   "Finance",
   "Fishing",
   "Fitness",
+  "Flips & Thrifters",
   "Food",
   "Gaming",
   "Gardening & Farming",

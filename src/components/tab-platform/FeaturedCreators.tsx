@@ -19,6 +19,7 @@ const CATEGORIES = [
   { name: "Finance", color: "#10b981" },
   { name: "Fishing", color: "#0ea5e9" },
   { name: "Fitness", color: "#10b981" },
+  { name: "Flips & Thrifters", color: "#f472b6" },
   { name: "Food", color: "#fbbf24" },
   { name: "Gaming", color: "#8b5cf6" },
   { name: "Gardening & Farming", color: "#22c55e" },
