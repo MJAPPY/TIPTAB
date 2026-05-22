@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, useMemo } from "react";
+import React, { useState, useEffect, useMemo, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { 
   ShieldAlert, 
@@ -47,7 +47,8 @@ import {
   BellOff,
   Coins,
   RefreshCw,
-  Scale
+  Scale,
+  Clock
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
@@ -89,7 +90,7 @@ const MOCK_AUDIT_LOGS: Record<string, any[]> = {
     { date: "2024-05-18", time: "09:12", event: "Profile Updated", actor: "tiptab", type: "user" },
   ],
   "carlos_delivery": [
-    { date: "2024-04-10", time: "11:05", event: "Membership Activated", actor: "System", type: "system" },
+    { date: "2024-04-10", time: "11:05", event: "Membership Activation", actor: "System", type: "system" },
     { date: "2024-05-02", time: "16:45", event: "Location Verified", actor: "Admin", type: "admin" },
   ]
 };
@@ -163,7 +164,9 @@ const AdminHub = () => {
   const [bannedHandles, setBannedHandles] = useState<string[]>([]);
   const [isDistributing, setIsDistributing] = useState(false);
   const [isSyncingPrices, setIsSyncingPrices] = useState(false);
-  const [xprPrice, setXprPrice] = useState<number | null>(null);
+  const [lastAutoSync, setLastAutoSync] = useState<number>(() => {
+    return parseInt(localStorage.getItem("tiptab_last_parity_sync") || "0");
+  });
 
   // Profile Delete Confirmation Flow
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
@@ -225,22 +228,19 @@ const AdminHub = () => {
 
   const fetchRates = async () => {
     try {
-      // 1. Fetch XPR/USD from CoinGecko
       const cgResponse = await fetch("https://api.coingecko.com/api/v3/simple/price?ids=proton&vs_currencies=usd");
       const cgData = await cgResponse.json();
       
-      // 2. Fetch TAB/XPR from Alcor DEX
       const alcorResponse = await fetch("https://proton.alcor.exchange/api/v2/tickers");
       const alcorData = await alcorResponse.json();
       const tabMarket = alcorData.find((m: any) => m.ticker_id === "TAB_XPR");
       
-      let xprPerTab = 0.36; // conservative fallback if DEX is down
+      let xprPerTab = 0.36; 
       if (tabMarket && tabMarket.last_price) {
         xprPerTab = parseFloat(tabMarket.last_price);
       }
 
       if (cgData.proton && cgData.proton.usd) {
-        setXprPrice(cgData.proton.usd);
         return { 
           xprUsd: cgData.proton.usd, 
           xprPerTab 
@@ -252,36 +252,46 @@ const AdminHub = () => {
     return null;
   };
 
-  const handleSyncParity = async () => {
+  const handleSyncParity = useCallback(async (isAuto = false) => {
     setIsSyncingPrices(true);
     const marketData = await fetchRates();
     
     if (marketData) {
       const { xprUsd, xprPerTab } = marketData;
       
-      // 1. Calculate Membership Parity based on target XUSDC
-      const targetUsd = parseFloat(localFeeXusdc);
-      if (!isNaN(targetUsd)) {
-        const calculatedXpr = (targetUsd / xprUsd).toFixed(0);
-        const calculatedXmd = targetUsd.toFixed(2);
+      // 1. Calculate Activation Parity
+      const targetFeeUsd = parseFloat(membershipFeeXusdc);
+      if (!isNaN(targetFeeUsd)) {
+        const calculatedXpr = (targetFeeUsd / xprUsd).toFixed(0);
+        const calculatedXmd = targetFeeUsd.toFixed(2);
         
+        updateMembershipFee(calculatedXpr, 'XPR');
+        updateMembershipFee(calculatedXmd, 'XMD');
         setLocalFee(calculatedXpr);
         setLocalFeeXmd(calculatedXmd);
       }
 
-      // 2. Calculate TAB Boost Parity based on current XPR Boost price
-      const boostXpr = parseFloat(localBoost);
-      if (!isNaN(boostXpr) && xprPerTab > 0) {
-        // formula: costInTab = costInXpr / (xprPerTab)
-        const calculatedBoostTab = (boostXpr / xprPerTab).toFixed(0);
-        setLocalBoostTab(calculatedBoostTab);
+      // 2. Calculate Boost Parity
+      const targetBoostUsd = parseFloat(boostPriceXusdc);
+      if (!isNaN(targetBoostUsd)) {
+        const boostXprVal = (targetBoostUsd / xprUsd).toFixed(0);
+        const boostTabVal = (parseFloat(boostXprVal) / xprPerTab).toFixed(0);
+        
+        updateBoostPrice(boostXprVal);
+        updateBoostTabPrice(boostTabVal);
+        setLocalBoost(boostXprVal);
+        setLocalBoostTab(boostTabVal);
       }
       
+      const now = Date.now();
+      setLastAutoSync(now);
+      localStorage.setItem("tiptab_last_parity_sync", now.toString());
+
       toast({
-        title: "Network Parity Synced",
-        description: `Fees and Boosts adjusted via Alcor/CoinGecko. (1 TAB = ${xprPerTab.toFixed(4)} XPR)`,
+        title: isAuto ? "Passive Parity Sync Complete" : "Network Parity Synced",
+        description: `Activation and Boosts calibrated via Alcor/CoinGecko. (1 TAB = ${xprPerTab.toFixed(4)} XPR)`,
       });
-    } else {
+    } else if (!isAuto) {
       toast({
         title: "Sync Failed",
         description: "Could not fetch current market rates from external APIs.",
@@ -289,41 +299,17 @@ const AdminHub = () => {
       });
     }
     setIsSyncingPrices(false);
-  };
+  }, [membershipFeeXusdc, boostPriceXusdc, updateMembershipFee, updateBoostPrice, updateBoostTabPrice, toast]);
 
-  const handleSyncBoostParity = async () => {
-    setIsSyncingPrices(true);
-    const marketData = await fetchRates();
-    
-    if (marketData) {
-      const { xprUsd, xprPerTab } = marketData;
-      
-      const targetUsd = parseFloat(localBoostXusdc);
-      if (!isNaN(targetUsd)) {
-        // 1. Calc XPR Boost based on USD
-        const calculatedXpr = (targetUsd / xprUsd).toFixed(0);
-        setLocalBoost(calculatedXpr);
-        
-        // 2. Calc TAB Boost based on resulting XPR
-        if (xprPerTab > 0) {
-          const calculatedBoostTab = (parseFloat(calculatedXpr) / xprPerTab).toFixed(0);
-          setLocalBoostTab(calculatedBoostTab);
-        }
-        
-        toast({
-          title: "Boost Parity Synced",
-          description: `Boost prices adjusted via XUSDC master valuation.`,
-        });
+  // Passive Auto-Sync Logic: Runs once per 24h when a Super Admin opens the dashboard
+  useEffect(() => {
+    if (adminRole === 'super' && isConnected) {
+      const oneDayInMs = 24 * 60 * 60 * 1000;
+      if (Date.now() - lastAutoSync > oneDayInMs) {
+        handleSyncParity(true);
       }
-    } else {
-      toast({
-        title: "Sync Failed",
-        description: "Could not fetch current market rates.",
-        variant: "destructive"
-      });
     }
-    setIsSyncingPrices(false);
-  };
+  }, [adminRole, isConnected, lastAutoSync, handleSyncParity]);
 
   const handleUpdateFee = (asset: 'XPR' | 'XMD' | 'XUSDC') => {
     if (adminRole !== 'super') {
@@ -358,7 +344,7 @@ const AdminHub = () => {
     if (payoutTotal > rewardsPool) {
       toast({
         title: "Over Limit",
-        description: `Sum of rewards (${payoutTotal.toLocaleString()} XPR) exceeds the Live Boost rewards pool (${rewardsPool.toLocaleString()} XPR).`,
+        description: `Sum of rewards (${payoutTotal.toLocaleString()} XPR) exceeds the rewards pool.`,
         variant: "destructive"
       });
       return;
@@ -482,7 +468,7 @@ const AdminHub = () => {
       if (permanentCount <= 1) {
         toast({
           title: "Action Locked",
-          description: "You cannot revoke your own access because you are the only Permanent Super Admin remaining. Appoint another Permanent Super Admin first.",
+          description: "You cannot revoke your own access because you are the only Permanent Super Admin remaining.",
           variant: "destructive"
         });
         return;
@@ -541,13 +527,6 @@ const AdminHub = () => {
     localStorage.removeItem(`tiptab_profile_${handle}`);
     localStorage.removeItem(`tiptab_membership_${handle}`);
     localStorage.removeItem(`tiptab_membership_date_${handle}`);
-    const savedUser = localStorage.getItem("tiptab_user_profile");
-    if (savedUser) {
-      const parsed = JSON.parse(savedUser) as Creator;
-      if (parsed.handle.replace('@', '').toLowerCase() === handle) {
-        localStorage.removeItem("tiptab_user_profile");
-      }
-    }
     toast({
       title: "Profile Purged Successfully",
       description: `@${handle}'s profile and map registrations have been completely removed.`,
@@ -824,16 +803,22 @@ const AdminHub = () => {
                       <div className="space-y-3 p-6 rounded-3xl bg-white/[0.03] border border-white/5">
                         <div className="flex items-center justify-between mb-4">
                            <Label className="text-[11px] font-black uppercase tracking-widest text-cyan-400">Master Asset: XUSDC</Label>
-                           <Button 
-                            variant="ghost" 
-                            size="sm" 
-                            onClick={handleSyncParity} 
-                            disabled={isSyncingPrices || adminRole !== 'super'}
-                            className="h-8 px-3 rounded-lg bg-white/5 border border-white/10 hover:bg-white/10 text-[9px] font-black uppercase tracking-widest gap-2 text-slate-300"
-                           >
-                             <Scale className={cn("h-3.5 w-3.5", isSyncingPrices && "animate-spin")} />
-                             Calculate Parity
-                           </Button>
+                           <div className="flex items-center gap-4">
+                             <div className="flex items-center gap-1.5 text-[8px] font-black text-white/20 uppercase tracking-widest">
+                               <Clock className="h-3 w-3" />
+                               {lastAutoSync > 0 ? new Date(lastAutoSync).toLocaleTimeString() : "Never"}
+                             </div>
+                             <Button 
+                              variant="ghost" 
+                              size="sm" 
+                              onClick={() => handleSyncParity()} 
+                              disabled={isSyncingPrices || adminRole !== 'super'}
+                              className="h-8 px-3 rounded-lg bg-white/5 border border-white/10 hover:bg-white/10 text-[9px] font-black uppercase tracking-widest gap-2 text-slate-300"
+                             >
+                               <Scale className={cn("h-3.5 w-3.5", isSyncingPrices && "animate-spin")} />
+                               Sync Parity
+                             </Button>
+                           </div>
                         </div>
                         <div className="flex gap-4">
                           <Input 
@@ -845,7 +830,6 @@ const AdminHub = () => {
                           />
                           <Button onClick={() => handleUpdateFee('XUSDC')} disabled={adminRole !== 'super'} className="bg-cyan-600 hover:bg-cyan-700 rounded-2xl px-6 h-16 font-black text-white">Update</Button>
                         </div>
-                        <p className="text-[9px] font-bold text-white/20 uppercase tracking-widest mt-3">Sets base valuation. Use 'Calculate Parity' to sync XPR/XMD.</p>
                       </div>
 
                       <div className="space-y-3">
@@ -882,16 +866,6 @@ const AdminHub = () => {
                         <div className="space-y-3 p-6 rounded-3xl bg-white/[0.03] border border-white/5">
                           <div className="flex items-center justify-between mb-4">
                              <Label className="text-[11px] font-black uppercase tracking-widest text-cyan-400">Master Asset: XUSDC (Boost)</Label>
-                             <Button 
-                              variant="ghost" 
-                              size="sm" 
-                              onClick={handleSyncBoostParity} 
-                              disabled={isSyncingPrices || adminRole !== 'super'}
-                              className="h-8 px-3 rounded-lg bg-white/5 border border-white/10 hover:bg-white/10 text-[9px] font-black uppercase tracking-widest gap-2 text-slate-300"
-                             >
-                               <Scale className={cn("h-3.5 w-3.5", isSyncingPrices && "animate-spin")} />
-                               Calculate Parity
-                             </Button>
                           </div>
                           <div className="flex gap-4">
                             <Input 
@@ -903,7 +877,7 @@ const AdminHub = () => {
                             />
                             <Button onClick={() => handleUpdateBoost('XUSDC')} disabled={adminRole !== 'super'} className="bg-cyan-600 hover:bg-cyan-700 rounded-2xl px-6 h-16 font-black text-white">Update</Button>
                           </div>
-                          <p className="text-[9px] font-bold text-white/20 uppercase tracking-widest mt-3">Sets base boost valuation. Use 'Calculate Parity' to sync XPR/TAB.</p>
+                          <p className="text-[9px] font-bold text-white/20 uppercase tracking-widest mt-3">Calculated Parity updates XPR/TAB Boosts simultaneously.</p>
                         </div>
 
                         <div className="space-y-4">
@@ -988,6 +962,16 @@ const AdminHub = () => {
                         </Button>
                       )}
                     </div>
+                  </div>
+                  
+                  <div className="mt-10 p-6 bg-white/[0.02] border border-white/5 rounded-3xl">
+                     <div className="flex items-center gap-3 mb-3">
+                        <Scale className="h-5 w-5 text-cyan-400" />
+                        <h4 className="text-xs font-black uppercase tracking-widest text-white/60">Passive Auto-Sync</h4>
+                     </div>
+                     <p className="text-[10px] font-bold text-white/30 leading-relaxed">
+                        Rates for XPR, TAB, and XMD are automatically re-calibrated against your master XUSDC targets every 24 hours whenever an administrator visits this Hub.
+                     </p>
                   </div>
                 </Card>
               </div>
