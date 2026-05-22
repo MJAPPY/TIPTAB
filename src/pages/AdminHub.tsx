@@ -889,26 +889,44 @@ const AdminHub = () => {
                 <CardHeader className="p-12 border-b border-white/5">
                   <div className="flex flex-col md:flex-row md:items-center justify-between gap-8">
                     <CardTitle className="text-3xl font-black tracking-tight uppercase italic text-white">Moderation</CardTitle>
-                    <Input placeholder="Search..." value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} className="w-full md:w-96 bg-[#2a1d4a] border-white/10 rounded-2xl h-14 text-white" />
+                    <Input placeholder="Search creators..." value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} className="w-full md:w-96 bg-[#2a1d4a] border-white/10 rounded-2xl h-14 text-white font-bold" />
                   </div>
                 </CardHeader>
                 <CardContent className="p-0">
                   <div className="overflow-x-auto no-scrollbar">
-                    <table className="w-full min-w-[700px]">
+                    <table className="w-full min-w-[800px]">
                       <tbody className="divide-y divide-white/5">
                         {filteredCreators.map((creator) => (
-                          <tr key={creator.id} className="group hover:bg-white/[0.02] transition-colors">
-                            <td className="px-10 py-8"><span className="font-black text-lg text-white">@{creator.handle}</span></td>
+                          <tr key={creator.id} className={cn("group hover:bg-white/[0.02] transition-colors", bannedHandles.includes(creator.handle) && "opacity-50")}>
+                            <td className="px-10 py-8">
+                              <div className="flex items-center gap-5">
+                                <div className={cn("h-14 w-14 rounded-2xl flex items-center justify-center text-xl font-black border-2 border-white/10 overflow-hidden shrink-0 shadow-lg", creator.color)}>
+                                  {creator.avatarImage ? <img src={creator.avatarImage} alt="" className="w-full h-full object-cover" /> : creator.avatar}
+                                </div>
+                                <div className="flex flex-col">
+                                  <span className="font-black text-xl text-white tracking-tight">@{creator.handle}</span>
+                                  <span className="text-xs text-white/40 font-bold uppercase tracking-widest">{creator.name}</span>
+                                </div>
+                              </div>
+                            </td>
                             <td className="px-10 py-8 text-right space-x-2">
-                              <Button variant="ghost" size="sm" onClick={() => openAuditLogs(creator)} className="h-10 rounded-xl bg-white/5 text-white/40 hover:text-purple-400 gap-2"><Activity className="h-4 w-4" /> Logs</Button>
-                              <Button variant="ghost" size="sm" onClick={() => openTransactionHistory(creator)} className="h-10 rounded-xl bg-white/5 text-white/40 hover:text-cyan-400 gap-2"><History className="h-4 w-4" /> History</Button>
+                              <Button 
+                                variant="ghost" 
+                                size="icon" 
+                                onClick={() => toggleBan(creator.handle)} 
+                                className={cn("h-11 w-11 rounded-xl transition-all", bannedHandles.includes(creator.handle) ? "bg-green-500/10 text-green-500 hover:bg-green-500 hover:text-white" : "bg-red-500/10 text-red-500 hover:bg-red-500 hover:text-white")}
+                              >
+                                {bannedHandles.includes(creator.handle) ? <Unlock className="h-5.5 w-5.5" /> : <Ban className="h-5.5 w-5.5" />}
+                              </Button>
+                              <Button variant="ghost" size="sm" onClick={() => openAuditLogs(creator)} className="h-11 rounded-xl bg-white/5 text-white/40 hover:text-purple-400 gap-2 border border-white/5 font-black uppercase text-[10px] tracking-widest"><Activity className="h-4 w-4" /> Logs</Button>
+                              <Button variant="ghost" size="sm" onClick={() => openTransactionHistory(creator)} className="h-11 rounded-xl bg-white/5 text-white/40 hover:text-cyan-400 gap-2 border border-white/5 font-black uppercase text-[10px] tracking-widest"><History className="h-4 w-4" /> History</Button>
                               <DropdownMenu>
                                 <DropdownMenuTrigger asChild>
-                                  <Button variant="ghost" size="icon" className="h-10 w-10 text-white/20"><MoreVertical className="h-5 w-5" /></Button>
+                                  <Button variant="ghost" size="icon" className="h-11 w-11 text-white/20 hover:text-white"><MoreVertical className="h-5 w-5" /></Button>
                                 </DropdownMenuTrigger>
-                                <DropdownMenuContent align="end" className="bg-[#1a102d] border-white/10 text-white">
-                                  <DropdownMenuItem onClick={clearAlert} className="text-orange-400 focus:text-orange-400"><Bell className="mr-2 h-4 w-4" /> Clear Alert</DropdownMenuItem>
-                                  <DropdownMenuItem onClick={() => { setCreatorToDelete(creator); setIsDeleteModalOpen(true); }} className="text-red-500 focus:text-red-500"><Trash2 className="mr-2 h-4 w-4" /> Delete Profile</DropdownMenuItem>
+                                <DropdownMenuContent align="end" className="bg-[#1a102d] border-white/10 text-white rounded-xl shadow-2xl p-2 min-w-[160px]">
+                                  <DropdownMenuItem onClick={clearAlert} className="text-orange-400 focus:text-orange-400 font-bold rounded-lg cursor-pointer"><Bell className="mr-2 h-4 w-4" /> Clear Alert</DropdownMenuItem>
+                                  <DropdownMenuItem onClick={() => { setCreatorToDelete(creator); setIsDeleteModalOpen(true); }} className="text-red-500 focus:text-red-500 font-bold rounded-lg cursor-pointer mt-1"><Trash2 className="mr-2 h-4 w-4" /> Delete Profile</DropdownMenuItem>
                                 </DropdownMenuContent>
                               </DropdownMenu>
                             </td>
