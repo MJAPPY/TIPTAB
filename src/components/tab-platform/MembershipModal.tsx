@@ -10,10 +10,18 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { 
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Zap, ShieldCheck, CheckCircle2, Wallet, ArrowRight, Sparkles, Calendar, Gift, Tag, Percent, Clock } from "lucide-react";
 import { useState, useEffect } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { useXpr, PromoCode } from "@/contexts/XprContext";
+import { cn } from "@/lib/utils";
 
 interface MembershipModalProps {
   isOpen: boolean;
@@ -22,11 +30,18 @@ interface MembershipModalProps {
 
 type OnboardingStep = "intro" | "payment" | "success";
 
+const ASSET_CONTRACTS = {
+  XPR: { account: 'eosio.token', precision: 4 },
+  XMD: { account: 'monedatoken', precision: 6 },
+  XUSDC: { account: 'xtokens', precision: 6 },
+};
+
 export const MembershipModal = ({ isOpen, onOpenChange }: MembershipModalProps) => {
   const [step, setStep] = useState<OnboardingStep>("intro");
   const [isProcessing, setIsProcessing] = useState(false);
+  const [paymentAsset, setPaymentAsset] = useState<'XPR' | 'XMD' | 'XUSDC'>("XPR");
   const { toast } = useToast();
-  const { session, actor, login, isConnected, setIsMember, isMember, membershipFee, applyPromoCode, usePromoCode } = useXpr();
+  const { session, actor, login, isConnected, setIsMember, isMember, membershipFee, membershipFeeXmd, membershipFeeXusdc, applyPromoCode, usePromoCode } = useXpr();
 
   // Promo code system states
   const [promoInput, setPromoInput] = useState("");
@@ -85,7 +100,12 @@ export const MembershipModal = ({ isOpen, onOpenChange }: MembershipModalProps) 
   };
 
   const calculateDiscountedFee = () => {
-    const original = parseFloat(membershipFee);
+    const feeLookup = {
+      XPR: parseFloat(membershipFee),
+      XMD: parseFloat(membershipFeeXmd),
+      XUSDC: parseFloat(membershipFeeXusdc)
+    };
+    const original = feeLookup[paymentAsset];
     if (!appliedPromo) return original;
     if (appliedPromo.type === 'free') return 0;
     return original * (1 - appliedPromo.value / 100);
@@ -97,6 +117,7 @@ export const MembershipModal = ({ isOpen, onOpenChange }: MembershipModalProps) 
     setIsProcessing(true);
     try {
       const discountedVal = calculateDiscountedFee();
+      const assetConfig = ASSET_CONTRACTS[paymentAsset];
       
       // If code grants 100% free access, bypass blockchain transact entirely
       if (discountedVal === 0) {
@@ -121,10 +142,10 @@ export const MembershipModal = ({ isOpen, onOpenChange }: MembershipModalProps) 
       }
 
       const permission = session.auth.permission || 'active';
-      const formattedFee = `${discountedVal.toFixed(4)} XPR`;
+      const formattedFee = `${discountedVal.toFixed(assetConfig.precision)} ${paymentAsset}`;
       
       const membershipAction = {
-        account: 'eosio.token', 
+        account: assetConfig.account, 
         name: 'transfer',
         authorization: [{
           actor: actor,
@@ -185,7 +206,12 @@ export const MembershipModal = ({ isOpen, onOpenChange }: MembershipModalProps) 
     }, 300);
   };
 
-  const rawFee = parseFloat(membershipFee);
+  const feeLookup = {
+    XPR: parseFloat(membershipFee),
+    XMD: parseFloat(membershipFeeXmd),
+    XUSDC: parseFloat(membershipFeeXusdc)
+  };
+  const rawFee = feeLookup[paymentAsset];
   const finalFee = calculateDiscountedFee();
 
   return (
@@ -256,27 +282,37 @@ export const MembershipModal = ({ isOpen, onOpenChange }: MembershipModalProps) 
                     </div>
                   </div>
                   <DialogTitle className="text-4xl font-black italic tracking-tighter uppercase">Network Activation</DialogTitle>
-                  <DialogDescription className="text-white/40 font-bold text-xs uppercase tracking-widest">
-                    This provides 12 months of full network status.
-                  </DialogDescription>
                 </DialogHeader>
               </div>
 
               <div className="bg-white/5 border-2 border-white/10 rounded-[40px] p-8 text-center relative overflow-hidden group hover:border-purple-500/50 transition-all">
                 <div className="absolute inset-0 bg-gradient-to-br from-purple-500/5 to-transparent pointer-events-none" />
-                <p className="text-white/40 font-black uppercase tracking-[0.3em] text-[10px] mb-3 group-hover:text-purple-400 transition-colors">12 MONTH ACCESS FEE</p>
                 
                 <div className="flex flex-col items-center justify-center gap-1">
+                  <div className="flex items-center gap-3 mb-2">
+                    <Select value={paymentAsset} onValueChange={(val: any) => setPaymentAsset(val)}>
+                      <SelectTrigger className="w-[120px] bg-white/5 border-white/20 h-10 rounded-xl font-black text-xs text-white">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent className="bg-[#1a102d] border-white/20 text-white rounded-xl">
+                        <SelectItem value="XPR" className="font-black cursor-pointer">XPR</SelectItem>
+                        <SelectItem value="XMD" className="font-black cursor-pointer">XMD</SelectItem>
+                        <SelectItem value="XUSDC" className="font-black cursor-pointer">XUSDC</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    <span className="text-white/40 font-black uppercase tracking-widest text-[9px]">Currency</span>
+                  </div>
+
                   {appliedPromo && (
                     <span className="text-2xl text-white/30 line-through font-black">
-                      {rawFee.toLocaleString()} XPR
+                      {rawFee.toLocaleString()} {paymentAsset}
                     </span>
                   )}
                   <div className="flex items-center justify-center gap-4">
                     <span className="text-5xl sm:text-6xl font-black tracking-tighter drop-shadow-[0_0_20px_rgba(255,255,255,0.2)] group-hover:text-purple-100 transition-colors">
                       {finalFee.toLocaleString()}
                     </span>
-                    <span className="text-2xl font-black text-orange-500 italic group-hover:text-purple-400 transition-colors">XPR</span>
+                    <span className="text-2xl font-black text-orange-500 italic group-hover:text-purple-400 transition-colors">{paymentAsset}</span>
                   </div>
                 </div>
               </div>
@@ -330,7 +366,7 @@ export const MembershipModal = ({ isOpen, onOpenChange }: MembershipModalProps) 
                       <span>AUTHORIZING...</span>
                     </div>
                   ) : (
-                    finalFee === 0 ? "CLAIM FREE SLOT" : (isMember ? "RENEW WITH WEBAUTH" : "PAY WITH WEBAUTH")
+                    finalFee === 0 ? "CLAIM FREE SLOT" : (isMember ? `RENEW WITH ${paymentAsset}` : `PAY WITH ${paymentAsset}`)
                   )}
                 </Button>
               </div>

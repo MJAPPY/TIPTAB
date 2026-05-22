@@ -58,7 +58,9 @@ interface XprContextType {
   networkAlert: string | null;
   broadcastAlert: (message: string | null) => void;
   membershipFee: string;
-  updateMembershipFee: (fee: string) => void;
+  membershipFeeXmd: string;
+  membershipFeeXusdc: string;
+  updateMembershipFee: (fee: string, asset?: 'XPR' | 'XMD' | 'XUSDC') => void;
   boostPrice: string;
   updateBoostPrice: (price: string) => void;
   boostTabPrice: string;
@@ -125,6 +127,20 @@ export const XprProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     return "2500";
   });
 
+  const [membershipFeeXmd, setMembershipFeeXmd] = useState(() => {
+    if (typeof window !== "undefined") {
+      return localStorage.getItem("tiptab_membership_fee_xmd") || "2.50";
+    }
+    return "2.50";
+  });
+
+  const [membershipFeeXusdc, setMembershipFeeXusdc] = useState(() => {
+    if (typeof window !== "undefined") {
+      return localStorage.getItem("tiptab_membership_fee_xusdc") || "2.50";
+    }
+    return "2.50";
+  });
+
   const [boostPrice, setBoostPrice] = useState(() => {
     if (typeof window !== "undefined") {
       return localStorage.getItem("tiptab_boost_price") || "1000";
@@ -184,9 +200,17 @@ export const XprProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     localStorage.setItem("tiptab_maintenance", status.toString());
   };
 
-  const updateMembershipFee = (fee: string) => {
-    setMembershipFee(fee);
-    localStorage.setItem("tiptab_membership_fee", fee);
+  const updateMembershipFee = (fee: string, asset: 'XPR' | 'XMD' | 'XUSDC' = 'XPR') => {
+    if (asset === 'XPR') {
+      setMembershipFee(fee);
+      localStorage.setItem("tiptab_membership_fee", fee);
+    } else if (asset === 'XMD') {
+      setMembershipFeeXmd(fee);
+      localStorage.setItem("tiptab_membership_fee_xmd", fee);
+    } else if (asset === 'XUSDC') {
+      setMembershipFeeXusdc(fee);
+      localStorage.setItem("tiptab_membership_fee_xusdc", fee);
+    }
   };
 
   const updateBoostPrice = (price: string) => {
@@ -544,6 +568,8 @@ export const XprProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     networkAlert,
     broadcastAlert,
     membershipFee,
+    membershipFeeXmd,
+    membershipFeeXusdc,
     updateMembershipFee,
     boostPrice,
     updateBoostPrice,

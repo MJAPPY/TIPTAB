@@ -44,7 +44,8 @@ import {
   ArrowUpRight,
   Flame,
   LayoutGrid,
-  BellOff
+  BellOff,
+  Coins
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
@@ -120,6 +121,8 @@ const AdminHub = () => {
     broadcastAlert, 
     networkAlert, 
     membershipFee, 
+    membershipFeeXmd,
+    membershipFeeXusdc,
     updateMembershipFee,
     boostPrice,
     updateBoostPrice,
@@ -138,6 +141,9 @@ const AdminHub = () => {
   
   const [activeTab, setActiveTab] = useState("analytics");
   const [localFee, setLocalFee] = useState(membershipFee || "2500");
+  const [localFeeXmd, setLocalFeeXmd] = useState(membershipFeeXmd || "2.50");
+  const [localFeeXusdc, setLocalFeeXusdc] = useState(membershipFeeXusdc || "2.50");
+  
   const [localBoost, setLocalBoost] = useState(boostPrice || "1000");
   const [localBoostTab, setLocalBoostTab] = useState(boostTabPrice || "5000");
   const [searchQuery, setSearchQuery] = useState("");
@@ -183,9 +189,11 @@ const AdminHub = () => {
 
   useEffect(() => {
     if (membershipFee) setLocalFee(membershipFee);
+    if (membershipFeeXmd) setLocalFeeXmd(membershipFeeXmd);
+    if (membershipFeeXusdc) setLocalFeeXusdc(membershipFeeXusdc);
     if (boostPrice) setLocalBoost(boostPrice);
     if (boostTabPrice) setLocalBoostTab(boostTabPrice);
-  }, [membershipFee, boostPrice, boostTabPrice]);
+  }, [membershipFee, membershipFeeXmd, membershipFeeXusdc, boostPrice, boostTabPrice]);
 
   useEffect(() => {
     if (!isConnected || !isAdmin) {
@@ -206,13 +214,14 @@ const AdminHub = () => {
     }
   }, [adminRole, activeTab]);
 
-  const handleUpdateFee = () => {
+  const handleUpdateFee = (asset: 'XPR' | 'XMD' | 'XUSDC') => {
     if (adminRole !== 'super') {
       toast({ title: "Unauthorized", description: "Only Super Admins can update fees.", variant: "destructive" });
       return;
     }
-    updateMembershipFee(localFee);
-    toast({ title: "Activation Fee Updated", description: `Global rate set to ${localFee} XPR.` });
+    const val = asset === 'XPR' ? localFee : asset === 'XMD' ? localFeeXmd : localFeeXusdc;
+    updateMembershipFee(val, asset);
+    toast({ title: `${asset} Fee Updated`, description: `Global rate set to ${val} ${asset}.` });
   };
 
   const handleUpdateBoost = () => {
@@ -700,21 +709,51 @@ const AdminHub = () => {
                     <CardDescription className="text-white/40 font-medium text-sm">Manage global parameters (Super Only)</CardDescription>
                   </CardHeader>
                   <CardContent className="p-10 space-y-8">
-                    <div className="space-y-4">
-                      <Label className="text-[11px] font-black uppercase tracking-widest text-white/40">Activation Fee (XPR)</Label>
-                      <div className="flex gap-4">
-                        <Input 
-                          type="number" 
-                          value={localFee} 
-                          onChange={(e) => setLocalFee(e.target.value)}
-                          disabled={adminRole !== 'super'}
-                          className="bg-[#2a1d4a] border-white/10 rounded-2xl font-black text-xl h-16 px-6 focus:ring-orange-500/50 text-white disabled:opacity-50"
-                        />
-                        <Button onClick={handleUpdateFee} disabled={adminRole !== 'super'} className="bg-orange-500 hover:bg-orange-600 rounded-2xl px-6 h-16 font-black text-white">Update</Button>
+                    <div className="space-y-6">
+                      <div className="space-y-3">
+                        <Label className="text-[11px] font-black uppercase tracking-widest text-white/40">XPR Activation Fee</Label>
+                        <div className="flex gap-4">
+                          <Input 
+                            type="number" 
+                            value={localFee} 
+                            onChange={(e) => setLocalFee(e.target.value)}
+                            disabled={adminRole !== 'super'}
+                            className="bg-[#2a1d4a] border-white/10 rounded-2xl font-black text-xl h-16 px-6 focus:ring-orange-500/50 text-white disabled:opacity-50"
+                          />
+                          <Button onClick={() => handleUpdateFee('XPR')} disabled={adminRole !== 'super'} className="bg-orange-500 hover:bg-orange-600 rounded-2xl px-6 h-16 font-black text-white">Update</Button>
+                        </div>
+                      </div>
+
+                      <div className="space-y-3">
+                        <Label className="text-[11px] font-black uppercase tracking-widest text-white/40">XMD Activation Fee</Label>
+                        <div className="flex gap-4">
+                          <Input 
+                            type="number" 
+                            value={localFeeXmd} 
+                            onChange={(e) => setLocalFeeXmd(e.target.value)}
+                            disabled={adminRole !== 'super'}
+                            className="bg-[#2a1d4a] border-white/10 rounded-2xl font-black text-xl h-16 px-6 focus:ring-purple-500/50 text-white disabled:opacity-50"
+                          />
+                          <Button onClick={() => handleUpdateFee('XMD')} disabled={adminRole !== 'super'} className="bg-purple-600 hover:bg-purple-700 rounded-2xl px-6 h-16 font-black text-white">Update</Button>
+                        </div>
+                      </div>
+
+                      <div className="space-y-3">
+                        <Label className="text-[11px] font-black uppercase tracking-widest text-white/40">XUSDC Activation Fee</Label>
+                        <div className="flex gap-4">
+                          <Input 
+                            type="number" 
+                            value={localFeeXusdc} 
+                            onChange={(e) => setLocalFeeXusdc(e.target.value)}
+                            disabled={adminRole !== 'super'}
+                            className="bg-[#2a1d4a] border-white/10 rounded-2xl font-black text-xl h-16 px-6 focus:ring-cyan-500/50 text-white disabled:opacity-50"
+                          />
+                          <Button onClick={() => handleUpdateFee('XUSDC')} disabled={adminRole !== 'super'} className="bg-cyan-600 hover:bg-cyan-700 rounded-2xl px-6 h-16 font-black text-white">Update</Button>
+                        </div>
                       </div>
                     </div>
 
-                    <div className="grid grid-cols-1 gap-8">
+                    <div className="grid grid-cols-1 gap-8 pt-4 border-t border-white/5">
                       <div className="space-y-4">
                         <Label className="text-[11px] font-black uppercase tracking-widest text-white/40">XPR Boost Price</Label>
                         <div className="flex gap-4">
