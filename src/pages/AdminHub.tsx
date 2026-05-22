@@ -286,6 +286,32 @@ const AdminHub = () => {
     setIsSyncingPrices(false);
   };
 
+  const handleSyncBoostParity = async () => {
+    setIsSyncingPrices(true);
+    const marketData = await fetchRates();
+    
+    if (marketData) {
+      const { xprPerTab } = marketData;
+      
+      const boostXpr = parseFloat(localBoost);
+      if (!isNaN(boostXpr) && xprPerTab > 0) {
+        const calculatedBoostTab = (boostXpr / xprPerTab).toFixed(0);
+        setLocalBoostTab(calculatedBoostTab);
+        toast({
+          title: "Boost Parity Synced",
+          description: `TAB boost price adjusted to ${calculatedBoostTab} based on current XPR market rate.`,
+        });
+      }
+    } else {
+      toast({
+        title: "Sync Failed",
+        description: "Could not fetch current market rates.",
+        variant: "destructive"
+      });
+    }
+    setIsSyncingPrices(false);
+  };
+
   const handleUpdateFee = (asset: 'XPR' | 'XMD' | 'XUSDC') => {
     if (adminRole !== 'super') {
       toast({ title: "Unauthorized", description: "Only Super Admins can update fees.", variant: "destructive" });
@@ -840,7 +866,19 @@ const AdminHub = () => {
 
                     <div className="grid grid-cols-1 gap-8 pt-4 border-t border-white/5">
                       <div className="space-y-4">
-                        <Label className="text-[11px] font-black uppercase tracking-widest text-white/40">XPR Boost Price</Label>
+                        <div className="flex items-center justify-between mb-2">
+                           <Label className="text-[11px] font-black uppercase tracking-widest text-orange-400">Master Asset: XPR (Boost)</Label>
+                           <Button 
+                            variant="ghost" 
+                            size="sm" 
+                            onClick={handleSyncBoostParity} 
+                            disabled={isSyncingPrices || adminRole !== 'super'}
+                            className="h-8 px-3 rounded-lg bg-white/5 border border-white/10 hover:bg-white/10 text-[9px] font-black uppercase tracking-widest gap-2 text-slate-300"
+                           >
+                             <Scale className={cn("h-3.5 w-3.5", isSyncingPrices && "animate-spin")} />
+                             Calculate Parity
+                           </Button>
+                        </div>
                         <div className="flex gap-4">
                           <Input 
                             type="number" 
