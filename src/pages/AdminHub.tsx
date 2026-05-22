@@ -49,7 +49,8 @@ import {
   RefreshCw,
   Scale,
   Clock,
-  Info
+  Info,
+  RotateCcw
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
@@ -160,6 +161,7 @@ const AdminHub = () => {
   const [isAuditModalOpen, setIsAuditModalOpen] = useState(false);
   const [isHistoryModalOpen, setIsHistoryModalOpen] = useState(false);
   const [isDetailedReportOpen, setIsDetailedReportOpen] = useState(false);
+  const [isResetTreasuryOpen, setIsResetTreasuryOpen] = useState(false);
   const [selectedCreator, setSelectedCreator] = useState<Creator | null>(null);
   const [moderatedCreators, setModeratedCreators] = useState<Creator[]>(CREATORS);
   const [bannedHandles, setBannedHandles] = useState<string[]>([]);
@@ -192,16 +194,15 @@ const AdminHub = () => {
   const [newPromoUses, setNewPromoUses] = useState("100");
 
   // Multi-token Financial Data with Explicit 50/50 Split Logic
-  const treasuryData = useMemo(() => {
-    // Base Volumes (Simulated/Simulated Revenue Totals)
-    const rawData = [
-      { symbol: "XPR", totalActivation: 452500, boostVolume: 12500, color: "text-orange-500", bg: "from-orange-500/10", icon: Zap },
-      { symbol: "TAB", totalActivation: 1200000, boostVolume: 50000, color: "text-purple-400", bg: "from-purple-500/10", icon: Sparkles },
-      { symbol: "XMD", totalActivation: 2450.50, boostVolume: 0, color: "text-cyan-400", bg: "from-cyan-500/10", icon: Globe },
-      { symbol: "XUSDC", totalActivation: 1840.25, boostVolume: 0, color: "text-green-400", bg: "from-green-500/10", icon: HandCoins }
-    ];
+  const [rawTreasuryData, setRawTreasuryData] = useState([
+    { symbol: "XPR", totalActivation: 452500, boostVolume: 12500, color: "text-orange-500", bg: "from-orange-500/10", icon: Zap },
+    { symbol: "TAB", totalActivation: 1200000, boostVolume: 50000, color: "text-purple-400", bg: "from-purple-500/10", icon: Sparkles },
+    { symbol: "XMD", totalActivation: 2450.50, boostVolume: 0, color: "text-cyan-400", bg: "from-cyan-500/10", icon: Globe },
+    { symbol: "XUSDC", totalActivation: 1840.25, boostVolume: 0, color: "text-green-400", bg: "from-green-500/10", icon: HandCoins }
+  ]);
 
-    return rawData.map(item => {
+  const treasuryData = useMemo(() => {
+    return rawTreasuryData.map(item => {
       // PROVEN 50% SPLIT: 50% to Rewards, 50% to Admin Net
       const rewards = item.boostVolume * 0.5;
       const adminBoostShare = item.boostVolume * 0.5;
@@ -211,11 +212,23 @@ const AdminHub = () => {
         ...item,
         revenue: netRevenue,
         rewards,
-        boostVolume: item.boostVolume,
         splitPolicy: "50/50 Rewards Split"
       };
     });
-  }, []);
+  }, [rawTreasuryData]);
+
+  const handleResetTreasury = () => {
+    setRawTreasuryData(prev => prev.map(item => ({
+      ...item,
+      totalActivation: 0,
+      boostVolume: 0
+    })));
+    setIsResetTreasuryOpen(false);
+    toast({
+      title: "Ledger Reset Successful",
+      description: "All treasury statistics have been cleared for the current reporting period."
+    });
+  };
 
   useEffect(() => {
     if (membershipFee) setLocalFee(membershipFee);
@@ -820,6 +833,35 @@ const AdminHub = () => {
                         <RefreshCw className={cn("h-6 w-6 mr-4", isSyncingPrices && "animate-spin")} />
                         Hard Sync
                       </Button>
+                      
+                      <Dialog open={isResetTreasuryOpen} onOpenChange={setIsResetTreasuryOpen}>
+                        <DialogTrigger asChild>
+                          <Button 
+                            variant="ghost"
+                            className="h-24 px-10 bg-red-500/5 border border-red-500/20 hover:bg-red-500 hover:text-white rounded-[32px] font-black text-sm uppercase tracking-[0.2em] text-red-500 transition-all group"
+                          >
+                            <RotateCcw className="h-6 w-6 mr-4 group-hover:rotate-[-45deg] transition-transform" />
+                            Reset Ledger
+                          </Button>
+                        </DialogTrigger>
+                        <DialogContent className="bg-[#2a1b4d] border-2 border-red-500/50 text-white rounded-[40px] p-10 max-w-md">
+                          <div className="text-center space-y-6">
+                            <div className="h-20 w-20 rounded-full bg-red-500/10 flex items-center justify-center mx-auto border-2 border-red-500/20">
+                              <AlertTriangle className="h-10 w-10 text-red-500" />
+                            </div>
+                            <DialogHeader>
+                              <DialogTitle className="text-3xl font-black italic uppercase text-center tracking-tighter">RESET TREASURY?</DialogTitle>
+                              <DialogDescription className="text-white/60 font-bold text-center">
+                                This will clear all accumulated revenue and boost statistics. Reward pools will be zeroed out. This action cannot be undone.
+                              </DialogDescription>
+                            </DialogHeader>
+                            <div className="flex gap-4">
+                              <Button onClick={() => setIsResetTreasuryOpen(false)} className="flex-1 h-14 bg-white/5 hover:bg-white/10 rounded-2xl font-black uppercase">Cancel</Button>
+                              <Button onClick={handleResetTreasury} className="flex-1 h-14 bg-red-500 hover:bg-red-600 rounded-2xl font-black uppercase">Yes, Reset Stats</Button>
+                            </div>
+                          </div>
+                        </DialogContent>
+                      </Dialog>
                     </div>
                   </CardContent>
                </Card>
