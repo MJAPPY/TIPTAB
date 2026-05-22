@@ -16,29 +16,37 @@ import { useXpr } from "@/contexts/XprContext";
 export const Tab = () => {
   const [isMembershipOpen, setIsMembershipOpen] = useState(false);
   const [selectedCreator, setSelectedCreator] = useState<Creator | null>(null);
-  const { actor, isConnected } = useXpr();
+  const { actor, userProfile, isMember } = useXpr();
   const navigate = useNavigate();
 
-  // Sync local user profile updates to the display list (Map is for Creators only)
+  // Optimized logic to ensure local user profile overrides seed data on the map and lists
   const displayCreators = useMemo(() => {
-    const savedUser = localStorage.getItem("tiptab_user_profile");
-    if (!savedUser) return CREATORS;
-    
-    const localUser = JSON.parse(savedUser) as Creator;
-    
-    // Check if this specific actor has a membership activation record
-    const membershipKey = `tiptab_membership_${actor}`;
-    const isLocalUserMember = localStorage.getItem(membershipKey) === 'true';
+    // 1. Start with the base list
+    let list = [...CREATORS];
 
-    // Only add to the map/featured list if they are a member
-    if (!isLocalUserMember) return CREATORS;
+    // 2. If user is logged in, find their profile in storage to ensure we have latest local edits
+    // (We also check userProfile from context which is synced)
+    if (actor && userProfile) {
+      const cleanActor = actor.toLowerCase();
+      
+      // Check if this actor is a member (either via local flag or context)
+      const membershipKey = `tiptab_membership_${actor}`;
+      const isActuallyMember = isMember || localStorage.getItem(membershipKey) === 'true';
 
-    const exists = CREATORS.find(c => c.id === localUser.id);
-    if (exists) {
-      return CREATORS.map(c => c.id === localUser.id ? localUser : c);
+      if (isActuallyMember) {
+        const existsIdx = list.findIndex(c => c.handle.toLowerCase() === cleanActor);
+        if (existsIdx !== -1) {
+          // Replace existing seed data with current user profile
+          list[existsIdx] = userProfile;
+        } else {
+          // Add new member to the top of the map/list
+          list = [userProfile, ...list];
+        }
+      }
     }
-    return [localUser, ...CREATORS];
-  }, [actor]);
+    
+    return list;
+  }, [actor, userProfile, isMember]);
 
   const handleViewProfile = (creator: Creator) => {
     navigate(`/tip/${creator.handle}`);

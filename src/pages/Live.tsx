@@ -58,26 +58,30 @@ const Live = () => {
   const [selectedCategory, setSelectedCategory] = useState("All");
   const [sortBy, setSortBy] = useState("newest");
   const [isMembershipOpen, setIsMembershipOpen] = useState(false);
-  const { actor, isMember, featuredHandles, boostStream, boostPrice } = useXpr();
+  const { actor, userProfile, isMember, featuredHandles, boostStream, boostPrice } = useXpr();
   const navigate = useNavigate();
 
   // Combined creator list including local updates
   const allCreators = useMemo(() => {
-    const savedUser = localStorage.getItem("tiptab_user_profile");
-    if (!savedUser) return CREATORS;
-    
-    const localUser = JSON.parse(savedUser) as Creator;
-    const membershipKey = `tiptab_membership_${actor}`;
-    const isLocalUserMember = localStorage.getItem(membershipKey) === 'true';
+    let list = [...CREATORS];
 
-    if (!isLocalUserMember) return CREATORS;
+    if (actor && userProfile) {
+      const cleanActor = actor.toLowerCase();
+      const membershipKey = `tiptab_membership_${actor}`;
+      const isActuallyMember = isMember || localStorage.getItem(membershipKey) === 'true';
 
-    const exists = CREATORS.find(c => c.handle.toLowerCase() === localUser.handle.toLowerCase());
-    if (exists) {
-      return CREATORS.map(c => c.handle.toLowerCase() === localUser.handle.toLowerCase() ? localUser : c);
+      if (isActuallyMember) {
+        const existsIdx = list.findIndex(c => c.handle.toLowerCase() === cleanActor);
+        if (existsIdx !== -1) {
+          list[existsIdx] = userProfile;
+        } else {
+          list = [userProfile, ...list];
+        }
+      }
     }
-    return [localUser, ...CREATORS];
-  }, [actor]);
+    
+    return list;
+  }, [actor, userProfile, isMember]);
 
   // Unified Filter logic
   const filteredCreators = useMemo(() => {
