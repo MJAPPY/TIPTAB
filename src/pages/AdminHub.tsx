@@ -67,6 +67,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useXpr, AdminUser } from "@/contexts/XprContext";
 import { Header } from "@/components/tab-platform/Header";
+import { MembershipModal } from "@/components/tab-platform/MembershipModal";
 import { CREATORS, Creator } from "@/data/creators";
 import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
@@ -1542,6 +1543,7 @@ const AdminHub = () => {
                         <thead className="bg-white/[0.03]">
                           <tr>
                             <th className="px-8 py-5 text-left text-[10px] font-black uppercase tracking-widest text-white/30">Code</th>
+                            <th className="px-8 py-5 text-center text-[10px] font-black uppercase tracking-widest text-white/30">Benefit</th>
                             <th className="px-8 py-5 text-center text-[10px] font-black uppercase tracking-widest text-white/30">Uses</th>
                             <th className="px-8 py-5 text-right text-[10px] font-black uppercase tracking-widest text-white/30">Control</th>
                           </tr>
@@ -1550,6 +1552,14 @@ const AdminHub = () => {
                           {promoCodes.map((promo) => (
                             <tr key={promo.id} className="group hover:bg-white/[0.01] transition-colors">
                               <td className="px-8 py-6"><span className="font-black text-lg text-white bg-white/5 border border-white/10 px-3.5 py-1.5 rounded-xl uppercase tracking-wider">{promo.code}</span></td>
+                              <td className="px-8 py-6 text-center">
+                                <Badge className={cn(
+                                  "font-black text-[10px] uppercase tracking-widest rounded-lg h-7 px-3 border-none",
+                                  promo.type === 'free' ? "bg-orange-500 text-white" : "bg-purple-600 text-white"
+                                )}>
+                                  {promo.type === 'free' ? "100% OFF (Free)" : `${promo.value}% OFF`}
+                                </Badge>
+                              </td>
                               <td className="px-8 py-6 text-center"><span className="font-black text-xs text-white/60">{promo.uses} / {promo.maxUses} used</span></td>
                               <td className="px-8 py-6 text-right"><Button variant="ghost" size="icon" onClick={() => deletePromoCode(promo.id)} className="h-10 w-10 rounded-xl bg-red-500/10 hover:bg-red-500 text-red-500 hover:text-white transition-all"><Trash2 className="h-4.5 w-4.5" /></Button></td>
                             </tr>
