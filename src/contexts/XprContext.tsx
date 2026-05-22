@@ -467,9 +467,12 @@ export const XprProvider: React.FC<{ children: React.ReactNode }> = ({ children 
           }
         }
       }
+      
       const savedProfile = localStorage.getItem(`tiptab_profile_${account}`);
       if (savedProfile) {
-        setUserProfile(JSON.parse(savedProfile));
+        const profile = JSON.parse(savedProfile);
+        setUserProfile(profile);
+        localStorage.setItem("tiptab_user_profile", savedProfile);
       } else {
         const seedCreator = CREATORS.find(c => c.handle === account);
         const newProfile: Creator = seedCreator ? { ...seedCreator } : {
@@ -479,11 +482,12 @@ export const XprProvider: React.FC<{ children: React.ReactNode }> = ({ children 
           bio: "Just joined the TIP TAB network!",
           location: "Global",
           coordinates: [0, 0],
-          category: "Other",
+          categories: ["Other"],
           avatar: account.slice(0, 2).toUpperCase(),
           color: "bg-purple-600"
         };
         setUserProfile(newProfile);
+        localStorage.setItem(`tiptab_profile_${account}`, JSON.stringify(newProfile));
         localStorage.setItem("tiptab_user_profile", JSON.stringify(newProfile));
       }
     } catch (error) {
@@ -548,8 +552,9 @@ export const XprProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
   const updateUserProfile = (profile: Creator) => {
     if (session?.auth.actor) {
-      localStorage.setItem(`tiptab_profile_${session.auth.actor}`, JSON.stringify(profile));
-      localStorage.setItem("tiptab_user_profile", JSON.stringify(profile));
+      const profileString = JSON.stringify(profile);
+      localStorage.setItem(`tiptab_profile_${session.auth.actor}`, profileString);
+      localStorage.setItem("tiptab_user_profile", profileString);
       setUserProfile(profile);
     }
   };
