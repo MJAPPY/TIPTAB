@@ -40,6 +40,34 @@ const CITY_COORDINATES: Record<string, [number, number]> = {
   "adelaide": [138.6007, -34.9285],
 };
 
+const CATEGORIES = [
+  "Art",
+  "Automotive",
+  "Biblical",
+  "Blockchain",
+  "Business",
+  "Content",
+  "Delivery",
+  "Dev",
+  "Education",
+  "Finance",
+  "Fishing",
+  "Fitness",
+  "Food",
+  "Gaming",
+  "Gardening & Farming",
+  "Health",
+  "Hospitality",
+  "Local News",
+  "Music",
+  "Other",
+  "Property Reno",
+  "Realty",
+  "Reviewing",
+  "Service",
+  "Sports"
+];
+
 interface ProfileEditorProps {
   initialData: Creator;
   onSave: (updatedData: Creator) => void;
@@ -60,7 +88,7 @@ export const ProfileEditor = ({ initialData, onSave, minimal = false }: ProfileE
     bio: initialData.bio,
     location: initialData.location,
     coordinates: initialData.coordinates,
-    category: initialData.category,
+    categories: initialData.categories || [initialData.category || "Other"],
     twitter: initialData.twitter || "",
     website: initialData.website || "",
     videoUrl: initialData.videoUrl || "",
@@ -84,7 +112,7 @@ export const ProfileEditor = ({ initialData, onSave, minimal = false }: ProfileE
       bio: initialData.bio,
       location: initialData.location,
       coordinates: initialData.coordinates,
-      category: initialData.category,
+      categories: initialData.categories || [(initialData as any).category || "Other"],
       twitter: initialData.twitter || "",
       website: initialData.website || "",
       videoUrl: initialData.videoUrl || "",
@@ -150,8 +178,14 @@ export const ProfileEditor = ({ initialData, onSave, minimal = false }: ProfileE
     setHasChanged(true);
   };
 
-  const handleCategoryChange = (val: string) => {
-    setFormData((prev) => ({ ...prev, category: val }));
+  const handleCategoryChange = (index: number, val: string) => {
+    const newCategories = [...formData.categories];
+    if (val === "None" && index === 1) {
+      newCategories.splice(1, 1);
+    } else {
+      newCategories[index] = val;
+    }
+    setFormData((prev) => ({ ...prev, categories: newCategories }));
     setHasChanged(true);
   };
 
@@ -470,49 +504,45 @@ export const ProfileEditor = ({ initialData, onSave, minimal = false }: ProfileE
                     <p className="text-[9px] text-white/20 font-bold uppercase tracking-widest px-1">TIPS ARE SENT DIRECTLY TO THIS XPR ACCOUNT NAME.</p>
                   </div>
 
-                  <div className="space-y-2">
-                    <Label className="text-white/60 font-bold uppercase tracking-widest text-[10px]">Category</Label>
-                    <Select 
-                      value={formData.category}
-                      onValueChange={handleCategoryChange}
-                    >
-                      <SelectTrigger className="bg-white/5 border-white/10 h-14 rounded-2xl focus:ring-purple-500 focus:bg-white/10 transition-all text-white">
-                        <SelectValue placeholder="Select a category" />
-                      </SelectTrigger>
-                      <SelectContent className="bg-[#1a102d] border-white/20 text-white rounded-xl">
-                        {[
-                          "Art",
-                          "Automotive",
-                          "Biblical",
-                          "Blockchain",
-                          "Business",
-                          "Content",
-                          "Delivery",
-                          "Dev",
-                          "Education",
-                          "Finance",
-                          "Fishing",
-                          "Fitness",
-                          "Food",
-                          "Gaming",
-                          "Gardening & Farming",
-                          "Health",
-                          "Hospitality",
-                          "Local News",
-                          "Music",
-                          "Other",
-                          "Property Reno",
-                          "Realty",
-                          "Reviewing",
-                          "Service",
-                          "Sports"
-                        ].map((cat) => (
-                          <SelectItem key={cat} value={cat} className="focus:bg-purple-500 focus:text-white cursor-pointer font-bold">
-                            {cat}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
+                  <div className="space-y-4">
+                    <div className="space-y-2">
+                      <Label className="text-white/60 font-bold uppercase tracking-widest text-[10px]">Primary Category</Label>
+                      <Select 
+                        value={formData.categories[0]}
+                        onValueChange={(val) => handleCategoryChange(0, val)}
+                      >
+                        <SelectTrigger className="bg-white/5 border-white/10 h-14 rounded-2xl focus:ring-purple-500 focus:bg-white/10 transition-all text-white">
+                          <SelectValue placeholder="Select primary category" />
+                        </SelectTrigger>
+                        <SelectContent className="bg-[#1a102d] border-white/20 text-white rounded-xl">
+                          {CATEGORIES.map((cat) => (
+                            <SelectItem key={cat} value={cat} className="focus:bg-purple-500 focus:text-white cursor-pointer font-bold">
+                              {cat}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label className="text-white/60 font-bold uppercase tracking-widest text-[10px]">Secondary Category (Optional)</Label>
+                      <Select 
+                        value={formData.categories[1] || "None"}
+                        onValueChange={(val) => handleCategoryChange(1, val)}
+                      >
+                        <SelectTrigger className="bg-white/5 border-white/10 h-14 rounded-2xl focus:ring-purple-500 focus:bg-white/10 transition-all text-white">
+                          <SelectValue placeholder="None" />
+                        </SelectTrigger>
+                        <SelectContent className="bg-[#1a102d] border-white/20 text-white rounded-xl">
+                          <SelectItem value="None" className="focus:bg-red-500 focus:text-white cursor-pointer font-bold">None</SelectItem>
+                          {CATEGORIES.filter(c => c !== formData.categories[0]).map((cat) => (
+                            <SelectItem key={cat} value={cat} className="focus:bg-purple-500 focus:text-white cursor-pointer font-bold">
+                              {cat}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
                   </div>
                 </>
               )}

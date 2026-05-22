@@ -47,7 +47,7 @@ export const FeaturedCreators = ({ creators, onSelectCreator, onViewProfile, onA
 
   const filteredCreators = useMemo(() => {
     return creators.filter(creator => {
-      const matchesCategory = activeCategory === "All" || creator.category === activeCategory;
+      const matchesCategory = activeCategory === "All" || (creator.categories && creator.categories.includes(activeCategory));
       const matchesSearch = creator.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
                            creator.handle.toLowerCase().includes(searchQuery.toLowerCase()) ||
                            creator.location.toLowerCase().includes(searchQuery.toLowerCase());
@@ -103,7 +103,7 @@ export const FeaturedCreators = ({ creators, onSelectCreator, onViewProfile, onA
                 className={cn(
                   "rounded-2xl h-12 px-6 whitespace-nowrap font-black text-[11px] uppercase tracking-[0.15em] transition-all border-2",
                   activeCategory === cat.name 
-                  ? "bg-purple-500/20 border-purple-500/60 text-purple-400 shadow-[0_0_20px_rgba(168,85,247,0.3)]" 
+                  ? "bg-purple-600/20 border-purple-500/60 text-purple-400 shadow-[0_0_20px_rgba(168,85,247,0.3)]" 
                   : "bg-white/5 border-transparent text-white/60 hover:text-purple-400 hover:bg-purple-500/10"
                 )}
               >
@@ -116,7 +116,9 @@ export const FeaturedCreators = ({ creators, onSelectCreator, onViewProfile, onA
       
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-8">
         {filteredCreators.map(creator => {
-          const theme = getCategoryTheme(creator.category);
+          const primaryCategory = creator.categories ? creator.categories[0] : "Other";
+          const theme = getCategoryTheme(primaryCategory);
+          
           return (
             <div 
               key={creator.id} 
@@ -146,11 +148,19 @@ export const FeaturedCreators = ({ creators, onSelectCreator, onViewProfile, onA
                   </div>
                 </div>
                 
-                <div 
-                  className="px-4 py-1.5 rounded-full border-2 text-[10px] font-black uppercase tracking-[0.2em] bg-black/40"
-                  style={{ borderColor: theme.color + '50', color: theme.color }}
-                >
-                  {creator.category}
+                <div className="flex flex-col items-end gap-2">
+                  {creator.categories && creator.categories.map((cat, idx) => {
+                    const catTheme = getCategoryTheme(cat);
+                    return (
+                      <div 
+                        key={idx}
+                        className="px-4 py-1.5 rounded-full border-2 text-[10px] font-black uppercase tracking-[0.2em] bg-black/40 whitespace-nowrap"
+                        style={{ borderColor: catTheme.color + '50', color: catTheme.color }}
+                      >
+                        {cat}
+                      </div>
+                    );
+                  })}
                 </div>
               </div>
               

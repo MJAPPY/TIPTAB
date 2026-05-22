@@ -322,10 +322,14 @@ const CreatorProfile = () => {
                   <ShieldCheck className="h-3.5 w-3.5 text-orange-500" /> Verified Creator
                 </div>
                 <h1 className="text-5xl md:text-7xl font-black tracking-tighter leading-none">{creator.name}</h1>
-                <div className="flex items-center justify-center md:justify-start gap-3">
+                <div className="flex flex-wrap items-center justify-center md:justify-start gap-3">
                   <span className="text-xl font-bold text-purple-400">@{creator.handle}</span>
                   <div className="h-1.5 w-1.5 rounded-full bg-white/10" />
-                  <span className="text-white/40 font-bold uppercase tracking-widest text-sm">{creator.category}</span>
+                  <div className="flex gap-2">
+                    {creator.categories && creator.categories.map((cat, idx) => (
+                      <span key={idx} className="text-white/40 font-bold uppercase tracking-widest text-sm">{cat}</span>
+                    ))}
+                  </div>
                 </div>
               </div>
             </div>

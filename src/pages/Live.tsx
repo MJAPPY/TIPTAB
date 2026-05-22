@@ -63,7 +63,7 @@ const Live = () => {
       const matchesSearch = c.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
                            c.handle.toLowerCase().includes(searchQuery.toLowerCase()) ||
                            c.location.toLowerCase().includes(searchQuery.toLowerCase());
-      const matchesCategory = selectedCategory === "All" || c.category === selectedCategory;
+      const matchesCategory = selectedCategory === "All" || (c.categories && c.categories.includes(selectedCategory));
       
       return hasLiveLink && matchesSearch && matchesCategory;
     });
@@ -166,7 +166,11 @@ const Live = () => {
                       {creator.bio}
                     </p>
                     <div className="pt-4 flex items-center justify-between border-t border-white/5">
-                      <span className="text-[10px] font-black uppercase tracking-widest text-orange-400">{creator.category}</span>
+                      <div className="flex gap-2">
+                        {creator.categories && creator.categories.map((cat, idx) => (
+                          <span key={idx} className="text-[10px] font-black uppercase tracking-widest text-orange-400">{cat}</span>
+                        ))}
+                      </div>
                       <div className="flex items-center gap-2 text-[10px] font-black text-white/40">
                         <MapPin className="h-3 w-3" />
                         {creator.location}
@@ -273,7 +277,11 @@ const Live = () => {
 
                     <div className="pt-4 flex items-center justify-between border-t border-white/5">
                       <div className="flex flex-col gap-1">
-                        <span className="text-[10px] font-black uppercase tracking-widest text-purple-400">{creator.category}</span>
+                        <div className="flex flex-wrap gap-1">
+                          {creator.categories && creator.categories.map((cat, idx) => (
+                            <span key={idx} className="text-[10px] font-black uppercase tracking-widest text-purple-400">{cat}</span>
+                          ))}
+                        </div>
                         <div className="flex items-center gap-2 text-[9px] font-bold text-white/20 uppercase tracking-tight">
                           <MapPin className="h-3 w-3" /> {creator.location}
                         </div>
