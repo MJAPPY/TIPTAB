@@ -10,21 +10,21 @@ import { CREATORS, Creator } from "@/data/creators";
 import { useXpr } from "@/contexts/XprContext";
 import { cn } from "@/lib/utils";
 
-// Generate mock stats for creators
+// Generate mock stats for creators - Now sorted by activityCount (Tips Received)
 const CREATOR_LEADERBOARD = CREATORS.map((creator, index) => ({
   ...creator,
   totalValue: [125000, 98400, 82100, 45000, 32000, 28000, 15000, 12000, 5000][index] || 1000,
   activityCount: [412, 321, 284, 156, 98, 76, 45, 32, 12][index] || 5,
-  label: "Liquid TAB"
-})).sort((a, b) => b.totalValue - a.totalValue);
+  label: "Tips Received"
+})).sort((a, b) => b.activityCount - a.activityCount);
 
-// Generate mock stats for supporters
+// Generate mock stats for supporters - Now sorted by activityCount (Tips Sent)
 const MOCK_SUPPORTERS = [
-  { id: "s1", name: "WhaleShark", handle: "whaleshark", avatar: "WS", color: "bg-blue-600", totalValue: 540000, activityCount: 1240, label: "Total Sent", location: "Dubai, UAE" },
-  { id: "s2", name: "EarlyAdopter", handle: "early", avatar: "EA", color: "bg-purple-600", totalValue: 215000, activityCount: 890, label: "Total Sent", location: "London, UK" },
-  { id: "s3", name: "Tab Fanatic", handle: "fanatic", avatar: "TF", color: "bg-orange-500", totalValue: 185000, activityCount: 650, label: "Total Sent", location: "Austin, USA" },
-  { id: "s4", name: "CryptoKing", handle: "cking", avatar: "CK", color: "bg-emerald-600", totalValue: 92000, activityCount: 420, label: "Total Sent", location: "Seoul, KR" },
-  { id: "s5", name: "XPR Warrior", handle: "warrior", avatar: "XW", color: "bg-red-600", totalValue: 75000, activityCount: 310, label: "Total Sent", location: "Tokyo, JP" },
+  { id: "s1", name: "WhaleShark", handle: "whaleshark", avatar: "WS", color: "bg-blue-600", totalValue: 540000, activityCount: 1240, label: "Tips Sent", location: "Dubai, UAE" },
+  { id: "s2", name: "EarlyAdopter", handle: "early", avatar: "EA", color: "bg-purple-600", totalValue: 215000, activityCount: 890, label: "Tips Sent", location: "London, UK" },
+  { id: "s3", name: "Tab Fanatic", handle: "fanatic", avatar: "TF", color: "bg-orange-500", totalValue: 185000, activityCount: 650, label: "Tips Sent", location: "Austin, USA" },
+  { id: "s4", name: "CryptoKing", handle: "cking", avatar: "CK", color: "bg-emerald-600", totalValue: 92000, activityCount: 420, label: "Tips Sent", location: "Seoul, KR" },
+  { id: "s5", name: "XPR Warrior", handle: "warrior", avatar: "XW", color: "bg-red-600", totalValue: 75000, activityCount: 310, label: "Tips Sent", location: "Tokyo, JP" },
 ];
 
 const Leaderboard = () => {
@@ -57,14 +57,14 @@ const Leaderboard = () => {
         avatar: localUser.avatar,
         avatarImage: localUser.avatarImage,
         color: localUser.color,
-        totalValue: 0, // Mock value for display
+        totalValue: 0, 
         activityCount: 0,
-        label: "Total Sent",
+        label: "Tips Sent",
         location: localUser.location
       });
     }
 
-    return combinedSupporters.sort((a, b) => b.totalValue - a.totalValue);
+    return combinedSupporters.sort((a, b) => b.activityCount - a.activityCount);
   }, [activeTab, isMember]);
 
   const DISPLAY_LIMIT = 50;
@@ -136,7 +136,7 @@ const Leaderboard = () => {
                 <h3 className="text-xl md:text-2xl font-black mb-1 truncate px-2">{topThree[1].name}</h3>
                 <p className="text-slate-200 font-bold mb-6 text-sm md:text-base">@{topThree[1].handle}</p>
                 <div className="text-2xl md:text-3xl font-black text-slate-100 drop-shadow-[0_0_10px_rgba(255,255,255,0.1)]">
-                  {topThree[1].totalValue.toLocaleString()} <span className="text-xs text-slate-400 font-black">TAB</span>
+                  {topThree[1].activityCount.toLocaleString()} <span className="text-xs text-slate-400 font-black">TIPS</span>
                 </div>
               </div>
             </div>
@@ -161,7 +161,7 @@ const Leaderboard = () => {
                 <h3 className="text-2xl md:text-3xl font-black mb-1 truncate px-2">{topThree[0].name}</h3>
                 <p className="text-yellow-300 font-black mb-8 text-sm md:text-base">@{topThree[0].handle}</p>
                 <div className="text-3xl md:text-4xl font-black text-white drop-shadow-[0_0_15px_rgba(250,204,21,0.4)]">
-                  {topThree[0].totalValue.toLocaleString()} <span className="text-xs md:text-sm text-yellow-400 font-black">TAB</span>
+                  {topThree[0].activityCount.toLocaleString()} <span className="text-xs md:text-sm text-yellow-400 font-black">TIPS</span>
                 </div>
               </div>
             </div>
@@ -183,7 +183,7 @@ const Leaderboard = () => {
                 <h3 className="text-xl md:text-2xl font-black mb-1 truncate px-2">{topThree[2].name}</h3>
                 <p className="text-orange-300 font-bold mb-6 text-sm md:text-base">@{topThree[2].handle}</p>
                 <div className="text-2xl md:text-3xl font-black text-orange-400 drop-shadow-[0_0_10px_rgba(251,146,60,0.3)]">
-                  {topThree[2].totalValue.toLocaleString()} <span className="text-xs text-orange-600 font-black">TAB</span>
+                  {topThree[2].activityCount.toLocaleString()} <span className="text-xs text-orange-600 font-black">TIPS</span>
                 </div>
               </div>
             </div>
@@ -198,8 +198,8 @@ const Leaderboard = () => {
               <span>Participant</span>
             </div>
             <div className="flex items-center gap-6 md:gap-12">
-              <span className="hidden sm:inline">{activeTab === "creators" ? "Tips Received" : "Tips Sent"}</span>
-              <span className="w-20 md:w-24 text-right">{currentData[0]?.label}</span>
+              <span className="hidden sm:inline">Cumulative Value</span>
+              <span className="w-20 md:w-24 text-right">Volume</span>
             </div>
           </div>
 
@@ -227,17 +227,12 @@ const Leaderboard = () => {
               </div>
 
               <div className="flex items-center gap-4 md:gap-12">
-                <div className="hidden sm:flex items-center gap-2 text-white/80 font-black text-xs md:text-sm">
-                  {activeTab === "creators" ? (
-                    <Flame className="h-4 w-4 text-orange-500 fill-orange-500" />
-                  ) : (
-                    <Heart className="h-4 w-4 text-red-500 fill-red-500" />
-                  )}
-                  {participant.activityCount} {activeTab === "creators" ? "Tips" : "Tips Sent"}
+                <div className="hidden sm:flex items-center gap-2 text-white/40 font-black text-xs md:text-sm">
+                  {participant.totalValue.toLocaleString()} <span className="text-[9px] uppercase tracking-widest">TAB Value</span>
                 </div>
                 <div className="w-20 md:w-32 text-right">
-                  <span className="text-xl md:text-2xl font-black group-hover:text-purple-400 transition-colors">{participant.totalValue.toLocaleString()}</span>
-                  <span className="text-[9px] md:text-[10px] font-black text-white/40 ml-1 uppercase tracking-widest">TAB</span>
+                  <span className="text-xl md:text-2xl font-black group-hover:text-purple-400 transition-colors">{participant.activityCount.toLocaleString()}</span>
+                  <span className="text-[9px] md:text-[10px] font-black text-orange-500 ml-1 uppercase tracking-widest">Tips</span>
                 </div>
               </div>
             </div>
