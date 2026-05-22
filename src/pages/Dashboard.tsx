@@ -20,7 +20,8 @@ import {
   Clock,
   Eye,
   Users,
-  Coins
+  Coins,
+  MessageSquare
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
@@ -58,6 +59,7 @@ const Dashboard = () => {
   const [transferAmount, setTransferAmount] = useState("");
   const [transferRecipient, setTransferRecipient] = useState("");
   const [transferSymbol, setTransferSymbol] = useState("TAB");
+  const [transferMessage, setTransferMessage] = useState("");
   const [isSending, setIsSending] = useState(false);
 
   // Analytics Metrics State
@@ -156,7 +158,7 @@ const Dashboard = () => {
           from: actor,
           to: transferRecipient.toLowerCase().trim(),
           quantity: formattedQuantity,
-          memo: 'Sent from TIP TAB Dashboard',
+          memo: transferMessage.trim() || 'Sent from TIP TAB Dashboard',
         },
       }];
 
@@ -169,6 +171,7 @@ const Dashboard = () => {
       });
       setTransferAmount("");
       setTransferRecipient("");
+      setTransferMessage("");
       refreshBalances();
     } catch (error: any) {
       toast({
@@ -428,6 +431,14 @@ const Dashboard = () => {
                           ))}
                         </SelectContent>
                       </Select>
+                    </div>
+                  </div>
+
+                  <div className="space-y-4">
+                    <Label className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-500 ml-2">Memo / Note (Optional)</Label>
+                    <div className="relative">
+                      <MessageSquare className="absolute left-6 top-1/2 -translate-y-1/2 h-5 w-5 text-purple-500/50" />
+                      <Input placeholder="Personal message..." value={transferMessage} onChange={(e) => setTransferMessage(e.target.value)} className="bg-white/5 border-white/10 h-20 rounded-[28px] font-bold text-xl text-slate-100 pl-16 focus:ring-purple-500/50" maxLength={64} />
                     </div>
                   </div>
 

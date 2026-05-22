@@ -20,10 +20,12 @@ import {
   Youtube,
   Radio,
   ArrowLeft,
-  Sparkles
+  Sparkles,
+  MessageSquare
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { CREATORS, Creator } from "@/data/creators";
 import { Header } from "@/components/tab-platform/Header";
@@ -53,6 +55,7 @@ const CreatorProfile = () => {
   const [creator, setCreator] = useState<Creator | null>(null);
   const [tipAmount, setTipAmount] = useState("50");
   const [asset, setAsset] = useState<string>("TAB");
+  const [message, setMessage] = useState("");
   const [isProcessing, setIsProcessing] = useState(false);
   const [isMembershipOpen, setIsMembershipOpen] = useState(false);
   const [isCopied, setIsCopied] = useState(false);
@@ -168,7 +171,7 @@ const CreatorProfile = () => {
           from: actor,
           to: recipient, 
           quantity: quantityString,
-          memo: 'Tipped via TipTab Profile',
+          memo: message.trim() || 'Tipped via TipTab Profile',
         },
       }];
 
@@ -183,6 +186,7 @@ const CreatorProfile = () => {
         description: `Successfully sent ${quantityString} to ${creator?.name}.`,
       });
       
+      setMessage("");
       const trigger = (window as any).triggerReaction;
       if (trigger) {
         const sequence = ['heart', 'firework', 'applause', 'firework', 'heart', 'applause', 'firework'];
@@ -606,6 +610,20 @@ const CreatorProfile = () => {
                     />
                     <div className="absolute inset-y-0 right-6 md:right-8 flex items-center pointer-events-none">
                       <span className={cn("font-black text-lg md:text-xl", asset === "TAB" ? "text-orange-500" : "text-purple-400")}>{asset}</span>
+                    </div>
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label className="text-white/30 font-black uppercase tracking-[0.2em] text-[9px] ml-2">Personal Message (Optional)</Label>
+                    <div className="relative">
+                      <MessageSquare className="absolute left-6 top-1/2 -translate-y-1/2 h-5 w-5 text-purple-500/40" />
+                      <Input 
+                        placeholder="Amazing stream, thank you!" 
+                        value={message}
+                        onChange={(e) => setMessage(e.target.value)}
+                        className="bg-white/5 border-white/10 h-16 rounded-2xl pl-16 text-lg font-medium focus:ring-purple-500/50"
+                        maxLength={64}
+                      />
                     </div>
                   </div>
 

@@ -6,13 +6,14 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Twitter, Globe, Zap, ShieldCheck, Wallet } from "lucide-react";
+import { Twitter, Globe, Zap, ShieldCheck, Wallet, MessageSquare } from "lucide-react";
 import { useState } from "react";
 import { Creator } from "@/data/creators";
 import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
 import { useXpr } from "@/contexts/XprContext";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Label } from "@/components/ui/label";
 
 interface TippingModalProps {
   creator: Creator | null;
@@ -31,6 +32,7 @@ const ASSET_CONFIGS: Record<string, { code: string; precision: number }> = {
 export const TippingModal = ({ creator, onClose }: TippingModalProps) => {
   const [tipAmount, setTipAmount] = useState<string>("50");
   const [asset, setAsset] = useState<string>("TAB");
+  const [message, setMessage] = useState("");
   const [isProcessing, setIsProcessing] = useState(false);
   const { toast } = useToast();
   const { session, actor, login, isConnected, recordTip } = useXpr();
@@ -85,7 +87,7 @@ export const TippingModal = ({ creator, onClose }: TippingModalProps) => {
           from: actor,
           to: recipient, 
           quantity: quantityString,
-          memo: 'Tipped via TipTab Map',
+          memo: message.trim() || 'Tipped via TipTab Map',
         },
       };
 
@@ -163,7 +165,7 @@ export const TippingModal = ({ creator, onClose }: TippingModalProps) => {
             <div className="flex items-center gap-2">
               <span className="text-purple-400 font-bold">@{creator.handle}</span>
               <div className="h-1 w-1 rounded-full bg-white/20" />
-              <span className="text-white/40 text-xs font-bold uppercase tracking-widest">{creator.category}</span>
+              <span className="text-white/40 text-xs font-bold uppercase tracking-widest">{creator.categories?.[0] || 'Creator'}</span>
             </div>
           </div>
           
@@ -221,11 +223,25 @@ export const TippingModal = ({ creator, onClose }: TippingModalProps) => {
                 <span className={cn("font-black", asset === "TAB" ? "text-orange-500" : "text-purple-400")}>{asset}</span>
               </div>
             </div>
+
+            <div className="space-y-2">
+              <Label className="text-white/30 font-black uppercase tracking-[0.2em] text-[9px] ml-2">Personal Message (Optional)</Label>
+              <div className="relative">
+                <MessageSquare className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-purple-500/40" />
+                <Input 
+                  placeholder="Keep up the great work!" 
+                  value={message}
+                  onChange={(e) => setMessage(e.target.value)}
+                  className="bg-white/5 border-white/10 h-12 rounded-2xl pl-12 text-sm font-medium focus:ring-purple-500/50"
+                  maxLength={64}
+                />
+              </div>
+            </div>
             
             <div className="space-y-3">
               {isConnected ? (
                 <Button 
-                  onClick={handleSendTip}
+                  onClick={handleSendTip} 
                   disabled={isProcessing}
                   className="w-full h-20 bg-gradient-to-r from-orange-500 to-purple-600 hover:from-purple-600 hover:to-purple-700 text-white font-black text-2xl rounded-3xl shadow-[0_20px_40px_-10px_rgba(249,115,22,0.3)] mt-2 transition-all active:scale-[0.98] group overflow-hidden"
                 >
