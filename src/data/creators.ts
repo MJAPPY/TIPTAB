@@ -4,20 +4,19 @@ export interface Creator {
   handle: string;
   bio: string;
   location: string;
-  coordinates: [number, number]; // [longitude, latitude]
-  categories: string[]; // Supports up to 2 categories
+  coordinates: [number, number] | null; // Allow null for users who don't want a map pin
+  categories: string[];
   avatar: string;
-  avatarImage?: string; // Base64 or URL
-  coverImage?: string; // Base64 or URL
-  coverPosition?: number; // Vertical offset percentage (0 to 100)
+  avatarImage?: string;
+  coverImage?: string;
+  coverPosition?: number;
   color: string;
   twitter?: string;
   website?: string;
   videoUrl?: string;
   instagram?: string;
   spotify?: string;
-  mediaEmbed?: string; // Specific field for the player
-  // Live Stream Links
+  mediaEmbed?: string;
   twitch?: string;
   tiktok?: string;
   youtubeLive?: string;
@@ -42,7 +41,7 @@ export const CREATORS: Creator[] = [
     instagram: "https://instagram.com/tabtokenxpr",
     website: "https://snipverse.com/tabxpr",
     mediaEmbed: "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
-    youtubeLive: "https://www.youtube.com/watch?v=jfKfPfyJRdk", // Lofi Girl Live
+    youtubeLive: "https://www.youtube.com/watch?v=jfKfPfyJRdk",
     tiktok: "https://www.tiktok.com/@xprnetwork"
   }
 ];
