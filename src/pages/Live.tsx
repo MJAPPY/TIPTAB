@@ -59,14 +59,35 @@ const Live = () => {
   const { actor, isMember, featuredHandles, boostStream, boostPrice } = useXpr();
   const navigate = useNavigate();
 
+  // Combine hardcoded creators with local user profile
+  const allCreators = useMemo(() => {
+    const savedUser = localStorage.getItem("tiptab_user_profile");
+    if (!savedUser) return CREATORS;
+    
+    const localUser = JSON.parse(savedUser) as Creator;
+    const membershipKey = `tiptab_membership_${actor}`;
+    const isLocalUserMember = localStorage.getItem(membershipKey) === 'true';
+
+    // Only add the local user to the Live hub if they are an active member
+    if (!isLocalUserMember) return CREATORS;
+
+    const exists = CREATORS.find(c => c.handle.toLowerCase() === localUser.handle.toLowerCase());
+    if (exists) {
+      return CREATORS.map(c => c.handle.toLowerCase() === localUser.handle.toLowerCase() ? localUser : c);
+    }
+    return [localUser, ...CREATORS];
+  }, [actor]);
+
   // Filter and Sort creators
   const filteredCreators = useMemo(() => {
-    let filtered = CREATORS.filter((c) => {
+    let filtered = allCreators.filter((c) => {
       const hasLiveLink = c.twitch || c.youtubeLive || c.tiktok || c.instagramLive;
       const matchesSearch = c.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
                            c.handle.toLowerCase().includes(searchQuery.toLowerCase()) ||
                            c.location.toLowerCase().includes(searchQuery.toLowerCase());
-      const matchesCategory = selectedCategory === "All" || (c.categories && c.categories.includes(selectedCategory));
+      
+      const creatorCategories = c.categories || [];
+      const matchesCategory = selectedCategory === "All" || creatorCategories.includes(selectedCategory);
       
       return hasLiveLink && matchesSearch && matchesCategory;
     });
@@ -77,19 +98,17 @@ const Live = () => {
       return [...filtered].sort(() => Math.random() - 0.5);
     } else if (sortBy === "newest") {
       return [...filtered].sort((a, b) => Number(b.id) - Number(a.id));
-    } else if (sortBy === "oldest") {
-      return [...filtered].sort((a, b) => Number(a.id) - Number(b.id));
     }
 
     return filtered;
-  }, [searchQuery, selectedCategory, sortBy]);
+  }, [allCreators, searchQuery, selectedCategory, sortBy]);
 
   const featuredCreators = useMemo(() => {
-    return filteredCreators.filter(c => featuredHandles.includes(c.handle.replace('@', '')));
+    return filteredCreators.filter(c => featuredHandles.includes(c.handle.replace('@', '').toLowerCase()));
   }, [filteredCreators, featuredHandles]);
 
   const regularCreators = useMemo(() => {
-    return filteredCreators.filter(c => !featuredHandles.includes(c.handle.replace('@', '')));
+    return filteredCreators.filter(c => !featuredHandles.includes(c.handle.replace('@', '').toLowerCase()));
   }, [filteredCreators, featuredHandles]);
 
   const handleBoost = async (handle: string) => {
@@ -155,9 +174,9 @@ const Live = () => {
                   </div>
 
                   <div className="p-8 space-y-4 relative">
-                    <div className="absolute -top-12 right-8 h-20 w-20 rounded-[28px] bg-white border-4 border-[#0a0514] flex items-center justify-center overflow-hidden shadow-2xl group-hover:scale-110 transition-transform duration-500">
+                    <div className="absolute -top-12 right-8 h-20 w-20 rounded-[28px] bg-[#0a0514] border-4 border-[#0a0514] flex items-center justify-center overflow-hidden shadow-2xl group-hover:scale-110 transition-transform duration-500">
                        <div className={cn("h-full w-full flex items-center justify-center text-xl font-black text-white", creator.color)}>
-                        {creator.avatar}
+                        {creator.avatarImage ? <img src={creator.avatarImage} alt="" className="w-full h-full object-cover" /> : creator.avatar}
                        </div>
                     </div>
                     
@@ -239,8 +258,8 @@ const Live = () => {
         {regularCreators.length > 0 ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {regularCreators.map((creator) => {
-              const isOwner = actor === creator.handle.replace('@', '');
-              const isBoosted = featuredHandles.includes(creator.handle.replace('@', ''));
+              const isOwner = actor === creator.handle.replace('@', '').toLowerCase();
+              const isBoosted = featuredHandles.includes(creator.handle.replace('@', '').toLowerCase());
               
               return (
                 <div 
@@ -265,7 +284,7 @@ const Live = () => {
                     <div className="flex items-center justify-between" onClick={() => navigate(`/tip/${creator.handle}`)}>
                       <div className="flex items-center gap-4">
                         <div className={cn("h-14 w-14 rounded-2xl flex items-center justify-center text-xl font-black border-2 border-white/10 text-white", creator.color)}>
-                          {creator.avatar}
+                          {creator.avatarImage ? <img src={creator.avatarImage} alt="" className="w-full h-full object-cover" /> : creator.avatar}
                         </div>
                         <div>
                           <h3 className="text-xl font-black tracking-tight group-hover:text-purple-400 transition-colors text-white">{creator.name}</h3>
