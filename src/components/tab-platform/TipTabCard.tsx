@@ -159,9 +159,9 @@ export const TipTabCard = ({ creator }: TipTabCardProps) => {
         <div className="relative z-10 flex items-end justify-between gap-4">
           {/* Left Info Column */}
           <div className="space-y-4 flex-1 min-w-0 pb-1">
-            {/* Increased font size for "Tip Card" text label */}
+            {/* Further increased font size for "Tip Card" text label */}
             <div className="mb-1">
-              <p className="text-[11px] md:text-[12px] font-black uppercase tracking-[0.45em] text-white/50 italic">
+              <p className="text-[15px] md:text-[16px] font-black uppercase tracking-[0.45em] text-white/50 italic">
                 Tip Card
               </p>
             </div>
