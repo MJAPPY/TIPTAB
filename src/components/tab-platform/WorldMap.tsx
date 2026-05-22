@@ -19,13 +19,14 @@ interface WorldMapProps {
 }
 
 export const WorldMap = ({ creators, onSelectCreator }: WorldMapProps) => {
-  // Filter out any creators with invalid or missing coordinates to prevent D3-Geo projection errors
-  const validCreators = creators.filter(c => 
+  // Filter out any creators with invalid coordinates OR whose location is set to "Global"
+  const mapVisibleCreators = creators.filter(c => 
     c.coordinates && 
     Array.isArray(c.coordinates) && 
     c.coordinates.length === 2 &&
     typeof c.coordinates[0] === 'number' &&
-    typeof c.coordinates[1] === 'number'
+    typeof c.coordinates[1] === 'number' &&
+    c.location.toLowerCase().trim() !== 'global'
   );
 
   return (
@@ -79,7 +80,7 @@ export const WorldMap = ({ creators, onSelectCreator }: WorldMapProps) => {
               }
             </Geographies>
 
-            {validCreators.map((creator) => (
+            {mapVisibleCreators.map((creator) => (
               <Marker key={creator.id} coordinates={creator.coordinates}>
                 <Tooltip>
                   <TooltipTrigger asChild>
