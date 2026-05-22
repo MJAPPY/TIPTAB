@@ -12,8 +12,8 @@ import { cn } from "@/lib/utils";
 
 // Reduced seed data for clean deployment
 const INITIAL_CREATOR_DATA = [
-  { id: "1", name: "TAB Project", handle: "tiptab", avatar: "TAB", color: "bg-red-600", totalValue: 5000, activityCount: 12, location: "London, UK" },
-  { id: "c20", name: "New Hustler", handle: "join_now", avatar: "NH", color: "bg-purple-500", totalValue: 0, activityCount: 0, location: "Global" },
+  { id: "1", name: "TAB Project", handle: "tiptab", avatar: "TAB", color: "bg-red-600", totalValue: 5000, activityCount: 12, location: "" },
+  { id: "c20", name: "New Hustler", handle: "join_now", avatar: "NH", color: "bg-purple-500", totalValue: 0, activityCount: 0, location: "" },
 ];
 
 const CREATOR_LEADERBOARD = INITIAL_CREATOR_DATA.sort((a, b) => b.activityCount - a.activityCount);
