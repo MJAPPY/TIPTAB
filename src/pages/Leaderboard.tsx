@@ -10,7 +10,7 @@ import { CREATORS, Creator } from "@/data/creators";
 import { useXpr } from "@/contexts/XprContext";
 import { cn } from "@/lib/utils";
 
-// Generate mock stats for creators - Now sorted by activityCount (Tips Received)
+// Generate mock stats for creators - Sorted by activityCount (Tips Received)
 const CREATOR_LEADERBOARD = CREATORS.map((creator, index) => ({
   ...creator,
   totalValue: [125000, 98400, 82100, 45000, 32000, 28000, 15000, 12000, 5000][index] || 1000,
@@ -18,13 +18,28 @@ const CREATOR_LEADERBOARD = CREATORS.map((creator, index) => ({
   label: "Tips Received"
 })).sort((a, b) => b.activityCount - a.activityCount);
 
-// Generate mock stats for supporters - Now sorted by activityCount (Tips Sent)
+// Expanded mock stats for supporters - Top 20
 const MOCK_SUPPORTERS = [
   { id: "s1", name: "WhaleShark", handle: "whaleshark", avatar: "WS", color: "bg-blue-600", totalValue: 540000, activityCount: 1240, label: "Tips Sent", location: "Dubai, UAE" },
   { id: "s2", name: "EarlyAdopter", handle: "early", avatar: "EA", color: "bg-purple-600", totalValue: 215000, activityCount: 890, label: "Tips Sent", location: "London, UK" },
   { id: "s3", name: "Tab Fanatic", handle: "fanatic", avatar: "TF", color: "bg-orange-500", totalValue: 185000, activityCount: 650, label: "Tips Sent", location: "Austin, USA" },
   { id: "s4", name: "CryptoKing", handle: "cking", avatar: "CK", color: "bg-emerald-600", totalValue: 92000, activityCount: 420, label: "Tips Sent", location: "Seoul, KR" },
   { id: "s5", name: "XPR Warrior", handle: "warrior", avatar: "XW", color: "bg-red-600", totalValue: 75000, activityCount: 310, label: "Tips Sent", location: "Tokyo, JP" },
+  { id: "s6", name: "Alpha", handle: "alpha_vault", avatar: "AV", color: "bg-indigo-600", totalValue: 62000, activityCount: 285, label: "Tips Sent", location: "Miami, USA" },
+  { id: "s7", name: "Nexus", handle: "nexus_x", avatar: "NX", color: "bg-cyan-600", totalValue: 58000, activityCount: 240, label: "Tips Sent", location: "Berlin, DE" },
+  { id: "s8", name: "Stardust", handle: "stardust", avatar: "SD", color: "bg-pink-600", totalValue: 51000, activityCount: 215, label: "Tips Sent", location: "Paris, FR" },
+  { id: "s9", name: "Orion", handle: "orion_tips", avatar: "OT", color: "bg-sky-600", totalValue: 45000, activityCount: 198, label: "Tips Sent", location: "Toronto, CA" },
+  { id: "s10", name: "Nova", handle: "nova_node", avatar: "NN", color: "bg-violet-600", totalValue: 38000, activityCount: 175, label: "Tips Sent", location: "Singapore, SG" },
+  { id: "s11", name: "Pixel", handle: "pixel_pete", avatar: "PP", color: "bg-yellow-600", totalValue: 32000, activityCount: 154, label: "Tips Sent", location: "Melbourne, AU" },
+  { id: "s12", name: "Vortex", handle: "vortex_v", avatar: "VV", color: "bg-slate-600", totalValue: 29000, activityCount: 132, label: "Tips Sent", location: "Lagos, NG" },
+  { id: "s13", name: "Zenix", handle: "zenix_tx", avatar: "ZT", color: "bg-lime-600", totalValue: 24000, activityCount: 110, label: "Tips Sent", location: "Madrid, ES" },
+  { id: "s14", name: "Echo", handle: "echo_chain", avatar: "EC", color: "bg-teal-600", totalValue: 19000, activityCount: 98, label: "Tips Sent", location: "Seattle, USA" },
+  { id: "s15", name: "Titan", handle: "titan_web", avatar: "TW", color: "bg-rose-600", totalValue: 15000, activityCount: 84, label: "Tips Sent", location: "Vancouver, CA" },
+  { id: "s16", name: "Luna", handle: "luna_love", avatar: "LL", color: "bg-fuchsia-600", totalValue: 12000, activityCount: 72, label: "Tips Sent", location: "Milan, IT" },
+  { id: "s17", name: "Atlas", handle: "atlas_geo", avatar: "AG", color: "bg-orange-700", totalValue: 9000, activityCount: 65, label: "Tips Sent", location: "Accra, GH" },
+  { id: "s18", name: "Solar", handle: "solar_power", avatar: "SP", color: "bg-yellow-500", totalValue: 7500, activityCount: 54, label: "Tips Sent", location: "Dubai, UAE" },
+  { id: "s19", name: "Quark", handle: "quark_x", avatar: "QX", color: "bg-cyan-500", totalValue: 5000, activityCount: 42, label: "Tips Sent", location: "Tokyo, JP" },
+  { id: "s20", name: "Byte", handle: "byte_size", avatar: "BS", color: "bg-blue-500", totalValue: 3000, activityCount: 31, label: "Tips Sent", location: "Seoul, KR" },
 ];
 
 const Leaderboard = () => {
@@ -50,24 +65,27 @@ const Leaderboard = () => {
 
     if (savedUser && !isMember) {
       const localUser = JSON.parse(savedUser) as Creator;
-      combinedSupporters.push({
-        id: localUser.id,
-        name: localUser.name,
-        handle: localUser.handle,
-        avatar: localUser.avatar,
-        avatarImage: localUser.avatarImage,
-        color: localUser.color,
-        totalValue: 0, 
-        activityCount: 0,
-        label: "Tips Sent",
-        location: localUser.location
-      });
+      // Only add if not already in mock list
+      if (!combinedSupporters.find(s => s.handle === localUser.handle)) {
+        combinedSupporters.push({
+          id: localUser.id,
+          name: localUser.name,
+          handle: localUser.handle,
+          avatar: localUser.avatar,
+          avatarImage: localUser.avatarImage,
+          color: localUser.color,
+          totalValue: 0, 
+          activityCount: 0,
+          label: "Tips Sent",
+          location: localUser.location
+        });
+      }
     }
 
     return combinedSupporters.sort((a, b) => b.activityCount - a.activityCount);
   }, [activeTab, isMember]);
 
-  const DISPLAY_LIMIT = 50;
+  const DISPLAY_LIMIT = 20; // Restricted to Top 20 as requested
   const topThree = currentData.slice(0, 3);
   const others = currentData.slice(3, DISPLAY_LIMIT);
 
@@ -241,7 +259,7 @@ const Leaderboard = () => {
           {currentData.length > DISPLAY_LIMIT && (
             <div className="pt-10 text-center">
               <p className="text-white/20 text-[10px] font-black uppercase tracking-[0.3em]">
-                + {currentData.length - DISPLAY_LIMIT} more participants in the ranking
+                Showing Top {DISPLAY_LIMIT} Participants
               </p>
             </div>
           )}
