@@ -21,7 +21,10 @@ import {
   Eye,
   Users,
   Coins,
-  MessageSquare
+  MessageSquare,
+  Star,
+  Trash2,
+  ExternalLink as ExternalLinkIcon
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
@@ -48,7 +51,7 @@ const ASSET_MAP: Record<string, { code: string; precision: number }> = {
 };
 
 const Dashboard = () => {
-  const { isConnected, actor, balances, refreshBalances, recordTip, session, login, isLoading: isAuthLoading, isMember, membershipDate, userProfile, updateUserProfile } = useXpr();
+  const { isConnected, actor, balances, refreshBalances, recordTip, session, login, isLoading: isAuthLoading, isMember, membershipDate, userProfile, updateUserProfile, favorites, toggleFavorite } = useXpr();
   const navigate = useNavigate();
   const { toast } = useToast();
   
@@ -218,6 +221,7 @@ const Dashboard = () => {
     const items = [
       { id: "analytics", icon: TrendingUp, label: "Analytics" },
       { id: "payouts", icon: Wallet, label: "Payouts" },
+      { id: "favorites", icon: Star, label: "Favorites" },
     ];
     if (isMember) items.splice(1, 0, { id: "card", icon: CreditCard, label: "Card" });
     items.push({ id: "settings", icon: UserIcon, label: "Profile" });
@@ -233,7 +237,7 @@ const Dashboard = () => {
       <main className="container mx-auto px-4 md:px-6 py-8 pt-32 sm:pt-44 relative z-10 pb-24">
         <div className="flex flex-col xl:flex-row xl:items-end justify-between gap-8 mb-12 sm:mb-16">
           <div className="space-y-3 sm:space-y-4">
-             <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/5 border border-white/10 text-[9px] font-black uppercase tracking-[0.2em] text-slate-400">
+             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/5 border border-white/10 text-[9px] font-black uppercase tracking-[0.2em] text-slate-400">
               <Zap className="h-3 w-3 text-orange-500 fill-orange-500" />
               {isMember ? "Creator Portal" : "Supporter Portal"}
             </div>
@@ -457,6 +461,63 @@ const Dashboard = () => {
                 <p className="text-slate-400 font-medium">Share this card anywhere to receive zero-fee tips.</p>
               </div>
               {userProfile && <TipTabCard creator={userProfile} />}
+            </div>
+          </TabsContent>
+
+          <TabsContent value="favorites" className="space-y-8 mt-0 animate-in fade-in slide-in-from-left-4 duration-500">
+            <div className="max-w-4xl mx-auto space-y-8">
+              <div className="flex items-center justify-between">
+                <h2 className="text-3xl font-black italic tracking-tighter text-slate-100 uppercase">Saved <span className="text-yellow-500">Creators</span></h2>
+                <Badge className="bg-white/10 text-white border-white/10 font-black text-[10px] uppercase tracking-widest h-8 px-4">{favorites.length} SAVED</Badge>
+              </div>
+
+              {favorites.length > 0 ? (
+                <div className="grid grid-cols-1 gap-4">
+                  {favorites.map((favHandle) => (
+                    <div 
+                      key={favHandle}
+                      className="bg-white/5 border border-white/10 rounded-[24px] p-5 flex items-center justify-between group hover:bg-white/[0.08] hover:border-purple-500/30 transition-all"
+                    >
+                      <div className="flex items-center gap-5">
+                        <div className="h-14 w-14 rounded-2xl bg-purple-500/20 flex items-center justify-center font-black text-purple-400 border border-purple-500/30 shadow-lg">
+                          {favHandle.slice(0, 2).toUpperCase()}
+                        </div>
+                        <div>
+                          <p className="text-lg font-black text-slate-100">@{favHandle}</p>
+                          <p className="text-[10px] font-bold text-white/30 uppercase tracking-widest">Network Member</p>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <Button 
+                          onClick={() => navigate(`/tip/${favHandle}`)}
+                          variant="ghost" 
+                          className="h-11 rounded-xl bg-white/5 border border-white/5 hover:bg-purple-600 hover:text-white transition-all font-black text-[10px] uppercase tracking-widest gap-2 px-5"
+                        >
+                          <ExternalLinkIcon className="h-3.5 w-3.5" /> Profile
+                        </Button>
+                        <Button 
+                          onClick={() => toggleFavorite(favHandle)}
+                          variant="ghost" 
+                          className="h-11 w-11 rounded-xl bg-red-500/10 text-red-500 hover:bg-red-500 hover:text-white transition-all p-0"
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <div className="py-24 text-center bg-white/[0.02] border border-dashed border-white/10 rounded-[48px] space-y-6">
+                  <div className="h-20 w-20 rounded-full bg-white/5 flex items-center justify-center mx-auto">
+                    <Star className="h-10 w-10 text-white/20" />
+                  </div>
+                  <div className="space-y-2">
+                    <h3 className="text-xl font-black italic text-slate-100 uppercase">NO SAVED CREATORS</h3>
+                    <p className="text-slate-400 font-medium max-w-xs mx-auto">Visit profiles and click the star icon to save your favorite performance streams here.</p>
+                  </div>
+                  <Button onClick={() => navigate("/")} className="bg-white text-black hover:bg-purple-600 hover:text-white font-black rounded-xl h-12 px-8 uppercase text-xs tracking-widest">Discover Network</Button>
+                </div>
+              )}
             </div>
           </TabsContent>
 

@@ -75,6 +75,10 @@ interface XprContextType {
   deletePromoCode: (id: string) => void;
   applyPromoCode: (code: string) => PromoCode | null;
   usePromoCode: (code: string) => void;
+  // Favorites System
+  favorites: string[];
+  toggleFavorite: (handle: string) => void;
+  isFavorite: (handle: string) => boolean;
 }
 
 const XprContext = createContext<XprContextType | undefined>(undefined);
@@ -115,6 +119,32 @@ export const XprProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const [isLoading, setIsLoading] = useState(true);
   const [userProfile, setUserProfile] = useState<Creator | null>(null);
   
+  const [favorites, setFavorites] = useState<string[]>([]);
+
+  useEffect(() => {
+    if (session?.auth.actor) {
+      const saved = localStorage.getItem(`tiptab_favorites_${session.auth.actor}`);
+      if (saved) setFavorites(JSON.parse(saved));
+    } else {
+      setFavorites([]);
+    }
+  }, [session]);
+
+  const toggleFavorite = (handle: string) => {
+    if (!session?.auth.actor) return;
+    const cleanHandle = handle.toLowerCase().replace('@', '');
+    const newFavorites = favorites.includes(cleanHandle)
+      ? favorites.filter(h => h !== cleanHandle)
+      : [...favorites, cleanHandle];
+    
+    setFavorites(newFavorites);
+    localStorage.setItem(`tiptab_favorites_${session.auth.actor}`, JSON.stringify(newFavorites));
+  };
+
+  const isFavorite = (handle: string) => {
+    return favorites.includes(handle.toLowerCase().replace('@', ''));
+  };
+
   const [networkAlert, setNetworkAlert] = useState<string | null>(() => {
     if (typeof window !== "undefined") {
       return localStorage.getItem("tiptab_network_alert");
@@ -598,7 +628,10 @@ export const XprProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     createPromoCode,
     deletePromoCode,
     applyPromoCode,
-    usePromoCode
+    usePromoCode,
+    favorites,
+    toggleFavorite,
+    isFavorite
   };
 
   return <XprContext.Provider value={value}>{children}</XprContext.Provider>;

@@ -21,7 +21,8 @@ import {
   Radio,
   ArrowLeft,
   Sparkles,
-  MessageSquare
+  MessageSquare,
+  Star
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -50,7 +51,7 @@ const CreatorProfile = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const { toast } = useToast();
-  const { session, actor, login, isConnected, recordTip, isMember, featuredHandles, boostStream, boostPrice, boostTabPrice, userProfile } = useXpr();
+  const { session, actor, login, isConnected, recordTip, isMember, featuredHandles, boostStream, boostPrice, boostTabPrice, userProfile, isFavorite, toggleFavorite } = useXpr();
   
   const [creator, setCreator] = useState<Creator | null>(null);
   const [tipAmount, setTipAmount] = useState("50");
@@ -252,6 +253,19 @@ const CreatorProfile = () => {
     }
   };
 
+  const handleToggleFavorite = () => {
+    if (!isConnected) {
+      handleConnect();
+      return;
+    }
+    toggleFavorite(creator!.handle);
+    const currentlyFav = isFavorite(creator!.handle);
+    toast({
+      title: currentlyFav ? "Removed from Favorites" : "Added to Favorites",
+      description: currentlyFav ? `Removed @${creator?.handle} from your saves.` : `Saved @${creator?.handle} to your dashboard.`,
+    });
+  };
+
   if (!creator) {
     return (
       <div className="min-h-screen bg-[#0a0514] flex items-center justify-center">
@@ -309,6 +323,7 @@ const CreatorProfile = () => {
   const featuredEmbedUrl = creator.mediaEmbed || creator.videoUrl || "";
   const isOwner = actor === creator.handle.replace('@', '').toLowerCase();
   const isBoosted = featuredHandles.includes(creator.handle.replace('@', '').toLowerCase());
+  const favorited = isFavorite(creator.handle);
 
   return (
     <div className="min-h-screen bg-[#0a0514] text-white selection:bg-purple-500/30">
@@ -358,9 +373,22 @@ const CreatorProfile = () => {
                 )}
               </div>
               
-              <div className="text-center md:text-left space-y-2 pb-4">
-                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/5 border border-white/10 text-[10px] font-black uppercase tracking-widest text-white/40 mb-2">
-                  <ShieldCheck className="h-3.5 w-3.5 text-orange-500" /> Verified Creator
+              <div className="text-center md:text-left space-y-2 pb-4 flex-1">
+                <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                  <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/5 border border-white/10 text-[10px] font-black uppercase tracking-widest text-white/40 mb-2 w-fit mx-auto md:mx-0">
+                    <ShieldCheck className="h-3.5 w-3.5 text-orange-500" /> Verified Creator
+                  </div>
+                  <Button 
+                    onClick={handleToggleFavorite}
+                    variant="ghost" 
+                    className={cn(
+                      "h-10 rounded-xl gap-2 font-black uppercase text-[10px] tracking-widest px-4 transition-all border-2",
+                      favorited ? "bg-yellow-500/10 border-yellow-500/40 text-yellow-500" : "bg-white/5 border-transparent text-white/40 hover:text-white"
+                    )}
+                  >
+                    <Star className={cn("h-3.5 w-3.5", favorited && "fill-yellow-500")} />
+                    {favorited ? "Saved to Favorites" : "Add to Favorites"}
+                  </Button>
                 </div>
                 <h1 className="text-5xl md:text-7xl font-black tracking-tighter leading-none">{creator.name}</h1>
                 <div className="flex flex-wrap items-center justify-center md:justify-start gap-3">
@@ -616,7 +644,7 @@ const CreatorProfile = () => {
                   <div className="space-y-2">
                     <Label className="text-white/30 font-black uppercase tracking-[0.2em] text-[9px] ml-2">Personal Message (Optional)</Label>
                     <div className="relative">
-                      <MessageSquare className="absolute left-6 top-1/2 -translate-y-1/2 h-5 w-5 text-purple-500/40" />
+                      <MessageSquare className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-purple-500/40" />
                       <Input 
                         placeholder="Amazing stream, thank you!" 
                         value={message}
