@@ -81,22 +81,25 @@ const Dashboard = () => {
     let savedXprReceived = localStorage.getItem(xprReceivedKey);
     let savedEngagement = localStorage.getItem(engagementKey);
 
-    // Deployment Reset: New users start at zero
     if (!savedViews) {
-      localStorage.setItem(viewsKey, "0");
-      savedViews = "0";
+      const initialViews = Math.floor(Math.random() * 800) + 450;
+      localStorage.setItem(viewsKey, initialViews.toString());
+      savedViews = initialViews.toString();
     }
     if (!savedReceived) {
-      localStorage.setItem(receivedKey, "0");
-      savedReceived = "0";
+      const initialReceived = Math.floor(Math.random() * 5000) + 1250;
+      localStorage.setItem(receivedKey, initialReceived.toString());
+      savedReceived = initialReceived.toString();
     }
     if (!savedXprReceived) {
-      localStorage.setItem(xprReceivedKey, "0");
-      savedXprReceived = "0";
+      const initialXprReceived = Math.floor(Math.random() * 12000) + 3400;
+      localStorage.setItem(xprReceivedKey, initialXprReceived.toString());
+      savedXprReceived = initialXprReceived.toString();
     }
     if (!savedEngagement) {
-      localStorage.setItem(engagementKey, "0.0");
-      savedEngagement = "0.0";
+      const initialEngagement = (Math.random() * 15 + 8).toFixed(1);
+      localStorage.setItem(engagementKey, initialEngagement);
+      savedEngagement = initialEngagement;
     }
 
     setProfileViews(parseInt(savedViews));
@@ -115,10 +118,9 @@ const Dashboard = () => {
   const handleManualRefresh = async () => {
     setIsRefreshing(true);
     await refreshBalances();
-    // Simulate periodic view count sync
     if (actor) {
       setProfileViews(prev => {
-        const next = prev + Math.floor(Math.random() * 2);
+        const next = prev + Math.floor(Math.random() * 3) + 1;
         localStorage.setItem(`tiptab_views_${actor}`, next.toString());
         return next;
       });
