@@ -65,6 +65,8 @@ interface XprContextType {
   updateBoostPrice: (price: string) => void;
   boostTabPrice: string;
   updateBoostTabPrice: (price: string) => void;
+  boostPriceXusdc: string;
+  updateBoostPriceXusdc: (price: string) => void;
   featuredHandles: string[];
   boostStream: (handle: string, asset?: 'XPR' | 'TAB') => Promise<boolean>;
   distributeXprRewards: (winners: { account: string; amount: string }[]) => Promise<boolean>;
@@ -155,6 +157,13 @@ export const XprProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     return "5000";
   });
 
+  const [boostPriceXusdc, setBoostPriceXusdc] = useState(() => {
+    if (typeof window !== "undefined") {
+      return localStorage.getItem("tiptab_boost_xusdc_price") || "1.00";
+    }
+    return "1.00";
+  });
+
   const [featuredHandles, setFeaturedHandles] = useState<string[]>(() => {
     if (typeof window !== "undefined") {
       const saved = localStorage.getItem("tiptab_featured_handles");
@@ -221,6 +230,11 @@ export const XprProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const updateBoostTabPrice = (price: string) => {
     setBoostTabPrice(price);
     localStorage.setItem("tiptab_boost_tab_price", price);
+  };
+
+  const updateBoostPriceXusdc = (price: string) => {
+    setBoostPriceXusdc(price);
+    localStorage.setItem("tiptab_boost_xusdc_price", price);
   };
 
   const broadcastAlert = (message: string | null) => {
@@ -575,6 +589,8 @@ export const XprProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     updateBoostPrice,
     boostTabPrice,
     updateBoostTabPrice,
+    boostPriceXusdc,
+    updateBoostPriceXusdc,
     featuredHandles,
     boostStream,
     distributeXprRewards,

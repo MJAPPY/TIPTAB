@@ -130,6 +130,8 @@ const AdminHub = () => {
     updateBoostPrice,
     boostTabPrice,
     updateBoostTabPrice,
+    boostPriceXusdc,
+    updateBoostPriceXusdc,
     distributeXprRewards,
     promoCodes,
     createPromoCode,
@@ -148,6 +150,8 @@ const AdminHub = () => {
   
   const [localBoost, setLocalBoost] = useState(boostPrice || "1000");
   const [localBoostTab, setLocalBoostTab] = useState(boostTabPrice || "5000");
+  const [localBoostXusdc, setLocalBoostXusdc] = useState(boostPriceXusdc || "1.00");
+  
   const [searchQuery, setSearchQuery] = useState("");
   const [alertMessage, setAlertMessage] = useState("");
   const [isAlertModalOpen, setIsAlertModalOpen] = useState(false);
@@ -197,7 +201,8 @@ const AdminHub = () => {
     if (membershipFeeXusdc) setLocalFeeXusdc(membershipFeeXusdc);
     if (boostPrice) setLocalBoost(boostPrice);
     if (boostTabPrice) setLocalBoostTab(boostTabPrice);
-  }, [membershipFee, membershipFeeXmd, membershipFeeXusdc, boostPrice, boostTabPrice]);
+    if (boostPriceXusdc) setLocalBoostXusdc(boostPriceXusdc);
+  }, [membershipFee, membershipFeeXmd, membershipFeeXusdc, boostPrice, boostTabPrice, boostPriceXusdc]);
 
   useEffect(() => {
     if (!isConnected || !isAdmin) {
@@ -291,15 +296,23 @@ const AdminHub = () => {
     const marketData = await fetchRates();
     
     if (marketData) {
-      const { xprPerTab } = marketData;
+      const { xprUsd, xprPerTab } = marketData;
       
-      const boostXpr = parseFloat(localBoost);
-      if (!isNaN(boostXpr) && xprPerTab > 0) {
-        const calculatedBoostTab = (boostXpr / xprPerTab).toFixed(0);
-        setLocalBoostTab(calculatedBoostTab);
+      const targetUsd = parseFloat(localBoostXusdc);
+      if (!isNaN(targetUsd)) {
+        // 1. Calc XPR Boost based on USD
+        const calculatedXpr = (targetUsd / xprUsd).toFixed(0);
+        setLocalBoost(calculatedXpr);
+        
+        // 2. Calc TAB Boost based on resulting XPR
+        if (xprPerTab > 0) {
+          const calculatedBoostTab = (parseFloat(calculatedXpr) / xprPerTab).toFixed(0);
+          setLocalBoostTab(calculatedBoostTab);
+        }
+        
         toast({
           title: "Boost Parity Synced",
-          description: `TAB boost price adjusted to ${calculatedBoostTab} based on current XPR market rate.`,
+          description: `Boost prices adjusted via XUSDC master valuation.`,
         });
       }
     } else {
@@ -322,22 +335,22 @@ const AdminHub = () => {
     toast({ title: `${asset} Fee Updated`, description: `Global rate set to ${val} ${asset}.` });
   };
 
-  const handleUpdateBoost = () => {
+  const handleUpdateBoost = (asset: 'XPR' | 'TAB' | 'XUSDC') => {
     if (adminRole !== 'super') {
       toast({ title: "Unauthorized", description: "Only Super Admins can update boost rates.", variant: "destructive" });
       return;
     }
-    updateBoostPrice(localBoost);
-    toast({ title: "Boost Price Updated", description: `Performance rate set to ${localBoost} XPR.` });
-  };
-
-  const handleUpdateBoostTab = () => {
-    if (adminRole !== 'super') {
-      toast({ title: "Unauthorized", description: "Only Super Admins can update TAB boost rates.", variant: "destructive" });
-      return;
+    
+    if (asset === 'XPR') {
+      updateBoostPrice(localBoost);
+      toast({ title: "XPR Boost Price Updated", description: `Rate set to ${localBoost} XPR.` });
+    } else if (asset === 'TAB') {
+      updateBoostTabPrice(localBoostTab);
+      toast({ title: "TAB Boost Updated", description: `Rate set to ${localBoostTab} TAB.` });
+    } else if (asset === 'XUSDC') {
+      updateBoostPriceXusdc(localBoostXusdc);
+      toast({ title: "XUSDC Boost Master Updated", description: `Master rate set to ${localBoostXusdc} XUSDC.` });
     }
-    updateBoostTabPrice(localBoostTab);
-    toast({ title: "TAB Boost Updated", description: `Performance rate set to ${localBoostTab} TAB.` });
   };
 
   const handleRewardWinners = async () => {
@@ -865,43 +878,60 @@ const AdminHub = () => {
                     </div>
 
                     <div className="grid grid-cols-1 gap-8 pt-4 border-t border-white/5">
-                      <div className="space-y-4">
-                        <div className="flex items-center justify-between mb-2">
-                           <Label className="text-[11px] font-black uppercase tracking-widest text-orange-400">Master Asset: XPR (Boost)</Label>
-                           <Button 
-                            variant="ghost" 
-                            size="sm" 
-                            onClick={handleSyncBoostParity} 
-                            disabled={isSyncingPrices || adminRole !== 'super'}
-                            className="h-8 px-3 rounded-lg bg-white/5 border border-white/10 hover:bg-white/10 text-[9px] font-black uppercase tracking-widest gap-2 text-slate-300"
-                           >
-                             <Scale className={cn("h-3.5 w-3.5", isSyncingPrices && "animate-spin")} />
-                             Calculate Parity
-                           </Button>
+                      <div className="space-y-6">
+                        <div className="space-y-3 p-6 rounded-3xl bg-white/[0.03] border border-white/5">
+                          <div className="flex items-center justify-between mb-4">
+                             <Label className="text-[11px] font-black uppercase tracking-widest text-cyan-400">Master Asset: XUSDC (Boost)</Label>
+                             <Button 
+                              variant="ghost" 
+                              size="sm" 
+                              onClick={handleSyncBoostParity} 
+                              disabled={isSyncingPrices || adminRole !== 'super'}
+                              className="h-8 px-3 rounded-lg bg-white/5 border border-white/10 hover:bg-white/10 text-[9px] font-black uppercase tracking-widest gap-2 text-slate-300"
+                             >
+                               <Scale className={cn("h-3.5 w-3.5", isSyncingPrices && "animate-spin")} />
+                               Calculate Parity
+                             </Button>
+                          </div>
+                          <div className="flex gap-4">
+                            <Input 
+                              type="number" 
+                              value={localBoostXusdc} 
+                              onChange={(e) => setLocalBoostXusdc(e.target.value)}
+                              disabled={adminRole !== 'super'}
+                              className="bg-[#2a1d4a] border-white/10 rounded-2xl font-black text-xl h-16 px-6 focus:ring-cyan-500/50 text-white disabled:opacity-50"
+                            />
+                            <Button onClick={() => handleUpdateBoost('XUSDC')} disabled={adminRole !== 'super'} className="bg-cyan-600 hover:bg-cyan-700 rounded-2xl px-6 h-16 font-black text-white">Update</Button>
+                          </div>
+                          <p className="text-[9px] font-bold text-white/20 uppercase tracking-widest mt-3">Sets base boost valuation. Use 'Calculate Parity' to sync XPR/TAB.</p>
                         </div>
-                        <div className="flex gap-4">
-                          <Input 
-                            type="number" 
-                            value={localBoost} 
-                            onChange={(e) => setLocalBoost(e.target.value)}
-                            disabled={adminRole !== 'super'}
-                            className="bg-[#2a1d4a] border-white/10 rounded-2xl font-black text-xl h-16 px-6 focus:ring-orange-500/50 text-white disabled:opacity-50"
-                          />
-                          <Button onClick={handleUpdateBoost} disabled={adminRole !== 'super'} className="bg-orange-500 hover:bg-orange-600 rounded-2xl px-6 h-16 font-black text-white">Update</Button>
-                        </div>
-                      </div>
 
-                      <div className="space-y-4">
-                        <Label className="text-[11px] font-black uppercase tracking-widest text-white/40">TAB Boost Price</Label>
-                        <div className="flex gap-4">
-                          <Input 
-                            type="number" 
-                            value={localBoostTab} 
-                            onChange={(e) => setLocalBoostTab(e.target.value)}
-                            disabled={adminRole !== 'super'}
-                            className="bg-[#2a1d4a] border-white/10 rounded-2xl font-black text-xl h-16 px-6 focus:ring-purple-500/50 text-white disabled:opacity-50"
-                          />
-                          <Button onClick={handleUpdateBoostTab} disabled={adminRole !== 'super'} className="bg-purple-600 hover:bg-purple-700 rounded-2xl px-6 h-16 font-black text-white">Update</Button>
+                        <div className="space-y-4">
+                          <Label className="text-[11px] font-black uppercase tracking-widest text-white/40">XPR Boost Price</Label>
+                          <div className="flex gap-4">
+                            <Input 
+                              type="number" 
+                              value={localBoost} 
+                              onChange={(e) => setLocalBoost(e.target.value)}
+                              disabled={adminRole !== 'super'}
+                              className="bg-[#2a1d4a] border-white/10 rounded-2xl font-black text-xl h-16 px-6 focus:ring-orange-500/50 text-white disabled:opacity-50"
+                            />
+                            <Button onClick={() => handleUpdateBoost('XPR')} disabled={adminRole !== 'super'} className="bg-orange-500 hover:bg-orange-600 rounded-2xl px-6 h-16 font-black text-white">Update</Button>
+                          </div>
+                        </div>
+
+                        <div className="space-y-4">
+                          <Label className="text-[11px] font-black uppercase tracking-widest text-white/40">TAB Boost Price</Label>
+                          <div className="flex gap-4">
+                            <Input 
+                              type="number" 
+                              value={localBoostTab} 
+                              onChange={(e) => setLocalBoostTab(e.target.value)}
+                              disabled={adminRole !== 'super'}
+                              className="bg-[#2a1d4a] border-white/10 rounded-2xl font-black text-xl h-16 px-6 focus:ring-purple-500/50 text-white disabled:opacity-50"
+                            />
+                            <Button onClick={() => handleUpdateBoost('TAB')} disabled={adminRole !== 'super'} className="bg-purple-600 hover:bg-purple-700 rounded-2xl px-6 h-16 font-black text-white">Update</Button>
+                          </div>
                         </div>
                       </div>
                     </div>
