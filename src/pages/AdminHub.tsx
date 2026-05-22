@@ -279,6 +279,11 @@ const AdminHub = () => {
     toast({ title: "Alert Broadcasted", description: "The message is now live across the platform." });
   };
 
+  const clearAlert = () => {
+    broadcastAlert(null);
+    toast({ title: "Alert Cleared" });
+  };
+
   const toggleMaintenance = () => {
     if (adminRole !== 'super') {
       toast({ title: "Unauthorized", description: "Only Super Admins can toggle maintenance mode.", variant: "destructive" });
@@ -398,6 +403,39 @@ const AdminHub = () => {
     navigate("/");
   };
 
+  const openAuditLogs = (creator: Creator) => {
+    setSelectedCreator(creator);
+    setIsAuditModalOpen(true);
+  };
+
+  const openTransactionHistory = (creator: Creator) => {
+    setSelectedCreator(creator);
+    setIsHistoryModalOpen(true);
+  };
+
+  const confirmDeleteProfile = () => {
+    if (!creatorToDelete) return;
+    const handle = creatorToDelete.handle.replace('@', '').toLowerCase();
+    setModeratedCreators(prev => prev.filter(c => c.id !== creatorToDelete.id));
+    localStorage.removeItem(`tiptab_profile_${handle}`);
+    localStorage.removeItem(`tiptab_membership_${handle}`);
+    localStorage.removeItem(`tiptab_membership_date_${handle}`);
+    const savedUser = localStorage.getItem("tiptab_user_profile");
+    if (savedUser) {
+      const parsed = JSON.parse(savedUser) as Creator;
+      if (parsed.handle.replace('@', '').toLowerCase() === handle) {
+        localStorage.removeItem("tiptab_user_profile");
+      }
+    }
+    toast({
+      title: "Profile Purged Successfully",
+      description: `@${handle}'s profile and map registrations have been completely removed.`,
+      variant: "destructive"
+    });
+    setIsDeleteModalOpen(false);
+    setCreatorToDelete(null);
+  };
+
   const filteredCreators = moderatedCreators.filter(c => 
     c.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
     c.handle.toLowerCase().includes(searchQuery.toLowerCase())
@@ -460,7 +498,6 @@ const AdminHub = () => {
         <div className="w-full">
           {activeTab === "analytics" && (
             <div className="space-y-10 animate-in fade-in duration-500">
-               {/* High Level Metrics */}
                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
                  {[
                    { label: "Active Members", value: "1,240", change: "+14%", icon: UserRoundCheck, color: "text-orange-400", sub: "Growth (MoM)" },
@@ -486,7 +523,6 @@ const AdminHub = () => {
                  ))}
                </div>
 
-               {/* Middle Section: Adoption & Geographical distribution */}
                <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
                  <Card className="lg:col-span-7 bg-[#1a112d] border border-white/10 rounded-[40px] p-8 space-y-8 relative overflow-hidden">
                     <div className="absolute top-0 right-0 p-8 opacity-5">
@@ -559,7 +595,6 @@ const AdminHub = () => {
                  </Card>
                </div>
 
-               {/* Network Health Grid */}
                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                   <div className="bg-white/5 border border-white/10 rounded-[32px] p-6 flex items-center justify-between group hover:border-green-500/30 transition-all">
                      <div className="space-y-1">
@@ -864,7 +899,19 @@ const AdminHub = () => {
                         {filteredCreators.map((creator) => (
                           <tr key={creator.id} className="group hover:bg-white/[0.02] transition-colors">
                             <td className="px-10 py-8"><span className="font-black text-lg text-white">@{creator.handle}</span></td>
-                            <td className="px-10 py-8 text-right"><Button variant="ghost" size="icon" onClick={() => toggleBan(creator.handle)} className={cn("h-12 w-12 rounded-xl transition-all", bannedHandles.includes(creator.handle) ? "bg-green-500/10 text-green-500" : "bg-red-500/10 text-red-500")}>{bannedHandles.includes(creator.handle) ? <Unlock className="h-5 w-5" /> : <Ban className="h-5 w-5" />}</Button></td>
+                            <td className="px-10 py-8 text-right space-x-2">
+                              <Button variant="ghost" size="sm" onClick={() => openAuditLogs(creator)} className="h-10 rounded-xl bg-white/5 text-white/40 hover:text-purple-400 gap-2"><Activity className="h-4 w-4" /> Logs</Button>
+                              <Button variant="ghost" size="sm" onClick={() => openTransactionHistory(creator)} className="h-10 rounded-xl bg-white/5 text-white/40 hover:text-cyan-400 gap-2"><History className="h-4 w-4" /> History</Button>
+                              <DropdownMenu>
+                                <DropdownMenuTrigger asChild>
+                                  <Button variant="ghost" size="icon" className="h-10 w-10 text-white/20"><MoreVertical className="h-5 w-5" /></Button>
+                                </DropdownMenuTrigger>
+                                <DropdownMenuContent align="end" className="bg-[#1a102d] border-white/10 text-white">
+                                  <DropdownMenuItem onClick={clearAlert} className="text-orange-400 focus:text-orange-400"><Bell className="mr-2 h-4 w-4" /> Clear Alert</DropdownMenuItem>
+                                  <DropdownMenuItem onClick={() => { setCreatorToDelete(creator); setIsDeleteModalOpen(true); }} className="text-red-500 focus:text-red-500"><Trash2 className="mr-2 h-4 w-4" /> Delete Profile</DropdownMenuItem>
+                                </DropdownMenuContent>
+                              </DropdownMenu>
+                            </td>
                           </tr>
                         ))}
                       </tbody>
@@ -902,6 +949,67 @@ const AdminHub = () => {
           )}
         </div>
       </main>
+
+      {/* Audit Logs Modal */}
+      <Dialog open={isAuditModalOpen} onOpenChange={setIsAuditModalOpen}>
+        <DialogContent className="bg-[#1a102d] border-white/10 text-white rounded-[32px] p-8 max-w-2xl">
+          <DialogHeader>
+            <DialogTitle className="text-2xl font-black italic uppercase tracking-tight">Audit Logs: @{selectedCreator?.handle}</DialogTitle>
+          </DialogHeader>
+          <ScrollArea className="h-[400px] mt-6 pr-4">
+            <div className="space-y-4">
+              {(MOCK_AUDIT_LOGS[selectedCreator?.handle || ""] || []).map((log, i) => (
+                <div key={i} className="p-4 rounded-2xl bg-white/5 border border-white/5 flex items-center justify-between">
+                  <div className="space-y-1">
+                    <p className="text-sm font-bold text-white">{log.event}</p>
+                    <p className="text-[10px] text-white/40 uppercase font-black">{log.date} at {log.time}</p>
+                  </div>
+                  <Badge variant="outline" className="border-purple-500/30 text-purple-400 font-black text-[9px] uppercase tracking-widest">
+                    {log.type}
+                  </Badge>
+                </div>
+              ))}
+              {(!MOCK_AUDIT_LOGS[selectedCreator?.handle || ""] || MOCK_AUDIT_LOGS[selectedCreator?.handle || ""].length === 0) && (
+                <div className="py-12 text-center text-white/20 font-black uppercase tracking-widest text-xs">No logs found for this account.</div>
+              )}
+            </div>
+          </ScrollArea>
+        </DialogContent>
+      </Dialog>
+
+      {/* Transaction History Modal */}
+      <Dialog open={isHistoryModalOpen} onOpenChange={setIsHistoryModalOpen}>
+        <DialogContent className="bg-[#1a102d] border-white/10 text-white rounded-[32px] p-8 max-w-2xl">
+          <DialogHeader>
+            <DialogTitle className="text-2xl font-black italic uppercase tracking-tight">On-Chain History: @{selectedCreator?.handle}</DialogTitle>
+          </DialogHeader>
+          <div className="py-20 text-center text-white/20 font-black uppercase tracking-widest text-xs space-y-4">
+            <History className="h-12 w-12 mx-auto mb-4 opacity-10" />
+            <p>Live ledger sync pending...</p>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Delete Profile Confirmation */}
+      <Dialog open={isDeleteModalOpen} onOpenChange={setIsDeleteModalOpen}>
+        <DialogContent className="bg-[#2a1b4d] border-2 border-red-500/50 text-white rounded-[40px] p-10 max-w-md">
+          <div className="text-center space-y-6">
+            <div className="h-20 w-20 rounded-full bg-red-500/10 flex items-center justify-center mx-auto border-2 border-red-500/20">
+              <Trash2 className="h-10 w-10 text-red-500" />
+            </div>
+            <DialogHeader>
+              <DialogTitle className="text-3xl font-black italic uppercase text-center tracking-tighter">PURGE PROFILE?</DialogTitle>
+              <DialogDescription className="text-white/60 font-bold text-center">
+                This will permanently remove @{creatorToDelete?.handle} from the map and wipe their metadata. This action is irreversible.
+              </DialogDescription>
+            </DialogHeader>
+            <div className="flex gap-4">
+              <Button onClick={() => setIsDeleteModalOpen(false)} className="flex-1 h-14 bg-white/5 hover:bg-white/10 rounded-2xl font-black uppercase">Cancel</Button>
+              <Button onClick={confirmDeleteProfile} className="flex-1 h-14 bg-red-500 hover:bg-red-600 rounded-2xl font-black uppercase">Yes, Purge</Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
 
       <Dialog open={removalStep === "warning1"} onOpenChange={(open) => !open && setRemovalStep("closed")}>
         <DialogContent className="bg-[#241a3d] border-2 border-yellow-500/30 text-white rounded-[40px] p-10 max-w-md">
