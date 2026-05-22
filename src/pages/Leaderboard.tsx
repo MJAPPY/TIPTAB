@@ -10,57 +10,20 @@ import { CREATORS, Creator } from "@/data/creators";
 import { useXpr } from "@/contexts/XprContext";
 import { cn } from "@/lib/utils";
 
-// Generate mock stats for creators - Expanded to Top 20
+// Reduced seed data for clean deployment
 const INITIAL_CREATOR_DATA = [
-  ...CREATORS.map((creator, index) => ({
-    ...creator,
-    totalValue: [125000, 98400, 82100, 45000, 32000, 28000, 15000, 12000, 5000][index] || 1000,
-    activityCount: [412, 321, 284, 156, 98, 76, 45, 32, 12][index] || 5,
-  })),
-  // Additional mock creators to fill top 20
-  { id: "c10", name: "Chef Julian", handle: "chef_j", avatar: "CJ", color: "bg-orange-600", totalValue: 4200, activityCount: 11, location: "Paris, FR" },
-  { id: "c11", name: "Zoe Cycles", handle: "zoe_bike", avatar: "ZC", color: "bg-lime-500", totalValue: 3800, activityCount: 10, location: "Amsterdam, NL" },
-  { id: "c12", name: "Tech Tips", handle: "tt_pro", avatar: "TT", color: "bg-slate-700", totalValue: 3500, activityCount: 9, location: "San Francisco, USA" },
-  { id: "c13", name: "Urban Gardener", handle: "green_city", avatar: "UG", color: "bg-green-700", totalValue: 3100, activityCount: 8, location: "Berlin, DE" },
-  { id: "c14", name: "Aero Spotter", handle: "planes_xyz", avatar: "AS", color: "bg-sky-500", totalValue: 2800, activityCount: 8, location: "Sydney, AU" },
-  { id: "c15", name: "Lofi Beats", handle: "lofi_vibes", avatar: "LB", color: "bg-indigo-400", totalValue: 2500, activityCount: 7, location: "Tokyo, JP" },
-  { id: "c16", name: "Fitness Daily", handle: "daily_fit", avatar: "FD", color: "bg-red-500", totalValue: 2200, activityCount: 6, location: "Miami, USA" },
-  { id: "c17", name: "Code Master", handle: "dev_guru", avatar: "CM", color: "bg-blue-800", totalValue: 1900, activityCount: 5, location: "London, UK" },
-  { id: "c18", name: "Artistic Soul", handle: "artsy", avatar: "AS", color: "bg-pink-500", totalValue: 1600, activityCount: 4, location: "Milan, IT" },
-  { id: "c19", name: "Crypto News", handle: "xpr_daily", avatar: "CN", color: "bg-orange-400", totalValue: 1300, activityCount: 3, location: "Austin, USA" },
-  { id: "c20", name: "New Hustler", handle: "join_now", avatar: "NH", color: "bg-purple-500", totalValue: 1000, activityCount: 2, location: "Global" },
+  { id: "1", name: "TAB Project", handle: "tiptab", avatar: "TAB", color: "bg-red-600", totalValue: 5000, activityCount: 12, location: "London, UK" },
+  { id: "c20", name: "New Hustler", handle: "join_now", avatar: "NH", color: "bg-purple-500", totalValue: 0, activityCount: 0, location: "Global" },
 ];
 
 const CREATOR_LEADERBOARD = INITIAL_CREATOR_DATA.sort((a, b) => b.activityCount - a.activityCount);
 
-// Expanded mock stats for supporters - Top 20
-const MOCK_SUPPORTERS = [
-  { id: "s1", name: "WhaleShark", handle: "whaleshark", avatar: "WS", color: "bg-blue-600", totalValue: 540000, activityCount: 1240, label: "Tips Sent", location: "Dubai, UAE" },
-  { id: "s2", name: "EarlyAdopter", handle: "early", avatar: "EA", color: "bg-purple-600", totalValue: 215000, activityCount: 890, label: "Tips Sent", location: "London, UK" },
-  { id: "s3", name: "Tab Fanatic", handle: "fanatic", avatar: "TF", color: "bg-orange-500", totalValue: 185000, activityCount: 650, label: "Tips Sent", location: "Austin, USA" },
-  { id: "s4", name: "CryptoKing", handle: "cking", avatar: "CK", color: "bg-emerald-600", totalValue: 92000, activityCount: 420, label: "Tips Sent", location: "Seoul, KR" },
-  { id: "s5", name: "XPR Warrior", handle: "warrior", avatar: "XW", color: "bg-red-600", totalValue: 75000, activityCount: 310, label: "Tips Sent", location: "Tokyo, JP" },
-  { id: "s6", name: "Alpha", handle: "alpha_vault", avatar: "AV", color: "bg-indigo-600", totalValue: 62000, activityCount: 285, label: "Tips Sent", location: "Miami, USA" },
-  { id: "s7", name: "Nexus", handle: "nexus_x", avatar: "NX", color: "bg-cyan-600", totalValue: 58000, activityCount: 240, label: "Tips Sent", location: "Berlin, DE" },
-  { id: "s8", name: "Stardust", handle: "stardust", avatar: "SD", color: "bg-pink-600", totalValue: 51000, activityCount: 215, label: "Tips Sent", location: "Paris, FR" },
-  { id: "s9", name: "Orion", handle: "orion_tips", avatar: "OT", color: "bg-sky-600", totalValue: 45000, activityCount: 198, label: "Tips Sent", location: "Toronto, CA" },
-  { id: "s10", name: "Nova", handle: "nova_node", avatar: "NN", color: "bg-violet-600", totalValue: 38000, activityCount: 175, label: "Tips Sent", location: "Singapore, SG" },
-  { id: "s11", name: "Pixel", handle: "pixel_pete", avatar: "PP", color: "bg-yellow-600", totalValue: 32000, activityCount: 154, label: "Tips Sent", location: "Melbourne, AU" },
-  { id: "s12", name: "Vortex", handle: "vortex_v", avatar: "VV", color: "bg-slate-600", totalValue: 29000, activityCount: 132, label: "Tips Sent", location: "Lagos, NG" },
-  { id: "s13", name: "Zenix", handle: "zenix_tx", avatar: "ZT", color: "bg-lime-600", totalValue: 24000, activityCount: 110, label: "Tips Sent", location: "Madrid, ES" },
-  { id: "s14", name: "Echo", handle: "echo_chain", avatar: "EC", color: "bg-teal-600", totalValue: 19000, activityCount: 98, label: "Tips Sent", location: "Seattle, USA" },
-  { id: "s15", name: "Titan", handle: "titan_web", avatar: "TW", color: "bg-rose-600", totalValue: 15000, activityCount: 84, label: "Tips Sent", location: "Vancouver, CA" },
-  { id: "s16", name: "Luna", handle: "luna_love", avatar: "LL", color: "bg-fuchsia-600", totalValue: 12000, activityCount: 72, label: "Tips Sent", location: "Milan, IT" },
-  { id: "s17", name: "Atlas", handle: "atlas_geo", avatar: "AG", color: "bg-orange-700", totalValue: 9000, activityCount: 65, label: "Tips Sent", location: "Accra, GH" },
-  { id: "s18", name: "Solar", handle: "solar_power", avatar: "SP", color: "bg-yellow-500", totalValue: 7500, activityCount: 54, label: "Tips Sent", location: "Dubai, UAE" },
-  { id: "s19", name: "Quark", handle: "quark_x", avatar: "QX", color: "bg-cyan-500", totalValue: 5000, activityCount: 42, label: "Tips Sent", location: "Tokyo, JP" },
-  { id: "s20", name: "Byte", handle: "byte_size", avatar: "BS", color: "bg-blue-500", totalValue: 3000, activityCount: 31, label: "Tips Sent", location: "Seoul, KR" },
-];
+const MOCK_SUPPORTERS: any[] = [];
 
 const Leaderboard = () => {
   const [isMembershipOpen, setIsMembershipOpen] = useState(false);
   const [activeTab, setActiveTab] = useState<"creators" | "supporters">("creators");
-  const { actor, isMember } = useXpr();
+  const { actor, isMember, balances } = useXpr();
   const navigate = useNavigate();
   
   const handleBack = () => {
@@ -78,9 +41,8 @@ const Leaderboard = () => {
     const savedUser = localStorage.getItem("tiptab_user_profile");
     let combinedSupporters = [...MOCK_SUPPORTERS];
 
-    if (savedUser && !isMember) {
+    if (savedUser && !isMember && actor) {
       const localUser = JSON.parse(savedUser) as Creator;
-      // Only add if not already in mock list
       if (!combinedSupporters.find(s => s.handle === localUser.handle)) {
         combinedSupporters.push({
           id: localUser.id,
@@ -89,8 +51,8 @@ const Leaderboard = () => {
           avatar: localUser.avatar,
           avatarImage: localUser.avatarImage,
           color: localUser.color,
-          totalValue: 0, 
-          activityCount: 0,
+          totalValue: parseInt(localStorage.getItem(`tiptab_tips_sent_${actor}`) || "0"), 
+          activityCount: parseInt(localStorage.getItem(`tiptab_tips_sent_${actor}`) || "0"),
           label: "Tips Sent",
           location: localUser.location
         });
@@ -98,9 +60,9 @@ const Leaderboard = () => {
     }
 
     return combinedSupporters.sort((a, b) => b.activityCount - a.activityCount);
-  }, [activeTab, isMember]);
+  }, [activeTab, isMember, actor]);
 
-  const DISPLAY_LIMIT = 20; // Restricted to Top 20 as requested
+  const DISPLAY_LIMIT = 20; 
   const topThree = currentData.slice(0, 3);
   const others = currentData.slice(3, DISPLAY_LIMIT);
 
@@ -153,129 +115,78 @@ const Leaderboard = () => {
 
         {/* Podium Section */}
         <div className="flex flex-col md:flex-row items-center md:items-end justify-center gap-8 md:gap-6 mb-24 lg:mb-32">
-          {/* 2nd Place */}
-          {topThree[1] && (
-            <div className="w-full max-w-sm md:w-72 order-2 md:order-1 animate-in slide-in-from-bottom-8 duration-700 delay-100">
-              <div className="bg-[#120a21]/80 border-2 border-slate-400/50 rounded-[40px] p-6 md:p-8 text-center relative group hover:border-slate-400 transition-all shadow-[0_0_30px_rgba(148,163,184,0.1)]">
-                <div className="absolute -top-4 md:-top-6 left-1/2 -translate-x-1/2 bg-slate-300 text-black font-black px-4 py-1 rounded-full text-[10px] md:text-xs uppercase tracking-widest shadow-lg">2nd Place</div>
-                <div className={cn("h-24 md:h-28 w-24 md:w-28 rounded-3xl mx-auto mb-6 border-4 border-slate-400 flex items-center justify-center text-3xl font-black overflow-hidden shadow-2xl relative", topThree[1].color)}>
-                  {("avatarImage" in topThree[1] && topThree[1].avatarImage) ? (
-                    <img src={topThree[1].avatarImage as string} alt="Avatar" className="w-full h-full object-cover" />
-                  ) : (
-                    <span className="relative z-10 text-white">{topThree[1].avatar}</span>
-                  )}
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
-                </div>
-                <h3 className="text-xl md:text-2xl font-black mb-1 truncate px-2">{topThree[1].name}</h3>
-                <p className="text-slate-200 font-bold mb-6 text-sm md:text-base">@{topThree[1].handle}</p>
-                <div className="text-2xl md:text-3xl font-black text-slate-100 drop-shadow-[0_0_10px_rgba(255,255,255,0.1)]">
-                  {topThree[1].activityCount.toLocaleString()} <span className="text-xs text-slate-400 font-black">TIPS</span>
-                </div>
-              </div>
-            </div>
-          )}
-
-          {/* 1st Place */}
-          {topThree[0] && (
-            <div className="w-full max-w-sm md:w-80 order-1 md:order-2 animate-in zoom-in-95 duration-1000 scale-105 md:scale-110">
-              <div className="bg-[#1a0f2e]/80 border-4 border-yellow-400/60 rounded-[48px] p-8 md:p-10 text-center relative group hover:border-yellow-400 transition-all shadow-[0_0_60px_rgba(250,204,21,0.2)] md:-translate-y-8 overflow-hidden">
-                <div className="absolute top-2 right-2 p-2 md:p-4">
-                  <Crown className="h-6 w-6 md:h-8 md:w-8 text-yellow-400 animate-bounce" />
-                </div>
-                <div className="absolute -top-4 md:-top-6 left-1/2 -translate-x-1/2 bg-yellow-400 text-black font-black px-6 py-1.5 rounded-full text-xs md:text-sm uppercase tracking-widest shadow-[0_0_20px_rgba(250,204,21,0.5)]">Champion</div>
-                <div className={cn("h-32 md:h-36 w-32 md:w-36 rounded-[32px] mx-auto mb-8 border-4 border-yellow-400 flex items-center justify-center text-4xl font-black overflow-hidden shadow-[0_0_40px_rgba(250,204,21,0.3)] relative", topThree[0].color)}>
-                  {("avatarImage" in topThree[0] && topThree[0].avatarImage) ? (
-                    <img src={topThree[0].avatarImage as string} alt="Avatar" className="w-full h-full object-cover" />
-                  ) : (
-                    <span className="relative z-10 text-white">{topThree[0].avatar}</span>
-                  )}
-                  <div className="absolute inset-0 bg-gradient-to-t from-yellow-900/40 to-transparent" />
-                </div>
-                <h3 className="text-2xl md:text-3xl font-black mb-1 truncate px-2">{topThree[0].name}</h3>
-                <p className="text-yellow-300 font-black mb-8 text-sm md:text-base">@{topThree[0].handle}</p>
-                <div className="text-3xl md:text-4xl font-black text-white drop-shadow-[0_0_15px_rgba(250,204,21,0.4)]">
-                  {topThree[0].activityCount.toLocaleString()} <span className="text-xs md:text-sm text-yellow-400 font-black">TIPS</span>
-                </div>
-              </div>
-            </div>
-          )}
-
-          {/* 3rd Place */}
-          {topThree[2] && (
-            <div className="w-full max-w-sm md:w-72 order-3 animate-in slide-in-from-bottom-8 duration-700 delay-200">
-              <div className="bg-[#120a21]/80 border-2 border-orange-700/50 rounded-[40px] p-6 md:p-8 text-center relative group hover:border-orange-700 transition-all shadow-[0_0_30px_rgba(194,65,12,0.1)]">
-                <div className="absolute -top-4 md:-top-6 left-1/2 -translate-x-1/2 bg-orange-600 text-white font-black px-4 py-1 rounded-full text-[10px] md:text-xs uppercase tracking-widest shadow-lg">3rd Place</div>
-                <div className={cn("h-24 md:h-28 w-24 md:w-28 rounded-3xl mx-auto mb-6 border-4 border-orange-700 flex items-center justify-center text-3xl font-black overflow-hidden shadow-2xl relative", topThree[2].color)}>
-                  {("avatarImage" in topThree[2] && topThree[2].avatarImage) ? (
-                    <img src={topThree[2].avatarImage as string} alt="Avatar" className="w-full h-full object-cover" />
-                  ) : (
-                    <span className="relative z-10 text-white">{topThree[2].avatar}</span>
-                  )}
-                  <div className="absolute inset-0 bg-gradient-to-t from-orange-950/60 to-transparent" />
-                </div>
-                <h3 className="text-xl md:text-2xl font-black mb-1 truncate px-2">{topThree[2].name}</h3>
-                <p className="text-orange-300 font-bold mb-6 text-sm md:text-base">@{topThree[2].handle}</p>
-                <div className="text-2xl md:text-3xl font-black text-orange-400 drop-shadow-[0_0_10px_rgba(251,146,60,0.3)]">
-                  {topThree[2].activityCount.toLocaleString()} <span className="text-xs text-orange-600 font-black">TIPS</span>
-                </div>
-              </div>
-            </div>
+          {currentData.length === 0 ? (
+            <div className="py-20 text-center opacity-40 italic font-bold">Waiting for network activity...</div>
+          ) : (
+            <>
+              {/* Podium rendering logic for top 3 */}
+              {topThree.map((participant, index) => {
+                const rank = index === 0 ? "1st" : index === 1 ? "2nd" : "3rd";
+                const isFirst = index === 0;
+                return (
+                  <div key={participant.id} className={cn("w-full max-w-sm md:w-72 order-2 animate-in slide-in-from-bottom-8 duration-700", isFirst && "scale-105 md:scale-110 order-1")}>
+                    <div className={cn(
+                      "bg-[#120a21]/80 border-2 rounded-[40px] p-6 md:p-8 text-center relative group hover:border-white transition-all shadow-2xl",
+                      isFirst ? "border-yellow-400/60" : "border-slate-400/50"
+                    )}>
+                      <div className="absolute -top-4 md:-top-6 left-1/2 -translate-x-1/2 bg-white/10 text-white font-black px-4 py-1 rounded-full text-[10px] md:text-xs uppercase tracking-widest shadow-lg">
+                        {rank} Place
+                      </div>
+                      <div className={cn("h-24 md:h-28 w-24 md:w-28 rounded-3xl mx-auto mb-6 border-4 flex items-center justify-center text-3xl font-black overflow-hidden shadow-2xl relative", participant.color, isFirst ? "border-yellow-400" : "border-slate-400")}>
+                        {participant.avatarImage ? (
+                          <img src={participant.avatarImage} alt="" className="w-full h-full object-cover" />
+                        ) : (
+                          <span className="relative z-10 text-white">{participant.avatar}</span>
+                        )}
+                      </div>
+                      <h3 className="text-xl md:text-2xl font-black mb-1 truncate px-2">{participant.name}</h3>
+                      <p className="text-white/60 font-bold mb-6 text-sm md:text-base">@{participant.handle}</p>
+                      <div className="text-2xl md:text-3xl font-black text-slate-100">
+                        {participant.activityCount.toLocaleString()} <span className="text-xs text-slate-400 font-black">TIPS</span>
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
+            </>
           )}
         </div>
 
         {/* List Section */}
         <div className="max-w-4xl mx-auto space-y-4">
-          <div className="flex items-center justify-between px-6 md:px-8 py-4 text-cyan-200 font-black uppercase tracking-widest text-[9px] md:text-[10px]">
-            <div className="flex items-center gap-6 md:gap-12">
-              <span className="w-8 text-center">Rank</span>
-              <span>Participant</span>
-            </div>
-            <div className="flex items-center gap-6 md:gap-12">
-              <span className="hidden sm:inline">Cumulative Value</span>
-              <span className="w-20 md:w-24 text-right">Volume</span>
-            </div>
-          </div>
-
           {others.map((participant, i) => (
             <div 
               key={participant.id}
               className="bg-white/5 border border-white/10 rounded-[24px] md:rounded-3xl p-4 md:p-6 flex items-center justify-between group hover:bg-white/15 hover:border-cyan-400/50 transition-all cursor-pointer"
             >
               <div className="flex items-center gap-4 md:gap-8">
-                <span className="w-8 text-center font-black text-white/60 text-lg md:text-xl group-hover:text-purple-400 transition-colors">#{i + 4}</span>
+                <span className="w-8 text-center font-black text-white/60 text-lg md:text-xl">#{i + 4}</span>
                 <div className="flex items-center gap-3 md:gap-4">
                   <div className={cn("h-12 md:h-16 w-12 md:w-16 rounded-xl md:rounded-2xl flex items-center justify-center text-base md:text-xl font-black border-2 border-white/20 overflow-hidden relative shadow-lg", participant.color)}>
-                    {("avatarImage" in participant && participant.avatarImage) ? (
-                      <img src={participant.avatarImage as string} alt="Avatar" className="w-full h-full object-cover" />
+                    {participant.avatarImage ? (
+                      <img src={participant.avatarImage} alt="" className="w-full h-full object-cover" />
                     ) : (
                       <span className="relative z-10 text-white">{participant.avatar}</span>
                     )}
                   </div>
-                  <div className="max-w-[100px] sm:max-w-none">
+                  <div>
                     <h4 className="font-black text-sm md:text-lg group-hover:text-purple-100 transition-colors truncate">{participant.name}</h4>
-                    <p className="text-xs md:text-sm text-white/70 font-bold group-hover:text-purple-400 transition-colors truncate">@{participant.handle}</p>
-                    <p className="text-[9px] text-slate-500 font-bold mt-0.5">{participant.location}</p>
+                    <p className="text-xs md:text-sm text-white/70 font-bold">@{participant.handle}</p>
                   </div>
                 </div>
               </div>
 
-              <div className="flex items-center gap-4 md:gap-12">
-                <div className="hidden sm:flex items-center gap-2 text-white/40 font-black text-xs md:text-sm">
-                  {participant.totalValue.toLocaleString()} <span className="text-[9px] uppercase tracking-widest">TAB Value</span>
-                </div>
-                <div className="w-20 md:w-32 text-right">
-                  <span className="text-xl md:text-2xl font-black group-hover:text-purple-400 transition-colors">{participant.activityCount.toLocaleString()}</span>
-                  <span className="text-[9px] md:text-[10px] font-black text-orange-500 ml-1 uppercase tracking-widest">Tips</span>
-                </div>
+              <div className="w-20 md:w-32 text-right">
+                <span className="text-xl md:text-2xl font-black">{participant.activityCount.toLocaleString()}</span>
+                <span className="text-[9px] md:text-[10px] font-black text-orange-500 ml-1 uppercase tracking-widest">Tips</span>
               </div>
             </div>
           ))}
           
-          {currentData.length > DISPLAY_LIMIT && (
-            <div className="pt-10 text-center">
-              <p className="text-white/20 text-[10px] font-black uppercase tracking-[0.3em]">
-                Showing Top {DISPLAY_LIMIT} Participants
-              </p>
+          {currentData.length === 0 && activeTab === "supporters" && (
+            <div className="py-20 text-center space-y-4 bg-white/[0.02] rounded-[40px] border border-dashed border-white/10">
+               <Heart className="h-12 w-12 mx-auto text-white/10" />
+               <p className="text-white/20 font-black uppercase tracking-[0.3em] text-xs">No supporters detected yet.</p>
             </div>
           )}
         </div>
