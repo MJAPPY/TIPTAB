@@ -55,7 +55,7 @@ const CreatorProfile = () => {
   const { session, actor, login, isConnected, recordTip, isMember, featuredHandles, boostStream, boostPrice, boostTabPrice, userProfile, isFavorite, toggleFavorite } = useXpr();
   
   const [creator, setCreator] = useState<Creator | null>(null);
-  const [tipAmount, setTipAmount] = useState("10");
+  const [tipAmount, setTipAmount] = useState("50");
   const [asset, setAsset] = useState<string>("TAB");
   const [message, setMessage] = useState("");
   const [isProcessing, setIsProcessing] = useState(false);
@@ -313,7 +313,8 @@ const CreatorProfile = () => {
     );
   }
 
-  const quickAmounts = ["1", "5", "10", "25"];
+  // Adjusted quick tiers: TAB is high numeric, stablecoins/XPR are lower
+  const quickAmounts = asset === "TAB" ? ["10", "50", "100", "250"] : ["1", "5", "10", "25"];
 
   const liveStreams = [
     { type: 'YouTube', url: creator.youtubeLive, icon: Youtube, color: 'text-red-500' },
