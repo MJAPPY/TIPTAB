@@ -48,7 +48,8 @@ import {
   Coins,
   RefreshCw,
   Scale,
-  Clock
+  Clock,
+  Info
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
@@ -190,45 +191,31 @@ const AdminHub = () => {
   const [newPromoValue, setNewPromoValue] = useState("50");
   const [newPromoUses, setNewPromoUses] = useState("100");
 
-  // Financial Sourced Calculations (Multi-token Mock Revenue Data)
-  const treasuryData = [
-    { 
-      symbol: "XPR", 
-      revenue: 458750, 
-      boostVolume: 12500, 
-      rewards: 6250, 
-      color: "text-orange-500", 
-      bg: "from-orange-500/10",
-      icon: Zap
-    },
-    { 
-      symbol: "TAB", 
-      revenue: 1250000, 
-      boostVolume: 50000, 
-      rewards: 25000, 
-      color: "text-purple-400", 
-      bg: "from-purple-500/10",
-      icon: Sparkles
-    },
-    { 
-      symbol: "XMD", 
-      revenue: 2450.50, 
-      boostVolume: 0, 
-      rewards: 0, 
-      color: "text-cyan-400", 
-      bg: "from-cyan-500/10",
-      icon: Globe
-    },
-    { 
-      symbol: "XUSDC", 
-      revenue: 1840.25, 
-      boostVolume: 0, 
-      rewards: 0, 
-      color: "text-green-400", 
-      bg: "from-green-500/10",
-      icon: HandCoins
-    }
-  ];
+  // Multi-token Financial Data with Explicit 50/50 Split Logic
+  const treasuryData = useMemo(() => {
+    // Base Volumes (Simulated/Simulated Revenue Totals)
+    const rawData = [
+      { symbol: "XPR", totalActivation: 452500, boostVolume: 12500, color: "text-orange-500", bg: "from-orange-500/10", icon: Zap },
+      { symbol: "TAB", totalActivation: 1200000, boostVolume: 50000, color: "text-purple-400", bg: "from-purple-500/10", icon: Sparkles },
+      { symbol: "XMD", totalActivation: 2450.50, boostVolume: 0, color: "text-cyan-400", bg: "from-cyan-500/10", icon: Globe },
+      { symbol: "XUSDC", totalActivation: 1840.25, boostVolume: 0, color: "text-green-400", bg: "from-green-500/10", icon: HandCoins }
+    ];
+
+    return rawData.map(item => {
+      // PROVEN 50% SPLIT: 50% to Rewards, 50% to Admin Net
+      const rewards = item.boostVolume * 0.5;
+      const adminBoostShare = item.boostVolume * 0.5;
+      const netRevenue = item.totalActivation + adminBoostShare;
+
+      return {
+        ...item,
+        revenue: netRevenue,
+        rewards,
+        boostVolume: item.boostVolume,
+        splitPolicy: "50/50 Rewards Split"
+      };
+    });
+  }, []);
 
   useEffect(() => {
     if (membershipFee) setLocalFee(membershipFee);
@@ -341,7 +328,7 @@ const AdminHub = () => {
     setIsSyncingPrices(false);
   }, [membershipFeeXusdc, boostPriceXusdc, localFeeXusdc, localBoostXusdc, updateMembershipFee, updateBoostPrice, updateBoostTabPrice, updateBoostPriceXusdc, toast]);
 
-  // Passive Auto-Sync Logic: Runs once per 24h when a Super Admin opens the dashboard
+  // Passive Auto-Sync Logic
   useEffect(() => {
     if (adminRole === 'super' && isConnected) {
       const oneDayInMs = 24 * 60 * 60 * 1000;
@@ -761,9 +748,15 @@ const AdminHub = () => {
                   <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-white/[0.03] to-transparent pointer-events-none" />
                   <CardHeader className="p-12 pb-6 relative z-10">
                     <div className="flex items-center justify-between">
-                      <CardTitle className="text-3xl font-black italic tracking-tighter flex items-center gap-4 text-white uppercase">
-                        <Activity className="h-10 w-10 text-purple-500 animate-pulse" /> NETWORK TREASURY
-                      </CardTitle>
+                      <div className="space-y-2">
+                        <CardTitle className="text-3xl font-black italic tracking-tighter flex items-center gap-4 text-white uppercase">
+                          <Activity className="h-10 w-10 text-purple-500 animate-pulse" /> NETWORK TREASURY
+                        </CardTitle>
+                        <div className="flex items-center gap-2 px-3 py-1 rounded-full bg-orange-500/10 border border-orange-500/20 w-fit">
+                          <Info className="h-3 w-3 text-orange-400" />
+                          <span className="text-[9px] font-black uppercase tracking-widest text-orange-400">Policy: 50% Boost Split to Rewards</span>
+                        </div>
+                      </div>
                       <div className="flex items-center gap-3 px-4 py-1.5 rounded-full bg-green-500/20 border border-green-500/40 shadow-[0_0_20px_rgba(34,197,94,0.3)]">
                         <span className="relative flex h-2.5 w-2.5">
                           <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
@@ -785,7 +778,12 @@ const AdminHub = () => {
                             <div className="space-y-8 relative z-10">
                                <div className="flex items-center justify-between">
                                   <div className="space-y-1">
-                                    <p className="text-[11px] font-black text-white/40 uppercase tracking-[0.4em]">Net Admin Revenue</p>
+                                    <div className="flex items-center gap-2 mb-1">
+                                      <p className="text-[11px] font-black text-white/40 uppercase tracking-[0.4em]">Net Admin Revenue</p>
+                                      {asset.boostVolume > 0 && (
+                                        <Badge variant="outline" className="h-4 border-white/10 text-[7px] font-black text-white/30 uppercase tracking-widest px-1.5">Inc. 50% Boost</Badge>
+                                      )}
+                                    </div>
                                     <p className="text-4xl font-black text-white tracking-tighter italic">
                                       {asset.revenue.toLocaleString()} <span className={cn("text-lg", asset.color)}>{asset.symbol}</span>
                                     </p>
