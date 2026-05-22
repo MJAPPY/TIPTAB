@@ -231,7 +231,7 @@ export const ProfileEditor = ({ initialData, onSave, minimal = false }: ProfileE
             </div>
           </div>
 
-          {/* Social & Broadcast (Only for Members) */}
+          {/* Social & Media (Only for Members) */}
           {!minimal && (
             <>
               <div className="space-y-8 pt-8 border-t border-white/5">
@@ -264,7 +264,7 @@ export const ProfileEditor = ({ initialData, onSave, minimal = false }: ProfileE
               </div>
 
               <div className="space-y-8 pt-8 border-t border-white/5">
-                <h4 className="font-bold text-lg flex items-center gap-2"><Globe className="h-5 w-5 text-cyan-400" /> Social Identity</h4>
+                <h4 className="font-bold text-lg flex items-center gap-2"><Globe className="h-5 w-5 text-cyan-400" /> Social & Media Links</h4>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
                   <div className="space-y-2">
                     <Label htmlFor="twitter" className="text-white/60 font-bold uppercase tracking-widest text-[10px]">Twitter URL</Label>
@@ -294,11 +294,18 @@ export const ProfileEditor = ({ initialData, onSave, minimal = false }: ProfileE
                       <Input id="spotify" value={formData.spotify} onChange={handleChange} className="pl-12 bg-white/5 border-white/10 h-12 rounded-xl" placeholder="https://open.spotify.com/..." />
                     </div>
                   </div>
+                  <div className="space-y-2 md:col-span-2">
+                    <Label htmlFor="videoUrl" className="text-white/60 font-bold uppercase tracking-widest text-[10px]">Video URL (YouTube/Vimeo)</Label>
+                    <div className="relative">
+                      <Video className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-white/20" />
+                      <Input id="videoUrl" value={formData.videoUrl} onChange={handleChange} className="pl-12 bg-white/5 border-white/10 h-12 rounded-xl" placeholder="https://..." />
+                    </div>
+                  </div>
                 </div>
               </div>
 
               <div className="space-y-8 pt-8 border-t border-white/5">
-                <h4 className="font-bold text-lg flex items-center gap-2"><Radio className="h-5 w-5 text-red-500" /> Live Broadcasts</h4>
+                <h4 className="font-bold text-lg flex items-center gap-2"><Radio className="h-5 w-5 text-red-500" /> Live Broadcast Channels</h4>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
                   <div className="space-y-2">
                     <Label htmlFor="twitch" className="text-white/60 font-bold uppercase tracking-widest text-[10px]">Twitch Channel</Label>
