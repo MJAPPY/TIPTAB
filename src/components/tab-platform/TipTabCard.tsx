@@ -159,6 +159,13 @@ export const TipTabCard = ({ creator }: TipTabCardProps) => {
         <div className="relative z-10 flex items-end justify-between gap-4">
           {/* Left Info Column */}
           <div className="space-y-4 flex-1 min-w-0 pb-1">
+            {/* Added "Tip Card" text label */}
+            <div className="mb-1">
+              <p className="text-[10px] md:text-[11px] font-black uppercase tracking-[0.45em] text-white/50 italic">
+                Tip Card
+              </p>
+            </div>
+
             <div className="space-y-1.5">
               <div className="flex items-center gap-2 text-white font-black text-[13px] md:text-sm">
                 <MapPin className="h-3.5 w-3.5 md:h-4 md:w-4 text-purple-500 shrink-0" />
