@@ -1,9 +1,9 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { useParams, useNavigate, useLocation } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import { 
-  Zap, Twitter, Instagram, Globe, Video, MapPin, ShieldCheck, Share2, Check, Wallet, Heart, Music, Tv, Twitch, Youtube, Radio, ArrowLeft, Sparkles
+  Zap, Twitter, Globe, MapPin, ShieldCheck, Heart, ArrowLeft, Sparkles, Coins
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -11,7 +11,6 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { CREATORS, Creator } from "@/data/creators";
 import { Header } from "@/components/tab-platform/Header";
 import { MembershipModal } from "@/components/tab-platform/MembershipModal";
-import { EmbedPlayer } from "@/components/tab-platform/EmbedPlayer";
 import { LiveReactions } from "@/components/tab-platform/LiveReactions";
 import { useToast } from "@/hooks/use-toast";
 import { useXpr } from "@/contexts/XprContext";
@@ -30,14 +29,13 @@ const CreatorProfile = () => {
   const { handle } = useParams<{ handle: string }>();
   const navigate = useNavigate();
   const { toast } = useToast();
-  const { session, actor, login, isConnected, recordTip, featuredHandles, boostStream, boostPrice, boostTabPrice, isMember } = useXpr();
+  const { session, actor, login, isConnected, recordTip, isMember } = useXpr();
   
   const [creator, setCreator] = useState<Creator | null>(null);
   const [tipAmount, setTipAmount] = useState("50");
   const [asset, setAsset] = useState<string>("TAB");
   const [isProcessing, setIsProcessing] = useState(false);
   const [isMembershipOpen, setIsMembershipOpen] = useState(false);
-  const [isCopied, setIsCopied] = useState(false);
   const [likeCount, setLikeCount] = useState(130);
   const [fireworkCount, setFireworkCount] = useState(42);
   const [applauseCount, setApplauseCount] = useState(84);
@@ -160,11 +158,45 @@ const CreatorProfile = () => {
                     <Button variant="ghost" onClick={() => handleReaction('heart')} className="bg-white/5 border border-white/10 h-10 px-4 rounded-xl gap-2"><Heart className="h-4 w-4 text-red-500" />{likeCount}</Button>
                     <Button variant="ghost" onClick={() => handleReaction('firework')} className="bg-white/5 border border-white/10 h-10 px-4 rounded-xl gap-2">🎇{fireworkCount}</Button>
                   </div>
-                  <div className="relative">
-                    <Input placeholder="0" value={tipAmount} onChange={(e) => setTipAmount(e.target.value)} className="bg-white/5 border-white/10 h-16 rounded-2xl text-right text-2xl font-black pr-16" />
-                    <span className="absolute right-6 top-1/2 -translate-y-1/2 font-black text-orange-500">{asset}</span>
+                  
+                  <div className="space-y-4">
+                    <Label className="text-[10px] font-black uppercase tracking-widest text-white/30 ml-1">Choose Asset & Amount</Label>
+                    <div className="flex gap-3">
+                      <div className="relative flex-1">
+                        <Input 
+                          placeholder="0" 
+                          value={tipAmount} 
+                          onChange={(e) => setTipAmount(e.target.value)} 
+                          className="bg-white/5 border-white/10 h-16 rounded-2xl text-right text-2xl font-black pr-6 focus:ring-purple-500/50" 
+                        />
+                      </div>
+                      <Select value={asset} onValueChange={(val) => setAsset(val)}>
+                        <SelectTrigger className="w-[120px] h-16 bg-white/5 border-white/10 rounded-2xl font-black text-lg text-white">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent className="bg-[#2a1b4d] border-white/20 text-white rounded-xl">
+                          {Object.keys(ASSET_CONFIGS).map(s => (
+                            <SelectItem key={s} value={s} className="font-black py-3 cursor-pointer">{s}</SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
                   </div>
-                  <Button onClick={handleSendTip} disabled={isProcessing} className="w-full h-20 bg-gradient-to-r from-orange-500 to-purple-600 rounded-2xl text-xl font-black">{isProcessing ? "Processing..." : "Send Appreciation"}</Button>
+
+                  <Button 
+                    onClick={handleSendTip} 
+                    disabled={isProcessing} 
+                    className="w-full h-20 bg-gradient-to-r from-orange-500 to-purple-600 hover:from-purple-600 hover:to-purple-700 rounded-2xl text-xl font-black shadow-lg transition-all active:scale-95"
+                  >
+                    {isProcessing ? (
+                      <div className="flex items-center gap-3">
+                        <div className="h-6 w-6 border-2 border-white/20 border-t-white rounded-full animate-spin" />
+                        <span>Processing...</span>
+                      </div>
+                    ) : (
+                      "Send Appreciation"
+                    )}
+                  </Button>
                 </div>
               </div>
             </div>
