@@ -45,7 +45,9 @@ import {
   Flame,
   LayoutGrid,
   BellOff,
-  Coins
+  Coins,
+  RefreshCw,
+  Scale
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
@@ -156,6 +158,8 @@ const AdminHub = () => {
   const [moderatedCreators, setModeratedCreators] = useState<Creator[]>(CREATORS);
   const [bannedHandles, setBannedHandles] = useState<string[]>([]);
   const [isDistributing, setIsDistributing] = useState(false);
+  const [isSyncingPrices, setIsSyncingPrices] = useState(false);
+  const [xprPrice, setXprPrice] = useState<number | null>(null);
 
   // Profile Delete Confirmation Flow
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
@@ -213,6 +217,47 @@ const AdminHub = () => {
       setActiveTab("analytics");
     }
   }, [adminRole, activeTab]);
+
+  const fetchRates = async () => {
+    try {
+      const response = await fetch("https://api.coingecko.com/api/v3/simple/price?ids=proton&vs_currencies=usd");
+      const data = await response.json();
+      if (data.proton && data.proton.usd) {
+        setXprPrice(data.proton.usd);
+        return data.proton.usd;
+      }
+    } catch (e) {
+      console.error("Price fetch failed", e);
+    }
+    return null;
+  };
+
+  const handleSyncParity = async () => {
+    setIsSyncingPrices(true);
+    const price = await fetchRates();
+    if (price) {
+      const targetUsd = parseFloat(localFeeXusdc);
+      if (!isNaN(targetUsd)) {
+        const calculatedXpr = (targetUsd / price).toFixed(0);
+        const calculatedXmd = targetUsd.toFixed(2);
+        
+        setLocalFee(calculatedXpr);
+        setLocalFeeXmd(calculatedXmd);
+        
+        toast({
+          title: "Parity Calculated",
+          description: `Rates adjusted based on XPR price of $${price.toFixed(4)}. Review and update individual assets.`,
+        });
+      }
+    } else {
+      toast({
+        title: "Sync Failed",
+        description: "Could not fetch current market rates.",
+        variant: "destructive"
+      });
+    }
+    setIsSyncingPrices(false);
+  };
 
   const handleUpdateFee = (asset: 'XPR' | 'XMD' | 'XUSDC') => {
     if (adminRole !== 'super') {
@@ -710,6 +755,33 @@ const AdminHub = () => {
                   </CardHeader>
                   <CardContent className="p-10 space-y-8">
                     <div className="space-y-6">
+                      <div className="space-y-3 p-6 rounded-3xl bg-white/[0.03] border border-white/5">
+                        <div className="flex items-center justify-between mb-4">
+                           <Label className="text-[11px] font-black uppercase tracking-widest text-cyan-400">Master Asset: XUSDC</Label>
+                           <Button 
+                            variant="ghost" 
+                            size="sm" 
+                            onClick={handleSyncParity} 
+                            disabled={isSyncingPrices || adminRole !== 'super'}
+                            className="h-8 px-3 rounded-lg bg-white/5 border border-white/10 hover:bg-white/10 text-[9px] font-black uppercase tracking-widest gap-2"
+                           >
+                             <Scale className={cn("h-3.5 w-3.5", isSyncingPrices && "animate-spin")} />
+                             Calculate Parity
+                           </Button>
+                        </div>
+                        <div className="flex gap-4">
+                          <Input 
+                            type="number" 
+                            value={localFeeXusdc} 
+                            onChange={(e) => setLocalFeeXusdc(e.target.value)}
+                            disabled={adminRole !== 'super'}
+                            className="bg-[#2a1d4a] border-white/10 rounded-2xl font-black text-xl h-16 px-6 focus:ring-cyan-500/50 text-white disabled:opacity-50"
+                          />
+                          <Button onClick={() => handleUpdateFee('XUSDC')} disabled={adminRole !== 'super'} className="bg-cyan-600 hover:bg-cyan-700 rounded-2xl px-6 h-16 font-black text-white">Update</Button>
+                        </div>
+                        <p className="text-[9px] font-bold text-white/20 uppercase tracking-widest mt-3">Sets base valuation. Use 'Calculate Parity' to sync XPR/XMD.</p>
+                      </div>
+
                       <div className="space-y-3">
                         <Label className="text-[11px] font-black uppercase tracking-widest text-white/40">XPR Activation Fee</Label>
                         <div className="flex gap-4">
@@ -735,20 +807,6 @@ const AdminHub = () => {
                             className="bg-[#2a1d4a] border-white/10 rounded-2xl font-black text-xl h-16 px-6 focus:ring-purple-500/50 text-white disabled:opacity-50"
                           />
                           <Button onClick={() => handleUpdateFee('XMD')} disabled={adminRole !== 'super'} className="bg-purple-600 hover:bg-purple-700 rounded-2xl px-6 h-16 font-black text-white">Update</Button>
-                        </div>
-                      </div>
-
-                      <div className="space-y-3">
-                        <Label className="text-[11px] font-black uppercase tracking-widest text-white/40">XUSDC Activation Fee</Label>
-                        <div className="flex gap-4">
-                          <Input 
-                            type="number" 
-                            value={localFeeXusdc} 
-                            onChange={(e) => setLocalFeeXusdc(e.target.value)}
-                            disabled={adminRole !== 'super'}
-                            className="bg-[#2a1d4a] border-white/10 rounded-2xl font-black text-xl h-16 px-6 focus:ring-cyan-500/50 text-white disabled:opacity-50"
-                          />
-                          <Button onClick={() => handleUpdateFee('XUSDC')} disabled={adminRole !== 'super'} className="bg-cyan-600 hover:bg-cyan-700 rounded-2xl px-6 h-16 font-black text-white">Update</Button>
                         </div>
                       </div>
                     </div>
