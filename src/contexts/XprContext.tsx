@@ -61,10 +61,8 @@ interface XprContextType {
   updateMembershipFee: (fee: string) => void;
   boostPrice: string;
   updateBoostPrice: (price: string) => void;
-  boostPriceTab: string;
-  updateBoostPriceTab: (price: string) => void;
   featuredHandles: string[];
-  boostStream: (handle: string, asset: 'XPR' | 'TAB') => Promise<boolean>;
+  boostStream: (handle: string) => Promise<boolean>;
   distributeXprRewards: (winners: { account: string; amount: string }[]) => Promise<boolean>;
   promoCodes: PromoCode[];
   createPromoCode: (code: string, type: 'free' | 'percent', value: number, maxUses: number) => void;
@@ -86,6 +84,7 @@ const APP_IDENTIFIER = 'tiptab';
 const APP_NAME = 'TIPTAB';
 const APP_LOGO = 'https://explorer.xprnetwork.org/api/account/tiptab/avatar';
 
+// Token Configurations
 const TOKENS = [
   { symbol: 'XPR', code: 'eosio.token', precision: 4 },
   { symbol: 'TAB', code: 'tokencreate', precision: 0 },
@@ -132,13 +131,6 @@ export const XprProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     return "500";
   });
 
-  const [boostPriceTab, setBoostPriceTab] = useState(() => {
-    if (typeof window !== "undefined") {
-      return localStorage.getItem("tiptab_boost_price_tab") || "1000";
-    }
-    return "1000";
-  });
-
   const [featuredHandles, setFeaturedHandles] = useState<string[]>(() => {
     if (typeof window !== "undefined") {
       const saved = localStorage.getItem("tiptab_featured_handles");
@@ -176,6 +168,7 @@ export const XprProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   });
 
   const activeActor = session ? session.auth.actor : null;
+
   const currentAdminObj = activeActor ? adminsList.find(a => a.handle === activeActor) : null;
   const isCurrentAdminPermanent = currentAdminObj?.isPermanent === true;
 
@@ -194,11 +187,6 @@ export const XprProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     localStorage.setItem("tiptab_boost_price", price);
   };
 
-  const updateBoostPriceTab = (price: string) => {
-    setBoostPriceTab(price);
-    localStorage.setItem("tiptab_boost_price_tab", price);
-  };
-
   const broadcastAlert = (message: string | null) => {
     setNetworkAlert(message);
     if (message) {
@@ -215,7 +203,12 @@ export const XprProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     
     if (adminsList.some(a => a.handle === cleanHandle)) return;
 
-    const newAdmin: AdminUser = { id: "admin_" + Date.now(), handle: cleanHandle, role };
+    const newAdmin: AdminUser = {
+      id: "admin_" + Date.now(),
+      handle: cleanHandle,
+      role
+    };
+
     const updated = [...adminsList, newAdmin];
     setAdminsList(updated);
     localStorage.setItem("tiptab_admins_list", JSON.stringify(updated));
@@ -223,12 +216,17 @@ export const XprProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
   const removeAdmin = (id: string) => {
     if (!isCurrentAdminPermanent) return;
+
     const target = adminsList.find(a => a.id === id);
     if (!target) return;
+
     if (target.isPermanent) {
       const permanentCount = adminsList.filter(a => a.isPermanent).length;
-      if (permanentCount <= 1) return;
+      if (permanentCount <= 1) {
+        return; 
+      }
     }
+
     const updated = adminsList.filter(a => a.id !== id);
     setAdminsList(updated);
     localStorage.setItem("tiptab_admins_list", JSON.stringify(updated));
@@ -236,27 +234,40 @@ export const XprProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
   const updateAdminRole = (id: string, role: 'super' | 'moderator' | 'treasurer') => {
     if (!isCurrentAdminPermanent) return;
+    
     const target = adminsList.find(a => a.id === id);
     if (!target) return;
+
     const updated = adminsList.map(a => {
       if (a.id === id) {
         const isDemotingSuper = role !== 'super';
-        return { ...a, role, isPermanent: isDemotingSuper ? false : a.isPermanent };
+        return { 
+          ...a, 
+          role, 
+          isPermanent: isDemotingSuper ? false : a.isPermanent 
+        };
       }
       return a;
     });
+
     setAdminsList(updated);
     localStorage.setItem("tiptab_admins_list", JSON.stringify(updated));
   };
 
   const makeAdminPermanent = (id: string, status: boolean) => {
     if (!isCurrentAdminPermanent) return;
+
     const updated = adminsList.map(a => {
       if (a.id === id) {
-        return { ...a, isPermanent: status, role: status ? ('super' as const) : a.role };
+        return { 
+          ...a, 
+          isPermanent: status,
+          role: status ? ('super' as const) : a.role 
+        };
       }
       return a;
     });
+
     setAdminsList(updated);
     localStorage.setItem("tiptab_admins_list", JSON.stringify(updated));
   };
@@ -284,34 +295,31 @@ export const XprProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const applyPromoCode = (code: string): PromoCode | null => {
     const cleanCode = code.toUpperCase().trim();
     const found = promoCodes.find(c => c.code === cleanCode);
-    if (found && found.uses < found.maxUses) return found;
+    if (found && found.uses < found.maxUses) {
+      return found;
+    }
     return null;
   };
 
   const usePromoCode = (code: string) => {
     const cleanCode = code.toUpperCase().trim();
     const updated = promoCodes.map(c => {
-      if (c.code === cleanCode) return { ...c, uses: c.uses + 1 };
+      if (c.code === cleanCode) {
+        return { ...c, uses: c.uses + 1 };
+      }
       return c;
     });
     setPromoCodes(updated);
     localStorage.setItem("tiptab_promo_codes", JSON.stringify(updated));
   };
 
-  const boostStream = async (handle: string, asset: 'XPR' | 'TAB'): Promise<boolean> => {
+  const boostStream = async (handle: string): Promise<boolean> => {
     if (!session || !isMember) return false;
     
     try {
-      const price = asset === 'XPR' ? boostPrice : boostPriceTab;
-      const config = TOKENS.find(t => t.symbol === asset);
-      if (!config) return false;
-
-      const formattedAmount = config.precision === 0 
-        ? `${Math.floor(parseFloat(price))} ${asset}` 
-        : `${parseFloat(price).toFixed(config.precision)} ${asset}`;
-
+      const formattedAmount = `${parseFloat(boostPrice).toFixed(4)} XPR`;
       const action = {
-        account: config.code,
+        account: 'eosio.token',
         name: 'transfer',
         authorization: [{
           actor: session.auth.actor,
@@ -327,7 +335,7 @@ export const XprProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
       await session.transact({ actions: [action] }, { broadcast: true });
       
-      const newFeatured = [...featuredHandles, handle.replace('@', '').toLowerCase()];
+      const newFeatured = [...featuredHandles, handle.replace('@', '')];
       setFeaturedHandles(newFeatured);
       localStorage.setItem("tiptab_featured_handles", JSON.stringify(newFeatured));
       
@@ -340,6 +348,7 @@ export const XprProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
   const distributeXprRewards = async (winners: { account: string; amount: string }[]): Promise<boolean> => {
     if (!session) return false;
+    
     const actorName = session.auth.actor;
     const currentAdmin = adminsList.find(a => a.handle === actorName);
     if (!currentAdmin || (currentAdmin.role !== 'super' && currentAdmin.role !== 'treasurer')) return false;
@@ -381,16 +390,23 @@ export const XprProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const fetchBalances = useCallback(async (account: string) => {
     if (!account) return;
     try {
+      const primaryEndpoint = PROTON_ENDPOINTS[0];
       const headers = { 'Content-Type': 'application/json' };
+
       const balanceRequests = TOKENS.map(token => 
-        fetch(`${PROTON_ENDPOINTS[0]}/v1/chain/get_currency_balance`, {
+        fetch(`${primaryEndpoint}/v1/chain/get_currency_balance`, {
           method: 'POST',
           headers,
-          body: JSON.stringify({ code: token.code, account: account, symbol: token.symbol })
+          body: JSON.stringify({
+            code: token.code,
+            account: account,
+            symbol: token.symbol
+          })
         }).then(res => res.ok ? res.json() : [])
       );
 
       const results = await Promise.all(balanceRequests);
+      
       const newBalances: any = {};
       results.forEach((data, index) => {
         const token = TOKENS[index];
@@ -404,26 +420,36 @@ export const XprProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       });
 
       const tipsSentKey = `tiptab_tips_sent_${account}`;
-      setBalances({ ...newBalances, tipsSent: parseInt(localStorage.getItem(tipsSentKey) || "0") });
+      const savedTips = parseInt(localStorage.getItem(tipsSentKey) || "0");
+
+      setBalances({
+        ...newBalances,
+        tipsSent: savedTips
+      });
 
       if (account === 'tiptab') {
         setIsMember(true);
         setMembershipDate(new Date(2099, 11, 31).toISOString());
       } else {
+        const membershipKey = `tiptab_membership_${account}`;
         const membershipDateKey = `tiptab_membership_date_${account}`;
         const savedDate = localStorage.getItem(membershipDateKey);
+        
         if (savedDate) {
-          const diffYears = (new Date().getTime() - new Date(savedDate).getTime()) / (1000 * 60 * 60 * 24 * 365);
+          const activationDate = new Date(savedDate);
+          const now = new Date();
+          const diffYears = (now.getTime() - activationDate.getTime()) / (1000 * 60 * 60 * 24 * 365);
+          
           if (diffYears < 1) {
             setIsMember(true);
             setMembershipDate(savedDate);
           } else {
             setIsMember(false);
             setMembershipDate(null);
-            localStorage.removeItem(`tiptab_membership_${account}`);
+            localStorage.removeItem(membershipKey);
           }
         } else {
-          if (localStorage.getItem(`tiptab_membership_${account}`) === 'true') {
+          if (localStorage.getItem(membershipKey) === 'true') {
             const fakeDate = new Date().toISOString();
             localStorage.setItem(membershipDateKey, fakeDate);
             setMembershipDate(fakeDate);
@@ -447,47 +473,75 @@ export const XprProvider: React.FC<{ children: React.ReactNode }> = ({ children 
           bio: "Just joined the TIP TAB network!",
           location: "Global",
           coordinates: [0, 0],
-          categories: ["Other"],
+          category: "Other",
           avatar: account.slice(0, 2).toUpperCase(),
           color: "bg-purple-600"
         };
         setUserProfile(newProfile);
         localStorage.setItem("tiptab_user_profile", JSON.stringify(newProfile));
       }
-    } catch (error) { console.error('Balance sync error:', error); }
+    } catch (error) {
+      console.error('Balance sync error:', error);
+    }
   }, []);
 
   const restoreSession = useCallback(async () => {
     try {
       const { session: restoredSession } = await ProtonWebSDK({
-        linkOptions: { endpoints: PROTON_ENDPOINTS, restoreSession: true },
-        transportOptions: { requestAccount: APP_IDENTIFIER, backoff: 1000 },
-        selectorOptions: { appName: APP_NAME, appLogo: APP_LOGO, customStyleOptions: { modalBackgroundColor: '#0a0514', logoBackgroundColor: '#0a0514' } },
+        linkOptions: {
+          endpoints: PROTON_ENDPOINTS,
+          restoreSession: true,
+        },
+        transportOptions: {
+          requestAccount: APP_IDENTIFIER,
+          backoff: 1000,
+        },
+        selectorOptions: {
+          appName: APP_NAME,
+          appLogo: APP_LOGO,
+          customStyleOptions: {
+            modalBackgroundColor: '#0a0514',
+            logoBackgroundColor: '#0a0514',
+          }
+        },
       });
+
       if (restoredSession) {
         setSession(restoredSession);
         await fetchBalances(restoredSession.auth.actor);
       }
-    } catch (error) { console.error('Session restoration error:', error); }
-    finally { setIsLoading(false); }
+    } catch (error) {
+      console.error('Session restoration error:', error);
+    } finally {
+      setIsLoading(false);
+    }
   }, [fetchBalances]);
 
-  useEffect(() => { restoreSession(); }, [restoreSession]);
+  useEffect(() => {
+    restoreSession();
+  }, [restoreSession]);
 
   const login = async () => {
     try {
       const { session: newSession } = await ProtonWebSDK({
         linkOptions: { endpoints: PROTON_ENDPOINTS },
         transportOptions: { requestAccount: APP_IDENTIFIER },
-        selectorOptions: { appName: APP_NAME, appLogo: APP_LOGO },
+        selectorOptions: {
+          appName: APP_NAME,
+          appLogo: APP_LOGO,
+        },
       });
+
       if (newSession) {
         setSession(newSession);
         await fetchBalances(newSession.auth.actor);
         return newSession;
       }
       return null;
-    } catch (error) { console.error('Login error:', error); throw error; }
+    } catch (error) {
+      console.error('Login error:', error);
+      throw error;
+    }
   };
 
   const logout = async () => {
@@ -502,7 +556,11 @@ export const XprProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     }
   };
 
-  const refreshBalances = async () => { if (session) await fetchBalances(session.auth.actor); };
+  const refreshBalances = async () => {
+    if (session) {
+      await fetchBalances(session.auth.actor);
+    }
+  };
 
   const updateUserProfile = (profile: Creator) => {
     if (session?.auth.actor) {
@@ -512,8 +570,48 @@ export const XprProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     }
   };
 
+  const isAdminActive = !!currentAdminObj;
+  const activeAdminRole = currentAdminObj ? currentAdminObj.role : null;
+
   const value = {
-    session, actor: activeActor, balances, isMember, membershipDate, setIsMember, login, logout, refreshBalances, recordTip, isConnected: !!session, isLoading, isAdmin: !!currentAdminObj, adminRole: currentAdminObj ? currentAdminObj.role : null, isPermanentAdmin: isCurrentAdminPermanent, adminsList, addAdmin, removeAdmin, updateAdminRole, makeAdminPermanent, userProfile, updateUserProfile, isMaintenanceMode, setMaintenanceMode, networkAlert, broadcastAlert, membershipFee, updateMembershipFee, boostPrice, updateBoostPrice, boostPriceTab, updateBoostPriceTab, featuredHandles, boostStream, distributeXprRewards, promoCodes, createPromoCode, deletePromoCode, applyPromoCode, usePromoCode
+    session,
+    actor: activeActor,
+    balances,
+    isMember,
+    membershipDate,
+    setIsMember,
+    login,
+    logout,
+    refreshBalances,
+    recordTip,
+    isConnected: !!session,
+    isLoading,
+    isAdmin: isAdminActive,
+    adminRole: activeAdminRole,
+    isPermanentAdmin: isCurrentAdminPermanent,
+    adminsList,
+    addAdmin,
+    removeAdmin,
+    updateAdminRole,
+    makeAdminPermanent,
+    userProfile,
+    updateUserProfile,
+    isMaintenanceMode,
+    setMaintenanceMode,
+    networkAlert,
+    broadcastAlert,
+    membershipFee,
+    updateMembershipFee,
+    boostPrice,
+    updateBoostPrice,
+    featuredHandles,
+    boostStream,
+    distributeXprRewards,
+    promoCodes,
+    createPromoCode,
+    deletePromoCode,
+    applyPromoCode,
+    usePromoCode
   };
 
   return <XprContext.Provider value={value}>{children}</XprContext.Provider>;
@@ -521,6 +619,8 @@ export const XprProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
 export const useXpr = () => {
   const context = useContext(XprContext);
-  if (context === undefined) throw new Error('useXpr must be used within an XprProvider');
+  if (context === undefined) {
+    throw new Error('useXpr must be used within an XprProvider');
+  }
   return context;
 };
