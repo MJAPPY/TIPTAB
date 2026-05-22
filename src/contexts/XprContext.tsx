@@ -55,8 +55,6 @@ interface XprContextType {
   updateUserProfile: (profile: Creator) => void;
   isMaintenanceMode: boolean;
   setMaintenanceMode: (status: boolean) => void;
-  isLiveFeedVisible: boolean;
-  setLiveFeedVisible: (status: boolean) => void;
   networkAlert: string | null;
   broadcastAlert: (message: string | null) => void;
   membershipFee: string;
@@ -77,6 +75,7 @@ interface XprContextType {
   deletePromoCode: (id: string) => void;
   applyPromoCode: (code: string) => PromoCode | null;
   usePromoCode: (code: string) => void;
+  // Favorites System
   favorites: string[];
   toggleFavorite: (handle: string) => void;
   isFavorite: (handle: string) => boolean;
@@ -209,19 +208,6 @@ export const XprProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     }
     return false;
   });
-
-  const [isLiveFeedVisible, setIsLiveFeedVisible] = useState(() => {
-    if (typeof window !== "undefined") {
-      const saved = localStorage.getItem("tiptab_live_feed_visible");
-      return saved === null ? true : saved === "true";
-    }
-    return true;
-  });
-
-  const setLiveFeedVisible = (status: boolean) => {
-    setIsLiveFeedVisible(status);
-    localStorage.setItem("tiptab_live_feed_visible", status.toString());
-  };
 
   const [adminsList, setAdminsList] = useState<AdminUser[]>(() => {
     if (typeof window !== "undefined") {
@@ -522,7 +508,7 @@ export const XprProvider: React.FC<{ children: React.ReactNode }> = ({ children 
           handle: account,
           bio: "Just joined the TIP TAB network!",
           location: "Global",
-          coordinates: [0, 0], 
+          coordinates: [0, 0], // Valid default coordinate to prevent map crashes
           categories: ["Other"],
           avatar: account.slice(0, 2).toUpperCase(),
           color: "bg-purple-600"
@@ -623,8 +609,6 @@ export const XprProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     updateUserProfile,
     isMaintenanceMode,
     setMaintenanceMode,
-    isLiveFeedVisible,
-    setLiveFeedVisible,
     networkAlert,
     broadcastAlert,
     membershipFee,

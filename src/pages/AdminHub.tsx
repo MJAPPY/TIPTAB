@@ -58,8 +58,7 @@ import {
   AlertCircle,
   TrendingDown,
   Eraser,
-  Dices,
-  Radio
+  Dices
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
@@ -132,8 +131,6 @@ const AdminHub = () => {
     isConnected, 
     isMaintenanceMode, 
     setMaintenanceMode, 
-    isLiveFeedVisible,
-    setLiveFeedVisible,
     broadcastAlert, 
     networkAlert, 
     membershipFee, 
@@ -184,6 +181,7 @@ const AdminHub = () => {
     return parseInt(localStorage.getItem("tiptab_last_parity_sync") || "0");
   });
 
+  // Analytics Metrics State
   const [analyticsStats, setAnalyticsStats] = useState({
     activeMembers: 1240,
     supporterBase: 4812,
@@ -209,23 +207,29 @@ const AdminHub = () => {
     });
   };
 
+  // Profile Delete Confirmation Flow
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [creatorToDelete, setCreatorToDelete] = useState<Creator | null>(null);
 
+  // New Admin creation states
   const [newAdminHandle, setNewAdminHandle] = useState("");
   const [newAdminRole, setNewAdminRole] = useState<'super' | 'moderator' | 'treasurer'>("moderator");
   
+  // Double warning flow state for self-removal of a permanent admin
   const [removalStep, setRemovalStep] = useState<"closed" | "warning1" | "warning2">("closed");
   const [confirmInput, setConfirmInput] = useState("");
   const [targetIdForRemoval, setTargetIdForRemoval] = useState<string | null>(null);
 
+  // Editable Leaderboard Payouts State
   const [winners, setWinners] = useState(INITIAL_LEADERBOARD_WINNERS);
 
+  // Promo Code Creation Form State
   const [newPromoCode, setNewPromoCode] = useState("");
   const [newPromoType, setNewPromoType] = useState<'free' | 'percent'>("percent");
   const [newPromoValue, setNewPromoValue] = useState("50");
   const [newPromoUses, setNewPromoUses] = useState("100");
 
+  // Multi-token Financial Data with Explicit 50/50 Split Logic
   const [rawTreasuryData, setRawTreasuryData] = useState([
     { symbol: "XPR", totalActivation: 452500, boostVolume: 12500, color: "text-orange-500", bg: "from-orange-500/10", icon: Zap },
     { symbol: "TAB", totalActivation: 1200000, boostVolume: 50000, color: "text-purple-400", bg: "from-purple-500/10", icon: Sparkles },
@@ -235,6 +239,7 @@ const AdminHub = () => {
 
   const treasuryData = useMemo(() => {
     return rawTreasuryData.map(item => {
+      // PROVEN 50% SPLIT: 50% to Rewards, 50% to Admin Net
       const rewards = item.boostVolume * 0.5;
       const adminBoostShare = item.boostVolume * 0.5;
       const netRevenue = item.totalActivation + adminBoostShare;
@@ -322,27 +327,32 @@ const AdminHub = () => {
     if (marketData) {
       const { xprUsd, xprPerTab } = marketData;
       
+      // Determine which base values to use: local state (if manual) or context (if auto)
       const targetFeeUsd = isAuto ? parseFloat(membershipFeeXusdc) : parseFloat(localFeeXusdc);
       const targetBoostUsd = isAuto ? parseFloat(boostPriceXusdc) : parseFloat(localBoostXusdc);
       
+      // 1. Calculate Activation Parity
       if (!isNaN(targetFeeUsd)) {
         const calculatedXpr = (targetFeeUsd / xprUsd).toFixed(0);
         const calculatedXmd = targetFeeUsd.toFixed(2);
         
         updateMembershipFee(calculatedXpr, 'XPR');
         updateMembershipFee(calculatedXmd, 'XMD');
+        // If manual sync, also ensure the XUSDC master in context matches what's in the input
         if (!isAuto) updateMembershipFee(localFeeXusdc, 'XUSDC');
         
         setLocalFee(calculatedXpr);
         setLocalFeeXmd(calculatedXmd);
       }
 
+      // 2. Calculate Boost Parity
       if (!isNaN(targetBoostUsd)) {
         const boostXprVal = (targetBoostUsd / xprUsd).toFixed(0);
         const boostTabVal = (parseFloat(boostXprVal) / xprPerTab).toFixed(0);
         
         updateBoostPrice(boostXprVal);
         updateBoostTabPrice(boostTabVal);
+        // If manual sync, also ensure the XUSDC master in context matches what's in the input
         if (!isAuto) updateBoostPriceXusdc(localBoostXusdc);
 
         setLocalBoost(boostXprVal);
@@ -367,6 +377,7 @@ const AdminHub = () => {
     setIsSyncingPrices(false);
   }, [membershipFeeXusdc, boostPriceXusdc, localFeeXusdc, localBoostXusdc, updateMembershipFee, updateBoostPrice, updateBoostTabPrice, updateBoostPriceXusdc, toast]);
 
+  // Passive Auto-Sync Logic
   useEffect(() => {
     if (adminRole === 'super' && isConnected) {
       const oneDayInMs = 24 * 60 * 60 * 1000;
@@ -447,6 +458,7 @@ const AdminHub = () => {
       return;
     }
     
+    // Simple distribution: 40% to 1st, 25% to 2nd, 15% to 3rd, 10% to 4th, 10% to 5th
     const distribution = [0.4, 0.25, 0.15, 0.1, 0.1];
     setWinners(prev => prev.map((w, idx) => ({
       ...w,
@@ -478,22 +490,6 @@ const AdminHub = () => {
     toast({
       title: newState ? "Maintenance Activated" : "Network Online",
       variant: newState ? "destructive" : "default"
-    });
-  };
-
-  const toggleLiveFeed = () => {
-    const newState = !isLiveFeedVisible;
-    setLiveFeedVisible(newState);
-    toast({
-      title: newState ? "Live Feed Enabled" : "Live Feed Disabled",
-      description: newState ? "The activity ticker is now visible to all users." : "The activity ticker has been hidden.",
-    });
-  };
-
-  const resetLiveFeed = () => {
-    toast({
-      title: "Live Feed Reset",
-      description: "Network event cache cleared and sequence restarted.",
     });
   };
 
@@ -975,6 +971,7 @@ const AdminHub = () => {
           {activeTab === "rewards" && (adminRole === 'super' || adminRole === 'treasurer') && (
             <div className="space-y-8 animate-in fade-in slide-in-from-bottom-6 duration-500">
               <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-stretch">
+                {/* Reward Pool Summary */}
                 <Card className="lg:col-span-4 bg-[#1a112d] border border-white/10 rounded-[40px] overflow-hidden shadow-2xl p-8 relative flex flex-col justify-between">
                    <div className="absolute top-0 right-0 p-6 opacity-5 pointer-events-none">
                       <Trophy className="h-40 w-48 text-white" />
@@ -1024,6 +1021,7 @@ const AdminHub = () => {
                    </div>
                 </Card>
 
+                {/* Ledger Table */}
                 <Card className="lg:col-span-8 bg-[#1a112d] border border-white/10 rounded-[40px] overflow-hidden shadow-2xl flex flex-col">
                   <CardHeader className="p-8 border-b border-white/5 flex flex-row items-center justify-between bg-white/[0.02]">
                     <div className="flex items-center gap-3">
@@ -1091,6 +1089,7 @@ const AdminHub = () => {
 
           {activeTab === "moderation" && (adminRole === 'super' || adminRole === 'moderator') && (
             <div className="space-y-8 animate-in fade-in slide-in-from-bottom-6 duration-500">
+              {/* Mod Registry Header & Stats */}
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                  <Card className="bg-[#130b21] border border-white/10 p-6 rounded-[32px] flex items-center gap-6">
                     <div className="h-14 w-14 rounded-2xl bg-purple-500/10 flex items-center justify-center border border-purple-500/20">
@@ -1425,32 +1424,9 @@ const AdminHub = () => {
                     </Button>
 
                     <div className="flex flex-col gap-3">
-                      <Button 
-                        onClick={toggleLiveFeed}
-                        className={cn(
-                          "w-full h-16 rounded-[28px] border font-black text-sm flex items-center justify-between px-8 transition-all",
-                          isLiveFeedVisible ? "bg-purple-600 text-white border-purple-700 shadow-[0_0_30px_rgba(168,85,247,0.3)]" : "bg-purple-500/10 border-purple-500/20 text-purple-400"
-                        )}
-                      >
-                        <div className="flex items-center gap-3">
-                          <Radio className={cn("h-4 w-4", isLiveFeedVisible && "animate-pulse")} />
-                          {isLiveFeedVisible ? "LIVE FEED ACTIVE" : "LIVE FEED HIDDEN"}
-                        </div>
-                      </Button>
-
-                      <Button 
-                        onClick={resetLiveFeed}
-                        variant="ghost"
-                        className="w-full h-12 rounded-[20px] bg-white/5 border border-white/10 text-white/40 hover:bg-white/10 hover:text-white font-black text-[10px] uppercase tracking-[0.2em] flex items-center justify-center gap-3"
-                      >
-                        <RotateCcw className="h-4 w-4" /> Reset Live Sequence
-                      </Button>
-
-                      <div className="h-px bg-white/5 my-2" />
-
                       <Dialog open={isAlertModalOpen} onOpenChange={setIsAlertModalOpen}>
                         <DialogTrigger asChild>
-                          <Button className="w-full h-16 rounded-[28px] bg-orange-500/10 border border-orange-500/20 text-orange-400 hover:bg-orange-500/20 font-black text-sm flex items-center justify-start gap-4 px-8">
+                          <Button className="w-full h-16 rounded-[28px] bg-purple-500/10 border border-purple-500/20 text-purple-300 hover:bg-purple-500/20 font-black text-sm flex items-center justify-start gap-4 px-8">
                             <Bell className="h-5 w-5" /> Broadcast Network Alert
                           </Button>
                         </DialogTrigger>
