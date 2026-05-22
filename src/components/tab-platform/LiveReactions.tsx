@@ -50,11 +50,11 @@ export const LiveReactions = () => {
   };
 
   return (
-    <div className="absolute inset-0 pointer-events-none overflow-hidden z-20">
+    <div className="fixed inset-0 pointer-events-none overflow-hidden z-[100]">
       {reactions.map(r => (
         <div
           key={r.id}
-          className="absolute bottom-0 animate-float-up"
+          className="absolute bottom-[45%] animate-float-up"
           style={{
             left: `${r.x}%`,
             transform: `scale(${r.scale})`,
@@ -78,7 +78,7 @@ export const LiveReactions = () => {
             opacity: 0.8;
           }
           100% {
-            transform: translateY(-800px) scale(1.4) rotate(15deg);
+            transform: translateY(-600px) scale(1.4) rotate(15deg);
             opacity: 0;
           }
         }

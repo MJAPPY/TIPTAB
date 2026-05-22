@@ -313,6 +313,7 @@ const CreatorProfile = () => {
   return (
     <div className="min-h-screen bg-[#0a0514] text-white selection:bg-purple-500/30">
       <Header onBecomeCreator={() => setIsMembershipOpen(true)} />
+      <LiveReactions />
 
       <div className="relative h-[40vh] md:h-[50vh] w-full overflow-hidden bg-black/60">
         {creator.coverImage ? (
@@ -331,7 +332,6 @@ const CreatorProfile = () => {
             <div className="absolute inset-0 bg-gradient-to-t from-[#0a0514] via-[#0a0514]/40 to-transparent" />
           </>
         )}
-        <LiveReactions />
         
         <div className="absolute top-24 left-6 z-20 md:hidden">
           <Button 
