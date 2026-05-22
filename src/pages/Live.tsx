@@ -58,21 +58,26 @@ const Live = () => {
   const [selectedCategory, setSelectedCategory] = useState("All");
   const [sortBy, setSortBy] = useState("newest");
   const [isMembershipOpen, setIsMembershipOpen] = useState(false);
-  const { actor, isMember, userProfile, featuredHandles, boostStream } = useXpr();
+  const { actor, isMember, featuredHandles, boostStream, boostPrice } = useXpr();
   const navigate = useNavigate();
 
-  // Combined creator list including local updates from context
+  // Combined creator list including local updates
   const allCreators = useMemo(() => {
-    // If we have a local user profile and they are a member, inject them into the list
-    if (isMember && userProfile) {
-      const exists = CREATORS.find(c => c.handle.toLowerCase() === userProfile.handle.toLowerCase());
-      if (exists) {
-        return CREATORS.map(c => c.handle.toLowerCase() === userProfile.handle.toLowerCase() ? userProfile : c);
-      }
-      return [userProfile, ...CREATORS];
+    const savedUser = localStorage.getItem("tiptab_user_profile");
+    if (!savedUser) return CREATORS;
+    
+    const localUser = JSON.parse(savedUser) as Creator;
+    const membershipKey = `tiptab_membership_${actor}`;
+    const isLocalUserMember = localStorage.getItem(membershipKey) === 'true';
+
+    if (!isLocalUserMember) return CREATORS;
+
+    const exists = CREATORS.find(c => c.handle.toLowerCase() === localUser.handle.toLowerCase());
+    if (exists) {
+      return CREATORS.map(c => c.handle.toLowerCase() === localUser.handle.toLowerCase() ? localUser : c);
     }
-    return CREATORS;
-  }, [isMember, userProfile]);
+    return [localUser, ...CREATORS];
+  }, [actor]);
 
   // Unified Filter logic
   const filteredCreators = useMemo(() => {
@@ -107,10 +112,7 @@ const Live = () => {
     } else if (sortBy === "random") {
       return [...filtered].sort(() => Math.random() - 0.5);
     } else {
-      return [...filtered].sort((a, b) => {
-        // Simple numeric ID sort, if ID is user_handle it uses alphabetical
-        return b.id.localeCompare(a.id);
-      });
+      return [...filtered].sort((a, b) => Number(b.id) - Number(a.id));
     }
   }, [filteredCreators, boostedList, sortBy]);
 
