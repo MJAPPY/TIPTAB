@@ -262,9 +262,11 @@ export const MembershipModal = ({ isOpen, onOpenChange }: MembershipModalProps) 
 
               <button 
                 onClick={handleNextStep}
-                className="w-full h-20 bg-white text-black hover:bg-purple-500 hover:text-white font-black text-2xl rounded-3xl shadow-[0_20px_40px_rgba(255,255,255,0.1)] transition-all group active:scale-95 animate-shimmer-silver"
+                className="w-full h-20 bg-white text-black hover:bg-purple-600 hover:text-white font-black text-xl md:text-2xl rounded-[32px] shadow-[0_20px_50px_-10px_rgba(255,255,255,0.2)] transition-all group active:scale-[0.98] overflow-hidden relative flex items-center justify-center gap-3"
               >
-                {isConnected ? "Continue to Payment" : "Connect WebAuth"} <ArrowRight className="ml-3 h-6 w-6 group-hover:translate-x-2 transition-transform" />
+                <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/40 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000" />
+                <span className="relative z-10">{isConnected ? "Continue to Payment" : "Connect WebAuth"}</span>
+                <ArrowRight className="relative z-10 h-6 w-6 group-hover:translate-x-2 transition-transform" />
               </button>
             </div>
           )}
