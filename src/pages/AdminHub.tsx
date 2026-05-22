@@ -50,7 +50,9 @@ import {
   Scale,
   Clock,
   Info,
-  RotateCcw
+  RotateCcw,
+  Percent as PercentIcon,
+  Hash
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
@@ -493,6 +495,8 @@ const AdminHub = () => {
 
     createPromoCode(newPromoCode, newPromoType, parsedVal, parsedUses);
     setNewPromoCode("");
+    setNewPromoValue("50");
+    setNewPromoUses("100");
     toast({ title: "Promo Code Created", description: `Promo code ${newPromoCode.toUpperCase()} is now live.` });
   };
 
@@ -1154,6 +1158,38 @@ const AdminHub = () => {
                           <Button type="button" onClick={() => setNewPromoType("free")} className={cn("h-12 rounded-xl font-black text-[10px] uppercase border transition-all", newPromoType === "free" ? "bg-orange-500 border-orange-500 text-white shadow-lg" : "bg-white/5 border-transparent text-white/40 hover:bg-white/10")}>Free Pass</Button>
                         </div>
                       </div>
+
+                      {newPromoType === 'percent' && (
+                        <div className="space-y-2 animate-in fade-in slide-in-from-top-2 duration-300">
+                          <Label className="text-[10px] font-black uppercase tracking-widest text-purple-400">Discount Percentage (%)</Label>
+                          <div className="relative">
+                            <PercentIcon className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-purple-500/50" />
+                            <Input 
+                              type="number" 
+                              min="1" 
+                              max="100" 
+                              value={newPromoValue} 
+                              onChange={(e) => setNewPromoValue(e.target.value)} 
+                              className="pl-12 bg-[#2a1d4a] border-white/10 rounded-xl h-12 px-4 focus:ring-purple-500/50 font-black text-white" 
+                            />
+                          </div>
+                        </div>
+                      )}
+
+                      <div className="space-y-2">
+                        <Label className="text-[10px] font-black uppercase tracking-widest text-white/50">Usage Limit (Max Uses)</Label>
+                        <div className="relative">
+                          <Hash className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-white/20" />
+                          <Input 
+                            type="number" 
+                            min="1" 
+                            value={newPromoUses} 
+                            onChange={(e) => setNewPromoUses(e.target.value)} 
+                            className="pl-12 bg-[#2a1d4a] border-white/10 rounded-xl h-12 px-4 focus:ring-purple-500/50 font-black text-white" 
+                          />
+                        </div>
+                      </div>
+
                       <Button type="submit" className="w-full h-12 bg-white text-black hover:bg-purple-500 hover:text-white rounded-xl font-black text-xs uppercase tracking-widest gap-2 mt-4 transition-all">
                         <Plus className="h-4 w-4" /> Create Promo
                       </Button>
