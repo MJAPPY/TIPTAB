@@ -612,8 +612,8 @@ const CreatorProfile = () => {
                 </div>
 
                 <div className="space-y-6 md:space-y-8">
-                  <div className="flex flex-col gap-3">
-                    <div className="grid grid-cols-4 gap-2 w-full">
+                  <div className="flex gap-3">
+                    <div className="grid grid-cols-4 gap-2 flex-1">
                       {quickAmounts.map(amount => (
                         <Button
                           key={amount}
@@ -629,7 +629,7 @@ const CreatorProfile = () => {
                       ))}
                     </div>
                     <Select value={asset} onValueChange={(val: string) => setAsset(val)}>
-                      <SelectTrigger className="w-full h-11 md:h-14 bg-white/5 border-2 border-white/10 rounded-xl md:rounded-2xl font-black text-[10px] md:text-xs text-white">
+                      <SelectTrigger className="w-[80px] md:w-[100px] h-11 md:h-14 bg-white/5 border-2 border-white/10 rounded-xl md:rounded-2xl font-black text-[10px] md:text-xs text-white shrink-0">
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent className="bg-[#1a102d] border-white/20 text-white rounded-xl">
