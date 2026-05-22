@@ -471,8 +471,10 @@ export const XprProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       const savedProfile = localStorage.getItem(`tiptab_profile_${account}`);
       if (savedProfile) {
         const profile = JSON.parse(savedProfile);
+        // Defensive fix: Ensure coordinates exist if data is corrupted or older version
+        if (!profile.coordinates) profile.coordinates = [0, 0];
         setUserProfile(profile);
-        localStorage.setItem("tiptab_user_profile", savedProfile);
+        localStorage.setItem("tiptab_user_profile", JSON.stringify(profile));
       } else {
         const seedCreator = CREATORS.find(c => c.handle === account);
         const newProfile: Creator = seedCreator ? { ...seedCreator } : {
