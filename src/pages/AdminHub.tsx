@@ -763,7 +763,7 @@ const AdminHub = () => {
                             size="sm" 
                             onClick={handleSyncParity} 
                             disabled={isSyncingPrices || adminRole !== 'super'}
-                            className="h-8 px-3 rounded-lg bg-white/5 border border-white/10 hover:bg-white/10 text-[9px] font-black uppercase tracking-widest gap-2"
+                            className="h-8 px-3 rounded-lg bg-white/5 border border-white/10 hover:bg-white/10 text-[9px] font-black uppercase tracking-widest gap-2 text-slate-300"
                            >
                              <Scale className={cn("h-3.5 w-3.5", isSyncingPrices && "animate-spin")} />
                              Calculate Parity
