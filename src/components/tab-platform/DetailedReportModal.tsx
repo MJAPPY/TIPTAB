@@ -37,7 +37,7 @@ interface DetailedReportModalProps {
 
 export const DetailedReportModal = ({ isOpen, onOpenChange }: DetailedReportModalProps) => {
   const [timeframe, setTimeframe] = useState("weekly");
-  const [isExporting, setIsDistributing] = useState(false);
+  const [isExporting, setIsExporting] = useState(false);
   const reportRef = useRef<HTMLDivElement>(null);
 
   const stats = {
@@ -66,11 +66,11 @@ export const DetailedReportModal = ({ isOpen, onOpenChange }: DetailedReportModa
 
   const exportToPdf = async () => {
     if (!reportRef.current) return;
-    setIsDistributing(true);
+    setIsExporting(true);
     try {
       const dataUrl = await toPng(reportRef.current, { 
-        quality: 0.95, 
-        pixelRatio: 2,
+        quality: 1, 
+        pixelRatio: 2.5,
         backgroundColor: '#0a0514' 
       });
       
@@ -84,7 +84,7 @@ export const DetailedReportModal = ({ isOpen, onOpenChange }: DetailedReportModa
     } catch (err) {
       console.error("PDF Export error:", err);
     } finally {
-      setIsDistributing(false);
+      setIsExporting(false);
     }
   };
 
@@ -123,6 +123,23 @@ export const DetailedReportModal = ({ isOpen, onOpenChange }: DetailedReportModa
 
         <ScrollArea className="max-h-[75vh]">
           <div ref={reportRef} className="p-10 space-y-12 bg-[#0a0514]">
+            {/* Document Header (Visible in Export) */}
+            <div className="flex items-center justify-between pb-8 border-b border-white/10 mb-4">
+              <div className="flex items-center gap-4">
+                <div className="relative h-12 w-12">
+                  <div className="absolute inset-0 bg-purple-500/20 blur-lg rounded-full" />
+                  <img src="/src/assets/logo.png" className="h-full w-full object-contain relative z-10" alt="TIPTAB" />
+                </div>
+                <div className="font-black italic tracking-tighter text-2xl leading-none">
+                  <span className="text-white">TIP</span><span className="text-orange-500">TAB</span>
+                </div>
+              </div>
+              <div className="text-right space-y-1">
+                <p className="text-[10px] font-black uppercase tracking-[0.3em] text-purple-400">Network Intel Terminal</p>
+                <p className="text-xs font-bold text-white/30 uppercase tracking-widest">{new Date().toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric' })}</p>
+              </div>
+            </div>
+
             {/* Visual Chart Section */}
             <div className="space-y-8">
               <div className="flex items-center justify-between">
