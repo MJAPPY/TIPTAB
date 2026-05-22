@@ -10,13 +10,28 @@ import { CREATORS, Creator } from "@/data/creators";
 import { useXpr } from "@/contexts/XprContext";
 import { cn } from "@/lib/utils";
 
-// Generate mock stats for creators - Sorted by activityCount (Tips Received)
-const CREATOR_LEADERBOARD = CREATORS.map((creator, index) => ({
-  ...creator,
-  totalValue: [125000, 98400, 82100, 45000, 32000, 28000, 15000, 12000, 5000][index] || 1000,
-  activityCount: [412, 321, 284, 156, 98, 76, 45, 32, 12][index] || 5,
-  label: "Tips Received"
-})).sort((a, b) => b.activityCount - a.activityCount);
+// Generate mock stats for creators - Expanded to Top 20
+const INITIAL_CREATOR_DATA = [
+  ...CREATORS.map((creator, index) => ({
+    ...creator,
+    totalValue: [125000, 98400, 82100, 45000, 32000, 28000, 15000, 12000, 5000][index] || 1000,
+    activityCount: [412, 321, 284, 156, 98, 76, 45, 32, 12][index] || 5,
+  })),
+  // Additional mock creators to fill top 20
+  { id: "c10", name: "Chef Julian", handle: "chef_j", avatar: "CJ", color: "bg-orange-600", totalValue: 4200, activityCount: 11, location: "Paris, FR" },
+  { id: "c11", name: "Zoe Cycles", handle: "zoe_bike", avatar: "ZC", color: "bg-lime-500", totalValue: 3800, activityCount: 10, location: "Amsterdam, NL" },
+  { id: "c12", name: "Tech Tips", handle: "tt_pro", avatar: "TT", color: "bg-slate-700", totalValue: 3500, activityCount: 9, location: "San Francisco, USA" },
+  { id: "c13", name: "Urban Gardener", handle: "green_city", avatar: "UG", color: "bg-green-700", totalValue: 3100, activityCount: 8, location: "Berlin, DE" },
+  { id: "c14", name: "Aero Spotter", handle: "planes_xyz", avatar: "AS", color: "bg-sky-500", totalValue: 2800, activityCount: 8, location: "Sydney, AU" },
+  { id: "c15", name: "Lofi Beats", handle: "lofi_vibes", avatar: "LB", color: "bg-indigo-400", totalValue: 2500, activityCount: 7, location: "Tokyo, JP" },
+  { id: "c16", name: "Fitness Daily", handle: "daily_fit", avatar: "FD", color: "bg-red-500", totalValue: 2200, activityCount: 6, location: "Miami, USA" },
+  { id: "c17", name: "Code Master", handle: "dev_guru", avatar: "CM", color: "bg-blue-800", totalValue: 1900, activityCount: 5, location: "London, UK" },
+  { id: "c18", name: "Artistic Soul", handle: "artsy", avatar: "AS", color: "bg-pink-500", totalValue: 1600, activityCount: 4, location: "Milan, IT" },
+  { id: "c19", name: "Crypto News", handle: "xpr_daily", avatar: "CN", color: "bg-orange-400", totalValue: 1300, activityCount: 3, location: "Austin, USA" },
+  { id: "c20", name: "New Hustler", handle: "join_now", avatar: "NH", color: "bg-purple-500", totalValue: 1000, activityCount: 2, location: "Global" },
+];
+
+const CREATOR_LEADERBOARD = INITIAL_CREATOR_DATA.sort((a, b) => b.activityCount - a.activityCount);
 
 // Expanded mock stats for supporters - Top 20
 const MOCK_SUPPORTERS = [
