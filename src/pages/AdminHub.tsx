@@ -220,11 +220,26 @@ const AdminHub = () => {
 
   const fetchRates = async () => {
     try {
-      const response = await fetch("https://api.coingecko.com/api/v3/simple/price?ids=proton&vs_currencies=usd");
-      const data = await response.json();
-      if (data.proton && data.proton.usd) {
-        setXprPrice(data.proton.usd);
-        return data.proton.usd;
+      // 1. Fetch XPR/USD from CoinGecko
+      const cgResponse = await fetch("https://api.coingecko.com/api/v3/simple/price?ids=proton&vs_currencies=usd");
+      const cgData = await cgResponse.json();
+      
+      // 2. Fetch TAB/XPR from Alcor DEX
+      const alcorResponse = await fetch("https://proton.alcor.exchange/api/v2/tickers");
+      const alcorData = await alcorResponse.json();
+      const tabMarket = alcorData.find((m: any) => m.ticker_id === "TAB_XPR");
+      
+      let xprPerTab = 0.36; // conservative fallback if DEX is down
+      if (tabMarket && tabMarket.last_price) {
+        xprPerTab = parseFloat(tabMarket.last_price);
+      }
+
+      if (cgData.proton && cgData.proton.usd) {
+        setXprPrice(cgData.proton.usd);
+        return { 
+          xprUsd: cgData.proton.usd, 
+          xprPerTab 
+        };
       }
     } catch (e) {
       console.error("Price fetch failed", e);
@@ -234,25 +249,37 @@ const AdminHub = () => {
 
   const handleSyncParity = async () => {
     setIsSyncingPrices(true);
-    const price = await fetchRates();
-    if (price) {
+    const marketData = await fetchRates();
+    
+    if (marketData) {
+      const { xprUsd, xprPerTab } = marketData;
+      
+      // 1. Calculate Membership Parity based on target XUSDC
       const targetUsd = parseFloat(localFeeXusdc);
       if (!isNaN(targetUsd)) {
-        const calculatedXpr = (targetUsd / price).toFixed(0);
+        const calculatedXpr = (targetUsd / xprUsd).toFixed(0);
         const calculatedXmd = targetUsd.toFixed(2);
         
         setLocalFee(calculatedXpr);
         setLocalFeeXmd(calculatedXmd);
-        
-        toast({
-          title: "Parity Calculated",
-          description: `Rates adjusted based on XPR price of $${price.toFixed(4)}. Review and update individual assets.`,
-        });
       }
+
+      // 2. Calculate TAB Boost Parity based on current XPR Boost price
+      const boostXpr = parseFloat(localBoost);
+      if (!isNaN(boostXpr) && xprPerTab > 0) {
+        // formula: costInTab = costInXpr / (xprPerTab)
+        const calculatedBoostTab = (boostXpr / xprPerTab).toFixed(0);
+        setLocalBoostTab(calculatedBoostTab);
+      }
+      
+      toast({
+        title: "Network Parity Synced",
+        description: `Fees and Boosts adjusted via Alcor/CoinGecko. (1 TAB = ${xprPerTab.toFixed(4)} XPR)`,
+      });
     } else {
       toast({
         title: "Sync Failed",
-        description: "Could not fetch current market rates.",
+        description: "Could not fetch current market rates from external APIs.",
         variant: "destructive"
       });
     }
