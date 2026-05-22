@@ -3,7 +3,20 @@ import React from "react";
 export const StatsBanner = () => {
   const stats = [
     { label: "Powered by", value: "WebAuth Protocol", color: "text-purple-400" },
-    { label: "Community", value: "XPR Network Creators & Athletes", color: "text-orange-400" },
+    { 
+      label: "Instant rewards in", 
+      value: (
+        <span className="flex items-center gap-2">
+          <span className="text-orange-500">TAB</span>
+          <span className="text-purple-400">XPR</span>
+          <span className="text-green-400">XUSDC</span>
+          <span className="text-cyan-400">XMD</span>
+          <span className="text-slate-400">METAL</span>
+          <span className="text-blue-500">LOAN</span>
+        </span>
+      ), 
+      isCustom: true 
+    },
     { label: "Settlement", value: "Instant & Zero Fee", color: "text-green-400" },
     { label: "Platform", value: "TAB Token Rewards", color: "text-blue-400" },
     { label: "Security", value: "On-Chain Verified", color: "text-orange-400" },
@@ -23,9 +36,15 @@ export const StatsBanner = () => {
               <span className="text-[10px] font-black uppercase tracking-[0.4em] text-white/40 group-hover:text-orange-500 transition-colors duration-500">
                 {stat.label}
               </span>
-              <span className={`text-2xl font-black italic tracking-tighter transition-all duration-500 group-hover:scale-105 ${stat.color}`}>
-                {stat.value}
-              </span>
+              {(stat as any).isCustom ? (
+                <div className="text-2xl font-black italic tracking-tighter transition-all duration-500 group-hover:scale-105">
+                  {stat.value}
+                </div>
+              ) : (
+                <span className={`text-2xl font-black italic tracking-tighter transition-all duration-500 group-hover:scale-105 ${stat.color}`}>
+                  {stat.value}
+                </span>
+              )}
             </div>
             <div className="relative">
               <div className="absolute inset-0 bg-purple-500 blur-md rounded-full opacity-50 animate-pulse" />
@@ -40,9 +59,15 @@ export const StatsBanner = () => {
               <span className="text-[10px] font-black uppercase tracking-[0.4em] text-white/40 group-hover:text-orange-500 transition-colors duration-500">
                 {stat.label}
               </span>
-              <span className={`text-2xl font-black italic tracking-tighter transition-all duration-500 group-hover:scale-105 ${stat.color}`}>
-                {stat.value}
-              </span>
+              {(stat as any).isCustom ? (
+                <div className="text-2xl font-black italic tracking-tighter transition-all duration-500 group-hover:scale-105">
+                  {stat.value}
+                </div>
+              ) : (
+                <span className={`text-2xl font-black italic tracking-tighter transition-all duration-500 group-hover:scale-105 ${stat.color}`}>
+                  {stat.value}
+                </span>
+              )}
             </div>
             <div className="relative">
               <div className="absolute inset-0 bg-purple-500 blur-md rounded-full opacity-50 animate-pulse" />
