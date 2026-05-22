@@ -162,6 +162,7 @@ const AdminHub = () => {
   const [isHistoryModalOpen, setIsHistoryModalOpen] = useState(false);
   const [isDetailedReportOpen, setIsDetailedReportOpen] = useState(false);
   const [isResetTreasuryOpen, setIsResetTreasuryOpen] = useState(false);
+  const [isResetAnalyticsOpen, setIsResetAnalyticsOpen] = useState(false);
   const [selectedCreator, setSelectedCreator] = useState<Creator | null>(null);
   const [moderatedCreators, setModeratedCreators] = useState<Creator[]>(CREATORS);
   const [bannedHandles, setBannedHandles] = useState<string[]>([]);
@@ -170,6 +171,32 @@ const AdminHub = () => {
   const [lastAutoSync, setLastAutoSync] = useState<number>(() => {
     return parseInt(localStorage.getItem("tiptab_last_parity_sync") || "0");
   });
+
+  // Analytics Metrics State
+  const [analyticsStats, setAnalyticsStats] = useState({
+    activeMembers: 1240,
+    supporterBase: 4812,
+    tippingVelocity: 84,
+    avgTipSize: 145,
+    newProfiles24h: 28,
+    performanceBoosts24h: 42
+  });
+
+  const handleResetAnalytics = () => {
+    setAnalyticsStats({
+      activeMembers: 0,
+      supporterBase: 0,
+      tippingVelocity: 0,
+      avgTipSize: 0,
+      newProfiles24h: 0,
+      performanceBoosts24h: 0
+    });
+    setIsResetAnalyticsOpen(false);
+    toast({
+      title: "Analytics Reset Successful",
+      description: "All platform activity metrics have been zeroed for the current window."
+    });
+  };
 
   // Profile Delete Confirmation Flow
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
@@ -630,10 +657,10 @@ const AdminHub = () => {
             <div className="space-y-10 animate-in fade-in duration-500">
                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
                  {[
-                   { label: "Active Members", value: "1,240", change: "+14%", icon: UserRoundCheck, color: "text-orange-400", sub: "Growth (MoM)" },
-                   { label: "Supporter Base", value: "4,812", change: "+8%", icon: Users, color: "text-purple-400", sub: "Unique Wallets" },
-                   { label: "Tipping Velocity", value: "84/hr", change: "+22%", icon: Flame, color: "text-red-500", sub: "Platform Speed" },
-                   { label: "Avg Tip Size", value: "145 TAB", change: "-2%", icon: Zap, color: "text-cyan-400", sub: "Network Value" }
+                   { label: "Active Members", value: analyticsStats.activeMembers.toLocaleString(), change: "+14%", icon: UserRoundCheck, color: "text-orange-400", sub: "Growth (MoM)" },
+                   { label: "Supporter Base", value: analyticsStats.supporterBase.toLocaleString(), change: "+8%", icon: Users, color: "text-purple-400", sub: "Unique Wallets" },
+                   { label: "Tipping Velocity", value: `${analyticsStats.tippingVelocity}/hr`, change: "+22%", icon: Flame, color: "text-red-500", sub: "Platform Speed" },
+                   { label: "Avg Tip Size", value: `${analyticsStats.avgTipSize} TAB`, change: "-2%", icon: Zap, color: "text-cyan-400", sub: "Network Value" }
                  ].map((stat, i) => (
                    <Card key={i} className="bg-[#130b21] border border-white/10 p-6 rounded-[32px] hover:border-white/20 transition-all">
                      <div className="flex items-center justify-between mb-4">
@@ -666,13 +693,43 @@ const AdminHub = () => {
                           </CardTitle>
                           <CardDescription className="text-white/40">Member totals and network expansion trends</CardDescription>
                         </div>
-                        <Button 
-                          onClick={() => setIsDetailedReportOpen(true)}
-                          variant="ghost" 
-                          className="h-10 rounded-xl bg-white/5 text-[9px] font-black uppercase tracking-widest text-white/40 gap-2 hover:bg-white/10 hover:text-white transition-all"
-                        >
-                           Detailed Report <ArrowUpRight className="h-3.5 w-3.5" />
-                        </Button>
+                        <div className="flex items-center gap-2">
+                           <Button 
+                            onClick={() => setIsDetailedReportOpen(true)}
+                            variant="ghost" 
+                            className="h-10 rounded-xl bg-white/5 text-[9px] font-black uppercase tracking-widest text-white/40 gap-2 hover:bg-white/10 hover:text-white transition-all"
+                          >
+                             Detailed Report <ArrowUpRight className="h-3.5 w-3.5" />
+                          </Button>
+                          <Dialog open={isResetAnalyticsOpen} onOpenChange={setIsResetAnalyticsOpen}>
+                            <DialogTrigger asChild>
+                              <Button 
+                                variant="ghost"
+                                className="h-10 px-4 bg-red-500/5 border border-red-500/20 hover:bg-red-500 hover:text-white rounded-xl font-black text-[9px] uppercase tracking-widest text-red-500 transition-all group"
+                              >
+                                <RotateCcw className="h-3.5 w-3.5 mr-2 group-hover:rotate-[-45deg] transition-transform" />
+                                Reset
+                              </Button>
+                            </DialogTrigger>
+                            <DialogContent className="bg-[#2a1b4d] border-2 border-red-500/50 text-white rounded-[40px] p-10 max-w-md">
+                              <div className="text-center space-y-6">
+                                <div className="h-20 w-20 rounded-full bg-red-500/10 flex items-center justify-center mx-auto border-2 border-red-500/20">
+                                  <AlertTriangle className="h-10 w-10 text-red-500" />
+                                </div>
+                                <DialogHeader>
+                                  <DialogTitle className="text-3xl font-black italic uppercase text-center tracking-tighter">RESET ANALYTICS?</DialogTitle>
+                                  <DialogDescription className="text-white/60 font-bold text-center">
+                                    This will zero out all platform velocity metrics, member growth counts, and engagement stats. This action is irreversible.
+                                  </DialogDescription>
+                                </DialogHeader>
+                                <div className="flex gap-4">
+                                  <Button onClick={() => setIsResetAnalyticsOpen(false)} className="flex-1 h-14 bg-white/5 hover:bg-white/10 rounded-2xl font-black uppercase">Cancel</Button>
+                                  <Button onClick={handleResetAnalytics} className="flex-1 h-14 bg-red-500 hover:bg-red-600 rounded-2xl font-black uppercase">Yes, Reset Metrics</Button>
+                                </div>
+                              </div>
+                            </DialogContent>
+                          </Dialog>
+                        </div>
                       </div>
                     </CardHeader>
                     <CardContent className="p-0 space-y-6 relative z-10">
@@ -682,9 +739,9 @@ const AdminHub = () => {
                                <div className="h-2 w-2 rounded-full bg-orange-500 animate-pulse" />
                                <span className="text-[10px] font-black uppercase tracking-widest text-white/60">New Profiles (24h)</span>
                             </div>
-                            <p className="text-4xl font-black text-white">28</p>
+                            <p className="text-4xl font-black text-white">{analyticsStats.newProfiles24h}</p>
                             <div className="h-1.5 w-full bg-white/5 rounded-full overflow-hidden">
-                               <div className="h-full bg-orange-500 w-[65%]" />
+                               <div className="h-full bg-orange-500 transition-all" style={{ width: analyticsStats.newProfiles24h > 0 ? '65%' : '0%' }} />
                             </div>
                          </div>
                          <div className="p-6 rounded-[28px] bg-white/[0.03] border border-white/5 space-y-4">
@@ -692,9 +749,9 @@ const AdminHub = () => {
                                <div className="h-2 w-2 rounded-full bg-purple-500 animate-pulse" />
                                <span className="text-[10px] font-black uppercase tracking-widest text-white/60">Performance Boosts (24h)</span>
                             </div>
-                            <p className="text-4xl font-black text-white">42</p>
+                            <p className="text-4xl font-black text-white">{analyticsStats.performanceBoosts24h}</p>
                             <div className="h-1.5 w-full bg-white/5 rounded-full overflow-hidden">
-                               <div className="h-full bg-purple-500 w-[82%]" />
+                               <div className="h-full bg-purple-500 transition-all" style={{ width: analyticsStats.performanceBoosts24h > 0 ? '82%' : '0%' }} />
                             </div>
                          </div>
                        </div>
@@ -1313,6 +1370,26 @@ const AdminHub = () => {
             <div className="flex gap-4">
               <Button onClick={() => setIsDeleteModalOpen(false)} className="flex-1 h-14 bg-white/5 hover:bg-white/10 rounded-2xl font-black uppercase">Cancel</Button>
               <Button onClick={confirmDeleteProfile} className="flex-1 h-14 bg-red-500 hover:bg-red-600 rounded-2xl font-black uppercase">Yes, Purge</Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={isResetAnalyticsOpen} onOpenChange={setIsResetAnalyticsOpen}>
+        <DialogContent className="bg-[#2a1b4d] border-2 border-red-500/50 text-white rounded-[40px] p-10 max-w-md">
+          <div className="text-center space-y-6">
+            <div className="h-20 w-20 rounded-full bg-red-500/10 flex items-center justify-center mx-auto border-2 border-red-500/20">
+              <AlertTriangle className="h-10 w-10 text-red-500" />
+            </div>
+            <DialogHeader>
+              <DialogTitle className="text-3xl font-black italic uppercase text-center tracking-tighter">RESET ANALYTICS?</DialogTitle>
+              <DialogDescription className="text-white/60 font-bold text-center">
+                This will zero out all platform velocity metrics, member growth counts, and engagement stats. This action is irreversible.
+              </DialogDescription>
+            </DialogHeader>
+            <div className="flex gap-4">
+              <Button onClick={() => setIsResetAnalyticsOpen(false)} className="flex-1 h-14 bg-white/5 hover:bg-white/10 rounded-2xl font-black uppercase">Cancel</Button>
+              <Button onClick={handleResetAnalytics} className="flex-1 h-14 bg-red-500 hover:bg-red-600 rounded-2xl font-black uppercase">Yes, Reset Metrics</Button>
             </div>
           </div>
         </DialogContent>
