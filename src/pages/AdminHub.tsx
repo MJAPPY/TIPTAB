@@ -43,7 +43,8 @@ import {
   Globe,
   ArrowUpRight,
   Flame,
-  LayoutGrid
+  LayoutGrid,
+  BellOff
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
@@ -170,8 +171,8 @@ const AdminHub = () => {
   const [newPromoUses, setNewPromoUses] = useState("100");
 
   // Financial Sourced Calculations
-  const boostRevenueTotal = 12500; // Static mock baseline for performance boosts
-  const activationRevenueTotal = 452500; // Static mock baseline for memberships
+  const boostRevenueTotal = 12500; 
+  const activationRevenueTotal = 452500; 
   
   const rewardsPool = useMemo(() => boostRevenueTotal * 0.5, []);
   const adminBoostShare = useMemo(() => boostRevenueTotal * 0.5, []);
@@ -194,7 +195,6 @@ const AdminHub = () => {
     }
   }, [isAdmin, isConnected, navigate, toast]);
 
-  // Adjust active tab if current admin permission is restricted
   useEffect(() => {
     if (adminRole === 'moderator' && !['moderation', 'config', 'analytics'].includes(activeTab)) {
       setActiveTab("analytics");
@@ -281,7 +281,7 @@ const AdminHub = () => {
 
   const clearAlert = () => {
     broadcastAlert(null);
-    toast({ title: "Alert Cleared" });
+    toast({ title: "Alert Cleared", description: "Global broadcast banner removed." });
   };
 
   const toggleMaintenance = () => {
@@ -330,7 +330,6 @@ const AdminHub = () => {
     toast({ title: "Promo Code Created", description: `Promo code ${newPromoCode.toUpperCase()} is now live.` });
   };
 
-  // Admin Add Handler
   const handleAddAdmin = (e: React.FormEvent) => {
     e.preventDefault();
     if (!isPermanentAdmin) {
@@ -352,7 +351,6 @@ const AdminHub = () => {
     });
   };
 
-  // Safe Removal Verification Flow
   const handleRemoveClick = (admin: AdminUser) => {
     if (!isPermanentAdmin) return;
     const isSelf = admin.handle === actor;
@@ -760,26 +758,37 @@ const AdminHub = () => {
                       </div>
                     </Button>
 
-                    <Dialog open={isAlertModalOpen} onOpenChange={setIsAlertModalOpen}>
-                      <DialogTrigger asChild>
-                        <Button className="w-full h-16 rounded-[28px] bg-purple-500/10 border border-purple-500/20 text-purple-300 hover:bg-purple-500/20 font-black text-sm flex items-center justify-start gap-4 px-8">
-                          <Bell className="h-5 w-5" /> Broadcast Network Alert
-                        </Button>
-                      </DialogTrigger>
-                      <DialogContent className="bg-[#2a1b4d] border-white/10 text-white rounded-3xl p-8 max-w-md shadow-2xl">
-                        <DialogHeader className="space-y-3">
-                          <DialogTitle className="text-2xl font-black italic tracking-tight">GLOBAL BROADCAST</DialogTitle>
-                          <DialogDescription className="text-white/50 font-bold">This message will appear at the top for all users.</DialogDescription>
-                        </DialogHeader>
-                        <div className="space-y-6 pt-4">
-                          <div className="space-y-2">
-                            <Label className="text-[11px] font-black uppercase tracking-widest text-white/40">Alert Message</Label>
-                            <Input value={alertMessage} onChange={(e) => setAlertMessage(e.target.value)} placeholder="e.g. Scheduled maintenance in 1 hour..." className="bg-white/5 border-white/10 h-14 rounded-xl px-4 text-white font-medium" />
+                    <div className="flex flex-col gap-3">
+                      <Dialog open={isAlertModalOpen} onOpenChange={setIsAlertModalOpen}>
+                        <DialogTrigger asChild>
+                          <Button className="w-full h-16 rounded-[28px] bg-purple-500/10 border border-purple-500/20 text-purple-300 hover:bg-purple-500/20 font-black text-sm flex items-center justify-start gap-4 px-8">
+                            <Bell className="h-5 w-5" /> Broadcast Network Alert
+                          </Button>
+                        </DialogTrigger>
+                        <DialogContent className="bg-[#2a1b4d] border-white/10 text-white rounded-3xl p-8 max-w-md shadow-2xl">
+                          <DialogHeader className="space-y-3">
+                            <DialogTitle className="text-2xl font-black italic tracking-tight">GLOBAL BROADCAST</DialogTitle>
+                            <DialogDescription className="text-white/50 font-bold">This message will appear at the top for all users.</DialogDescription>
+                          </DialogHeader>
+                          <div className="space-y-6 pt-4">
+                            <div className="space-y-2">
+                              <Label className="text-[11px] font-black uppercase tracking-widest text-white/40">Alert Message</Label>
+                              <Input value={alertMessage} onChange={(e) => setAlertMessage(e.target.value)} placeholder="e.g. Scheduled maintenance in 1 hour..." className="bg-white/5 border-white/10 h-14 rounded-xl px-4 text-white font-medium" />
+                            </div>
+                            <Button onClick={handleBroadcast} className="w-full h-14 bg-purple-600 hover:bg-purple-700 text-white font-black rounded-xl">Broadcast Live</Button>
                           </div>
-                          <Button onClick={handleBroadcast} className="w-full h-14 bg-purple-600 hover:bg-purple-700 text-white font-black rounded-xl">Broadcast Live</Button>
-                        </div>
-                      </DialogContent>
-                    </Dialog>
+                        </DialogContent>
+                      </Dialog>
+
+                      {networkAlert && (
+                        <Button 
+                          onClick={clearAlert}
+                          className="w-full h-12 rounded-[20px] bg-orange-500/10 border border-orange-500/20 text-orange-400 hover:bg-orange-500/20 font-black text-[10px] uppercase tracking-[0.2em] flex items-center justify-center gap-3 animate-in fade-in zoom-in-95"
+                        >
+                          <BellOff className="h-4 w-4" /> Clear Active Broadcast
+                        </Button>
+                      )}
+                    </div>
                   </div>
                 </Card>
               </div>
@@ -925,8 +934,7 @@ const AdminHub = () => {
                                   <Button variant="ghost" size="icon" className="h-11 w-11 text-white/20 hover:text-white"><MoreVertical className="h-5 w-5" /></Button>
                                 </DropdownMenuTrigger>
                                 <DropdownMenuContent align="end" className="bg-[#1a102d] border-white/10 text-white rounded-xl shadow-2xl p-2 min-w-[160px]">
-                                  <DropdownMenuItem onClick={clearAlert} className="text-orange-400 focus:text-orange-400 font-bold rounded-lg cursor-pointer"><Bell className="mr-2 h-4 w-4" /> Clear Alert</DropdownMenuItem>
-                                  <DropdownMenuItem onClick={() => { setCreatorToDelete(creator); setIsDeleteModalOpen(true); }} className="text-red-500 focus:text-red-500 font-bold rounded-lg cursor-pointer mt-1"><Trash2 className="mr-2 h-4 w-4" /> Delete Profile</DropdownMenuItem>
+                                  <DropdownMenuItem onClick={() => { setCreatorToDelete(creator); setIsDeleteModalOpen(true); }} className="text-red-500 focus:text-red-500 font-bold rounded-lg cursor-pointer"><Trash2 className="mr-2 h-4 w-4" /> Delete Profile</DropdownMenuItem>
                                 </DropdownMenuContent>
                               </DropdownMenu>
                             </td>
@@ -968,7 +976,6 @@ const AdminHub = () => {
         </div>
       </main>
 
-      {/* Audit Logs Modal */}
       <Dialog open={isAuditModalOpen} onOpenChange={setIsAuditModalOpen}>
         <DialogContent className="bg-[#1a102d] border-white/10 text-white rounded-[32px] p-8 max-w-2xl">
           <DialogHeader>
@@ -995,7 +1002,6 @@ const AdminHub = () => {
         </DialogContent>
       </Dialog>
 
-      {/* Transaction History Modal */}
       <Dialog open={isHistoryModalOpen} onOpenChange={setIsHistoryModalOpen}>
         <DialogContent className="bg-[#1a102d] border-white/10 text-white rounded-[32px] p-8 max-w-2xl">
           <DialogHeader>
@@ -1008,7 +1014,6 @@ const AdminHub = () => {
         </DialogContent>
       </Dialog>
 
-      {/* Delete Profile Confirmation */}
       <Dialog open={isDeleteModalOpen} onOpenChange={setIsDeleteModalOpen}>
         <DialogContent className="bg-[#2a1b4d] border-2 border-red-500/50 text-white rounded-[40px] p-10 max-w-md">
           <div className="text-center space-y-6">
