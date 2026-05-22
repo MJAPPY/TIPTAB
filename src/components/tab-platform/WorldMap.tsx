@@ -19,11 +19,9 @@ interface WorldMapProps {
 }
 
 export const WorldMap = ({ creators, onSelectCreator }: WorldMapProps) => {
-  // Only display markers for creators who have coordinates set
-  const pinnedCreators = creators.filter(c => c.coordinates !== null);
-
   return (
     <div className="w-full bg-white/[0.03] rounded-[40px] overflow-hidden border border-white/10 relative group shadow-[inset_0_0_100px_rgba(168,85,247,0.08)] aspect-[1.8/1] md:aspect-[2.2/1] flex items-center justify-center">
+      {/* Decorative background glow */}
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[70%] h-[70%] bg-purple-500/10 blur-[120px] rounded-full pointer-events-none" />
       
       <div className="absolute top-6 left-8 z-10 hidden sm:block pointer-events-none">
@@ -72,8 +70,8 @@ export const WorldMap = ({ creators, onSelectCreator }: WorldMapProps) => {
               }
             </Geographies>
 
-            {pinnedCreators.map((creator) => (
-              <Marker key={creator.id} coordinates={creator.coordinates!}>
+            {creators.map((creator) => (
+              <Marker key={creator.id} coordinates={creator.coordinates}>
                 <Tooltip>
                   <TooltipTrigger asChild>
                     <g 
