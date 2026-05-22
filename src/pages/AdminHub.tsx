@@ -39,7 +39,11 @@ import {
   Timer,
   Server,
   LineChart,
-  UserRoundCheck
+  UserRoundCheck,
+  Globe,
+  ArrowUpRight,
+  Flame,
+  LayoutGrid
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
@@ -129,7 +133,7 @@ const AdminHub = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
   
-  const [activeTab, setActiveTab] = useState("treasury");
+  const [activeTab, setActiveTab] = useState("analytics");
   const [localFee, setLocalFee] = useState(membershipFee || "2500");
   const [localBoost, setLocalBoost] = useState(boostPrice || "1000");
   const [localBoostTab, setLocalBoostTab] = useState(boostTabPrice || "5000");
@@ -192,10 +196,10 @@ const AdminHub = () => {
 
   // Adjust active tab if current admin permission is restricted
   useEffect(() => {
-    if (adminRole === 'moderator' && activeTab !== 'moderation' && activeTab !== 'config') {
-      setActiveTab("moderation");
-    } else if (adminRole === 'treasurer' && activeTab !== 'treasury' && activeTab !== 'codes' && activeTab !== 'rewards') {
-      setActiveTab("treasury");
+    if (adminRole === 'moderator' && !['moderation', 'config', 'analytics'].includes(activeTab)) {
+      setActiveTab("analytics");
+    } else if (adminRole === 'treasurer' && !['treasury', 'codes', 'rewards', 'analytics'].includes(activeTab)) {
+      setActiveTab("analytics");
     }
   }, [adminRole, activeTab]);
 
@@ -273,11 +277,6 @@ const AdminHub = () => {
     setIsAlertModalOpen(false);
     setAlertMessage("");
     toast({ title: "Alert Broadcasted", description: "The message is now live across the platform." });
-  };
-
-  const clearAlert = () => {
-    broadcastAlert(null);
-    toast({ title: "Alert Cleared" });
   };
 
   const toggleMaintenance = () => {
@@ -399,46 +398,13 @@ const AdminHub = () => {
     navigate("/");
   };
 
-  const openAuditLogs = (creator: Creator) => {
-    setSelectedCreator(creator);
-    setIsAuditModalOpen(true);
-  };
-
-  const openTransactionHistory = (creator: Creator) => {
-    setSelectedCreator(creator);
-    setIsHistoryModalOpen(true);
-  };
-
-  const confirmDeleteProfile = () => {
-    if (!creatorToDelete) return;
-    const handle = creatorToDelete.handle.replace('@', '').toLowerCase();
-    setModeratedCreators(prev => prev.filter(c => c.id !== creatorToDelete.id));
-    localStorage.removeItem(`tiptab_profile_${handle}`);
-    localStorage.removeItem(`tiptab_membership_${handle}`);
-    localStorage.removeItem(`tiptab_membership_date_${handle}`);
-    const savedUser = localStorage.getItem("tiptab_user_profile");
-    if (savedUser) {
-      const parsed = JSON.parse(savedUser) as Creator;
-      if (parsed.handle.replace('@', '').toLowerCase() === handle) {
-        localStorage.removeItem("tiptab_user_profile");
-      }
-    }
-    toast({
-      title: "Profile Purged Successfully",
-      description: `@${handle}'s profile and map registrations have been completely removed.`,
-      variant: "destructive"
-    });
-    setIsDeleteModalOpen(false);
-    setCreatorToDelete(null);
-  };
-
   const filteredCreators = moderatedCreators.filter(c => 
     c.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
     c.handle.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
   const adminNavItems = useMemo(() => {
-    const items = [];
+    const items = [{ id: "analytics", label: "Analytics", icon: BarChart3 }];
     if (adminRole === 'super' || adminRole === 'treasurer') items.push({ id: "treasury", label: "Treasury", icon: Activity });
     if (adminRole === 'super' || adminRole === 'moderator') items.push({ id: "config", label: "Config", icon: Settings });
     if (adminRole === 'super' || adminRole === 'treasurer') {
@@ -492,15 +458,143 @@ const AdminHub = () => {
         </div>
 
         <div className="w-full">
+          {activeTab === "analytics" && (
+            <div className="space-y-10 animate-in fade-in duration-500">
+               {/* High Level Metrics */}
+               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                 {[
+                   { label: "Active Members", value: "1,240", change: "+14%", icon: UserRoundCheck, color: "text-orange-400", sub: "Growth (MoM)" },
+                   { label: "Supporter Base", value: "4,812", change: "+8%", icon: Users, color: "text-purple-400", sub: "Unique Wallets" },
+                   { label: "Tipping Velocity", value: "84/hr", change: "+22%", icon: Flame, color: "text-red-500", sub: "Platform Speed" },
+                   { label: "Avg Tip Size", value: "145 TAB", change: "-2%", icon: Zap, color: "text-cyan-400", sub: "Network Value" }
+                 ].map((stat, i) => (
+                   <Card key={i} className="bg-[#130b21] border border-white/10 p-6 rounded-[32px] hover:border-white/20 transition-all">
+                     <div className="flex items-center justify-between mb-4">
+                       <div className={cn("h-10 w-10 rounded-xl bg-white/5 flex items-center justify-center", stat.color)}>
+                         <stat.icon className="h-5 w-5" />
+                       </div>
+                       <span className={cn("text-[10px] font-black uppercase tracking-widest", stat.change.startsWith('+') ? "text-green-400" : "text-red-400")}>
+                         {stat.change}
+                       </span>
+                     </div>
+                     <div className="space-y-1">
+                       <p className="text-3xl font-black text-white tracking-tighter">{stat.value}</p>
+                       <p className="text-[10px] font-black uppercase tracking-[0.2em] text-white/30">{stat.label}</p>
+                       <p className="text-[8px] font-bold text-white/10 uppercase tracking-widest pt-1">{stat.sub}</p>
+                     </div>
+                   </Card>
+                 ))}
+               </div>
+
+               {/* Middle Section: Adoption & Geographical distribution */}
+               <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+                 <Card className="lg:col-span-7 bg-[#1a112d] border border-white/10 rounded-[40px] p-8 space-y-8 relative overflow-hidden">
+                    <div className="absolute top-0 right-0 p-8 opacity-5">
+                      <TrendingUp className="h-48 w-48 text-white" />
+                    </div>
+                    <CardHeader className="p-0 relative z-10">
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <CardTitle className="text-xl font-black flex items-center gap-3 text-white uppercase italic tracking-tight">
+                            <LineChart className="h-5 w-5 text-purple-400" /> Adoption Velocity
+                          </CardTitle>
+                          <CardDescription className="text-white/40">Member totals and network expansion trends</CardDescription>
+                        </div>
+                        <Button variant="ghost" className="h-10 rounded-xl bg-white/5 text-[9px] font-black uppercase tracking-widest text-white/40 gap-2">
+                           Detailed Report <ArrowUpRight className="h-3.5 w-3.5" />
+                        </Button>
+                      </div>
+                    </CardHeader>
+                    <CardContent className="p-0 space-y-6 relative z-10">
+                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                         <div className="p-6 rounded-[28px] bg-white/[0.03] border border-white/5 space-y-4">
+                            <div className="flex items-center gap-3">
+                               <div className="h-2 w-2 rounded-full bg-orange-500 animate-pulse" />
+                               <span className="text-[10px] font-black uppercase tracking-widest text-white/60">New Profiles (24h)</span>
+                            </div>
+                            <p className="text-4xl font-black text-white">28</p>
+                            <div className="h-1.5 w-full bg-white/5 rounded-full overflow-hidden">
+                               <div className="h-full bg-orange-500 w-[65%]" />
+                            </div>
+                         </div>
+                         <div className="p-6 rounded-[28px] bg-white/[0.03] border border-white/5 space-y-4">
+                            <div className="flex items-center gap-3">
+                               <div className="h-2 w-2 rounded-full bg-purple-500 animate-pulse" />
+                               <span className="text-[10px] font-black uppercase tracking-widest text-white/60">Performance Boosts (24h)</span>
+                            </div>
+                            <p className="text-4xl font-black text-white">42</p>
+                            <div className="h-1.5 w-full bg-white/5 rounded-full overflow-hidden">
+                               <div className="h-full bg-purple-500 w-[82%]" />
+                            </div>
+                         </div>
+                       </div>
+                    </CardContent>
+                 </Card>
+
+                 <Card className="lg:col-span-5 bg-[#130b21] border border-white/10 rounded-[40px] p-8 space-y-8 relative overflow-hidden">
+                    <CardHeader className="p-0">
+                      <CardTitle className="text-xl font-black flex items-center gap-3 text-white uppercase italic">
+                        <Globe className="h-5 w-5 text-cyan-400" /> Distribution
+                      </CardTitle>
+                      <CardDescription className="text-white/40">Geographical presence hotspots</CardDescription>
+                    </CardHeader>
+                    <CardContent className="p-0 space-y-6">
+                      {[
+                        { city: "London, UK", count: 412, color: "bg-purple-500" },
+                        { city: "Austin, USA", count: 284, color: "bg-orange-500" },
+                        { city: "Melbourne, AU", count: 156, color: "bg-cyan-500" }
+                      ].map((loc, i) => (
+                        <div key={i} className="flex items-center justify-between group">
+                          <div className="flex items-center gap-4">
+                            <div className={cn("h-2.5 w-2.5 rounded-full", loc.color)} />
+                            <span className="font-black text-sm text-white/80 group-hover:text-white transition-colors">{loc.city}</span>
+                          </div>
+                          <span className="font-black text-xs text-white/40">{loc.count} pins</span>
+                        </div>
+                      ))}
+                      <div className="pt-4 mt-4 border-t border-white/5">
+                        <p className="text-[9px] font-black text-white/20 uppercase tracking-[0.3em] text-center">Global Coverage: 84% Recognized Cities</p>
+                      </div>
+                    </CardContent>
+                 </Card>
+               </div>
+
+               {/* Network Health Grid */}
+               <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                  <div className="bg-white/5 border border-white/10 rounded-[32px] p-6 flex items-center justify-between group hover:border-green-500/30 transition-all">
+                     <div className="space-y-1">
+                        <p className="text-[10px] font-black uppercase tracking-widest text-white/40">Broadcast Stability</p>
+                        <p className="text-xl font-black text-white">99.9%</p>
+                     </div>
+                     <CheckCircle2 className="h-8 w-8 text-green-500 opacity-20 group-hover:opacity-100 transition-opacity" />
+                  </div>
+                  <div className="bg-white/5 border border-white/10 rounded-[32px] p-6 flex items-center justify-between group hover:border-cyan-500/30 transition-all">
+                     <div className="space-y-1">
+                        <p className="text-[10px] font-black uppercase tracking-widest text-white/40">Platform Latency</p>
+                        <p className="text-xl font-black text-white">12ms</p>
+                     </div>
+                     <Activity className="h-8 w-8 text-cyan-500 opacity-20 group-hover:opacity-100 transition-opacity" />
+                  </div>
+                  <div className="bg-white/5 border border-white/10 rounded-[32px] p-6 flex items-center justify-between group hover:border-orange-500/30 transition-all">
+                     <div className="space-y-1">
+                        <p className="text-[10px] font-black uppercase tracking-widest text-white/40">Conversion Rate</p>
+                        <p className="text-xl font-black text-white">12.4%</p>
+                     </div>
+                     <MousePointerClick className="h-8 w-8 text-orange-500 opacity-20 group-hover:opacity-100 transition-opacity" />
+                  </div>
+               </div>
+            </div>
+          )}
+
           {activeTab === "treasury" && (adminRole === 'super' || adminRole === 'treasurer') && (
             <div className="space-y-8 animate-in fade-in duration-300">
-              <div className="grid grid-cols-1 md:grid-cols-12 gap-8 items-start">
-                <Card className="md:col-span-12 lg:col-span-6 bg-[#1a112d] border-[4px] border-slate-300/40 rounded-[40px] overflow-hidden shadow-[0_0_80px_rgba(0,0,0,0.8)] relative group ring-2 ring-white/10 h-full">
+              <div className="max-w-3xl mx-auto">
+                <Card className="bg-[#1a112d] border-[4px] border-slate-300/40 rounded-[40px] overflow-hidden shadow-[0_0_80px_rgba(0,0,0,0.8)] relative group ring-2 ring-white/10">
                   <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-white/[0.05] to-transparent pointer-events-none" />
-                  <CardHeader className="p-8 pb-2 relative z-10">
+                  <CardHeader className="p-10 pb-2 relative z-10">
                     <div className="flex items-center justify-between">
-                      <CardTitle className="text-xl md:text-2xl font-black italic tracking-tighter flex items-center gap-3 text-white">
-                        <Activity className="h-6 w-6 text-purple-500 animate-pulse" /> NETWORK TREASURY
+                      <CardTitle className="text-2xl md:text-3xl font-black italic tracking-tighter flex items-center gap-3 text-white uppercase">
+                        <Activity className="h-8 w-8 text-purple-500 animate-pulse" /> NETWORK TREASURY
                       </CardTitle>
                       <div className="flex items-center gap-2 px-3 py-1 rounded-full bg-green-500/20 border border-green-500/40">
                         <span className="relative flex h-2 w-2">
@@ -511,83 +605,46 @@ const AdminHub = () => {
                       </div>
                     </div>
                   </CardHeader>
-                  <CardContent className="p-8 pt-0 space-y-8 relative z-10">
-                    <div className="space-y-4 bg-white/5 p-6 rounded-[28px] border border-white/10">
+                  <CardContent className="p-10 pt-0 space-y-10 relative z-10">
+                    <div className="space-y-6 bg-white/5 p-8 rounded-[36px] border border-white/10">
                       <div className="flex items-center justify-between">
                         <div className="space-y-1">
-                          <p className="text-[11px] font-black text-orange-500 uppercase tracking-[0.4em]">Rewards Pool (50% Boost Split)</p>
-                          <p className="text-4xl font-black text-white tracking-tighter italic">{rewardsPool.toLocaleString()} <span className="text-orange-500 text-lg">XPR</span></p>
+                          <p className="text-[12px] font-black text-orange-500 uppercase tracking-[0.4em]">Rewards Pool (50% Boost Split)</p>
+                          <p className="text-5xl font-black text-white tracking-tighter italic">{rewardsPool.toLocaleString()} <span className="text-orange-500 text-xl">XPR</span></p>
                         </div>
-                        <Trophy className="h-8 w-8 text-orange-500" />
+                        <Trophy className="h-12 w-12 text-orange-500 drop-shadow-[0_0_15px_rgba(249,115,22,0.4)]" />
                       </div>
-                      <div className="pt-4 border-t border-white/5">
-                        <p className="text-[9px] font-bold text-white/30 uppercase tracking-[0.2em]">Live Boost Sourced Only</p>
+                      <div className="pt-6 border-t border-white/5">
+                        <p className="text-[10px] font-bold text-white/30 uppercase tracking-[0.2em]">Sourced from Performance Boost Revenue</p>
                       </div>
                     </div>
 
-                    <div className="grid grid-cols-1 gap-4">
-                       <div className="bg-gradient-to-r from-purple-500/10 to-transparent p-5 rounded-2xl border border-white/10 flex items-center justify-between">
-                        <div>
-                          <span className="text-[11px] font-black text-white/40 uppercase tracking-[0.3em] block mb-0.5">Admin Revenue (100% Membership + 50% Boost)</span>
-                          <span className="text-xl font-black text-purple-400 italic">{totalAdminRevenue.toLocaleString()} <span className="text-xs">XPR</span></span>
+                    <div className="grid grid-cols-1 gap-6">
+                       <div className="bg-gradient-to-r from-purple-500/10 to-transparent p-7 rounded-[28px] border border-white/10 flex items-center justify-between group hover:border-purple-500/40 transition-all">
+                        <div className="space-y-1">
+                          <span className="text-[11px] font-black text-white/40 uppercase tracking-[0.3em] block mb-0.5">Admin Revenue (Net)</span>
+                          <span className="text-3xl font-black text-purple-400 italic tracking-tight">{totalAdminRevenue.toLocaleString()} <span className="text-sm">XPR</span></span>
                         </div>
-                        <HandCoins className="h-5 w-5 text-purple-400" />
+                        <HandCoins className="h-8 w-8 text-purple-400 group-hover:scale-110 transition-transform" />
                       </div>
                       
-                      <div className="bg-gradient-to-r from-orange-500/10 to-transparent p-5 rounded-2xl border border-white/10 flex items-center justify-between">
-                        <div>
-                          <span className="text-[11px] font-black text-white/40 uppercase tracking-[0.3em] block mb-0.5">Performance Boost Revenue</span>
-                          <span className="text-xl font-black text-white italic">{boostRevenueTotal.toLocaleString()} <span className="text-xs text-orange-500">XPR</span></span>
+                      <div className="bg-gradient-to-r from-orange-500/10 to-transparent p-7 rounded-[28px] border border-white/10 flex items-center justify-between group hover:border-orange-500/40 transition-all">
+                        <div className="space-y-1">
+                          <span className="text-[11px] font-black text-white/40 uppercase tracking-[0.3em] block mb-0.5">Performance Boost Volume (Gross)</span>
+                          <span className="text-3xl font-black text-white italic tracking-tight">{boostRevenueTotal.toLocaleString()} <span className="text-sm text-orange-500">XPR</span></span>
                         </div>
-                        <Zap className="h-5 w-5 text-orange-500 fill-orange-500" />
+                        <Zap className="h-8 w-8 text-orange-500 fill-orange-500 group-hover:scale-110 transition-transform" />
                       </div>
                     </div>
 
                     <Button 
                       onClick={() => setActiveTab("rewards")}
-                      className="w-full h-16 bg-white text-black hover:bg-orange-500 hover:text-white rounded-2xl font-black text-xs uppercase tracking-widest shadow-2xl transition-all"
+                      className="w-full h-20 bg-white text-black hover:bg-orange-500 hover:text-white rounded-[24px] font-black text-sm uppercase tracking-[0.2em] shadow-2xl transition-all active:scale-95"
                     >
-                      Go To Rewards Panel
+                      Process Network Rewards
                     </Button>
                   </CardContent>
                 </Card>
-
-                <div className="md:col-span-12 lg:col-span-6 space-y-6">
-                  <Card className="bg-[#1a112d] border border-white/10 rounded-[40px] p-8 space-y-6 overflow-hidden relative">
-                    <div className="absolute top-0 right-0 p-8 opacity-5">
-                      <TrendingUp className="h-48 w-48 text-white" />
-                    </div>
-                    <CardHeader className="p-0 relative z-10">
-                      <CardTitle className="text-xl font-black flex items-center gap-3 text-white uppercase italic">
-                        <LineChart className="h-5 w-5 text-cyan-400" /> Growth & Adoption
-                      </CardTitle>
-                      <CardDescription className="text-white/40">Member totals and network expansion velocity</CardDescription>
-                    </CardHeader>
-                    <CardContent className="p-0 grid grid-cols-1 sm:grid-cols-2 gap-4 relative z-10">
-                      <div className="p-5 rounded-2xl bg-white/5 border border-white/5 space-y-2 group hover:border-orange-500/30 transition-all">
-                        <span className="text-[10px] font-black uppercase tracking-widest text-slate-500 flex items-center gap-2">
-                          <UserRoundCheck className="h-3.5 w-3.5 text-orange-400" /> Total Verified Members
-                        </span>
-                        <div className="flex items-end gap-2">
-                          <span className="text-3xl font-black text-white">1,240</span>
-                          <span className="text-[9px] font-black text-orange-400 mb-1 flex items-center gap-0.5"><TrendingUp className="h-2.5 w-2.5" /> 14%</span>
-                        </div>
-                        <p className="text-[8px] font-bold text-slate-600 uppercase tracking-tighter">Growth (MoM)</p>
-                      </div>
-
-                      <div className="p-5 rounded-2xl bg-white/5 border border-white/5 space-y-2 group hover:border-purple-500/30 transition-all">
-                        <span className="text-[10px] font-black uppercase tracking-widest text-slate-500 flex items-center gap-2">
-                          <Users className="h-3.5 w-3.5 text-purple-400" /> Supporter Network
-                        </span>
-                        <div className="flex items-end gap-2">
-                          <span className="text-3xl font-black text-white">4,812</span>
-                          <span className="text-[9px] font-black text-purple-400 mb-1 flex items-center gap-0.5"><TrendingUp className="h-2.5 w-2.5" /> 8%</span>
-                        </div>
-                        <p className="text-[8px] font-bold text-slate-600 uppercase tracking-tighter">Total unique wallets</p>
-                      </div>
-                    </CardContent>
-                  </Card>
-                </div>
               </div>
             </div>
           )}
