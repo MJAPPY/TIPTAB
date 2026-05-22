@@ -48,7 +48,7 @@ const CreatorProfile = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const { toast } = useToast();
-  const { session, actor, login, isConnected, recordTip, isMember, featuredHandles, boostStream, boostPrice, boostTabPrice } = useXpr();
+  const { session, actor, login, isConnected, recordTip, isMember, featuredHandles, boostStream, boostPrice, boostTabPrice, userProfile } = useXpr();
   
   const [creator, setCreator] = useState<Creator | null>(null);
   const [tipAmount, setTipAmount] = useState("50");
@@ -71,10 +71,25 @@ const CreatorProfile = () => {
     if (!handle) return;
     const cleanHandle = handle.replace(/^@/, "").toLowerCase().trim();
     
+    // Priority 1: Check if viewing own profile (live context data)
+    if (actor === cleanHandle && userProfile) {
+      setCreator(userProfile);
+      return;
+    }
+
+    // Priority 2: Check for any local storage overrides for this specific handle
+    const localOverride = localStorage.getItem(`tiptab_profile_${cleanHandle}`);
+    if (localOverride) {
+      setCreator(JSON.parse(localOverride));
+      return;
+    }
+    
+    // Priority 3: Fallback to static seed data
     const found = CREATORS.find(c => c.handle.toLowerCase() === cleanHandle);
     if (found) {
       setCreator(found);
     } else {
+      // Priority 4: Fallback to general user profile (legacy key)
       const savedUser = localStorage.getItem("tiptab_user_profile");
       if (savedUser) {
         const localUser = JSON.parse(savedUser) as Creator;
@@ -85,7 +100,7 @@ const CreatorProfile = () => {
       }
       navigate("/");
     }
-  }, [handle, navigate]);
+  }, [handle, navigate, actor, userProfile]);
 
   const handleBack = () => {
     if (window.history.length > 1 && location.key !== 'default') {
