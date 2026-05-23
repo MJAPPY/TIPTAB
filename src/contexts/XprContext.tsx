@@ -149,7 +149,7 @@ export const XprProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
   useEffect(() => {
     if (session?.auth.actor) {
-      const saved = localStorage.getItem(`tiptab_favorites_${session.auth.actor}`);
+      const saved = localStorage.getItem(`tiptab_favorites_${session.auth.actor.toString()}`);
       if (saved) setFavorites(JSON.parse(saved));
     } else {
       setFavorites([]);
@@ -164,7 +164,7 @@ export const XprProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       : [...favorites, cleanHandle];
     
     setFavorites(newFavorites);
-    localStorage.setItem(`tiptab_favorites_${session.auth.actor}`, JSON.stringify(newFavorites));
+    localStorage.setItem(`tiptab_favorites_${session.auth.actor.toString()}`, JSON.stringify(newFavorites));
   };
 
   const isFavorite = (handle: string) => {
@@ -255,7 +255,7 @@ export const XprProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     return [];
   });
 
-  const activeActor = session ? session.auth.actor : null;
+  const activeActor = session ? session.auth.actor.toString() : null;
   const currentAdminObj = activeActor ? adminsList.find(a => a.handle === activeActor) : null;
   const isCurrentAdminPermanent = currentAdminObj?.isPermanent === true;
 
@@ -273,7 +273,7 @@ export const XprProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       setMembershipFeeXmd(fee);
       updateData.membership_fee_xmd = parseFloat(fee);
     } else if (asset === 'XUSDC') {
-      setMembershipFeeXusdc(fee);
+      setMembershipFee(fee);
       updateData.membership_fee_xusdc = parseFloat(fee);
     }
     
@@ -443,14 +443,14 @@ export const XprProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
   const distributeXprRewards = async (winners: { account: string; amount: string }[]) => {
     if (!session) return false;
-    const actorName = session.auth.actor;
+    const actorName = session.auth.actor.toString();
     const currentAdmin = adminsList.find(a => a.handle === actorName);
     if (!currentAdmin || (currentAdmin.role !== 'super' && currentAdmin.role !== 'treasurer')) return false;
     try {
       const actions = winners.map(winner => ({
         account: 'eosio.token',
         name: 'transfer',
-        authorization: [{ actor: actorName, permission: session.auth.permission }],
+        authorization: [{ actor: session.auth.actor, permission: session.auth.permission }],
         data: {
           from: actorName,
           to: winner.account,
@@ -468,7 +468,7 @@ export const XprProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
   const recordTip = useCallback((amount: number) => {
     if (!session?.auth.actor) return;
-    const actor = session.auth.actor;
+    const actor = session.auth.actor.toString();
     const key = `tiptab_tips_sent_${actor}`;
     const current = parseInt(localStorage.getItem(key) || "0");
     const updated = current + amount;
@@ -562,12 +562,12 @@ export const XprProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     try {
       const { session: restoredSession } = await ProtonWebSDK({
         linkOptions: { endpoints: PROTON_ENDPOINTS, restoreSession: true },
-        transportOptions: { requestAccount: APP_IDENTIFIER, backoff: 1000 },
-        selectorOptions: { appName: APP_NAME, appLogo: APP_LOGO, customStyleOptions: { modalBackgroundColor: '#0a0514', logoBackgroundColor: '#0a0514' } },
+        transportOptions: { requestAccount: APP_IDENTIFIER },
+        selectorOptions: { },
       });
       if (restoredSession) {
         setSession(restoredSession);
-        await fetchBalances(restoredSession.auth.actor);
+        await fetchBalances(restoredSession.auth.actor.toString());
       }
     } catch (error) {
       console.error('Session restoration error:', error);
@@ -583,11 +583,11 @@ export const XprProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       const { session: newSession } = await ProtonWebSDK({
         linkOptions: { endpoints: PROTON_ENDPOINTS },
         transportOptions: { requestAccount: APP_IDENTIFIER },
-        selectorOptions: { appName: APP_NAME, appLogo: APP_LOGO },
+        selectorOptions: { },
       });
       if (newSession) {
         setSession(newSession);
-        await fetchBalances(newSession.auth.actor);
+        await fetchBalances(newSession.auth.actor.toString());
         return newSession;
       }
       return null;
@@ -610,12 +610,13 @@ export const XprProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   };
 
   const refreshBalances = async () => {
-    if (session) await fetchBalances(session.auth.actor);
+    if (session) await fetchBalances(session.auth.actor.toString());
   };
 
   const updateUserProfile = (profile: Creator) => {
     if (session?.auth.actor) {
-      localStorage.setItem(`tiptab_profile_${session.auth.actor}`, JSON.stringify(profile));
+      const actor = session.auth.actor.toString();
+      localStorage.setItem(`tiptab_profile_${actor}`, JSON.stringify(profile));
       localStorage.setItem("tiptab_user_profile", JSON.stringify(profile));
       setUserProfile(profile);
     }

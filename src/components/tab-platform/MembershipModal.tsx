@@ -17,7 +17,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Zap, ShieldCheck, CheckCircle2, Wallet, ArrowRight, Sparkles, Calendar, Gift, Tag, Percent, Clock } from "lucide-react";
+import { Zap, ShieldCheck, CheckCircle2, Wallet, ArrowRight, Sparkles, Calendar, Gift } from "lucide-react";
 import { useState, useEffect } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { useXpr, PromoCode } from "@/contexts/XprContext";
@@ -148,7 +148,7 @@ export const MembershipModal = ({ isOpen, onOpenChange }: MembershipModalProps) 
         account: assetConfig.account, 
         name: 'transfer',
         authorization: [{
-          actor: actor,
+          actor: session.auth.actor,
           permission: permission,
         }],
         data: {
@@ -161,11 +161,7 @@ export const MembershipModal = ({ isOpen, onOpenChange }: MembershipModalProps) 
 
       await session.transact(
         { actions: [membershipAction] }, 
-        { 
-          broadcast: true,
-          title: isMember ? 'Renew TIPTAB Membership' : 'Activate TIPTAB Membership',
-          description: `Fee: ${formattedFee}`
-        }
+        { broadcast: true }
       );
       
       const now = new Date().toISOString();

@@ -15,37 +15,25 @@ import {
   Bell,
   Zap,
   Power,
-  X,
-  FileText,
   History,
   HandCoins,
   Users,
   Trophy,
   Sparkles,
-  Laptop,
   Gift,
   Plus,
   Trash2,
   UserPlus,
   ShieldCheck,
   UserCheck,
-  HelpCircle,
-  ShieldAlert as AlertIcon,
   AlertTriangle,
   BarChart3,
   TrendingUp,
   MousePointerClick,
-  Heart,
-  Timer,
-  Server,
-  LineChart,
-  UserRoundCheck,
   Globe,
   ArrowUpRight,
   Flame,
-  LayoutGrid,
   BellOff,
-  Coins,
   RefreshCw,
   Scale,
   Clock,
@@ -56,10 +44,9 @@ import {
   Filter,
   CheckCircle,
   AlertCircle,
-  TrendingDown,
   Eraser,
   Dices,
-  Crown
+  MapPin
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
@@ -710,7 +697,7 @@ const AdminHub = () => {
             <div className="space-y-10 animate-in fade-in duration-500">
                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
                  {[
-                   { label: "Active Members", value: analyticsStats.activeMembers.toLocaleString(), change: "+14%", icon: UserRoundCheck, color: "text-orange-400", sub: "Growth (MoM)" },
+                   { label: "Active Members", value: analyticsStats.activeMembers.toLocaleString(), change: "+14%", icon: UserCheck, color: "text-orange-400", sub: "Growth (MoM)" },
                    { label: "Supporter Base", value: analyticsStats.supporterBase.toLocaleString(), change: "+8%", icon: Users, color: "text-purple-400", sub: "Unique Wallets" },
                    { label: "Tipping Velocity", value: `${analyticsStats.tippingVelocity}/hr`, change: "+22%", icon: Flame, color: "text-red-500", sub: "Platform Speed" },
                    { label: "Avg Tip Size", value: `${analyticsStats.avgTipSize} TAB`, change: "-2%", icon: Zap, color: "text-cyan-400", sub: "Network Value" }
@@ -742,7 +729,7 @@ const AdminHub = () => {
                       <div className="flex items-center justify-between">
                         <div>
                           <CardTitle className="text-xl font-black flex items-center gap-3 text-white uppercase italic tracking-tight">
-                            <LineChart className="h-5 w-5 text-purple-400" /> Adoption Velocity
+                            <TrendingUp className="h-5 w-5 text-purple-400" /> Adoption Velocity
                           </CardTitle>
                           <CardDescription className="text-white/40">Member totals and network expansion trends</CardDescription>
                         </div>

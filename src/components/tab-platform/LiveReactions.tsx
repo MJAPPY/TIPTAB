@@ -2,7 +2,6 @@
 
 import React, { useState, useEffect, useCallback } from 'react';
 import { Heart } from 'lucide-react';
-import { cn } from '@/lib/utils';
 
 type ReactionType = 'heart' | 'firework' | 'applause';
 
@@ -35,7 +34,9 @@ export const LiveReactions = () => {
 
   useEffect(() => {
     (window as any).triggerReaction = addReaction;
-    return () => delete (window as any).triggerReaction;
+    return () => {
+      delete (window as any).triggerReaction;
+    };
   }, [addReaction]);
 
   const renderReaction = (reaction: Reaction) => {

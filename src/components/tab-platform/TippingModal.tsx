@@ -6,7 +6,7 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Twitter, Globe, Zap, ShieldCheck, Wallet, MessageSquare, Facebook, MessageCircle } from "lucide-react";
+import { Twitter, Globe, Zap, ShieldCheck, Wallet, MessageSquare, Facebook } from "lucide-react";
 import { useState } from "react";
 import { Creator } from "@/data/creators";
 import { useToast } from "@/hooks/use-toast";
@@ -80,7 +80,7 @@ export const TippingModal = ({ creator, onClose }: TippingModalProps) => {
         account: config.code, 
         name: 'transfer',
         authorization: [{
-          actor: actor,
+          actor: session.auth.actor,
           permission: permission,
         }],
         data: {
@@ -93,11 +93,7 @@ export const TippingModal = ({ creator, onClose }: TippingModalProps) => {
 
       await session.transact(
         { actions: [transferAction] }, 
-        { 
-          broadcast: true,
-          title: `Tip ${creator.name}`,
-          description: `Sending ${quantityString} to ${creator.handle}`
-        }
+        { broadcast: true }
       );
       
       if (asset === "TAB") {
