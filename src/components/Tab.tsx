@@ -12,7 +12,6 @@ import { ActivityTicker } from "./tab-platform/ActivityTicker";
 import { Toaster } from "@/components/ui/toaster";
 import { CREATORS, Creator } from "@/data/creators";
 import { useXpr } from "@/contexts/XprContext";
-import { APP_LOGO } from "@/utils/assets";
 
 export const Tab = () => {
   const [isMembershipOpen, setIsMembershipOpen] = useState(false);
@@ -20,19 +19,27 @@ export const Tab = () => {
   const { actor, userProfile, isMember } = useXpr();
   const navigate = useNavigate();
 
+  // Optimized logic to ensure local user profile overrides seed data on the map and lists
   const displayCreators = useMemo(() => {
+    // 1. Start with the base list
     let list = [...CREATORS];
 
+    // 2. If user is logged in, find their profile in storage to ensure we have latest local edits
+    // (We also check userProfile from context which is synced)
     if (actor && userProfile) {
       const cleanActor = actor.toLowerCase();
+      
+      // Check if this actor is a member (either via local flag or context)
       const membershipKey = `tiptab_membership_${actor}`;
       const isActuallyMember = isMember || localStorage.getItem(membershipKey) === 'true';
 
       if (isActuallyMember) {
         const existsIdx = list.findIndex(c => c.handle.toLowerCase() === cleanActor);
         if (existsIdx !== -1) {
+          // Replace existing seed data with current user profile
           list[existsIdx] = userProfile;
         } else {
+          // Add new member to the top of the map/list
           list = [userProfile, ...list];
         }
       }
@@ -66,6 +73,7 @@ export const Tab = () => {
               <div className="h-1.5 w-1.5 rounded-full bg-white animate-pulse" />
             </div>
             <h2 className="text-base sm:text-lg font-bold">Live on XPR Network</h2>
+            <span className="text-white/40 text-[10px] sm:text-xs">— click a pin to view profile</span>
           </div>
           <WorldMap creators={displayCreators} onSelectCreator={handleViewProfile} />
         </section>
@@ -83,15 +91,39 @@ export const Tab = () => {
       <footer className="py-16 sm:py-24 border-t border-white/5 bg-black/20 mt-20">
         <div className="container mx-auto px-6 text-center">
           <Link to="/" className="mb-8 sm:mb-12 flex flex-col items-center gap-4 sm:gap-8 group inline-flex">
-            <img src={APP_LOGO} alt="TIPTAB Logo" className="h-24 w-24 sm:h-40 sm:w-40 object-contain drop-shadow-[0_0_30px_rgba(168,85,247,0.2)] group-hover:scale-105 transition-transform duration-500" />
+            <img src="/src/assets/logo.png" alt="TIPTAB Logo" className="h-24 w-24 sm:h-40 sm:w-40 object-contain drop-shadow-[0_0_30px_rgba(168,85,247,0.2)] group-hover:scale-105 transition-transform duration-500" />
             <span className="text-3xl sm:text-5xl font-black italic tracking-tighter text-white group-hover:text-[#a855f7] transition-colors duration-300">
               TIP<span className="text-orange-500">TAB</span>
             </span>
           </Link>
           <div className="space-y-4 mb-10 sm:mb-12 max-w-xl mx-auto px-4">
             <p className="text-white/40 text-sm sm:text-lg font-medium">
-              Empowering the global workforce through direct, fee-free tipping on the <span className="text-purple-400">XPR Network</span>.
+              Empowering the global workforce through direct, fee-free tipping on the <span className="text-purple-400">XPR Network</span>. Join the future of appreciation.
             </p>
+            <p className="text-orange-500/80 font-black italic tracking-tight text-lg sm:text-xl uppercase drop-shadow-[0_0_15px_rgba(249,115,22,0.2)]">
+              “Tipping is the appreciation of value”
+            </p>
+          </div>
+          <div className="flex flex-wrap justify-center gap-6 sm:gap-10 text-white/60 font-bold text-sm sm:text-base">
+            <Link to="/docs" className="hover:text-purple-400 transition-colors">FAQ</Link>
+            <Link to="/assets" className="hover:text-orange-400 transition-colors">Assets</Link>
+            <a 
+              href="https://x.com/tabtokenxpr" 
+              target="_blank" 
+              rel="noopener noreferrer" 
+              className="hover:text-purple-400 transition-colors"
+            >
+              Twitter
+            </a>
+            <a 
+              href="https://snipverse.com/tabxpr" 
+              target="_blank" 
+              rel="noopener noreferrer" 
+              className="hover:text-purple-400 transition-colors"
+            >
+              Snipverse
+            </a>
+            <Link to="/docs?section=support" className="hover:text-orange-400 transition-colors">Support Hub</Link>
           </div>
           <div className="mt-16 sm:mt-20 pt-8 sm:pt-10 border-t border-white/5 text-white/20 text-[10px] sm:text-xs font-black uppercase tracking-[0.3em] px-4">
             © {new Date().getFullYear()} TIPTAB Platform. SECURED BY XPR NETWORK.

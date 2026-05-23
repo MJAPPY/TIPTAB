@@ -1,8 +1,7 @@
 import { Button } from "@/components/ui/button";
-import { ArrowRight, Sparkles, Heart, Car, Zap, UserCheck } from "lucide-react";
+import { Zap, ArrowRight, UserCheck, Sparkles, Globe, Heart, Rocket, Car } from "lucide-react";
 import { Creator } from "@/data/creators";
 import { useXpr } from "@/contexts/XprContext";
-import { APP_LOGO } from "@/utils/assets";
 
 interface HeroProps {
   creators: Creator[];
@@ -11,11 +10,14 @@ interface HeroProps {
 
 export const Hero = ({ creators, onJoin }: HeroProps) => {
   const { isMember } = useXpr();
+  // Take the first 4 creators for the preview avatars
   const previewCreators = creators.slice(0, 4);
+  // Calculate a dynamic count (using a base of 10k to maintain the 'scale' vibe)
   const formattedCount = (10 + (creators.length / 1000)).toFixed(1);
 
   return (
     <section className="relative pt-8 md:pt-16 pb-24 md:pb-32 overflow-hidden">
+      {/* Cinematic Background */}
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[1000px] h-[1000px] bg-purple-600/10 blur-[160px] rounded-full -z-10" />
       <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-orange-500/5 blur-[120px] rounded-full -z-10" />
       
@@ -32,19 +34,34 @@ export const Hero = ({ creators, onJoin }: HeroProps) => {
               <span className="text-transparent bg-clip-text bg-gradient-to-r from-orange-400 via-pink-500 to-purple-600">Appreciation Hub</span>
             </h1>
             
-            <p className="text-xl md:text-2xl text-white/80 max-w-2xl leading-relaxed font-medium">
-              Whether you're a delivery pro, a musician, or a digital creator—TIPTAB connects you directly to people who value your hustle.
-            </p>
+            <div className="space-y-6">
+              <p className="text-xl md:text-2xl text-white/80 max-w-2xl leading-relaxed font-medium">
+                Whether you're a delivery pro, a fitness coach, a musician, or a digital creator—TIPTAB connects you directly to the people who value your hustle via the <span className="text-purple-400 font-black">XPR Network</span>. Zero fees.
+              </p>
+              
+              <div className="flex flex-wrap items-center gap-x-3 gap-y-2 text-xl md:text-2xl font-black italic tracking-tight">
+                <span className="text-white/40 not-italic font-medium">Instant rewards in</span>
+                <span className="text-orange-500 drop-shadow-[0_0_10px_rgba(249,115,22,0.3)]">TAB</span>
+                <span className="text-purple-400 drop-shadow-[0_0_10px_rgba(168,85,247,0.3)]">XPR</span>
+                <span className="text-green-400 drop-shadow-[0_0_10px_rgba(34,197,94,0.3)]">XUSDC</span>
+                <span className="text-cyan-400 drop-shadow-[0_0_10px_rgba(6,182,212,0.3)]">XMD</span>
+                <span className="text-slate-400 drop-shadow-[0_0_10px_rgba(148,163,184,0.3)]">METAL</span>
+                <span className="text-blue-500 drop-shadow-[0_0_10px_rgba(59,130,246,0.3)]">LOAN</span>
+              </div>
+            </div>
 
             <div className="flex flex-col sm:flex-row items-center gap-4 pt-4">
               {!isMember && (
                 <div className="flex flex-col gap-2 w-full sm:w-auto">
                   <Button 
                     onClick={onJoin}
-                    className="w-full h-16 md:h-20 px-10 md:px-14 bg-white text-black hover:bg-orange-600 hover:text-purple-200 rounded-[24px] md:rounded-[32px] font-black text-xl md:text-2xl shadow-2xl transition-all group active:scale-95"
+                    className="w-full h-16 md:h-20 px-10 md:px-14 bg-white text-black hover:bg-orange-600 hover:text-purple-200 rounded-[24px] md:rounded-[32px] font-black text-xl md:text-2xl shadow-[0_20px_50px_rgba(255,255,255,0.1)] transition-all group active:scale-95 animate-shimmer-silver"
                   >
                     Join the Network <ArrowRight className="ml-3 h-6 w-6 group-hover:translate-x-2 transition-transform" />
                   </Button>
+                  <p className="text-[10px] md:text-xs font-bold text-white/30 italic px-2">
+                    *wallet connection required to join
+                  </p>
                 </div>
               )}
               <div className="flex items-center gap-4 px-6">
@@ -67,16 +84,32 @@ export const Hero = ({ creators, onJoin }: HeroProps) => {
                 </p>
               </div>
             </div>
+            
+            <div className="flex flex-wrap items-center gap-4 md:gap-6 pt-4">
+              <div className="flex items-center gap-3 bg-white/5 px-6 py-3 rounded-2xl border border-white/5">
+                <Zap className="h-5 w-5 text-orange-500 fill-orange-500" />
+                <span className="text-[10px] font-black uppercase tracking-widest text-white/60">Direct Tipping</span>
+              </div>
+              <div className="flex items-center gap-3 bg-white/5 px-6 py-3 rounded-2xl border border-white/5">
+                <UserCheck className="h-5 w-5 text-purple-500" />
+                <span className="text-[10px] font-black uppercase tracking-widest text-white/60">Everyday Hustle</span>
+              </div>
+              <div className="flex items-center gap-3 bg-white/5 px-6 py-3 rounded-2xl border border-white/5 group hover:border-green-500/30 transition-colors">
+                <Car className="h-5 w-5 text-green-500 drop-shadow-[0_0_8px_rgba(34,197,94,0.4)]" />
+                <span className="text-[10px] font-black uppercase tracking-widest text-white/60 group-hover:text-green-400 transition-colors">Gig Economy Ready</span>
+              </div>
+            </div>
           </div>
           
           <div className="flex-1 relative lg:block hidden">
             <div className="relative z-10 flex items-center justify-center">
               <div className="absolute inset-0 bg-purple-500/10 blur-[120px] rounded-full scale-150" />
+              
               <div className="relative group">
                 <img 
-                  src={APP_LOGO} 
+                  src="/src/assets/logo.png" 
                   alt="TIPTAB Logo"
-                  className="w-full max-w-[480px] mx-auto drop-shadow-[0_0_50px_rgba(168,85,247,0.4)] animate-delayed-spin transition-transform duration-700 group-hover:scale-105"
+                  className="w-full max-w-[480px] mx-auto drop-shadow-[0_0_50px_rgba(168,85,247,0.4)] animate-delayed-spin cursor-pointer transition-transform duration-700 group-hover:scale-105"
                 />
               </div>
             </div>
