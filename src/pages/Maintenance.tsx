@@ -61,7 +61,7 @@ const Maintenance = () => {
             <div className="relative h-40 w-40 md:h-56 md:w-56 bg-black/40 backdrop-blur-3xl border-2 border-white/10 rounded-[60px] flex items-center justify-center shadow-[0_0_80px_rgba(168,85,247,0.15)] mx-auto transition-all active:scale-95 group-hover:border-purple-500/30">
                <div className="absolute inset-4 rounded-[40px] border border-white/5 bg-gradient-to-br from-white/10 to-transparent" />
                <img 
-                src="/src/assets/logo.png" 
+                src="/logo.png" 
                 alt="TIPTAB" 
                 className="h-24 w-24 md:h-36 md:w-36 object-contain drop-shadow-[0_0_30px_rgba(168,85,247,0.6)] group-hover:scale-105 transition-transform duration-500" 
               />
