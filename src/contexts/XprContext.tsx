@@ -3,6 +3,7 @@
 import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import ProtonWebSDK, { LinkSession } from '@proton/web-sdk';
 import { CREATORS, Creator } from '@/data/creators';
+import { supabase } from "@/integrations/supabase/client";
 
 export interface PromoCode {
   id: string;
@@ -91,6 +92,7 @@ interface XprContextType {
   // Live Ticker Feed
   liveActivities: any[];
   resetLiveTicker: () => void;
+  syncPlatformSettings: () => Promise<void>;
 }
 
 const XprContext = createContext<XprContextType | undefined>(undefined);
@@ -176,47 +178,46 @@ export const XprProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     return null;
   });
   
-  const [membershipFee, setMembershipFee] = useState(() => {
-    if (typeof window !== "undefined") {
-      return localStorage.getItem("tiptab_membership_fee") || "2500";
-    }
-    return "2500";
-  });
+  const [membershipFee, setMembershipFee] = useState("2500");
+  const [membershipFeeXmd, setMembershipFeeXmd] = useState("2.50");
+  const [membershipFeeXusdc, setMembershipFeeXusdc] = useState("2.50");
+  const [boostPrice, setBoostPrice] = useState("1000");
+  const [boostTabPrice, setBoostTabPrice] = useState("5000");
+  const [boostPriceXusdc, setBoostPriceXusdc] = useState("1.00");
 
-  const [membershipFeeXmd, setMembershipFeeXmd] = useState(() => {
-    if (typeof window !== "undefined") {
-      return localStorage.getItem("tiptab_membership_fee_xmd") || "2.50";
-    }
-    return "2.50";
-  });
+  const syncPlatformSettings = useCallback(async () => {
+    try {
+      const { data, error } = await supabase
+        .from('platform_settings')
+        .select('*')
+        .eq('id', 'global')
+        .single();
 
-  const [membershipFeeXusdc, setMembershipFeeXusdc] = useState(() => {
-    if (typeof window !== "undefined") {
-      return localStorage.getItem("tiptab_membership_fee_xusdc") || "2.50";
+      if (data && !error) {
+        setMembershipFee(data.membership_fee_xpr.toString());
+        setMembershipFeeXmd(data.membership_fee_xmd.toString());
+        setMembershipFeeXusdc(data.membership_fee_xusdc.toString());
+        setBoostPrice(data.boost_price_xpr.toString());
+        setBoostTabPrice(data.boost_price_tab.toString());
+        setBoostPriceXusdc(data.boost_price_xusdc.toString());
+        
+        // Also keep local storage in sync for redundancy
+        localStorage.setItem("tiptab_membership_fee", data.membership_fee_xpr.toString());
+        localStorage.setItem("tiptab_membership_fee_xmd", data.membership_fee_xmd.toString());
+        localStorage.setItem("tiptab_membership_fee_xusdc", data.membership_fee_xusdc.toString());
+        localStorage.setItem("tiptab_boost_price", data.boost_price_xpr.toString());
+        localStorage.setItem("tiptab_boost_tab_price", data.boost_price_tab.toString());
+        localStorage.setItem("tiptab_boost_xusdc_price", data.boost_price_xusdc.toString());
+      }
+    } catch (err) {
+      console.error("Failed to sync platform settings from DB:", err);
     }
-    return "2.50";
-  });
+  }, []);
 
-  const [boostPrice, setBoostPrice] = useState(() => {
-    if (typeof window !== "undefined") {
-      return localStorage.getItem("tiptab_boost_price") || "1000";
-    }
-    return "1000";
-  });
-
-  const [boostTabPrice, setBoostTabPrice] = useState(() => {
-    if (typeof window !== "undefined") {
-      return localStorage.getItem("tiptab_boost_tab_price") || "5000";
-    }
-    return "5000";
-  });
-
-  const [boostPriceXusdc, setBoostPriceXusdc] = useState(() => {
-    if (typeof window !== "undefined") {
-      return localStorage.getItem("tiptab_boost_xusdc_price") || "1.00";
-    }
-    return "1.00";
-  });
+  // Fetch settings on mount
+  useEffect(() => {
+    syncPlatformSettings();
+  }, [syncPlatformSettings]);
 
   const [featuredHandles, setFeaturedHandles] = useState<string[]>(() => {
     if (typeof window !== "undefined") {
@@ -263,32 +264,44 @@ export const XprProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     localStorage.setItem("tiptab_maintenance", status.toString());
   };
 
-  const updateMembershipFee = (fee: string, asset: 'XPR' | 'XMD' | 'XUSDC' = 'XPR') => {
+  const updateMembershipFee = async (fee: string, asset: 'XPR' | 'XMD' | 'XUSDC' = 'XPR') => {
+    const updateData: any = { updated_at: new Date().toISOString() };
     if (asset === 'XPR') {
       setMembershipFee(fee);
-      localStorage.setItem("tiptab_membership_fee", fee);
+      updateData.membership_fee_xpr = parseFloat(fee);
     } else if (asset === 'XMD') {
       setMembershipFeeXmd(fee);
-      localStorage.setItem("tiptab_membership_fee_xmd", fee);
+      updateData.membership_fee_xmd = parseFloat(fee);
     } else if (asset === 'XUSDC') {
       setMembershipFeeXusdc(fee);
-      localStorage.setItem("tiptab_membership_fee_xusdc", fee);
+      updateData.membership_fee_xusdc = parseFloat(fee);
     }
+    
+    await supabase.from('platform_settings').update(updateData).eq('id', 'global');
   };
 
-  const updateBoostPrice = (price: string) => {
+  const updateBoostPrice = async (price: string) => {
     setBoostPrice(price);
-    localStorage.setItem("tiptab_boost_price", price);
+    await supabase.from('platform_settings').update({ 
+      boost_price_xpr: parseFloat(price),
+      updated_at: new Date().toISOString()
+    }).eq('id', 'global');
   };
 
-  const updateBoostTabPrice = (price: string) => {
+  const updateBoostTabPrice = async (price: string) => {
     setBoostTabPrice(price);
-    localStorage.setItem("tiptab_boost_tab_price", price);
+    await supabase.from('platform_settings').update({ 
+      boost_price_tab: parseFloat(price),
+      updated_at: new Date().toISOString()
+    }).eq('id', 'global');
   };
 
-  const updateBoostPriceXusdc = (price: string) => {
+  const updateBoostPriceXusdc = async (price: string) => {
     setBoostPriceXusdc(price);
-    localStorage.setItem("tiptab_boost_xusdc_price", price);
+    await supabase.from('platform_settings').update({ 
+      boost_price_xusdc: parseFloat(price),
+      updated_at: new Date().toISOString()
+    }).eq('id', 'global');
   };
 
   const broadcastAlert = (message: string | null) => {
@@ -657,7 +670,8 @@ export const XprProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     toggleFavorite,
     isFavorite,
     liveActivities,
-    resetLiveTicker
+    resetLiveTicker,
+    syncPlatformSettings
   };
 
   return <XprContext.Provider value={value}>{children}</XprContext.Provider>;
