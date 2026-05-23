@@ -6,6 +6,7 @@ import { useXpr } from "@/contexts/XprContext";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
+import { APP_LOGO } from "@/utils/assets";
 
 const Maintenance = () => {
   const { isAdmin, setMaintenanceMode, login, isConnected } = useXpr();
@@ -13,7 +14,6 @@ const Maintenance = () => {
   const [clickCount, setClickCount] = useState(0);
 
   const handleHiddenLogin = async () => {
-    // Hidden trigger: Click 3 times to show login
     const newCount = clickCount + 1;
     setClickCount(newCount);
 
@@ -33,35 +33,30 @@ const Maintenance = () => {
       }
     }
 
-    // Reset click count after 2 seconds of inactivity
     setTimeout(() => setClickCount(0), 2000);
   };
 
   return (
     <div className="min-h-screen bg-[#06030e] text-white flex flex-col items-center justify-center p-6 relative overflow-hidden selection:bg-purple-500/30">
-      {/* Dynamic Background Effects */}
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-purple-600/10 blur-[150px] rounded-full animate-pulse-slow" />
       <div className="absolute top-0 right-0 w-[600px] h-[600px] bg-orange-500/5 blur-[120px] rounded-full" />
       
-      {/* Animated Grid Overlay */}
       <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/stardust.png')] opacity-20 pointer-events-none" />
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,transparent_0%,rgba(6,3,14,1)_70%)]" />
 
       <div className="relative z-10 max-w-3xl w-full text-center space-y-12">
-        {/* Hidden Login Trigger Logo */}
         <div className="space-y-4">
           <div 
             className="relative inline-block cursor-pointer group"
             onClick={handleHiddenLogin}
           >
-            {/* Multi-layered glow */}
             <div className="absolute inset-0 bg-purple-500/20 blur-[100px] rounded-full scale-150 animate-pulse" />
             <div className="absolute inset-0 bg-orange-500/10 blur-[60px] rounded-full scale-125 animate-pulse-slow" />
             
             <div className="relative h-40 w-40 md:h-56 md:w-56 bg-black/40 backdrop-blur-3xl border-2 border-white/10 rounded-[60px] flex items-center justify-center shadow-[0_0_80px_rgba(168,85,247,0.15)] mx-auto transition-all active:scale-95 group-hover:border-purple-500/30">
                <div className="absolute inset-4 rounded-[40px] border border-white/5 bg-gradient-to-br from-white/10 to-transparent" />
                <img 
-                src="/src/assets/logo.png" 
+                src={APP_LOGO} 
                 alt="TIPTAB" 
                 className="h-24 w-24 md:h-36 md:w-36 object-contain drop-shadow-[0_0_30px_rgba(168,85,247,0.6)] group-hover:scale-105 transition-transform duration-500" 
               />

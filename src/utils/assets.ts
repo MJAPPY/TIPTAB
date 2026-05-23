@@ -1,0 +1,1 @@
+export const APP_LOGO = "dyad-media://media/TIPTAB/.dyad/media/7997dcfdcd7d9116bc1ee67da956ee0897b1032946d85fa251b03fcdde716c18.png";
