@@ -45,7 +45,7 @@ import { cn } from "@/lib/utils";
 const ASSET_MAP: Record<string, { code: string; precision: number }> = {
   TAB: { code: 'tokencreate', precision: 0 },
   XPR: { code: 'eosio.token', precision: 4 },
-  XMD: { code: 'moneda.token', precision: 6 },
+  XMD: { code: 'xmd.token', precision: 6 },
   XUSDC: { code: 'xtokens', precision: 6 },
   METAL: { code: 'token.metal', precision: 8 },
   LOAN: { code: 'loan.token', precision: 4 },
@@ -400,7 +400,7 @@ const Dashboard = () => {
                     </div>
                   </CardHeader>
                   <CardContent className="p-0 mt-4 flex flex-col flex-1 justify-between">
-                    <span className="text-3xl sm:text-4xl font-black tracking-tighter text-slate-100">{engagementRate}%</span>
+                    <span className="text-3xl font-black tracking-tighter text-slate-100">{engagementRate}%</span>
                     <p className="text-[10px] text-white/30 font-bold uppercase tracking-widest pt-2">Conversion Ratio</p>
                   </CardContent>
                 </Card>

@@ -33,7 +33,7 @@ type OnboardingStep = "intro" | "payment" | "success";
 
 const ASSET_CONTRACTS = {
   XPR: { account: 'eosio.token', precision: 4 },
-  XMD: { account: 'moneda.token', precision: 6 },
+  XMD: { account: 'xmd.token', precision: 6 },
   XUSDC: { account: 'xtokens', precision: 6 },
 };
 

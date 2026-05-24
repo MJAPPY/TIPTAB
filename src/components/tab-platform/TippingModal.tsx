@@ -23,7 +23,7 @@ interface TippingModalProps {
 const ASSET_CONFIGS: Record<string, { code: string; precision: number }> = {
   TAB: { code: 'tokencreate', precision: 0 },
   XPR: { code: 'eosio.token', precision: 4 },
-  XMD: { code: 'moneda.token', precision: 6 },
+  XMD: { code: 'xmd.token', precision: 6 },
   XUSDC: { code: 'xtokens', precision: 6 },
   METAL: { code: 'token.metal', precision: 8 },
   LOAN: { code: 'loan.token', precision: 4 },
