@@ -544,7 +544,7 @@ export const XprProvider: React.FC<{ children: React.ReactNode }> = ({ children 
           name: account,
           handle: account,
           bio: "Just joined the TIP TAB network!",
-          location: "Global",
+          location: "",
           coordinates: [0, 0], // Valid default coordinate to prevent map crashes
           categories: ["Other"],
           avatar: account.slice(0, 2).toUpperCase(),

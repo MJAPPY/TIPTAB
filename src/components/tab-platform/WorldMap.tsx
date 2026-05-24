@@ -19,13 +19,16 @@ interface WorldMapProps {
 }
 
 export const WorldMap = ({ creators, onSelectCreator }: WorldMapProps) => {
-  // Filter out any creators with invalid coordinates OR whose location is set to "Global"
+  // Filter out any creators with invalid coordinates OR whose location is set to "Global" or empty
   const mapVisibleCreators = creators.filter(c => 
     c.coordinates && 
     Array.isArray(c.coordinates) && 
     c.coordinates.length === 2 &&
     typeof c.coordinates[0] === 'number' &&
     typeof c.coordinates[1] === 'number' &&
+    (c.coordinates[0] !== 0 || c.coordinates[1] !== 0) && // Ensure coordinates are not the default [0,0]
+    c.location &&
+    c.location.trim() !== "" &&
     c.location.toLowerCase().trim() !== 'global'
   );
 
