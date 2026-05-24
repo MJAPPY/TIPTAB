@@ -111,7 +111,7 @@ const APP_LOGO = 'https://explorer.xprnetwork.org/api/account/tiptab/avatar';
 const TOKENS = [
   { symbol: 'XPR', code: 'eosio.token', precision: 4 },
   { symbol: 'TAB', code: 'tokencreate', precision: 0 },
-  { symbol: 'XMD', code: 'monedatoken', precision: 6 },
+  { symbol: 'XMD', code: 'moneda.token', precision: 6 },
   { symbol: 'XUSDC', code: 'xtokens', precision: 6 },
   { symbol: 'METAL', code: 'token.metal', precision: 8 },
   { symbol: 'LOAN', code: 'loan.token', precision: 4 },
