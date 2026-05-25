@@ -1,13 +1,16 @@
 import React from "react";
 import { TOKEN_LOGOS } from "@/constants/logos";
 
+// Simple internal cn utility for this component
+const cn = (...classes: any[]) => classes.filter(Boolean).join(" ");
+
 export const StatsBanner = () => {
   const stats = [
     { label: "Powered by", value: "WebAuth Protocol", color: "text-purple-400" },
     { 
       label: "Instant rewards in", 
       value: (
-        <span className="flex items-center gap-4">
+        <span className="flex items-center gap-6">
           {[
             { s: 'TAB', c: 'text-orange-500' },
             { s: 'XPR', c: 'text-purple-400' },
@@ -16,10 +19,10 @@ export const StatsBanner = () => {
             { s: 'METAL', c: 'text-slate-400' },
             { s: 'LOAN', c: 'text-blue-500' }
           ].map(t => (
-            <span key={t.s} className="flex items-center gap-1.5 group/token">
-              <img src={TOKEN_LOGOS[t.s]} alt={t.s} className="h-5 w-5 object-contain group-hover/token:scale-125 transition-transform" />
-              <span className={t.c}>{t.s}</span>
-            </span>
+            <div key={t.s} className="flex flex-col items-center gap-1 group/token">
+              <span className={cn("text-[10px] font-black italic tracking-tighter uppercase", t.c)}>{t.s}</span>
+              <img src={TOKEN_LOGOS[t.s]} alt={t.s} className="h-6 w-6 object-contain group-hover/token:scale-125 transition-transform" />
+            </div>
           ))}
         </span>
       ), 
@@ -32,7 +35,7 @@ export const StatsBanner = () => {
   ];
 
   return (
-    <div className="relative border-y border-white/10 bg-black/40 backdrop-blur-sm py-8 overflow-hidden flex items-center h-24">
+    <div className="relative border-y border-white/10 bg-black/40 backdrop-blur-sm py-8 overflow-hidden flex items-center h-28">
       <div className="absolute inset-0 bg-gradient-to-r from-purple-500/5 via-transparent to-orange-500/5 pointer-events-none" />
       
       <div className="flex whitespace-nowrap animate-stats-ticker">
@@ -43,7 +46,7 @@ export const StatsBanner = () => {
                 {stat.label}
               </span>
               {(stat as any).isCustom ? (
-                <div className="text-2xl font-black italic tracking-tighter transition-all duration-500 group-hover:scale-105">
+                <div className="pt-2">
                   {stat.value}
                 </div>
               ) : (
@@ -65,7 +68,7 @@ export const StatsBanner = () => {
                 {stat.label}
               </span>
               {(stat as any).isCustom ? (
-                <div className="text-2xl font-black italic tracking-tighter transition-all duration-500 group-hover:scale-105">
+                <div className="pt-2">
                   {stat.value}
                 </div>
               ) : (

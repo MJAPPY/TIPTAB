@@ -49,15 +49,15 @@ export const Hero = ({ creators, onJoin }: HeroProps) => {
               
               <div className="space-y-4">
                 <span className="text-white/40 font-black italic tracking-tight text-lg uppercase">Instant rewards in</span>
-                <div className="flex flex-wrap items-center gap-6">
+                <div className="flex flex-wrap items-center gap-10">
                   {rewardTokens.map((token) => (
-                    <div key={token.symbol} className="flex flex-col items-center gap-2 group cursor-default">
-                      <div className="h-10 w-10 md:h-12 md:w-12 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center p-2 group-hover:scale-110 group-hover:border-white/20 transition-all shadow-lg" style={{ boxShadow: `0 0 20px ${token.glow}` }}>
-                        <img src={TOKEN_LOGOS[token.symbol]} alt={token.symbol} className="w-full h-full object-contain" />
-                      </div>
+                    <div key={token.symbol} className="flex flex-col items-center gap-3 group cursor-default">
                       <span className={cn("text-xs md:text-sm font-black italic tracking-tighter uppercase", token.color)}>
                         {token.symbol}
                       </span>
+                      <div className="h-10 w-10 md:h-12 md:w-12 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center p-2 group-hover:scale-110 group-hover:border-white/20 transition-all shadow-lg" style={{ boxShadow: `0 0 20px ${token.glow}` }}>
+                        <img src={TOKEN_LOGOS[token.symbol]} alt={token.symbol} className="w-full h-full object-contain" />
+                      </div>
                     </div>
                   ))}
                 </div>
