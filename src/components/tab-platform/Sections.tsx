@@ -1,4 +1,5 @@
 import React from "react";
+import { TOKEN_LOGOS } from "@/constants/logos";
 
 export const StatsBanner = () => {
   const stats = [
@@ -6,13 +7,20 @@ export const StatsBanner = () => {
     { 
       label: "Instant rewards in", 
       value: (
-        <span className="flex items-center gap-2">
-          <span className="text-orange-500">TAB</span>
-          <span className="text-purple-400">XPR</span>
-          <span className="text-green-400">XUSDC</span>
-          <span className="text-cyan-400">XMD</span>
-          <span className="text-slate-400">METAL</span>
-          <span className="text-blue-500">LOAN</span>
+        <span className="flex items-center gap-4">
+          {[
+            { s: 'TAB', c: 'text-orange-500' },
+            { s: 'XPR', c: 'text-purple-400' },
+            { s: 'XUSDC', c: 'text-green-400' },
+            { s: 'XMD', c: 'text-cyan-400' },
+            { s: 'METAL', c: 'text-slate-400' },
+            { s: 'LOAN', c: 'text-blue-500' }
+          ].map(t => (
+            <span key={t.s} className="flex items-center gap-1.5 group/token">
+              <img src={TOKEN_LOGOS[t.s]} alt={t.s} className="h-5 w-5 object-contain group-hover/token:scale-125 transition-transform" />
+              <span className={t.c}>{t.s}</span>
+            </span>
+          ))}
         </span>
       ), 
       isCustom: true 
@@ -25,11 +33,9 @@ export const StatsBanner = () => {
 
   return (
     <div className="relative border-y border-white/10 bg-black/40 backdrop-blur-sm py-8 overflow-hidden flex items-center h-24">
-      {/* Subtle background gradient overlay */}
       <div className="absolute inset-0 bg-gradient-to-r from-purple-500/5 via-transparent to-orange-500/5 pointer-events-none" />
       
       <div className="flex whitespace-nowrap animate-stats-ticker">
-        {/* First set of stats */}
         {stats.map((stat, i) => (
           <div key={`a-${i}`} className="flex items-center gap-8 px-16 group">
             <div className="flex flex-col -space-y-1">
@@ -52,7 +58,6 @@ export const StatsBanner = () => {
             </div>
           </div>
         ))}
-        {/* Duplicate set for seamless loop */}
         {stats.map((stat, i) => (
           <div key={`b-${i}`} className="flex items-center gap-8 px-16 group">
             <div className="flex flex-col -space-y-1">

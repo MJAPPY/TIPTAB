@@ -18,11 +18,12 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Zap, ShieldCheck, CheckCircle2, Wallet, ArrowRight, Sparkles, Calendar, Gift } from "lucide-react";
+import { Zap, CheckCircle2, Wallet, ArrowRight, Sparkles, Calendar, Gift } from "lucide-react";
 import { useState, useEffect } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { useXpr, PromoCode } from "@/contexts/XprContext";
 import { cn } from "@/lib/utils";
+import { TOKEN_LOGOS } from "@/constants/logos";
 
 interface MembershipModalProps {
   isOpen: boolean;
@@ -47,18 +48,13 @@ export const MembershipModal = ({ isOpen, onOpenChange }: MembershipModalProps) 
   const { toast } = useToast();
   const { session, actor, login, isConnected, setIsMember, isMember, membershipFee, membershipFeeXmd, membershipFeeXusdc, membershipFeeMetal, membershipFeeLoan, membershipFeeXmt, applyPromoCode, usePromoCode } = useXpr();
 
-  // Promo code system states
   const [promoInput, setPromoInput] = useState("");
   const [appliedPromo, setAppliedPromo] = useState<PromoCode | null>(null);
 
-  // Reset or initialize step whenever the modal opens
   useEffect(() => {
     if (isOpen) {
-      if (isConnected) {
-        setStep("payment");
-      } else {
-        setStep("intro");
-      }
+      if (isConnected) setStep("payment");
+      else setStep("intro");
     }
   }, [isOpen, isConnected]); 
 
@@ -66,15 +62,9 @@ export const MembershipModal = ({ isOpen, onOpenChange }: MembershipModalProps) 
     if (!isConnected) {
       try {
         const newSession = await login();
-        if (newSession) {
-          setStep("payment");
-        }
-      } catch (err) {
-        console.error("Login process interrupted:", err);
-      }
-    } else {
-      setStep("payment");
-    }
+        if (newSession) setStep("payment");
+      } catch (err) { console.error(err); }
+    } else { setStep("payment"); }
   };
 
   const handleApplyPromo = () => {
@@ -82,26 +72,13 @@ export const MembershipModal = ({ isOpen, onOpenChange }: MembershipModalProps) 
     const promo = applyPromoCode(promoInput);
     if (promo) {
       setAppliedPromo(promo);
-      toast({
-        title: "Promo Code Applied!",
-        description: promo.type === "free" ? "Free 1-year pass applied!" : `${promo.value}% discount applied to membership.`,
-      });
+      toast({ title: "Promo Code Applied!", description: promo.type === "free" ? "Free 1-year pass applied!" : `${promo.value}% discount applied.` });
     } else {
-      toast({
-        title: "Invalid Code",
-        description: "The code entered is invalid or has expired.",
-        variant: "destructive"
-      });
+      toast({ title: "Invalid Code", description: "The code entered is invalid or expired.", variant: "destructive" });
     }
   };
 
-  const handleRemovePromo = () => {
-    setAppliedPromo(null);
-    setPromoInput("");
-    toast({
-      title: "Promo Code Removed",
-    });
-  };
+  const handleRemovePromo = () => { setAppliedPromo(null); setPromoInput(""); };
 
   const calculateDiscountedFee = () => {
     const feeLookup = {
@@ -120,92 +97,44 @@ export const MembershipModal = ({ isOpen, onOpenChange }: MembershipModalProps) 
 
   const handleJoin = async () => {
     if (!session || !actor) return;
-    
     setIsProcessing(true);
     try {
       const discountedVal = calculateDiscountedFee();
       const assetConfig = ASSET_CONTRACTS[paymentAsset];
       
       if (discountedVal === 0) {
-        const now = new Date().toISOString();
-        const membershipKey = `tiptab_membership_${actor}`;
-        const membershipDateKey = `tiptab_membership_date_${actor}`;
-        
-        localStorage.setItem(membershipKey, 'true');
-        localStorage.setItem(membershipDateKey, now);
-        setIsMember(true);
-        
-        if (appliedPromo) {
-          usePromoCode(appliedPromo.code);
-        }
-        
-        setStep("success");
-        toast({
-          title: "Membership Activated!",
-          description: "Welcome to the TIPTAB creator network.",
-        });
+        finishActivation();
         return;
       }
 
-      const permission = session.auth.permission || 'active';
       const formattedFee = `${discountedVal.toFixed(assetConfig.precision)} ${paymentAsset}`;
-      
       const membershipAction = {
         account: assetConfig.account, 
         name: 'transfer',
-        authorization: [{
-          actor: session.auth.actor,
-          permission: permission,
-        }],
-        data: {
-          from: actor,
-          to: 'tiptab', 
-          quantity: formattedFee,
-          memo: isMember ? 'TipTab Yearly Membership Renewal' : 'TipTab Membership Activation',
-        },
+        authorization: [{ actor: session.auth.actor, permission: session.auth.permission || 'active' }],
+        data: { from: actor, to: 'tiptab', quantity: formattedFee, memo: isMember ? 'Renewal' : 'Activation' },
       };
 
-      await session.transact(
-        { actions: [membershipAction] }, 
-        { broadcast: true }
-      );
-      
-      const now = new Date().toISOString();
-      const membershipKey = `tiptab_membership_${actor}`;
-      const membershipDateKey = `tiptab_membership_date_${actor}`;
-      
-      localStorage.setItem(membershipKey, 'true');
-      localStorage.setItem(membershipDateKey, now);
-      setIsMember(true);
-
-      if (appliedPromo) {
-        usePromoCode(appliedPromo.code);
-      }
-      
-      setStep("success");
-      toast({
-        title: isMember ? "Membership Renewed!" : "Membership Activated!",
-        description: "Welcome to the TIPTAB creator network.",
-      });
+      await session.transact({ actions: [membershipAction] }, { broadcast: true });
+      finishActivation();
     } catch (error: any) {
-      console.error("Transact error:", error);
-      toast({
-        title: "Transaction Failed",
-        description: error.message || "Please check your balance and try again.",
-        variant: "destructive"
-      });
-    } finally {
-      setIsProcessing(false);
-    }
+      toast({ title: "Transaction Failed", description: error.message || "Network error.", variant: "destructive" });
+    } finally { setIsProcessing(false); }
+  };
+
+  const finishActivation = () => {
+    const now = new Date().toISOString();
+    localStorage.setItem(`tiptab_membership_${actor}`, 'true');
+    localStorage.setItem(`tiptab_membership_date_${actor}`, now);
+    setIsMember(true);
+    if (appliedPromo) usePromoCode(appliedPromo.code);
+    setStep("success");
+    toast({ title: "Membership Activated!" });
   };
 
   const handleClose = () => {
     onOpenChange(false);
-    setTimeout(() => {
-      setStep("intro");
-      setAppliedPromo(null);
-      setPromoInput("");
-    }, 300);
+    setTimeout(() => { setStep("intro"); setAppliedPromo(null); setPromoInput(""); }, 300);
   };
 
   const feeLookup = {
@@ -216,18 +145,13 @@ export const MembershipModal = ({ isOpen, onOpenChange }: MembershipModalProps) 
     LOAN: parseFloat(membershipFeeLoan),
     XMT: parseFloat(membershipFeeXmt)
   };
-  const rawFee = feeLookup[paymentAsset];
   const finalFee = calculateDiscountedFee();
 
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && handleClose()}>
       <DialogContent className="bg-[#1e1438] border-white/20 text-white sm:max-w-[480px] rounded-[40px] p-0 overflow-hidden shadow-[0_0_120px_rgba(0,0,0,0.9)] max-h-[90vh] flex flex-col">
-        
         <div className="absolute top-0 left-0 right-0 h-1.5 bg-white/5 z-50">
-          <div 
-            className="h-full bg-gradient-to-r from-orange-500 via-purple-500 to-cyan-500 transition-all duration-700"
-            style={{ width: step === "intro" ? "33%" : step === "payment" ? "66%" : "100%" }}
-          />
+          <div className="h-full bg-gradient-to-r from-orange-500 via-purple-500 to-cyan-500 transition-all duration-700" style={{ width: step === "intro" ? "33%" : step === "payment" ? "66%" : "100%" }} />
         </div>
 
         <ScrollArea className="flex-1 w-full">
@@ -239,7 +163,7 @@ export const MembershipModal = ({ isOpen, onOpenChange }: MembershipModalProps) 
                     <Sparkles className="h-10 w-10 md:h-12 md:w-12 text-white fill-white" />
                   </div>
                   <DialogHeader>
-                    <DialogTitle className="text-3xl md:text-4xl font-black text-center tracking-tight italic">
+                    <DialogTitle className="text-3xl md:text-4xl font-black text-center tracking-tight italic uppercase">
                       {isMember ? "RENEW YOUR SLOT" : "CLAIM YOUR SLOT"}
                     </DialogTitle>
                     <DialogDescription className="text-white/80 text-center text-base md:text-lg font-medium">
@@ -255,24 +179,20 @@ export const MembershipModal = ({ isOpen, onOpenChange }: MembershipModalProps) 
                     { title: "Global Discovery", desc: "Appear on the interactive creator map", icon: Sparkles },
                   ].map((item, i) => (
                     <div key={i} className="flex items-start gap-4 p-4 md:p-5 rounded-[24px] bg-white/5 border border-white/10 group hover:border-purple-500/50 transition-colors">
-                      <div className="mt-1 h-10 w-10 md:h-12 md:w-12 rounded-2xl bg-purple-500/20 flex items-center justify-center shrink-0 shadow-lg">
+                      <div className="mt-1 h-10 w-10 md:h-12 md:w-12 rounded-2xl bg-purple-500/20 flex items-center justify-center shrink-0">
                         <item.icon className="h-5 w-5 md:h-6 md:w-6 text-purple-400" />
                       </div>
                       <div>
-                        <h4 className="font-black text-white text-sm md:text-base tracking-tight group-hover:text-purple-400 transition-colors">{item.title}</h4>
+                        <h4 className="font-black text-white text-sm md:text-base tracking-tight">{item.title}</h4>
                         <p className="text-xs md:text-sm text-white/50 font-bold">{item.desc}</p>
                       </div>
                     </div>
                   ))}
                 </div>
 
-                <button 
-                  onClick={handleNextStep}
-                  className="w-full h-16 md:h-20 bg-white text-black hover:bg-purple-600 hover:text-white font-black text-lg md:text-2xl rounded-[28px] md:rounded-[32px] shadow-[0_20px_50px_-10px_rgba(255,255,255,0.2)] transition-all group active:scale-[0.98] overflow-hidden relative flex items-center justify-center gap-3"
-                >
-                  <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/40 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000" />
-                  <span className="relative z-10">{isConnected ? "Continue to Payment" : "Connect WebAuth"}</span>
-                  <ArrowRight className="relative z-10 h-5 w-5 md:h-6 md:w-6 group-hover:translate-x-2 transition-transform" />
+                <button onClick={handleNextStep} className="w-full h-16 md:h-20 bg-white text-black hover:bg-purple-600 hover:text-white font-black text-lg md:text-2xl rounded-[28px] md:rounded-[32px] shadow-2xl transition-all flex items-center justify-center gap-3">
+                  <span>{isConnected ? "Continue to Payment" : "Connect WebAuth"}</span>
+                  <ArrowRight className="h-5 w-5 md:h-6 md:w-6" />
                 </button>
               </div>
             )}
@@ -280,139 +200,74 @@ export const MembershipModal = ({ isOpen, onOpenChange }: MembershipModalProps) 
             {step === "payment" && isConnected && (
               <div className="space-y-6 md:space-y-8 animate-in fade-in slide-in-from-right-4 duration-500">
                 <div className="space-y-2">
-                  <Button variant="ghost" onClick={() => setStep("intro")} className="text-white/60 hover:text-purple-400 -ml-4 font-black tracking-widest uppercase text-[10px] md:text-xs">
-                    ← Back to benefits
-                  </Button>
-                  <DialogHeader className="pt-1">
-                    <div className="flex items-center gap-2 mb-2">
-                      <div className="px-3 py-1 rounded-full bg-orange-500 text-white text-[8px] md:text-[9px] font-black uppercase tracking-[0.2em] shadow-lg">
-                        Annual Renewal
-                      </div>
-                    </div>
+                  <Button variant="ghost" onClick={() => setStep("intro")} className="text-white/60 hover:text-purple-400 -ml-4 font-black tracking-widest uppercase text-[10px]">← Back</Button>
+                  <DialogHeader>
                     <DialogTitle className="text-3xl md:text-4xl font-black italic tracking-tighter uppercase leading-tight">Network Activation</DialogTitle>
                   </DialogHeader>
                 </div>
 
                 <div className="bg-white/5 border-2 border-white/10 rounded-[32px] md:rounded-[40px] p-6 md:p-8 text-center relative overflow-hidden group hover:border-purple-500/50 transition-all">
-                  <div className="absolute inset-0 bg-gradient-to-br from-purple-500/5 to-transparent pointer-events-none" />
-                  
-                  <div className="flex flex-col items-center justify-center gap-1">
+                  <div className="flex flex-col items-center justify-center gap-3">
                     <div className="flex items-center gap-3 mb-2">
                       <Select value={paymentAsset} onValueChange={(val: any) => setPaymentAsset(val)}>
-                        <SelectTrigger className="w-[100px] md:w-[120px] bg-white/5 border-white/20 h-9 md:h-10 rounded-xl font-black text-[10px] md:text-xs text-white">
+                        <SelectTrigger className="w-[110px] md:w-[130px] bg-white/5 border-white/20 h-10 md:h-12 rounded-xl font-black text-xs text-white">
                           <SelectValue />
                         </SelectTrigger>
                         <SelectContent className="bg-[#1a102d] border-white/20 text-white rounded-xl">
-                          <SelectItem value="XPR" className="font-black cursor-pointer">XPR</SelectItem>
-                          <SelectItem value="XMD" className="font-black cursor-pointer">XMD</SelectItem>
-                          <SelectItem value="XUSDC" className="font-black cursor-pointer">XUSDC</SelectItem>
-                          <SelectItem value="METAL" className="font-black cursor-pointer">METAL</SelectItem>
-                          <SelectItem value="LOAN" className="font-black cursor-pointer">LOAN</SelectItem>
-                          <SelectItem value="XMT" className="font-black cursor-pointer">XMT</SelectItem>
+                          {Object.keys(ASSET_CONTRACTS).map(s => (
+                            <SelectItem key={s} value={s} className="font-black py-2 cursor-pointer">
+                              <div className="flex items-center gap-2">
+                                <img src={TOKEN_LOGOS[s]} className="h-4 w-4" alt="" /> {s}
+                              </div>
+                            </SelectItem>
+                          ))}
                         </SelectContent>
                       </Select>
-                      <span className="text-white/40 font-black uppercase tracking-widest text-[8px] md:text-[9px]">Currency</span>
+                      <div className="h-10 w-10 rounded-full bg-white/5 p-1.5 flex items-center justify-center border border-white/10">
+                        <img src={TOKEN_LOGOS[paymentAsset]} alt="" className="w-full h-full object-contain" />
+                      </div>
                     </div>
 
-                    {appliedPromo && (
-                      <span className="text-xl md:text-2xl text-white/30 line-through font-black">
-                        {rawFee.toLocaleString()} {paymentAsset}
-                      </span>
-                    )}
+                    {appliedPromo && <span className="text-xl text-white/30 line-through font-black">{feeLookup[paymentAsset].toLocaleString()} {paymentAsset}</span>}
                     <div className="flex items-center justify-center gap-3 md:gap-4">
-                      <span className="text-4xl md:text-6xl font-black tracking-tighter drop-shadow-[0_0_20px_rgba(255,255,255,0.2)] group-hover:text-purple-100 transition-colors">
+                      <span className="text-4xl md:text-6xl font-black tracking-tighter text-white">
                         {finalFee.toLocaleString(undefined, { maximumFractionDigits: paymentAsset === 'XPR' || paymentAsset === 'LOAN' ? 0 : 4 })}
                       </span>
-                      <span className="text-xl md:text-2xl font-black text-orange-500 italic group-hover:text-purple-400 transition-colors">{paymentAsset}</span>
+                      <span className="text-xl md:text-2xl font-black text-orange-500 italic">{paymentAsset}</span>
                     </div>
                   </div>
                 </div>
 
-                <div className="space-y-3 bg-white/[0.03] p-4 md:p-5 border border-white/10 rounded-2xl">
-                  <Label className="text-[9px] md:text-[10px] font-black uppercase tracking-widest text-white/50">Enter Promo Code</Label>
+                <div className="space-y-3 bg-white/[0.03] p-4 border border-white/10 rounded-2xl">
+                  <Label className="text-[10px] font-black uppercase tracking-widest text-white/50">Promo Code</Label>
                   {appliedPromo ? (
                     <div className="flex items-center justify-between bg-purple-500/10 border border-purple-500/30 p-3 rounded-xl">
-                      <div className="flex items-center gap-3">
-                        <Gift className="h-4 w-4 md:h-5 md:w-5 text-purple-400" />
-                        <div>
-                          <p className="text-[10px] md:text-xs font-black text-white">{appliedPromo.code}</p>
-                          <p className="text-[8px] md:text-[10px] text-purple-400 font-bold uppercase">{appliedPromo.type === 'free' ? 'Free Pass' : `${appliedPromo.value}% Off`}</p>
-                        </div>
-                      </div>
-                      <Button variant="ghost" size="sm" onClick={handleRemovePromo} className="h-7 md:h-8 px-2 md:px-3 rounded-lg text-red-400 hover:bg-red-500/10 font-bold text-[10px] md:text-xs uppercase">Remove</Button>
+                      <div className="flex items-center gap-3"><Gift className="h-5 w-5 text-purple-400" /><p className="text-xs font-black text-white">{appliedPromo.code}</p></div>
+                      <Button variant="ghost" size="sm" onClick={handleRemovePromo} className="text-red-400 font-bold text-xs uppercase">Remove</Button>
                     </div>
                   ) : (
                     <div className="flex gap-2">
-                      <Input 
-                        placeholder="e.g. WELCOME100" 
-                        value={promoInput} 
-                        onChange={(e) => setPromoInput(e.target.value)} 
-                        className="bg-white/5 border-white/10 h-10 md:h-11 rounded-xl px-4 text-white font-black text-sm"
-                      />
-                      <Button onClick={handleApplyPromo} className="h-10 md:h-11 bg-purple-600 hover:bg-purple-700 text-white font-black px-4 md:px-5 rounded-xl text-[10px] md:text-xs uppercase">Apply</Button>
+                      <Input placeholder="WELCOME100" value={promoInput} onChange={(e) => setPromoInput(e.target.value)} className="bg-white/5 border-white/10 h-11 rounded-xl px-4 text-white font-black" />
+                      <Button onClick={handleApplyPromo} className="h-11 bg-purple-600 hover:bg-purple-700 text-white font-black px-5 rounded-xl uppercase text-xs">Apply</Button>
                     </div>
                   )}
                 </div>
 
-                <div className="space-y-4 md:space-y-6">
-                  <div className="flex items-center gap-3 md:gap-4 p-4 md:p-5 rounded-[20px] md:rounded-[24px] bg-purple-500/10 border-2 border-purple-500/30">
-                    <div className="h-10 w-10 md:h-12 md:w-12 rounded-xl bg-purple-500/20 flex items-center justify-center shadow-lg">
-                      <Wallet className="h-5 w-5 md:h-6 md:w-6 text-purple-400" />
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <p className="text-[9px] md:text-xs font-black uppercase tracking-widest text-white/40 mb-0.5 md:mb-1">Authenticated Wallet</p>
-                      <p className="text-base md:text-lg font-black text-purple-400 italic truncate">@{actor}</p>
-                    </div>
-                    <CheckCircle2 className="h-6 w-6 md:h-7 md:w-7 text-green-500 drop-shadow-[0_0_10px_rgba(34,197,94,0.4)]" />
-                  </div>
+                <Button onClick={handleJoin} disabled={isProcessing} className="w-full h-16 md:h-24 bg-gradient-to-r from-orange-500 to-purple-600 text-white font-black text-xl md:text-2xl rounded-[28px] md:rounded-[32px] shadow-2xl transition-all">
+                  {isProcessing ? "AUTHORIZING..." : (finalFee === 0 ? "CLAIM FREE SLOT" : `PAY WITH ${paymentAsset}`)}
+                </Button>
 
-                  <Button 
-                    onClick={handleJoin} 
-                    disabled={isProcessing}
-                    className="w-full h-16 md:h-24 bg-gradient-to-r from-orange-500 to-purple-600 hover:from-purple-600 hover:to-purple-700 text-white font-black text-xl md:text-2xl rounded-[28px] md:rounded-[32px] shadow-[0_20px_50px_rgba(249,115,22,0.3)] border-b-4 border-black/20 transition-all active:translate-y-1 active:border-b-0"
-                  >
-                    {isProcessing ? (
-                      <div className="flex items-center gap-3 md:gap-4">
-                        <div className="h-6 w-6 md:h-8 md:w-8 border-4 border-white/20 border-t-white rounded-full animate-spin" />
-                        <span>AUTHORIZING...</span>
-                      </div>
-                    ) : (
-                      finalFee === 0 ? "CLAIM FREE SLOT" : (isMember ? `RENEW WITH ${paymentAsset}` : `PAY WITH ${paymentAsset}`)
-                    )}
-                  </Button>
-                </div>
-
-                <p className="text-[9px] md:text-[10px] text-center text-white/30 uppercase tracking-[0.3em] font-black leading-relaxed pb-4">
-                  <ShieldCheck className="h-3 w-3 inline mr-2 text-orange-500" />
-                  Secured via XPR Network • Destination: @tiptab
-                </p>
+                <p className="text-[10px] text-center text-white/30 uppercase tracking-[0.3em] font-black pb-4">Secured via XPR Network • @tiptab</p>
               </div>
             )}
 
             {step === "success" && (
-              <div className="space-y-8 md:space-y-10 py-6 md:py-10 animate-in zoom-in-95 duration-500 text-center">
-                <div className="relative">
-                  <div className="mx-auto h-28 w-28 md:h-32 md:w-32 rounded-[36px] md:rounded-[40px] bg-green-500 flex items-center justify-center shadow-[0_0_60px_rgba(34,197,94,0.5)]">
-                    <CheckCircle2 className="h-14 w-14 md:h-16 md:w-16 text-white" />
-                  </div>
-                  <div className="absolute top-0 left-1/2 -translate-x-1/2 w-40 md:w-48 h-40 md:h-48 bg-green-500/20 blur-3xl -z-10" />
+              <div className="space-y-8 py-10 animate-in zoom-in-95 duration-500 text-center">
+                <div className="mx-auto h-28 w-28 rounded-[36px] bg-green-500 flex items-center justify-center shadow-[0_0_60px_rgba(34,197,94,0.5)]">
+                  <CheckCircle2 className="h-14 w-14 text-white" />
                 </div>
-
-                <div className="space-y-4">
-                  <h2 className="text-4xl md:text-5xl font-black tracking-tighter italic">YOU'RE IN!</h2>
-                  <p className="text-white/80 text-lg md:text-xl max-w-[320px] mx-auto leading-relaxed font-bold">
-                    Your creator status is updated. Start sharing your link!
-                  </p>
-                </div>
-
-                <div className="flex flex-col gap-4">
-                  <Button 
-                    onClick={handleClose}
-                    className="h-16 md:h-20 bg-white text-black hover:bg-purple-500 hover:text-white font-black text-xl md:text-2xl rounded-[28px] md:rounded-3xl shadow-2xl transition-all"
-                  >
-                    BACK TO DASHBOARD
-                  </Button>
-                </div>
+                <h2 className="text-4xl font-black tracking-tighter italic">YOU'RE IN!</h2>
+                <Button onClick={handleClose} className="h-16 md:h-20 w-full bg-white text-black hover:bg-purple-500 hover:text-white font-black text-xl rounded-[28px] md:rounded-3xl shadow-2xl">BACK TO DASHBOARD</Button>
               </div>
             )}
           </div>
