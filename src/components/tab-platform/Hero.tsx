@@ -22,6 +22,7 @@ export const Hero = ({ creators, onJoin }: HeroProps) => {
     { symbol: "XMD", color: "text-cyan-400", glow: "rgba(6,182,212,0.3)" },
     { symbol: "METAL", color: "text-slate-400", glow: "rgba(148,163,184,0.3)" },
     { symbol: "LOAN", color: "text-blue-500", glow: "rgba(59,130,246,0.3)" },
+    { symbol: "XMT", color: "text-emerald-400", glow: "rgba(16,185,129,0.3)" },
   ];
 
   return (
@@ -49,7 +50,7 @@ export const Hero = ({ creators, onJoin }: HeroProps) => {
               
               <div className="space-y-4">
                 <span className="text-white/40 font-black italic tracking-tight text-lg uppercase">Instant rewards in</span>
-                <div className="flex flex-wrap items-center gap-10">
+                <div className="flex flex-wrap items-center gap-8">
                   {rewardTokens.map((token) => (
                     <div key={token.symbol} className="flex flex-col items-center gap-3 group cursor-default">
                       <span className={cn("text-xs md:text-sm font-black italic tracking-tighter uppercase", token.color)}>

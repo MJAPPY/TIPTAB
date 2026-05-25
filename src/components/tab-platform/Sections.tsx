@@ -17,7 +17,8 @@ export const StatsBanner = () => {
             { s: 'XUSDC', c: 'text-green-400' },
             { s: 'XMD', c: 'text-cyan-400' },
             { s: 'METAL', c: 'text-slate-400' },
-            { s: 'LOAN', c: 'text-blue-500' }
+            { s: 'LOAN', c: 'text-blue-500' },
+            { s: 'XMT', c: 'text-emerald-400' }
           ].map(t => (
             <div key={t.s} className="flex flex-col items-center gap-1 group/token">
               <span className={cn("text-[10px] font-black italic tracking-tighter uppercase", t.c)}>{t.s}</span>
