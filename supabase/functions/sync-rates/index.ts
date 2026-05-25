@@ -1,4 +1,3 @@
-
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
 
@@ -19,25 +18,36 @@ serve(async (req) => {
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
     )
 
-    console.log("[sync-rates] Starting rate synchronization...");
+    console.log("[sync-rates] Starting advanced rate synchronization...");
 
     // 1. Fetch market data
-    const cgResponse = await fetch("https://api.coingecko.com/api/v3/simple/price?ids=proton&vs_currencies=usd");
+    const cgResponse = await fetch("https://api.coingecko.com/api/v3/simple/price?ids=proton,metal,loan&vs_currencies=usd");
     const cgData = await cgResponse.json();
     
     const alcorResponse = await fetch("https://proton.alcor.exchange/api/v2/tickers");
     const alcorData = await alcorResponse.json();
+    
     const tabMarket = alcorData.find((m: any) => m.ticker_id === "TAB_XPR");
+    const xmtMarket = alcorData.find((m: any) => m.ticker_id === "XMT_XPR");
     
     const xprUsd = cgData.proton?.usd;
+    const metalUsd = cgData.metal?.usd;
+    const loanUsd = cgData.loan?.usd;
+
+    if (!xprUsd) {
+      throw new Error("Failed to fetch XPR/USD price");
+    }
+
     let xprPerTab = 0.36; 
     if (tabMarket && tabMarket.last_price) {
       xprPerTab = parseFloat(tabMarket.last_price);
     }
 
-    if (!xprUsd) {
-      throw new Error("Failed to fetch XPR/USD price");
+    let xprPerXmt = 0.05; // Fallback
+    if (xmtMarket && xmtMarket.last_price) {
+      xprPerXmt = parseFloat(xmtMarket.last_price);
     }
+    const xmtUsd = xprPerXmt * xprUsd;
 
     // 2. Get current master settings
     const { data: settings, error: fetchError } = await supabase
@@ -50,19 +60,28 @@ serve(async (req) => {
       throw new Error("Failed to fetch platform settings");
     }
 
-    // 3. Calculate new rates
-    const membershipFeeXpr = Math.round(Number(settings.membership_fee_xusdc) / xprUsd);
-    const membershipFeeXmd = Number(settings.membership_fee_xusdc).toFixed(2);
+    // 3. Calculate new rates based on XUSDC Master Fee
+    const targetUsd = Number(settings.membership_fee_xusdc);
     
-    const boostPriceXpr = Math.round(Number(settings.boost_price_xusdc) / xprUsd);
+    const membershipFeeXpr = Math.round(targetUsd / xprUsd);
+    const membershipFeeXmd = targetUsd.toFixed(2);
+    const membershipFeeMetal = metalUsd ? (targetUsd / metalUsd).toFixed(4) : targetUsd.toFixed(4);
+    const membershipFeeLoan = loanUsd ? (targetUsd / loanUsd).toFixed(0) : (targetUsd * 4000).toFixed(0);
+    const membershipFeeXmt = xmtUsd ? (targetUsd / xmtUsd).toFixed(4) : targetUsd.toFixed(4);
+    
+    const boostTargetUsd = Number(settings.boost_price_xusdc);
+    const boostPriceXpr = Math.round(boostTargetUsd / xprUsd);
     const boostPriceTab = Math.round(boostPriceXpr / xprPerTab);
 
-    // 4. Update table
+    // 4. Update table with expanded asset support
     const { error: updateError } = await supabase
       .from('platform_settings')
       .update({
         membership_fee_xpr: membershipFeeXpr,
         membership_fee_xmd: membershipFeeXmd,
+        membership_fee_metal: parseFloat(membershipFeeMetal),
+        membership_fee_loan: parseFloat(membershipFeeLoan),
+        membership_fee_xmt: parseFloat(membershipFeeXmt),
         boost_price_xpr: boostPriceXpr,
         boost_price_tab: boostPriceTab,
         last_sync_at: new Date().toISOString(),
@@ -74,11 +93,13 @@ serve(async (req) => {
       throw updateError;
     }
 
-    console.log("[sync-rates] Successfully synced rates:", {
+    console.log("[sync-rates] Successfully synced all rates:", {
       xprUsd,
-      xprPerTab,
-      membershipFeeXpr,
-      boostPriceTab
+      metalUsd,
+      loanUsd,
+      xmtUsd,
+      membershipFeeMetal,
+      membershipFeeXmt
     });
 
     return new Response(JSON.stringify({ success: true }), {

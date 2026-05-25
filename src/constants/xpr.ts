@@ -19,6 +19,7 @@ export const TOKENS = [
   { symbol: 'XUSDC', code: 'xtokens', precision: 6 },
   { symbol: 'METAL', code: 'token.metal', precision: 8 },
   { symbol: 'LOAN', code: 'loan.token', precision: 4 },
+  { symbol: 'XMT', code: 'xtokens', precision: 8 },
 ];
 
 export const DEFAULT_ACTIVITIES = [

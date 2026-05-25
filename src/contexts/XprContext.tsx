@@ -42,7 +42,10 @@ interface XprContextType {
   membershipFee: string;
   membershipFeeXmd: string;
   membershipFeeXusdc: string;
-  updateMembershipFee: (fee: string, asset?: 'XPR' | 'XMD' | 'XUSDC') => void;
+  membershipFeeMetal: string;
+  membershipFeeLoan: string;
+  membershipFeeXmt: string;
+  updateMembershipFee: (fee: string, asset?: 'XPR' | 'XMD' | 'XUSDC' | 'METAL' | 'LOAN' | 'XMT') => void;
   boostPrice: string;
   updateBoostPrice: (price: string) => void;
   boostTabPrice: string;
@@ -69,7 +72,7 @@ const XprContext = createContext<XprContextType | undefined>(undefined);
 
 export const XprProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [session, setSession] = useState<LinkSession | null>(null);
-  const [balances, setBalances] = useState<Balances>({ xpr: '0.0000', tab: '0', xmd: '0.000000', xusdc: '0.000000', metal: '0.00000000', loan: '0.0000', tipsSent: 0 });
+  const [balances, setBalances] = useState<Balances>({ xpr: '0.0000', tab: '0', xmd: '0.000000', xusdc: '0.000000', metal: '0.00000000', loan: '0.0000', xmt: '0.00000000', tipsSent: 0 });
   const [isMember, setIsMember] = useState(false);
   const [membershipDate, setMembershipDate] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -237,7 +240,7 @@ export const XprProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     if (session) {
       await session.remove();
       setSession(null);
-      setBalances({ xpr: '0.0000', tab: '0', xmd: '0.000000', xusdc: '0.000000', metal: '0.00000000', loan: '0.0000', tipsSent: 0 });
+      setBalances({ xpr: '0.0000', tab: '0', xmd: '0.000000', xusdc: '0.000000', metal: '0.00000000', loan: '0.0000', xmt: '0.00000000', tipsSent: 0 });
       setIsMember(false);
       setMembershipDate(null);
       setUserProfile(null);

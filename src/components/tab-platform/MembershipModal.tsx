@@ -35,14 +35,17 @@ const ASSET_CONTRACTS = {
   XPR: { account: 'eosio.token', precision: 4 },
   XMD: { account: 'xmd.token', precision: 6 },
   XUSDC: { account: 'xtokens', precision: 6 },
+  METAL: { account: 'token.metal', precision: 8 },
+  LOAN: { account: 'loan.token', precision: 4 },
+  XMT: { account: 'xtokens', precision: 8 },
 };
 
 export const MembershipModal = ({ isOpen, onOpenChange }: MembershipModalProps) => {
   const [step, setStep] = useState<OnboardingStep>("intro");
   const [isProcessing, setIsProcessing] = useState(false);
-  const [paymentAsset, setPaymentAsset] = useState<'XPR' | 'XMD' | 'XUSDC'>("XPR");
+  const [paymentAsset, setPaymentAsset] = useState<keyof typeof ASSET_CONTRACTS>("XPR");
   const { toast } = useToast();
-  const { session, actor, login, isConnected, setIsMember, isMember, membershipFee, membershipFeeXmd, membershipFeeXusdc, applyPromoCode, usePromoCode } = useXpr();
+  const { session, actor, login, isConnected, setIsMember, isMember, membershipFee, membershipFeeXmd, membershipFeeXusdc, membershipFeeMetal, membershipFeeLoan, membershipFeeXmt, applyPromoCode, usePromoCode } = useXpr();
 
   // Promo code system states
   const [promoInput, setPromoInput] = useState("");
@@ -104,7 +107,10 @@ export const MembershipModal = ({ isOpen, onOpenChange }: MembershipModalProps) 
     const feeLookup = {
       XPR: parseFloat(membershipFee),
       XMD: parseFloat(membershipFeeXmd),
-      XUSDC: parseFloat(membershipFeeXusdc)
+      XUSDC: parseFloat(membershipFeeXusdc),
+      METAL: parseFloat(membershipFeeMetal),
+      LOAN: parseFloat(membershipFeeLoan),
+      XMT: parseFloat(membershipFeeXmt)
     };
     const original = feeLookup[paymentAsset];
     if (!appliedPromo) return original;
@@ -205,7 +211,10 @@ export const MembershipModal = ({ isOpen, onOpenChange }: MembershipModalProps) 
   const feeLookup = {
     XPR: parseFloat(membershipFee),
     XMD: parseFloat(membershipFeeXmd),
-    XUSDC: parseFloat(membershipFeeXusdc)
+    XUSDC: parseFloat(membershipFeeXusdc),
+    METAL: parseFloat(membershipFeeMetal),
+    LOAN: parseFloat(membershipFeeLoan),
+    XMT: parseFloat(membershipFeeXmt)
   };
   const rawFee = feeLookup[paymentAsset];
   const finalFee = calculateDiscountedFee();
@@ -297,6 +306,9 @@ export const MembershipModal = ({ isOpen, onOpenChange }: MembershipModalProps) 
                           <SelectItem value="XPR" className="font-black cursor-pointer">XPR</SelectItem>
                           <SelectItem value="XMD" className="font-black cursor-pointer">XMD</SelectItem>
                           <SelectItem value="XUSDC" className="font-black cursor-pointer">XUSDC</SelectItem>
+                          <SelectItem value="METAL" className="font-black cursor-pointer">METAL</SelectItem>
+                          <SelectItem value="LOAN" className="font-black cursor-pointer">LOAN</SelectItem>
+                          <SelectItem value="XMT" className="font-black cursor-pointer">XMT</SelectItem>
                         </SelectContent>
                       </Select>
                       <span className="text-white/40 font-black uppercase tracking-widest text-[8px] md:text-[9px]">Currency</span>
@@ -309,7 +321,7 @@ export const MembershipModal = ({ isOpen, onOpenChange }: MembershipModalProps) 
                     )}
                     <div className="flex items-center justify-center gap-3 md:gap-4">
                       <span className="text-4xl md:text-6xl font-black tracking-tighter drop-shadow-[0_0_20px_rgba(255,255,255,0.2)] group-hover:text-purple-100 transition-colors">
-                        {finalFee.toLocaleString()}
+                        {finalFee.toLocaleString(undefined, { maximumFractionDigits: paymentAsset === 'XPR' || paymentAsset === 'LOAN' ? 0 : 4 })}
                       </span>
                       <span className="text-xl md:text-2xl font-black text-orange-500 italic group-hover:text-purple-400 transition-colors">{paymentAsset}</span>
                     </div>

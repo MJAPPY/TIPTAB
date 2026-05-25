@@ -26,6 +26,7 @@ export interface Balances {
   xusdc: string;
   metal: string;
   loan: string;
+  xmt: string;
   tipsSent: number;
 }
 
