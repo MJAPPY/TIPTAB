@@ -147,7 +147,7 @@ export const TipTabCard = ({ creator }: TipTabCardProps) => {
           {/* Branding */}
           <div className="flex flex-col items-end shrink-0 -mt-1">
              <div className="flex items-center gap-0.5 -mr-2">
-               <img src="/logo.png" alt="" className="h-14 w-14 md:h-16 md:w-16 object-contain drop-shadow-[0_0_15px_rgba(168,85,247,0.3)]" />
+               <img src="/src/assets/logo.png" alt="" className="h-14 w-14 md:h-16 md:w-16 object-contain drop-shadow-[0_0_15px_rgba(168,85,247,0.3)]" />
                <span className="text-lg md:text-xl font-black italic tracking-tighter text-white">
                 TIP<span className="text-orange-500">TAB</span>
                </span>

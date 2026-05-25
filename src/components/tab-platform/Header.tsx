@@ -214,7 +214,7 @@ export const Header = ({ onBecomeCreator }: HeaderProps) => {
                 </Button>
                 <div className="h-4 sm:h-5 w-px bg-white/10" />
                 <Link to="/" onClick={handleHomeClick} className="flex items-center gap-1 sm:gap-2">
-                  <img src="/logo.png" alt="TIPTAB" className="h-8 w-8 sm:h-12 md:h-16 object-contain" />
+                  <img src="/src/assets/logo.png" alt="TIPTAB" className="h-8 w-8 sm:h-12 md:h-16 object-contain" />
                   <span className="text-[11px] sm:text-2xl font-black italic tracking-tighter text-slate-100">
                     TIP<span className="text-orange-500">TAB</span>
                   </span>
@@ -224,7 +224,7 @@ export const Header = ({ onBecomeCreator }: HeaderProps) => {
               <Link to="/" onClick={handleHomeClick} className="flex items-center gap-1 md:gap-2 group shrink-0">
                 <div className="relative">
                   <div className="absolute inset-0 bg-purple-500/20 blur-lg rounded-full group-hover:scale-110 transition-transform" />
-                  <img src="/logo.png" alt="TIPTAB Logo" className="h-9 w-9 xs:h-11 xs:w-11 sm:h-18 md:h-20 lg:h-22 object-contain relative z-10" />
+                  <img src="/src/assets/logo.png" alt="TIPTAB Logo" className="h-9 w-9 xs:h-11 xs:w-11 sm:h-18 md:h-20 lg:h-22 object-contain relative z-10" />
                 </div>
                 <div className="flex flex-col -space-y-0.5 md:-space-y-1">
                   <span className="text-[11px] xs:text-sm sm:text-lg md:text-xl lg:text-2xl font-black italic tracking-tighter text-slate-100 group-hover:text-[#a855f7] transition-colors duration-300 leading-none">

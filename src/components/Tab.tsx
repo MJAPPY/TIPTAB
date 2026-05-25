@@ -91,7 +91,7 @@ export const Tab = () => {
       <footer className="py-16 sm:py-24 border-t border-white/5 bg-black/20 mt-20">
         <div className="container mx-auto px-6 text-center">
           <Link to="/" className="mb-8 sm:mb-12 flex flex-col items-center gap-4 sm:gap-8 group inline-flex">
-            <img src="/logo.png" alt="TIPTAB Logo" className="h-24 w-24 sm:h-40 sm:w-40 object-contain drop-shadow-[0_0_30px_rgba(168,85,247,0.2)] group-hover:scale-105 transition-transform duration-500" />
+            <img src="/src/assets/logo.png" alt="TIPTAB Logo" className="h-24 w-24 sm:h-40 sm:w-40 object-contain drop-shadow-[0_0_30px_rgba(168,85,247,0.2)] group-hover:scale-105 transition-transform duration-500" />
             <span className="text-3xl sm:text-5xl font-black italic tracking-tighter text-white group-hover:text-[#a855f7] transition-colors duration-300">
               TIP<span className="text-orange-500">TAB</span>
             </span>

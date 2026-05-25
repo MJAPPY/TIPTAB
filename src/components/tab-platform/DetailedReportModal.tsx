@@ -128,7 +128,7 @@ export const DetailedReportModal = ({ isOpen, onOpenChange }: DetailedReportModa
               <div className="flex items-center gap-4">
                 <div className="relative h-12 w-12">
                   <div className="absolute inset-0 bg-purple-500/20 blur-lg rounded-full" />
-                  <img src="/logo.png" className="h-full w-full object-contain relative z-10" alt="TIPTAB" />
+                  <img src="/src/assets/logo.png" className="h-full w-full object-contain relative z-10" alt="TIPTAB" />
                 </div>
                 <div className="font-black italic tracking-tighter text-2xl leading-none">
                   <span className="text-white">TIP</span><span className="text-orange-500">TAB</span>
