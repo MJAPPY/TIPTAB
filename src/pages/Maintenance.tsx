@@ -8,7 +8,7 @@ import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
 
 const Maintenance = () => {
-  const { isAdmin, setMaintenanceMode, login, isConnected } = useXpr();
+  const { isAdmin, setMaintenanceMode, login, logout, isConnected, adminsList } = useXpr();
   const { toast } = useToast();
   const [clickCount, setClickCount] = useState(0);
 
@@ -19,17 +19,46 @@ const Maintenance = () => {
 
     if (newCount >= 3) {
       setClickCount(0);
+      
       if (!isConnected) {
         try {
-          await login();
+          const session = await login();
+          if (session) {
+            const actorName = session.auth.actor.toString();
+            // Check if this actor is in the authorized admin list
+            const isAuthorized = adminsList.some(a => a.handle === actorName);
+            
+            if (!isAuthorized) {
+              toast({
+                title: "Unauthorized Access",
+                description: "This bypass portal is restricted to Network Administrators only.",
+                variant: "destructive",
+              });
+              await logout(); // Immediately terminate unauthorized session
+            } else {
+              toast({
+                title: "Admin Access Granted",
+                description: `Successfully authenticated as @${actorName}`,
+              });
+            }
+          }
         } catch (e) {
           console.error("Admin login failed", e);
         }
       } else {
-        toast({
-          title: "Admin Access",
-          description: isAdmin ? "You are authenticated as admin." : "Connected but not authorized as admin.",
-        });
+        if (!isAdmin) {
+          toast({
+            title: "Access Denied",
+            description: "Your current session does not have administrator privileges.",
+            variant: "destructive",
+          });
+          await logout();
+        } else {
+          toast({
+            title: "Admin Session Active",
+            description: "You are already authenticated as an administrator.",
+          });
+        }
       }
     }
 
