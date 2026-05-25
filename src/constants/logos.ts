@@ -1,7 +1,7 @@
 "use client";
 
 export const TOKEN_LOGOS: Record<string, string> = {
-  TAB: "/src/assets/logo.png",
+  TAB: "/logo.png",
   XPR: "/xpr2.png",
   XUSDC: "/usdc.png",
   XMD: "/xmd.png",

@@ -122,7 +122,7 @@ export const Hero = ({ creators, onJoin }: HeroProps) => {
               
               <div className="relative group">
                 <img 
-                  src="/src/assets/logo.png" 
+                  src="/logo.png" 
                   alt="TIPTAB Logo"
                   className="w-full max-w-[480px] mx-auto drop-shadow-[0_0_50px_rgba(168,85,247,0.4)] animate-delayed-spin cursor-pointer transition-transform duration-700 group-hover:scale-105"
                 />

@@ -2,6 +2,7 @@
 
 import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import ProtonWebSDK, { LinkSession } from '@proton/web-sdk';
+import { supabase } from "@/integrations/supabase/client";
 import { CREATORS, Creator } from '@/data/creators';
 import { Balances, PromoCode, AdminUser } from '@/types/xpr';
 import { PROTON_ENDPOINTS, APP_IDENTIFIER, ROOT_ADMINS, TOKENS } from '@/constants/xpr';
@@ -91,6 +92,22 @@ export const XprProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const adminHook = useXprAdmin(activeActor);
   const platformHook = useXprPlatform(adminHook.currentAdminObj);
   const socialHook = useXprSocial(activeActor);
+
+  // Supabase Keep-Alive to prevent auto-pause (Free Tier)
+  useEffect(() => {
+    const keepAlive = async () => {
+      const lastPing = localStorage.getItem('supabase_keep_alive');
+      const now = Date.now();
+      // Only ping if last ping was more than 24h ago to keep it ultra light
+      if (!lastPing || now - parseInt(lastPing) > 86400000) {
+        try {
+          await supabase.from('platform_settings').select('id').limit(1);
+          localStorage.setItem('supabase_keep_alive', now.toString());
+        } catch (e) { /* ignore ping errors */ }
+      }
+    };
+    keepAlive();
+  }, []);
 
   const boostStream = async (handle: string, asset: 'XPR' | 'TAB' = 'XPR'): Promise<boolean> => {
     if (!session || !isMember) return false;

@@ -41,7 +41,7 @@ export const BrandLogo = ({ className, showText = true, size = "md", isStatic = 
         )}
         
         <img 
-          src="/src/assets/logo.png" 
+          src="/logo.png" 
           alt="TAB Token" 
           className={cn(
             "w-full h-full object-contain relative z-10",
