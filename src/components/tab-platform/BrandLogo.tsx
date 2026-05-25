@@ -41,7 +41,7 @@ export const BrandLogo = ({ className, showText = true, size = "md", isStatic = 
         )}
         
         <img 
-          src="/src/assets/logo.png" 
+          src="/logo.png" 
           alt="TAB Token" 
           className={cn(
             "w-full h-full object-contain relative z-10",
@@ -55,7 +55,6 @@ export const BrandLogo = ({ className, showText = true, size = "md", isStatic = 
           "font-black italic tracking-tighter leading-none flex items-center",
           textSizeClasses[size]
         )}>
-          {/* Added a text-shadow border for static mode to ensure visibility on white surfaces */}
           <span className={cn(
             "text-white transition-colors duration-300", 
             !isStatic && "group-hover:text-purple-400",
