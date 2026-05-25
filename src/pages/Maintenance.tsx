@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Sparkles, ShieldAlert, Radio, Zap, Lock, AlertTriangle } from "lucide-react";
 import { useXpr } from "@/contexts/XprContext";
 import { Button } from "@/components/ui/button";
@@ -8,10 +8,20 @@ import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
 
 const Maintenance = () => {
-  const { isAdmin, setMaintenanceMode, login, isConnected, logout, actor } = useXpr();
+  const { isAdmin, setMaintenanceMode, login, isConnected, logout, actor, isLoading } = useXpr();
   const { toast } = useToast();
   const [clickCount, setClickCount] = useState(0);
   const [isAuthenticating, setIsAuthenticating] = useState(false);
+
+  // Security: If a regular user is connected while on this page, log them out immediately
+  useEffect(() => {
+    if (!isLoading && isConnected && !isAdmin) {
+      const performLogout = async () => {
+        await logout();
+      };
+      performLogout();
+    }
+  }, [isConnected, isAdmin, isLoading, logout]);
 
   const handleHiddenLogin = async () => {
     // Hidden trigger: Click 3 times to show login
@@ -152,11 +162,11 @@ const Maintenance = () => {
 
       <style>{`
         @keyframes pulse-slow {
-          0%, 100% { opacity: 0.3; transform: scale(1) translate(-50%, -50%); }
-          50% { opacity: 0.5; transform: scale(1.1) translate(-50%, -50%); }
+          0%, 100% { opacity: 1; transform: scale(1); }
+          50% { opacity: 0.8; transform: scale(0.98); }
         }
         .animate-pulse-slow {
-          animation: pulse-slow 8s ease-in-out infinite;
+          animation: pulse-slow 3s ease-in-out infinite;
         }
       `}</style>
     </div>
