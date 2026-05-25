@@ -5,7 +5,6 @@ import { Sparkles, ShieldAlert, Radio, Zap, Lock, AlertTriangle } from "lucide-r
 import { useXpr } from "@/contexts/XprContext";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
-import { ROOT_ADMINS } from "@/constants/xpr";
 import { cn } from "@/lib/utils";
 
 const Maintenance = () => {
@@ -15,16 +14,14 @@ const Maintenance = () => {
   const [isAuthenticating, setIsAuthenticating] = useState(false);
 
   // Security: If a regular user is connected while on this page, log them out immediately
-  // Added a check for ROOT_ADMINS to prevent accidental logouts of the primary admin account
   useEffect(() => {
-    const isRoot = actor && ROOT_ADMINS.includes(actor.toLowerCase());
-    if (!isLoading && isConnected && !isAdmin && !isRoot) {
+    if (!isLoading && isConnected && !isAdmin) {
       const performLogout = async () => {
         await logout();
       };
       performLogout();
     }
-  }, [isConnected, isAdmin, isLoading, logout, actor]);
+  }, [isConnected, isAdmin, isLoading, logout]);
 
   const handleHiddenLogin = async () => {
     // Hidden trigger: Click 3 times to show login
@@ -39,30 +36,24 @@ const Maintenance = () => {
         // Trigger WebAuth Login
         const session = await login();
         
-        if (session) {
-          const loggedActor = session.auth.actor.toString().toLowerCase();
-          const isRoot = ROOT_ADMINS.includes(loggedActor);
-          
-          // Wait briefly for context to sync, but check root status immediately
-          setTimeout(async () => {
-            if (!isRoot && !isAdmin) {
-              toast({
-                title: "Authorization Denied",
-                description: "This account is not authorized to bypass maintenance.",
-                variant: "destructive"
-              });
-              await logout();
-            } else {
-              toast({
-                title: "Admin Authenticated",
-                description: `Welcome back, @${loggedActor}.`,
-              });
-            }
-            setIsAuthenticating(false);
-          }, 800);
-        } else {
+        // Immediate Security Check: If the logged in user is NOT an admin, kick them out
+        // We wait a tiny bit to ensure the context has updated the isAdmin state
+        setTimeout(async () => {
+          if (session && !isAdmin) {
+            toast({
+              title: "Authorization Denied",
+              description: "This account is not authorized to bypass maintenance.",
+              variant: "destructive"
+            });
+            await logout();
+          } else if (session && isAdmin) {
+            toast({
+              title: "Admin Authenticated",
+              description: `Welcome back, @${session.auth.actor}.`,
+            });
+          }
           setIsAuthenticating(false);
-        }
+        }, 500);
 
       } catch (e) {
         console.error("Admin login failed", e);
@@ -133,7 +124,7 @@ const Maintenance = () => {
           </div>
         </div>
 
-        {(isAdmin || (actor && ROOT_ADMINS.includes(actor.toLowerCase()))) && isConnected && (
+        {isAdmin && isConnected && (
           <div className="pt-12 animate-in fade-in zoom-in-95 duration-700">
             <div className="bg-gradient-to-br from-purple-500/10 to-orange-500/10 border border-white/10 rounded-[40px] p-10 space-y-6 relative overflow-hidden">
               <div className="absolute top-0 right-0 p-8 opacity-20">
