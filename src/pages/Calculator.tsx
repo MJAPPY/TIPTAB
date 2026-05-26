@@ -19,76 +19,62 @@ const Calculator = () => {
   const [result, setResult] = useState<number>(0);
   const [isSyncing, setIsSyncing] = useState(false);
 
-  // Initial rates - will be updated by live fetches
+  // Rates relative to XPR (XPR = 1.0)
   const [rates, setRates] = useState<Record<string, number>>({
-    TAB: 2.768, 
+    TAB: 0.36, 
     XPR: 1.0000,
-    USD: 0.00092,
-    EUR: 0.00085,
-    GBP: 0.00072,
-    AUD: 0.0014,
-    HKD: 0.0072,
-    CNY: 0.0066,
-    JPY: 0.14,
-    CAD: 0.0012,
-    SGD: 0.0012,
-    CHF: 0.00081,
-    NZD: 0.0015,
+    USD: 0.00273, // approx 1/366
+    XMT: 111.0,
+    METAL: 62.0,
+    LOAN: 0.17,
+    EUR: 0.0025,
+    GBP: 0.0022,
+    CAD: 0.0037,
   });
 
   const symbols: Record<string, string> = {
     TAB: "TAB",
     XPR: "XPR",
+    XMT: "XMT",
+    METAL: "METAL",
+    LOAN: "LOAN",
     USD: "$",
     EUR: "€",
     GBP: "£",
-    AUD: "A$",
-    HKD: "HK$",
-    CNY: "¥",
-    JPY: "¥",
     CAD: "C$",
-    SGD: "S$",
-    CHF: "Fr",
-    NZD: "NZ$",
   };
 
   const fetchRates = async () => {
     setIsSyncing(true);
     try {
-      const cgResponse = await fetch(
-        "https://api.coingecko.com/api/v3/simple/price?ids=proton&vs_currencies=usd,eur,gbp,aud,hkd,cny,jpy,cad,sgd,chf,nzd"
-      );
+      const cgResponse = await fetch("https://api.coingecko.com/api/v3/simple/price?ids=proton&vs_currencies=usd,eur,gbp,cad");
       const cgData = await cgResponse.json();
       
       const alcorResponse = await fetch("https://proton.alcor.exchange/api/v2/tickers");
       const alcorData = await alcorResponse.json();
       
-      const tabMarket = alcorData.find((m: any) => m.ticker_id === "TAB_XPR");
-      
-      let tabRatio = 2.768; 
-      if (tabMarket && tabMarket.last_price) {
-        const xprPerTab = parseFloat(tabMarket.last_price);
-        if (xprPerTab > 0) {
-          tabRatio = 1 / xprPerTab;
-        }
-      }
+      const getAlcorPrice = (tickerId: string) => {
+        const ticker = alcorData.find((m: any) => m.ticker_id === tickerId);
+        return ticker ? parseFloat(ticker.last_price) : null;
+      };
+
+      const xprUsd = cgData.proton?.usd || 0.00273;
+      const xprPerTab = getAlcorPrice("TAB_XPR") || 0.36;
+      const xprPerXmt = getAlcorPrice("XMT_XPR") || 111.0;
+      const xprPerLoan = getAlcorPrice("LOAN_XPR") || 0.17;
+      const xprPerMetal = getAlcorPrice("METAL_XPR") || 62.0;
 
       if (cgData.proton) {
-        const p = cgData.proton;
         setRates({
-          TAB: tabRatio, 
+          TAB: xprPerTab, 
           XPR: 1.0000,
-          USD: p.usd,
-          EUR: p.eur,
-          GBP: p.gbp,
-          AUD: p.aud,
-          HKD: p.hkd,
-          CNY: p.cny,
-          JPY: p.jpy,
-          CAD: p.cad,
-          SGD: p.sgd,
-          CHF: p.chf,
-          NZD: p.nzd,
+          XMT: xprPerXmt,
+          LOAN: xprPerLoan,
+          METAL: xprPerMetal,
+          USD: xprUsd,
+          EUR: cgData.proton.eur,
+          GBP: cgData.proton.gbp,
+          CAD: cgData.proton.cad,
         });
       }
     } catch (error) {
@@ -105,7 +91,7 @@ const Calculator = () => {
   }, []);
 
   const sortedCurrencies = useMemo(() => {
-    const priority = ["TAB", "XPR", "USD", "CAD"];
+    const priority = ["TAB", "XPR", "USD", "XMT", "LOAN", "METAL"];
     const keys = Object.keys(rates);
     const others = keys
       .filter(k => !priority.includes(k))
@@ -114,10 +100,12 @@ const Calculator = () => {
   }, [rates]);
 
   useEffect(() => {
-    const fromRate = rates[fromCurrency];
-    const toRate = rates[toCurrency];
+    const fromPriceInXpr = rates[fromCurrency];
+    const toPriceInXpr = rates[toCurrency];
     const numAmount = parseFloat(amount) || 0;
-    const converted = (numAmount / fromRate) * toRate;
+    
+    // Formula: (Amount * FromPriceInXpr) / ToPriceInXpr
+    const converted = (numAmount * fromPriceInXpr) / toPriceInXpr;
     setResult(converted);
   }, [amount, fromCurrency, toCurrency, rates]);
 
@@ -148,7 +136,7 @@ const Calculator = () => {
               VALUE <span className="text-transparent bg-clip-text bg-gradient-to-r from-orange-500 to-purple-500">ENGINE</span>
             </h1>
             <p className="text-slate-300 text-sm md:text-lg max-w-xl mx-auto font-medium leading-relaxed opacity-80">
-              Precision TAB valuation powered by <span className="text-orange-500">Alcor Liquidity</span> and <span className="text-purple-400">XPR Network</span> Explorer data.
+              Precision asset valuation powered by <span className="text-orange-500">Alcor DEX</span> and <span className="text-purple-400">XPR Network</span> liquidity pairs.
             </p>
           </div>
 
@@ -228,7 +216,7 @@ const Calculator = () => {
                 <div className="pt-5 md:pt-6 border-t border-white/10 flex flex-col sm:flex-row items-center justify-between gap-3 text-[9px] md:text-[10px] font-bold text-slate-400">
                   <div className="flex items-center gap-2">
                     <TrendingUp className="h-3 w-3 text-emerald-400" />
-                    1 {fromCurrency} = {(rates[toCurrency] / rates[fromCurrency]).toFixed(6)} {toCurrency}
+                    1 {fromCurrency} = {(rates[fromCurrency] / rates[toCurrency]).toFixed(6)} {toCurrency}
                   </div>
                   <div className="flex items-center gap-1.5 text-emerald-400 uppercase tracking-widest font-black">
                     <div className="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-pulse" />
@@ -245,9 +233,9 @@ const Calculator = () => {
                 </h3>
                 <div className="space-y-4 md:space-y-5">
                   {[
-                    { pair: "TAB / XPR", rate: (1/rates.TAB).toFixed(4), change: "Live", icon: Zap },
-                    { pair: "TAB / USD", rate: (rates.USD / rates.TAB).toFixed(5), change: "Live", icon: DollarSign },
-                    { pair: "XPR / EUR", rate: rates.EUR.toFixed(5), change: "Live", icon: TrendingUp }
+                    { pair: "TAB / XPR", rate: rates.TAB.toFixed(4), change: "Live", icon: Zap },
+                    { pair: "XMT / USD", rate: (rates.XMT * rates.USD / (1)).toFixed(5), change: "Live", icon: DollarSign },
+                    { pair: "XPR / USD", rate: rates.USD.toFixed(5), change: "Live", icon: TrendingUp }
                   ].map((item, i) => (
                     <div key={i} className="flex items-center justify-between px-1">
                       <div className="flex items-center gap-3">

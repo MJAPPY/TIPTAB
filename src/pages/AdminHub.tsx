@@ -299,15 +299,14 @@ const AdminHub = () => {
 
   const fetchRates = async () => {
     try {
-      // Correct market anchoring
-      const cgResponse = await fetch("https://api.coingecko.com/api/v3/simple/price?ids=proton,metal-pay,loan&vs_currencies=usd");
+      // 1. Fetch live market anchor from CoinGecko
+      const cgResponse = await fetch("https://api.coingecko.com/api/v3/simple/price?ids=proton&vs_currencies=usd");
       const cgData = await cgResponse.json();
       const xprUsd = cgData.proton?.usd;
-      const metalUsd = cgData['metal-pay']?.usd;
-      const loanUsd = cgData.loan?.usd;
       
       if (!xprUsd) throw new Error("XPR Price anchor failed");
 
+      // 2. Fetch Alcor DEX Tickers for accurate chain parity
       const alcorResponse = await fetch("https://proton.alcor.exchange/api/v2/tickers");
       const alcorData = await alcorResponse.json();
       
@@ -316,11 +315,12 @@ const AdminHub = () => {
         return ticker ? parseFloat(ticker.last_price) : null;
       };
 
-      // Tickers return Amount of XPR per 1 Unit of token
+      // Tickers return amount of XPR per 1 unit of token
+      // Based on user feedback: 1 XUSDC = 366 XPR, 3.3 XMT, 2143 LOAN, 5.9 METAL
       const tabXpr = getAlcorRate("TAB_XPR") || 0.36;
-      const xmtXpr = getAlcorRate("XMT_XPR") || 3.17;
-      const loanXpr = getAlcorRate("LOAN_XPR") || (loanUsd ? loanUsd / xprUsd : 0.25);
-      const metalXpr = getAlcorRate("METAL_XPR") || (metalUsd ? metalUsd / xprUsd : 1900);
+      const xmtXpr = getAlcorRate("XMT_XPR") || 111.0;  // 366 / 3.3 approx
+      const loanXpr = getAlcorRate("LOAN_XPR") || 0.17; // 366 / 2143 approx
+      const metalXpr = getAlcorRate("METAL_XPR") || 62.0; // 366 / 5.9 approx
 
       return { 
         xprUsd, 
@@ -346,11 +346,10 @@ const AdminHub = () => {
       const targetBoostUsd = isAuto ? parseFloat(boostPriceXusdc) : parseFloat(localBoostXusdc);
       
       if (!isNaN(targetFeeUsd)) {
-        // Correct Parity logic: Total Target USD / (Value of 1 token in USD)
-        // Value of 1 token in USD = (Amount of XPR per 1 token) * (Value of 1 XPR in USD)
         const calculatedXpr = (targetFeeUsd / xprUsd).toFixed(0);
         const calculatedXmd = targetFeeUsd.toFixed(2);
         
+        // Precise Parity Calculation: TargetUSD / (Price_of_token_in_XPR * XPR_USD_Price)
         const calculatedMetal = (targetFeeUsd / (metalXpr * xprUsd)).toFixed(4);
         const calculatedLoan = (targetFeeUsd / (loanXpr * xprUsd)).toFixed(0);
         const calculatedXmt = (targetFeeUsd / (xmtXpr * xprUsd)).toFixed(4);
@@ -389,7 +388,7 @@ const AdminHub = () => {
 
       toast({
         title: isAuto ? "Dynamic Parity Sync" : "DEX Parity Recalibrated",
-        description: `All asset rates re-indexed against live XPR Network liquidity.`,
+        description: `Fees precisely re-indexed against live XPR Network liquidity.`,
       });
     } else if (!isAuto) {
       toast({

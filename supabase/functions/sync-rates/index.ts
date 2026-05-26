@@ -20,11 +20,16 @@ serve(async (req) => {
 
     console.log("[sync-rates] Starting precise rate synchronization...");
 
-    // 1. Fetch market data with correct CoinGecko IDs
-    // METAL ID on CG is 'metal-pay'
-    const cgResponse = await fetch("https://api.coingecko.com/api/v3/simple/price?ids=proton,metal-pay,loan&vs_currencies=usd");
+    // 1. Fetch live market anchor from CoinGecko
+    const cgResponse = await fetch("https://api.coingecko.com/api/v3/simple/price?ids=proton&vs_currencies=usd");
     const cgData = await cgResponse.json();
+    const xprUsd = cgData.proton?.usd;
     
+    if (!xprUsd) {
+      throw new Error("Failed to fetch XPR/USD price anchor");
+    }
+
+    // 2. Fetch Alcor DEX Tickers for accurate chain parity
     const alcorResponse = await fetch("https://proton.alcor.exchange/api/v2/tickers");
     const alcorData = await alcorResponse.json();
     
@@ -33,21 +38,13 @@ serve(async (req) => {
       return ticker ? parseFloat(ticker.last_price) : null;
     };
 
-    const xprUsd = cgData.proton?.usd;
-    const metalUsd = cgData['metal-pay']?.usd;
-    const loanUsd = cgData.loan?.usd;
-
-    if (!xprUsd) {
-      throw new Error("Failed to fetch XPR/USD price anchor");
-    }
-
-    // Precise Parity calculations via Alcor DEX (XPR relative)
+    // Tickers return amount of XPR per 1 unit of token
     const xprPerTab = getAlcorRate("TAB_XPR") || 0.36;
-    const xprPerXmt = getAlcorRate("XMT_XPR") || 3.17;
-    const xprPerLoan = getAlcorRate("LOAN_XPR") || (loanUsd ? loanUsd / xprUsd : 0.25);
-    const xprPerMetal = getAlcorRate("METAL_XPR") || (metalUsd ? metalUsd / xprUsd : 1900);
+    const xprPerXmt = getAlcorRate("XMT_XPR") || 111.0;
+    const xprPerLoan = getAlcorRate("LOAN_XPR") || 0.17;
+    const xprPerMetal = getAlcorRate("METAL_XPR") || 62.0;
 
-    // 2. Get current master settings
+    // 3. Get current master settings
     const { data: settings, error: fetchError } = await supabase
       .from('platform_settings')
       .select('*')
@@ -58,14 +55,13 @@ serve(async (req) => {
       throw new Error("Failed to fetch platform settings");
     }
 
-    // 3. Calculate new rates based on XUSDC Master Fee
+    // 4. Calculate new rates based on XUSDC Master Fee target
     const targetUsd = Number(settings.membership_fee_xusdc);
     
     const membershipFeeXpr = Math.round(targetUsd / xprUsd);
     const membershipFeeXmd = targetUsd.toFixed(2);
     
-    // Formula: Total Target USD / (Value of 1 token in USD)
-    // Value of 1 token in USD = (Amount of XPR per 1 token) * (Value of 1 XPR in USD)
+    // Parity Formula: TargetUSD / (Price_of_token_in_XPR * XPR_USD_Price)
     const membershipFeeMetal = (targetUsd / (xprPerMetal * xprUsd)).toFixed(4);
     const membershipFeeLoan = (targetUsd / (xprPerLoan * xprUsd)).toFixed(0);
     const membershipFeeXmt = (targetUsd / (xprPerXmt * xprUsd)).toFixed(4);
@@ -74,7 +70,7 @@ serve(async (req) => {
     const boostPriceXpr = Math.round(boostTargetUsd / xprUsd);
     const boostPriceTab = Math.round(boostPriceXpr / xprPerTab);
 
-    // 4. Update table
+    // 5. Update database table
     const { error: updateError } = await supabase
       .from('platform_settings')
       .update({
