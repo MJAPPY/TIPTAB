@@ -18,7 +18,7 @@ serve(async (req) => {
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
     )
 
-    console.log("[sync-rates] Starting advanced rate synchronization...");
+    console.log("[sync-rates] Starting precise rate synchronization...");
 
     // 1. Fetch market data with correct CoinGecko IDs
     // METAL ID on CG is 'metal-pay'
@@ -28,28 +28,24 @@ serve(async (req) => {
     const alcorResponse = await fetch("https://proton.alcor.exchange/api/v2/tickers");
     const alcorData = await alcorResponse.json();
     
-    const tabMarket = alcorData.find((m: any) => m.ticker_id === "TAB_XPR");
-    const xmtMarket = alcorData.find((m: any) => m.ticker_id === "XMT_XPR");
-    
+    const getAlcorRate = (id: string) => {
+      const ticker = alcorData.find((m: any) => m.ticker_id === id);
+      return ticker ? parseFloat(ticker.last_price) : null;
+    };
+
     const xprUsd = cgData.proton?.usd;
     const metalUsd = cgData['metal-pay']?.usd;
     const loanUsd = cgData.loan?.usd;
 
     if (!xprUsd) {
-      throw new Error("Failed to fetch XPR/USD price");
+      throw new Error("Failed to fetch XPR/USD price anchor");
     }
 
-    // Parity calculations via XPR
-    let xprPerTab = 0.36; 
-    if (tabMarket && tabMarket.last_price) {
-      xprPerTab = parseFloat(tabMarket.last_price);
-    }
-
-    let xprPerXmt = 0.05; 
-    if (xmtMarket && xmtMarket.last_price) {
-      xprPerXmt = parseFloat(xmtMarket.last_price);
-    }
-    const xmtUsd = xprPerXmt * xprUsd;
+    // Precise Parity calculations via Alcor DEX (XPR relative)
+    const xprPerTab = getAlcorRate("TAB_XPR") || 0.36;
+    const xprPerXmt = getAlcorRate("XMT_XPR") || 3.17;
+    const xprPerLoan = getAlcorRate("LOAN_XPR") || (loanUsd ? loanUsd / xprUsd : 0.25);
+    const xprPerMetal = getAlcorRate("METAL_XPR") || (metalUsd ? metalUsd / xprUsd : 1900);
 
     // 2. Get current master settings
     const { data: settings, error: fetchError } = await supabase
@@ -67,9 +63,12 @@ serve(async (req) => {
     
     const membershipFeeXpr = Math.round(targetUsd / xprUsd);
     const membershipFeeXmd = targetUsd.toFixed(2);
-    const membershipFeeMetal = metalUsd ? (targetUsd / metalUsd).toFixed(4) : (targetUsd / 0.012).toFixed(4);
-    const membershipFeeLoan = loanUsd ? (targetUsd / loanUsd).toFixed(0) : (targetUsd * 4000).toFixed(0);
-    const membershipFeeXmt = xmtUsd ? (targetUsd / xmtUsd).toFixed(4) : targetUsd.toFixed(4);
+    
+    // Formula: Total Target USD / (Value of 1 token in USD)
+    // Value of 1 token in USD = (Amount of XPR per 1 token) * (Value of 1 XPR in USD)
+    const membershipFeeMetal = (targetUsd / (xprPerMetal * xprUsd)).toFixed(4);
+    const membershipFeeLoan = (targetUsd / (xprPerLoan * xprUsd)).toFixed(0);
+    const membershipFeeXmt = (targetUsd / (xprPerXmt * xprUsd)).toFixed(4);
     
     const boostTargetUsd = Number(settings.boost_price_xusdc);
     const boostPriceXpr = Math.round(boostTargetUsd / xprUsd);
@@ -95,7 +94,7 @@ serve(async (req) => {
       throw updateError;
     }
 
-    console.log("[sync-rates] Successfully synced all rates for network assets.");
+    console.log("[sync-rates] Successfully synced all precise DEX rates.");
 
     return new Response(JSON.stringify({ success: true }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },

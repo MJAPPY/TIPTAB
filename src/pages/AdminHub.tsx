@@ -299,27 +299,28 @@ const AdminHub = () => {
 
   const fetchRates = async () => {
     try {
-      // 1. Anchor XPR/USD from CoinGecko
-      const cgResponse = await fetch("https://api.coingecko.com/api/v3/simple/price?ids=proton&vs_currencies=usd");
+      // Correct market anchoring
+      const cgResponse = await fetch("https://api.coingecko.com/api/v3/simple/price?ids=proton,metal-pay,loan&vs_currencies=usd");
       const cgData = await cgResponse.json();
       const xprUsd = cgData.proton?.usd;
+      const metalUsd = cgData['metal-pay']?.usd;
+      const loanUsd = cgData.loan?.usd;
       
-      if (!xprUsd) throw new Error("Failed to anchor XPR price");
+      if (!xprUsd) throw new Error("XPR Price anchor failed");
 
-      // 2. Fetch Alcor Tickers for all native pairs (SYMB_XPR)
       const alcorResponse = await fetch("https://proton.alcor.exchange/api/v2/tickers");
       const alcorData = await alcorResponse.json();
       
-      const getAlcorPrice = (tickerId: string) => {
-        const ticker = alcorData.find((m: any) => m.ticker_id === tickerId);
+      const getAlcorRate = (id: string) => {
+        const ticker = alcorData.find((m: any) => m.ticker_id === id);
         return ticker ? parseFloat(ticker.last_price) : null;
       };
 
-      // Tickers reflect amount of XPR per 1 unit of token
-      const tabXpr = getAlcorPrice("TAB_XPR") || 0.36;
-      const xmtXpr = getAlcorPrice("XMT_XPR") || 0.05;
-      const loanXpr = getAlcorPrice("LOAN_XPR") || 0.00025;
-      const metalXpr = getAlcorPrice("METAL_XPR") || 14.5;
+      // Tickers return Amount of XPR per 1 Unit of token
+      const tabXpr = getAlcorRate("TAB_XPR") || 0.36;
+      const xmtXpr = getAlcorRate("XMT_XPR") || 3.17;
+      const loanXpr = getAlcorRate("LOAN_XPR") || (loanUsd ? loanUsd / xprUsd : 0.25);
+      const metalXpr = getAlcorRate("METAL_XPR") || (metalUsd ? metalUsd / xprUsd : 1900);
 
       return { 
         xprUsd, 
@@ -345,10 +346,11 @@ const AdminHub = () => {
       const targetBoostUsd = isAuto ? parseFloat(boostPriceXusdc) : parseFloat(localBoostXusdc);
       
       if (!isNaN(targetFeeUsd)) {
+        // Correct Parity logic: Total Target USD / (Value of 1 token in USD)
+        // Value of 1 token in USD = (Amount of XPR per 1 token) * (Value of 1 XPR in USD)
         const calculatedXpr = (targetFeeUsd / xprUsd).toFixed(0);
         const calculatedXmd = targetFeeUsd.toFixed(2);
         
-        // Advanced Parity Logic: TargetUSD / (Price_of_token_in_XPR * XPR_USD)
         const calculatedMetal = (targetFeeUsd / (metalXpr * xprUsd)).toFixed(4);
         const calculatedLoan = (targetFeeUsd / (loanXpr * xprUsd)).toFixed(0);
         const calculatedXmt = (targetFeeUsd / (xmtXpr * xprUsd)).toFixed(4);
@@ -370,7 +372,7 @@ const AdminHub = () => {
 
       if (!isNaN(targetBoostUsd)) {
         const boostXprVal = (targetBoostUsd / xprUsd).toFixed(0);
-        // Correct parity for TAB (Amount of TAB needed to reach boost target)
+        // Precise TAB parity based on live liquidity
         const boostTabVal = (parseFloat(boostXprVal) / tabXpr).toFixed(0);
         
         updateBoostPrice(boostXprVal);
@@ -386,13 +388,13 @@ const AdminHub = () => {
       localStorage.setItem("tiptab_last_parity_sync", now.toString());
 
       toast({
-        title: isAuto ? "Network Parity Calibration" : "Alcor Parity Synced",
-        description: `Fees re-indexed against live XPR DEX liquidity.`,
+        title: isAuto ? "Dynamic Parity Sync" : "DEX Parity Recalibrated",
+        description: `All asset rates re-indexed against live XPR Network liquidity.`,
       });
     } else if (!isAuto) {
       toast({
-        title: "Sync Failed",
-        description: "Alcor / CoinGecko link interrupted. Check network connectivity.",
+        title: "Sync Interrupted",
+        description: "Network pricing nodes did not respond. Check Alcor/CG connectivity.",
         variant: "destructive"
       });
     }
