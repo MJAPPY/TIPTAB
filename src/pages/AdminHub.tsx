@@ -299,7 +299,8 @@ const AdminHub = () => {
 
   const fetchRates = async () => {
     try {
-      const cgResponse = await fetch("https://api.coingecko.com/api/v3/simple/price?ids=proton,metal,loan&vs_currencies=usd");
+      // metal-pay is the correct CoinGecko ID for Metal (MTL)
+      const cgResponse = await fetch("https://api.coingecko.com/api/v3/simple/price?ids=proton,metal-pay,loan&vs_currencies=usd");
       const cgData = await cgResponse.json();
       
       const alcorResponse = await fetch("https://proton.alcor.exchange/api/v2/tickers");
@@ -321,7 +322,7 @@ const AdminHub = () => {
       if (cgData.proton && cgData.proton.usd) {
         return { 
           xprUsd: cgData.proton.usd, 
-          metalUsd: cgData.metal?.usd || 0,
+          metalUsd: cgData['metal-pay']?.usd || 0,
           loanUsd: cgData.loan?.usd || 0,
           xprPerTab,
           xprPerXmt
@@ -348,6 +349,8 @@ const AdminHub = () => {
         const calculatedXmd = targetFeeUsd.toFixed(2);
         const calculatedMetal = metalUsd ? (targetFeeUsd / metalUsd).toFixed(4) : targetFeeUsd.toFixed(4);
         const calculatedLoan = loanUsd ? (targetFeeUsd / loanUsd).toFixed(0) : (targetFeeUsd * 4000).toFixed(0);
+        
+        // Correct parity logic for XMT (XPR based)
         const calculatedXmt = (targetFeeUsd / (xprPerXmt * xprUsd)).toFixed(4);
         
         updateMembershipFee(calculatedXpr, 'XPR');
@@ -367,6 +370,7 @@ const AdminHub = () => {
 
       if (!isNaN(targetBoostUsd)) {
         const boostXprVal = (targetBoostUsd / xprUsd).toFixed(0);
+        // Correct parity for TAB (XPR based)
         const boostTabVal = (parseFloat(boostXprVal) / xprPerTab).toFixed(0);
         
         updateBoostPrice(boostXprVal);
