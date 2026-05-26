@@ -87,23 +87,24 @@ const Dashboard = () => {
     let savedXprReceived = localStorage.getItem(xprReceivedKey);
     let savedEngagement = localStorage.getItem(engagementKey);
 
+    // Initial metrics set to 0 for production
     if (!savedViews) {
-      const initialViews = Math.floor(Math.random() * 800) + 450;
+      const initialViews = 0;
       localStorage.setItem(viewsKey, initialViews.toString());
       savedViews = initialViews.toString();
     }
     if (!savedReceived) {
-      const initialReceived = Math.floor(Math.random() * 5000) + 1250;
+      const initialReceived = 0;
       localStorage.setItem(receivedKey, initialReceived.toString());
       savedReceived = initialReceived.toString();
     }
     if (!savedXprReceived) {
-      const initialXprReceived = Math.floor(Math.random() * 12000) + 3400;
+      const initialXprReceived = 0;
       localStorage.setItem(xprReceivedKey, initialXprReceived.toString());
       savedXprReceived = initialXprReceived.toString();
     }
     if (!savedEngagement) {
-      const initialEngagement = (Math.random() * 15 + 8).toFixed(1);
+      const initialEngagement = "0.0";
       localStorage.setItem(engagementKey, initialEngagement);
       savedEngagement = initialEngagement;
     }
@@ -126,7 +127,7 @@ const Dashboard = () => {
     await refreshBalances();
     if (actor) {
       setProfileViews(prev => {
-        const next = prev + Math.floor(Math.random() * 3) + 1;
+        const next = prev + 1;
         localStorage.setItem(`tiptab_views_${actor}`, next.toString());
         return next;
       });

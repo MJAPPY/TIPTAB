@@ -83,23 +83,16 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { DetailedReportModal } from "@/components/tab-platform/DetailedReportModal";
 
-const MOCK_AUDIT_LOGS: Record<string, any[]> = {
-  "tiptab": [
-    { date: "2024-05-15", time: "14:20", event: "Account Verified", actor: "System", type: "system" },
-    { date: "2024-05-18", time: "09:12", event: "Profile Updated", actor: "tiptab", type: "user" },
-  ],
-  "carlos_delivery": [
-    { date: "2024-04-10", time: "11:05", event: "Membership Activation", actor: "System", type: "system" },
-    { date: "2024-05-02", time: "16:45", event: "Location Verified", actor: "Admin", type: "admin" },
-  ]
-};
+// Audit logs are now empty for production
+const MOCK_AUDIT_LOGS: Record<string, any[]> = {};
 
+// Initial leaderboard recipients with zero rewards for production
 const INITIAL_LEADERBOARD_WINNERS = [
-  { account: "whaleshark", role: "Supporter", rank: 1, reward: "3000" },
-  { account: "tiptab", role: "Creator", rank: 2, reward: "1500" },
-  { account: "carlos_delivery", role: "Creator", rank: 3, reward: "1000" },
-  { account: "early", role: "Supporter", rank: 4, reward: "500" },
-  { account: "mayafit", role: "Creator", rank: 5, reward: "250" },
+  { account: "whaleshark", role: "Supporter", rank: 1, reward: "0" },
+  { account: "tiptab", role: "Creator", rank: 2, reward: "0" },
+  { account: "carlos_delivery", role: "Creator", rank: 3, reward: "0" },
+  { account: "early", role: "Supporter", rank: 4, reward: "0" },
+  { account: "mayafit", role: "Creator", rank: 5, reward: "0" },
   { account: "fanatic", role: "Supporter", rank: 6, reward: "0" },
   { account: "cking", role: "Supporter", rank: 7, reward: "0" },
   { account: "kofibuilds", role: "Creator", rank: 8, reward: "0" },
@@ -177,25 +170,30 @@ const AdminHub = () => {
     return parseInt(localStorage.getItem("tiptab_last_parity_sync") || "0");
   });
 
-  // Analytics Metrics State
-  const [analyticsStats, setAnalyticsStats] = useState({
-    activeMembers: 1240,
-    supporterBase: 4812,
-    tippingVelocity: 84,
-    avgTipSize: 145,
-    newProfiles24h: 28,
-    performanceBoosts24h: 42
-  });
-
-  const handleResetAnalytics = () => {
-    setAnalyticsStats({
+  // Analytics Metrics State loaded from localStorage
+  const [analyticsStats, setAnalyticsStats] = useState(() => {
+    const saved = localStorage.getItem("tiptab_admin_analytics");
+    return saved ? JSON.parse(saved) : {
       activeMembers: 0,
       supporterBase: 0,
       tippingVelocity: 0,
       avgTipSize: 0,
       newProfiles24h: 0,
       performanceBoosts24h: 0
-    });
+    };
+  });
+
+  const handleResetAnalytics = () => {
+    const resetData = {
+      activeMembers: 0,
+      supporterBase: 0,
+      tippingVelocity: 0,
+      avgTipSize: 0,
+      newProfiles24h: 0,
+      performanceBoosts24h: 0
+    };
+    setAnalyticsStats(resetData);
+    localStorage.setItem("tiptab_admin_analytics", JSON.stringify(resetData));
     setIsResetAnalyticsOpen(false);
     toast({
       title: "Analytics Reset Successful",
@@ -225,17 +223,20 @@ const AdminHub = () => {
   const [newPromoValue, setNewPromoValue] = useState("50");
   const [newPromoUses, setNewPromoUses] = useState("100");
 
-  // Multi-token Financial Data with Explicit 50/50 Split Logic
-  const [rawTreasuryData, setRawTreasuryData] = useState([
-    { symbol: "XPR", totalActivation: 452500, boostVolume: 12500, color: "text-orange-500", bg: "from-orange-500/10", icon: Zap },
-    { symbol: "TAB", totalActivation: 1200000, boostVolume: 50000, color: "text-purple-400", bg: "from-purple-500/10", icon: Sparkles },
-    { symbol: "XMD", totalActivation: 2450.50, boostVolume: 0, color: "text-cyan-400", bg: "from-cyan-500/10", icon: Globe },
-    { symbol: "XUSDC", totalActivation: 1840.25, boostVolume: 0, color: "text-green-400", bg: "from-green-500/10", icon: HandCoins }
-  ]);
+  // Multi-token Financial Data loaded from localStorage
+  const [rawTreasuryData, setRawTreasuryData] = useState(() => {
+    const saved = localStorage.getItem("tiptab_treasury_ledger");
+    return saved ? JSON.parse(saved) : [
+      { symbol: "XPR", totalActivation: 0, boostVolume: 0, color: "text-orange-500", bg: "from-orange-500/10", icon: Zap },
+      { symbol: "TAB", totalActivation: 0, boostVolume: 0, color: "text-purple-400", bg: "from-purple-500/10", icon: Sparkles },
+      { symbol: "XMD", totalActivation: 0, boostVolume: 0, color: "text-cyan-400", bg: "from-cyan-500/10", icon: Globe },
+      { symbol: "XUSDC", totalActivation: 0, boostVolume: 0, color: "text-green-400", bg: "from-green-500/10", icon: HandCoins }
+    ];
+  });
 
   const treasuryData = useMemo(() => {
-    return rawTreasuryData.map(item => {
-      // PROVEN 50% SPLIT: 50% to Rewards, 50% to Admin Net
+    return rawTreasuryData.map((item: any) => {
+      // 50% SPLIT: 50% to Rewards, 50% to Admin Net
       const rewards = item.boostVolume * 0.5;
       const adminBoostShare = item.boostVolume * 0.5;
       const netRevenue = item.totalActivation + adminBoostShare;
@@ -250,11 +251,13 @@ const AdminHub = () => {
   }, [rawTreasuryData]);
 
   const handleResetTreasury = () => {
-    setRawTreasuryData(prev => prev.map(item => ({
+    const resetData = rawTreasuryData.map((item: any) => ({
       ...item,
       totalActivation: 0,
       boostVolume: 0
-    })));
+    }));
+    setRawTreasuryData(resetData);
+    localStorage.setItem("tiptab_treasury_ledger", JSON.stringify(resetData));
     setIsResetTreasuryOpen(false);
     toast({
       title: "Ledger Reset Successful",
@@ -731,17 +734,17 @@ const AdminHub = () => {
             <div className="space-y-10 animate-in fade-in duration-500">
                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
                  {[
-                   { label: "Active Members", value: analyticsStats.activeMembers.toLocaleString(), change: "+14%", icon: UserCheck, color: "text-orange-400", sub: "Growth (MoM)" },
-                   { label: "Supporter Base", value: analyticsStats.supporterBase.toLocaleString(), change: "+8%", icon: Users, color: "text-purple-400", sub: "Unique Wallets" },
-                   { label: "Tipping Velocity", value: `${analyticsStats.tippingVelocity}/hr`, change: "+22%", icon: Flame, color: "text-red-500", sub: "Platform Speed" },
-                   { label: "Avg Tip Size", value: `${analyticsStats.avgTipSize} TAB`, change: "-2%", icon: Zap, color: "text-cyan-400", sub: "Network Value" }
+                   { label: "Active Members", value: analyticsStats.activeMembers.toLocaleString(), change: "+0%", icon: UserCheck, color: "text-orange-400", sub: "Growth (MoM)" },
+                   { label: "Supporter Base", value: analyticsStats.supporterBase.toLocaleString(), change: "+0%", icon: Users, color: "text-purple-400", sub: "Unique Wallets" },
+                   { label: "Tipping Velocity", value: `${analyticsStats.tippingVelocity}/hr`, change: "+0%", icon: Flame, color: "text-red-500", sub: "Platform Speed" },
+                   { label: "Avg Tip Size", value: `${analyticsStats.avgTipSize} TAB`, change: "0%", icon: Zap, color: "text-cyan-400", sub: "Network Value" }
                  ].map((stat, i) => (
                    <Card key={i} className="bg-[#130b21] border border-white/10 p-6 rounded-[32px] hover:border-white/20 transition-all">
                      <div className="flex items-center justify-between mb-4">
                        <div className={cn("h-10 w-10 rounded-xl bg-white/5 flex items-center justify-center", stat.color)}>
                          <stat.icon className="h-5 w-5" />
                        </div>
-                       <span className={cn("text-[10px] font-black uppercase tracking-widest", stat.change.startsWith('+') ? "text-green-400" : "text-red-400")}>
+                       <span className={cn("text-[10px] font-black uppercase tracking-widest", stat.change.startsWith('+') ? "text-green-400" : stat.change === "0%" ? "text-slate-400" : "text-red-400")}>
                          {stat.change}
                        </span>
                      </div>
@@ -840,21 +843,11 @@ const AdminHub = () => {
                       <CardDescription className="text-white/40">Geographical presence hotspots</CardDescription>
                     </CardHeader>
                     <CardContent className="p-0 space-y-6">
-                      {[
-                        { city: "London, UK", count: 412, color: "bg-purple-500" },
-                        { city: "Austin, USA", count: 284, color: "bg-orange-500" },
-                        { city: "Melbourne, AU", count: 156, color: "bg-cyan-500" }
-                      ].map((loc, i) => (
-                        <div key={i} className="flex items-center justify-between group">
-                          <div className="flex items-center gap-4">
-                            <div className={cn("h-2.5 w-2.5 rounded-full", loc.color)} />
-                            <span className="font-black text-sm text-white/80 group-hover:text-white transition-colors">{loc.city}</span>
-                          </div>
-                          <span className="font-black text-xs text-white/40">{loc.count} pins</span>
-                        </div>
-                      ))}
+                      <div className="py-12 text-center">
+                        <p className="text-[10px] font-black text-white/10 uppercase tracking-[0.3em]">No active geodata found.</p>
+                      </div>
                       <div className="pt-4 mt-4 border-t border-white/5">
-                        <p className="text-[9px] font-black text-white/20 uppercase tracking-[0.3em] text-center">Global Coverage: 84% Recognized Cities</p>
+                        <p className="text-[9px] font-black text-white/20 uppercase tracking-[0.3em] text-center">Global Coverage: Syncing...</p>
                       </div>
                     </CardContent>
                  </Card>
@@ -878,7 +871,7 @@ const AdminHub = () => {
                   <div className="bg-white/5 border border-white/10 rounded-[32px] p-6 flex items-center justify-between group hover:border-orange-500/30 transition-all">
                      <div className="space-y-1">
                         <p className="text-[10px] font-black uppercase tracking-widest text-white/40">Conversion Rate</p>
-                        <p className="text-xl font-black text-white">12.4%</p>
+                        <p className="text-xl font-black text-white">0%</p>
                      </div>
                      <MousePointerClick className="h-8 w-8 text-orange-500 opacity-20 group-hover:opacity-100 transition-opacity" />
                   </div>
