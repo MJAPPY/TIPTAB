@@ -8,9 +8,9 @@ export const useXprSocial = (activeActor: string | null) => {
   const [liveActivities, setLiveActivities] = useState(() => {
     if (typeof window !== "undefined") {
       const saved = localStorage.getItem("tiptab_live_activities");
-      return saved ? JSON.parse(saved) : DEFAULT_ACTIVITIES;
+      return saved ? JSON.parse(saved) : [...DEFAULT_ACTIVITIES];
     }
-    return DEFAULT_ACTIVITIES;
+    return [...DEFAULT_ACTIVITIES];
   });
 
   useEffect(() => {
@@ -31,8 +31,10 @@ export const useXprSocial = (activeActor: string | null) => {
   const isFavorite = (handle: string) => favorites.includes(handle.toLowerCase().replace('@', ''));
 
   const resetLiveTicker = () => {
-    setLiveActivities(DEFAULT_ACTIVITIES);
-    localStorage.setItem("tiptab_live_activities", JSON.stringify(DEFAULT_ACTIVITIES));
+    // Spread into a new array to ensure reference equality change triggers re-render
+    const freshDefaults = [...DEFAULT_ACTIVITIES];
+    setLiveActivities(freshDefaults);
+    localStorage.setItem("tiptab_live_activities", JSON.stringify(freshDefaults));
   };
 
   return { favorites, liveActivities, toggleFavorite, isFavorite, resetLiveTicker };
