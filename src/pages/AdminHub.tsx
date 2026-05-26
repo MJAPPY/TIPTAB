@@ -1328,10 +1328,10 @@ const AdminHub = () => {
                       <table className="w-full min-w-[800px]">
                         <thead className="bg-white/[0.03]">
                           <tr>
-                            <th className="px-10 py-5 text-left text-[10px] font-black uppercase tracking-widest text-white/30">Recipient</th>
-                            <th className="px-10 py-5 text-center text-[10px] font-black uppercase tracking-widest text-white/30">Network Role</th>
-                            <th className="px-10 py-5 text-center text-[10px] font-black uppercase tracking-widest text-white/30">Current Rank</th>
-                            <th className="px-10 py-5 text-right text-[10px] font-black uppercase tracking-widest text-white/30">Reward Value (XPR)</th>
+                            <th className="px-10 py-5 text-left text-[10px] font-black uppercase tracking-widest text-white">Recipient</th>
+                            <th className="px-10 py-5 text-center text-[10px] font-black uppercase tracking-widest text-white">Network Role</th>
+                            <th className="px-10 py-5 text-center text-[10px] font-black uppercase tracking-widest text-white">Current Rank</th>
+                            <th className="px-10 py-5 text-right text-[10px] font-black uppercase tracking-widest text-white">Reward Value (XPR)</th>
                           </tr>
                         </thead>
                         <tbody className="divide-y divide-white/5">
@@ -1354,10 +1354,10 @@ const AdminHub = () => {
                               <td className="px-10 py-6 text-center">
                                  <div className="flex items-center justify-center gap-2">
                                     <span className={cn(
-                                      "h-8 w-8 rounded-lg flex items-center justify-center font-black text-xs",
-                                      i === 0 ? "bg-yellow-500 text-black shadow-lg" :
-                                      i === 1 ? "bg-slate-300 text-black shadow-lg" :
-                                      i === 2 ? "bg-orange-600 text-white shadow-lg" : "bg-white/5 text-white/40"
+                                      "h-8 w-8 rounded-lg flex items-center justify-center font-black text-xs text-white shadow-lg",
+                                      i === 0 ? "bg-yellow-500" :
+                                      i === 1 ? "bg-slate-300" :
+                                      i === 2 ? "bg-orange-600" : "bg-white/5 text-white/40 shadow-none"
                                     )}>#{winner.rank}</span>
                                  </div>
                               </td>
@@ -1367,7 +1367,7 @@ const AdminHub = () => {
                                     type="number" 
                                     value={winner.reward} 
                                     onChange={(e) => handleRewardValueChange(i, e.target.value)}
-                                    className="bg-white/5 border-white/10 text-right font-black text-lg h-12 pr-14 focus:ring-yellow-500/50 rounded-xl"
+                                    className="bg-white/5 border-white/10 text-right font-black text-lg h-12 pr-14 focus:ring-yellow-500/50 rounded-xl text-white"
                                    />
                                    <span className="absolute right-4 top-1/2 -translate-y-1/2 font-black text-[10px] text-white/20 uppercase">XPR</span>
                                 </div>
@@ -1391,7 +1391,7 @@ const AdminHub = () => {
                      <Button 
                       onClick={handleRewardWinners}
                       disabled={isDistributing || totalRewardsValue === 0}
-                      className="w-full md:w-[320px] h-20 bg-white text-black hover:bg-yellow-500 hover:text-black font-black text-xl uppercase tracking-widest rounded-3xl shadow-[0_20px_50px_rgba(255,255,255,0.1)] transition-all active:scale-95 disabled:opacity-20"
+                      className="w-full md:w-[320px] h-20 bg-purple-600 text-white hover:bg-orange-500 transition-all font-black text-xl uppercase tracking-widest rounded-3xl shadow-[0_20px_50px_rgba(168,85,247,0.2)] active:scale-95 disabled:opacity-20"
                      >
                         {isDistributing ? <div className="flex items-center gap-3"><RefreshCw className="h-6 w-6 animate-spin" /> PAYING...</div> : "Confirm Payout"}
                      </Button>
