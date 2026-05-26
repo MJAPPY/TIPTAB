@@ -299,41 +299,39 @@ const AdminHub = () => {
 
   const fetchRates = async () => {
     try {
-      // 1. Fetch Alcor Tickers - This is the primary source for XPR Network Parity
       const alcorResponse = await fetch("https://proton.alcor.exchange/api/v2/tickers");
       const alcorData = await alcorResponse.json();
       
-      const getAlcorPrice = (tickerId: string) => {
-        const ticker = alcorData.find((m: any) => m.ticker_id === tickerId);
-        return ticker ? parseFloat(ticker.last_price) : null;
+      const getAlcorRate = (base: string, quote: string) => {
+        // Try both directions SYMB_XPR and XPR_SYMB
+        const ticker = alcorData.find((m: any) => 
+          m.ticker_id === `${base}_${quote}` || m.ticker_id === `${quote}_${base}`
+        );
+        if (!ticker) return null;
+        
+        // last_price is base_currency_price_in_quote_currency
+        // e.g. for XUSDC_XPR, last_price is XPR per 1 XUSDC
+        const [tickerBase, tickerQuote] = ticker.ticker_id.split('_');
+        const price = parseFloat(ticker.last_price);
+        
+        if (tickerBase === base && tickerQuote === quote) return price;
+        if (tickerBase === quote && tickerQuote === base) return 1 / price;
+        return null;
       };
 
-      // ALCOR PARITY LOGIC:
-      // We use XUSDC_XPR to define the USD value of XPR.
-      // If last_price for XUSDC_XPR is 1111, then 1 XUSDC = 1111 XPR.
-      const xprPerUsd = getAlcorPrice("XUSDC_XPR") || 1111;
+      // MASTER PARITY: Get XPR per 1 XUSDC (Amount of XPR to equal $1)
+      // Usually ticker is XUSDC_XPR (~1111) or XPR_XUSDC (~0.0009)
+      const xprPerUsd = getAlcorRate("XUSDC", "XPR") || 1111;
       
-      // All other token prices on Alcor are returned in XPR (e.g. 1 XMT = 3.17 XPR)
-      const tabPriceInXpr = getAlcorPrice("TAB_XPR") || 0.36;
-      const xmtPriceInXpr = getAlcorPrice("XMT_XPR") || 3.17;
-      const loanPriceInXpr = getAlcorPrice("LOAN_XPR") || 0.00025;
-      const metalPriceInXpr = getAlcorPrice("METAL_XPR") || 1611;
+      // DERIVATIVES: Get XPR per 1 Unit of token
+      const tabXpr = getAlcorRate("TAB", "XPR") || 0.36;
+      const xmtXpr = getAlcorRate("XMT", "XPR") || 3.17;
+      const loanXpr = getAlcorRate("LOAN", "XPR") || 0.00025;
+      const metalXpr = getAlcorRate("METAL", "XPR") || 1611;
 
-      // 2. Fetch CoinGecko as a safety fallback/anchor for METAL and LOAN if DEX liquidity is dry
-      const cgResponse = await fetch("https://api.coingecko.com/api/v3/simple/price?ids=proton,metal-pay,loan&vs_currencies=usd");
-      const cgData = await cgResponse.json();
-      const xprUsdFromCg = cgData.proton?.usd || (1 / xprPerUsd);
-
-      return { 
-        xprPerUsd, 
-        tabPriceInXpr,
-        xmtPriceInXpr,
-        loanPriceInXpr,
-        metalPriceInXpr,
-        xprUsd: xprUsdFromCg
-      };
+      return { xprPerUsd, tabXpr, xmtXpr, loanXpr, metalXpr };
     } catch (e) {
-      console.error("Parity fetch failed", e);
+      console.error("Advanced parity fetch failed", e);
     }
     return null;
   };
@@ -343,23 +341,22 @@ const AdminHub = () => {
     const data = await fetchRates();
     
     if (data) {
-      const { xprPerUsd, tabPriceInXpr, xmtPriceInXpr, loanPriceInXpr, metalPriceInXpr } = data;
+      const { xprPerUsd, tabXpr, xmtXpr, loanXpr, metalXpr } = data;
       
       const targetFeeUsd = isAuto ? parseFloat(membershipFeeXusdc) : parseFloat(localFeeXusdc);
       const targetBoostUsd = isAuto ? parseFloat(boostPriceXusdc) : parseFloat(localBoostXusdc);
       
       if (!isNaN(targetFeeUsd)) {
-        // Calculation: Total XPR required for target USD / Amount of XPR per 1 unit of token
+        // Calculation: (Target Dollars) * (XPR per 1 Dollar) = Total XPR Required
         const totalXprRequired = targetFeeUsd * xprPerUsd;
         
         const calculatedXpr = totalXprRequired.toFixed(0);
         const calculatedXmd = targetFeeUsd.toFixed(2);
         
-        // Precise Token Parity: Total XPR needed / (Token's Value in XPR)
-        const calculatedMetal = (totalXprRequired / metalPriceInXpr).toFixed(4);
-        const calculatedLoan = (totalXprRequired / loanPriceInXpr).toFixed(0);
-        const calculatedXmt = (totalXprRequired / xmtPriceInXpr).toFixed(4);
-        const calculatedTab = (totalXprRequired / tabPriceInXpr).toFixed(0);
+        // Precise Parity: (Total XPR needed for target) / (Amount of XPR 1 token is worth)
+        const calculatedMetal = (totalXprRequired / metalXpr).toFixed(4);
+        const calculatedLoan = (totalXprRequired / loanXpr).toFixed(0);
+        const calculatedXmt = (totalXprRequired / xmtXpr).toFixed(4);
         
         updateMembershipFee(calculatedXpr, 'XPR');
         updateMembershipFee(calculatedXmd, 'XMD');
@@ -378,7 +375,7 @@ const AdminHub = () => {
 
       if (!isNaN(targetBoostUsd)) {
         const boostXprVal = (targetBoostUsd * xprPerUsd).toFixed(0);
-        const boostTabVal = (parseFloat(boostXprVal) / tabPriceInXpr).toFixed(0);
+        const boostTabVal = (parseFloat(boostXprVal) / tabXpr).toFixed(0);
         
         updateBoostPrice(boostXprVal);
         updateBoostTabPrice(boostTabVal);
@@ -394,12 +391,12 @@ const AdminHub = () => {
 
       toast({
         title: isAuto ? "Dynamic Parity Sync" : "Alcor Parity Indexed",
-        description: `Recalibrated based on live ${xprPerUsd.toFixed(0)} XPR/USD exchange rate.`,
+        description: `All rates re-calculated based on live 1 XUSDC = ${xprPerUsd.toFixed(2)} XPR exchange.`,
       });
     } else if (!isAuto) {
       toast({
         title: "Sync Failed",
-        description: "Alcor DEX API is currently unreachable. Check your network.",
+        description: "DEX connectivity issue. Ensure Alcor API is reachable.",
         variant: "destructive"
       });
     }
@@ -1412,7 +1409,7 @@ const AdminHub = () => {
                       <div className="space-y-1">
                         <CardTitle className="text-3xl font-black italic tracking-tighter flex items-center gap-3 text-white uppercase">
                           <Users className="h-8 w-8 text-purple-400" /> Platform Registry
-                        </CardTitle>
+                        </CardTitle欣赏
                         <CardDescription className="text-white/40 font-bold text-sm uppercase tracking-widest">Network Content & Profile Management</CardDescription>
                       </div>
                       <div className="flex items-center gap-3">
