@@ -299,37 +299,37 @@ const AdminHub = () => {
 
   const fetchRates = async () => {
     try {
-      // metal-pay is the correct CoinGecko ID for Metal (MTL)
-      const cgResponse = await fetch("https://api.coingecko.com/api/v3/simple/price?ids=proton,metal-pay,loan&vs_currencies=usd");
+      // 1. Anchor XPR/USD from CoinGecko
+      const cgResponse = await fetch("https://api.coingecko.com/api/v3/simple/price?ids=proton&vs_currencies=usd");
       const cgData = await cgResponse.json();
+      const xprUsd = cgData.proton?.usd;
       
+      if (!xprUsd) throw new Error("Failed to anchor XPR price");
+
+      // 2. Fetch Alcor Tickers for all native pairs (SYMB_XPR)
       const alcorResponse = await fetch("https://proton.alcor.exchange/api/v2/tickers");
       const alcorData = await alcorResponse.json();
       
-      const tabMarket = alcorData.find((m: any) => m.ticker_id === "TAB_XPR");
-      const xmtMarket = alcorData.find((m: any) => m.ticker_id === "XMT_XPR");
-      
-      let xprPerTab = 0.36; 
-      if (tabMarket && tabMarket.last_price) {
-        xprPerTab = parseFloat(tabMarket.last_price);
-      }
+      const getAlcorPrice = (tickerId: string) => {
+        const ticker = alcorData.find((m: any) => m.ticker_id === tickerId);
+        return ticker ? parseFloat(ticker.last_price) : null;
+      };
 
-      let xprPerXmt = 0.05;
-      if (xmtMarket && xmtMarket.last_price) {
-        xprPerXmt = parseFloat(xmtMarket.last_price);
-      }
+      // Tickers reflect amount of XPR per 1 unit of token
+      const tabXpr = getAlcorPrice("TAB_XPR") || 0.36;
+      const xmtXpr = getAlcorPrice("XMT_XPR") || 0.05;
+      const loanXpr = getAlcorPrice("LOAN_XPR") || 0.00025;
+      const metalXpr = getAlcorPrice("METAL_XPR") || 14.5;
 
-      if (cgData.proton && cgData.proton.usd) {
-        return { 
-          xprUsd: cgData.proton.usd, 
-          metalUsd: cgData['metal-pay']?.usd || 0,
-          loanUsd: cgData.loan?.usd || 0,
-          xprPerTab,
-          xprPerXmt
-        };
-      }
+      return { 
+        xprUsd, 
+        tabXpr,
+        xmtXpr,
+        loanXpr,
+        metalXpr
+      };
     } catch (e) {
-      console.error("Price fetch failed", e);
+      console.error("Advanced price sync failed", e);
     }
     return null;
   };
@@ -339,7 +339,7 @@ const AdminHub = () => {
     const marketData = await fetchRates();
     
     if (marketData) {
-      const { xprUsd, metalUsd, loanUsd, xprPerTab, xprPerXmt } = marketData;
+      const { xprUsd, tabXpr, xmtXpr, loanXpr, metalXpr } = marketData;
       
       const targetFeeUsd = isAuto ? parseFloat(membershipFeeXusdc) : parseFloat(localFeeXusdc);
       const targetBoostUsd = isAuto ? parseFloat(boostPriceXusdc) : parseFloat(localBoostXusdc);
@@ -347,11 +347,11 @@ const AdminHub = () => {
       if (!isNaN(targetFeeUsd)) {
         const calculatedXpr = (targetFeeUsd / xprUsd).toFixed(0);
         const calculatedXmd = targetFeeUsd.toFixed(2);
-        const calculatedMetal = metalUsd ? (targetFeeUsd / metalUsd).toFixed(4) : targetFeeUsd.toFixed(4);
-        const calculatedLoan = loanUsd ? (targetFeeUsd / loanUsd).toFixed(0) : (targetFeeUsd * 4000).toFixed(0);
         
-        // Correct parity logic for XMT (XPR based)
-        const calculatedXmt = (targetFeeUsd / (xprPerXmt * xprUsd)).toFixed(4);
+        // Advanced Parity Logic: TargetUSD / (Price_of_token_in_XPR * XPR_USD)
+        const calculatedMetal = (targetFeeUsd / (metalXpr * xprUsd)).toFixed(4);
+        const calculatedLoan = (targetFeeUsd / (loanXpr * xprUsd)).toFixed(0);
+        const calculatedXmt = (targetFeeUsd / (xmtXpr * xprUsd)).toFixed(4);
         
         updateMembershipFee(calculatedXpr, 'XPR');
         updateMembershipFee(calculatedXmd, 'XMD');
@@ -370,8 +370,8 @@ const AdminHub = () => {
 
       if (!isNaN(targetBoostUsd)) {
         const boostXprVal = (targetBoostUsd / xprUsd).toFixed(0);
-        // Correct parity for TAB (XPR based)
-        const boostTabVal = (parseFloat(boostXprVal) / xprPerTab).toFixed(0);
+        // Correct parity for TAB (Amount of TAB needed to reach boost target)
+        const boostTabVal = (parseFloat(boostXprVal) / tabXpr).toFixed(0);
         
         updateBoostPrice(boostXprVal);
         updateBoostTabPrice(boostTabVal);
@@ -386,13 +386,13 @@ const AdminHub = () => {
       localStorage.setItem("tiptab_last_parity_sync", now.toString());
 
       toast({
-        title: isAuto ? "Passive Parity Sync Complete" : "Network Parity Synced",
-        description: `Full multi-asset calibration complete (XPR, XMD, METAL, LOAN, XMT, TAB).`,
+        title: isAuto ? "Network Parity Calibration" : "Alcor Parity Synced",
+        description: `Fees re-indexed against live XPR DEX liquidity.`,
       });
     } else if (!isAuto) {
       toast({
         title: "Sync Failed",
-        description: "Could not fetch current market rates from external APIs.",
+        description: "Alcor / CoinGecko link interrupted. Check network connectivity.",
         variant: "destructive"
       });
     }
