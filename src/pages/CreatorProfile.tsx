@@ -29,7 +29,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { CREATORS, Creator } from "@/data/creators";
+import { Creator } from "@/data/creators";
 import { Header } from "@/components/tab-platform/Header";
 import { MembershipModal } from "@/components/tab-platform/MembershipModal";
 import { EmbedPlayer } from "@/components/tab-platform/EmbedPlayer";
@@ -52,7 +52,7 @@ const CreatorProfile = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const { toast } = useToast();
-  const { session, actor, login, isConnected, recordTip, isMember, featuredHandles, boostStream, boostPrice, boostTabPrice, userProfile, isFavorite, toggleFavorite } = useXpr();
+  const { session, actor, login, isConnected, recordTip, isMember, featuredHandles, boostStream, boostPrice, boostTabPrice, userProfile, isFavorite, toggleFavorite, dbCreators } = useXpr();
   
   const [creator, setCreator] = useState<Creator | null>(null);
   const [tipAmount, setTipAmount] = useState("50");
@@ -82,30 +82,31 @@ const CreatorProfile = () => {
       return;
     }
 
-    // Priority 2: Check for any local storage overrides for this specific handle
+    // Priority 2: Check database creators list
+    const foundInDb = dbCreators.find(c => c.handle.toLowerCase() === cleanHandle);
+    if (foundInDb) {
+      setCreator(foundInDb);
+      return;
+    }
+
+    // Priority 3: Check for any local storage overrides for this specific handle
     const localOverride = localStorage.getItem(`tiptab_profile_${cleanHandle}`);
     if (localOverride) {
       setCreator(JSON.parse(localOverride));
       return;
     }
     
-    // Priority 3: Fallback to static seed data
-    const found = CREATORS.find(c => c.handle.toLowerCase() === cleanHandle);
-    if (found) {
-      setCreator(found);
-    } else {
-      // Priority 4: Fallback to general user profile (legacy key)
-      const savedUser = localStorage.getItem("tiptab_user_profile");
-      if (savedUser) {
-        const localUser = JSON.parse(savedUser) as Creator;
-        if (localUser.handle.toLowerCase() === cleanHandle) {
-          setCreator(localUser);
-          return;
-        }
+    // Priority 4: Fallback to general user profile (legacy key)
+    const savedUser = localStorage.getItem("tiptab_user_profile");
+    if (savedUser) {
+      const localUser = JSON.parse(savedUser) as Creator;
+      if (localUser.handle.toLowerCase() === cleanHandle) {
+        setCreator(localUser);
+        return;
       }
-      navigate("/");
     }
-  }, [handle, navigate, actor, userProfile]);
+    navigate("/");
+  }, [handle, navigate, actor, userProfile, dbCreators]);
 
   const handleBack = () => {
     if (window.history.length > 1 && location.key !== 'default') {

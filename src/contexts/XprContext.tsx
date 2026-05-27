@@ -67,6 +67,8 @@ interface XprContextType {
   liveActivities: any[];
   resetLiveTicker: () => void;
   syncPlatformSettings: () => Promise<void>;
+  dbCreators: Creator[];
+  fetchDbCreators: () => Promise<void>;
 }
 
 const XprContext = createContext<XprContextType | undefined>(undefined);
@@ -78,6 +80,7 @@ export const XprProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const [membershipDate, setMembershipDate] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [userProfile, setUserProfile] = useState<Creator | null>(null);
+  const [dbCreators, setDbCreators] = useState<Creator[]>([]);
   const [featuredHandles, setFeaturedHandles] = useState<string[]>(() => {
     if (typeof window !== "undefined") {
       const saved = localStorage.getItem("tiptab_featured_handles");
@@ -92,6 +95,48 @@ export const XprProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const adminHook = useXprAdmin(activeActor);
   const platformHook = useXprPlatform(adminHook.currentAdminObj);
   const socialHook = useXprSocial(activeActor);
+
+  const fetchDbCreators = useCallback(async () => {
+    try {
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('*')
+        .order('created_at', { ascending: false });
+      
+      if (data && !error) {
+        const mapped: Creator[] = data.map(item => ({
+          id: `user_${item.handle}`,
+          name: item.name || item.handle,
+          handle: item.handle,
+          bio: item.bio || "",
+          location: item.location || "",
+          coordinates: item.coordinates || [0, 0],
+          categories: item.categories || ["Other"],
+          avatar: item.avatar || item.handle.slice(0, 2).toUpperCase(),
+          avatarImage: item.avatar_image || "",
+          coverImage: item.cover_image || "",
+          coverPosition: item.cover_position ?? 50,
+          color: item.color || "bg-purple-600",
+          twitter: item.twitter || "",
+          website: item.website || "",
+          videoUrl: item.video_url || "",
+          instagram: item.instagram || "",
+          spotify: item.spotify || "",
+          snipverse: item.snipverse || "",
+          facebook: item.facebook || "",
+          kick: item.kick || "",
+          rumble: item.rumble || "",
+          twitch: item.twitch || "",
+          tiktok: item.tiktok || "",
+          youtubeLive: item.youtube_live || "",
+          instagramLive: item.instagram_live || "",
+        }));
+        setDbCreators(mapped);
+      }
+    } catch (e) {
+      console.error("Error fetching creators from Supabase:", e);
+    }
+  }, []);
 
   // Supabase Keep-Alive to prevent auto-pause (Free Tier)
   useEffect(() => {
@@ -199,29 +244,99 @@ export const XprProvider: React.FC<{ children: React.ReactNode }> = ({ children 
           setIsMember(true);
         } else { setIsMember(false); setMembershipDate(null); }
       }
-      const savedProfile = localStorage.getItem(`tiptab_profile_${account}`);
-      if (savedProfile) setUserProfile(JSON.parse(savedProfile));
-      else {
-        const seedCreator = CREATORS.find(c => c.handle === account);
-        const newProfile: Creator = seedCreator ? { ...seedCreator } : {
+
+      // Sync user profile from Supabase first
+      const { data: dbProfile, error: dbError } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('handle', account)
+        .maybeSingle();
+
+      if (dbProfile && !dbError) {
+        const mappedProfile: Creator = {
           id: `user_${account}`,
-          name: account,
-          handle: account,
-          bio: "Just joined the TIP TAB network!",
-          location: "",
-          coordinates: [0, 0],
-          categories: ["Other"],
-          avatar: account.slice(0, 2).toUpperCase(),
-          color: "bg-purple-600"
+          name: dbProfile.name || account,
+          handle: dbProfile.handle,
+          bio: dbProfile.bio || "",
+          location: dbProfile.location || "",
+          coordinates: dbProfile.coordinates || [0, 0],
+          categories: dbProfile.categories || ["Other"],
+          avatar: dbProfile.avatar || account.slice(0, 2).toUpperCase(),
+          avatarImage: dbProfile.avatar_image || "",
+          coverImage: dbProfile.cover_image || "",
+          coverPosition: dbProfile.cover_position ?? 50,
+          color: dbProfile.color || "bg-purple-600",
+          twitter: dbProfile.twitter || "",
+          website: dbProfile.website || "",
+          videoUrl: dbProfile.video_url || "",
+          instagram: dbProfile.instagram || "",
+          spotify: dbProfile.spotify || "",
+          snipverse: dbProfile.snipverse || "",
+          facebook: dbProfile.facebook || "",
+          kick: dbProfile.kick || "",
+          rumble: dbProfile.rumble || "",
+          twitch: dbProfile.twitch || "",
+          tiktok: dbProfile.tiktok || "",
+          youtubeLive: dbProfile.youtube_live || "",
+          instagramLive: dbProfile.instagram_live || "",
         };
-        setUserProfile(newProfile);
-        localStorage.setItem("tiptab_user_profile", JSON.stringify(newProfile));
+        setUserProfile(mappedProfile);
+        localStorage.setItem(`tiptab_profile_${account}`, JSON.stringify(mappedProfile));
+        localStorage.setItem("tiptab_user_profile", JSON.stringify(mappedProfile));
+      } else {
+        const savedProfile = localStorage.getItem(`tiptab_profile_${account}`);
+        if (savedProfile) {
+          const parsed = JSON.parse(savedProfile);
+          setUserProfile(parsed);
+          // Auto-sync local backup to database
+          await supabase.from('profiles').upsert({
+            handle: account,
+            name: parsed.name,
+            bio: parsed.bio,
+            location: parsed.location,
+            coordinates: parsed.coordinates,
+            categories: parsed.categories,
+            avatar: parsed.avatar,
+            avatar_image: parsed.avatarImage,
+            cover_image: parsed.coverImage,
+            cover_position: parsed.coverPosition,
+            color: parsed.color,
+            twitter: parsed.twitter,
+            website: parsed.website,
+            video_url: parsed.videoUrl,
+            instagram: parsed.instagram,
+            spotify: parsed.spotify,
+            snipverse: parsed.snipverse,
+            facebook: parsed.facebook,
+            kick: parsed.kick,
+            rumble: parsed.rumble,
+            twitch: parsed.twitch,
+            tiktok: parsed.tiktok,
+            youtube_live: parsed.youtubeLive,
+            instagram_live: parsed.instagramLive,
+          });
+        } else {
+          const newProfile: Creator = {
+            id: `user_${account}`,
+            name: account,
+            handle: account,
+            bio: "Just joined the TIP TAB network!",
+            location: "",
+            coordinates: [0, 0],
+            categories: ["Other"],
+            avatar: account.slice(0, 2).toUpperCase(),
+            color: "bg-purple-600"
+          };
+          setUserProfile(newProfile);
+          localStorage.setItem("tiptab_user_profile", JSON.stringify(newProfile));
+        }
       }
     } catch (error) { console.error('Balance sync error:', error); }
   }, []);
 
   const restoreSession = useCallback(async () => {
     try {
+      await fetchDbCreators(); // Load global database profiles on load
       const { session: restoredSession } = await ProtonWebSDK({
         linkOptions: { endpoints: PROTON_ENDPOINTS, restoreSession: true },
         transportOptions: { requestAccount: APP_IDENTIFIER },
@@ -233,7 +348,7 @@ export const XprProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       }
     } catch (error) { console.error('Session restoration error:', error); }
     finally { setIsLoading(false); }
-  }, [fetchBalances]);
+  }, [fetchBalances, fetchDbCreators]);
 
   useEffect(() => { restoreSession(); }, [restoreSession]);
 
@@ -267,12 +382,46 @@ export const XprProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
   const refreshBalances = async () => { if (session) await fetchBalances(session.auth.actor.toString()); };
 
-  const updateUserProfile = (profile: Creator) => {
+  const updateUserProfile = async (profile: Creator) => {
     if (session?.auth.actor) {
       const actorName = session.auth.actor.toString();
       localStorage.setItem(`tiptab_profile_${actorName}`, JSON.stringify(profile));
       localStorage.setItem("tiptab_user_profile", JSON.stringify(profile));
       setUserProfile(profile);
+
+      // Save global profile to Supabase
+      try {
+        await supabase.from('profiles').upsert({
+          handle: actorName,
+          name: profile.name,
+          bio: profile.bio,
+          location: profile.location,
+          coordinates: profile.coordinates,
+          categories: profile.categories,
+          avatar: profile.avatar,
+          avatar_image: profile.avatarImage || "",
+          cover_image: profile.coverImage || "",
+          cover_position: profile.coverPosition ?? 50,
+          color: profile.color,
+          twitter: profile.twitter || "",
+          website: profile.website || "",
+          video_url: profile.videoUrl || "",
+          instagram: profile.instagram || "",
+          spotify: profile.spotify || "",
+          snipverse: profile.snipverse || "",
+          facebook: profile.facebook || "",
+          kick: profile.kick || "",
+          rumble: profile.rumble || "",
+          twitch: profile.twitch || "",
+          tiktok: profile.tiktok || "",
+          youtube_live: profile.youtubeLive || "",
+          instagram_live: profile.instagramLive || "",
+        });
+        // Re-fetch creator list to immediately update live preview
+        fetchDbCreators();
+      } catch (err) {
+        console.error("Failed to sync profile to Supabase", err);
+      }
     }
   };
 
@@ -280,7 +429,7 @@ export const XprProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     session, actor: activeActor, balances, isMember, membershipDate, setIsMember, login, logout, refreshBalances, recordTip,
     isConnected: !!session, isLoading, isAdmin: !!adminHook.currentAdminObj, adminRole: adminHook.currentAdminObj ? adminHook.currentAdminObj.role : null,
     isPermanentAdmin: adminHook.isCurrentAdminPermanent, ...adminHook, ...platformHook, ...socialHook,
-    userProfile, updateUserProfile, featuredHandles, boostStream, distributeXprRewards
+    userProfile, updateUserProfile, featuredHandles, boostStream, distributeXprRewards, dbCreators, fetchDbCreators
   };
 
   return <XprContext.Provider value={value}>{children}</XprContext.Provider>;

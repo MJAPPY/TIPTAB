@@ -10,22 +10,21 @@ import { MembershipModal } from "@/components/tab-platform/MembershipModal";
 import { TippingModal } from "./tab-platform/TippingModal";
 import { ActivityTicker } from "./tab-platform/ActivityTicker";
 import { Toaster } from "@/components/ui/toaster";
-import { CREATORS, Creator } from "@/data/creators";
+import { Creator } from "@/data/creators";
 import { useXpr } from "@/contexts/XprContext";
 
 export const Tab = () => {
   const [isMembershipOpen, setIsMembershipOpen] = useState(false);
   const [selectedCreator, setSelectedCreator] = useState<Creator | null>(null);
-  const { actor, userProfile, isMember } = useXpr();
+  const { actor, userProfile, isMember, dbCreators } = useXpr();
   const navigate = useNavigate();
 
   // Optimized logic to ensure local user profile overrides seed data on the map and lists
   const displayCreators = useMemo(() => {
-    // 1. Start with the base list
-    let list = [...CREATORS];
+    // 1. Start with the database list
+    let list = [...dbCreators];
 
     // 2. If user is logged in, find their profile in storage to ensure we have latest local edits
-    // (We also check userProfile from context which is synced)
     if (actor && userProfile) {
       const cleanActor = actor.toLowerCase();
       
@@ -46,7 +45,7 @@ export const Tab = () => {
     }
     
     return list;
-  }, [actor, userProfile, isMember]);
+  }, [actor, userProfile, isMember, dbCreators]);
 
   const handleViewProfile = (creator: Creator) => {
     navigate(`/tip/${creator.handle}`);

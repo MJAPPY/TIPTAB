@@ -3,7 +3,6 @@
 import React, { useState, useMemo } from "react";
 import { Header } from "@/components/tab-platform/Header";
 import { MembershipModal } from "@/components/tab-platform/MembershipModal";
-import { CREATORS, Creator } from "@/data/creators";
 import { Search, MapPin, Tv, Radio, Music, Gamepad2, Zap, LayoutGrid, Users, ArrowUpDown, Truck, Coffee, Dumbbell, Trophy, Fish, Hammer, Car, Building, Utensils, Star, Sprout, Briefcase, Link as LinkIcon, Landmark, Newspaper, Sparkles, ShieldCheck, Cloud, Plane, TrainFront, Flame, ShoppingBag, Lightbulb } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -58,12 +57,12 @@ const Live = () => {
   const [selectedCategory, setSelectedCategory] = useState("All");
   const [sortBy, setSortBy] = useState("newest");
   const [isMembershipOpen, setIsMembershipOpen] = useState(false);
-  const { actor, userProfile, isMember, featuredHandles, boostStream, boostPrice } = useXpr();
+  const { actor, userProfile, isMember, featuredHandles, boostStream, boostPrice, dbCreators } = useXpr();
   const navigate = useNavigate();
 
   // Combined creator list including local updates
   const allCreators = useMemo(() => {
-    let list = [...CREATORS];
+    let list = [...dbCreators];
 
     if (actor && userProfile) {
       const cleanActor = actor.toLowerCase();
@@ -81,7 +80,7 @@ const Live = () => {
     }
     
     return list;
-  }, [actor, userProfile, isMember]);
+  }, [actor, userProfile, isMember, dbCreators]);
 
   // Unified Filter logic
   const filteredCreators = useMemo(() => {
