@@ -78,7 +78,12 @@ export const XprProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const [balances, setBalances] = useState<Balances>({ xpr: '0.0000', tab: '0', xmd: '0.000000', xusdc: '0.000000', metal: '0.00000000', loan: '0.0000', xmt: '0.00000000', tipsSent: 0 });
   const [isMember, setIsMember] = useState(false);
   const [membershipDate, setMembershipDate] = useState<string | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(() => {
+    if (typeof window !== "undefined") {
+      return localStorage.getItem("tiptab_has_session") === "true";
+    }
+    return true;
+  });
   const [userProfile, setUserProfile] = useState<Creator | null>(null);
   const [dbCreators, setDbCreators] = useState<Creator[]>([]);
   const [featuredHandles, setFeaturedHandles] = useState<string[]>(() => {
@@ -373,6 +378,13 @@ export const XprProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const restoreSession = useCallback(async () => {
     try {
       await fetchDbCreators(); // Load global database profiles on load
+      
+      const hasSavedSession = localStorage.getItem("tiptab_has_session") === "true";
+      if (!hasSavedSession) {
+        setIsLoading(false);
+        return;
+      }
+
       const { session: restoredSession } = await ProtonWebSDK({
         linkOptions: { endpoints: PROTON_ENDPOINTS, restoreSession: true },
         transportOptions: { requestAccount: APP_IDENTIFIER },
@@ -381,9 +393,15 @@ export const XprProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       if (restoredSession) {
         setSession(restoredSession);
         await fetchBalances(restoredSession.auth.actor.toString());
+      } else {
+        localStorage.removeItem("tiptab_has_session");
       }
-    } catch (error) { console.error('Session restoration error:', error); }
-    finally { setIsLoading(false); }
+    } catch (error) { 
+      console.error('Session restoration error:', error); 
+      localStorage.removeItem("tiptab_has_session");
+    } finally { 
+      setIsLoading(false); 
+    }
   }, [fetchBalances, fetchDbCreators]);
 
   useEffect(() => { restoreSession(); }, [restoreSession]);
@@ -396,6 +414,7 @@ export const XprProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         selectorOptions: { },
       });
       if (newSession) {
+        localStorage.setItem("tiptab_has_session", "true");
         setSession(newSession);
         await fetchBalances(newSession.auth.actor.toString());
         return newSession;
@@ -407,6 +426,7 @@ export const XprProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const logout = async () => {
     if (session) {
       await session.remove();
+      localStorage.removeItem("tiptab_has_session");
       setSession(null);
       setBalances({ xpr: '0.0000', tab: '0', xmd: '0.000000', xusdc: '0.000000', metal: '0.00000000', loan: '0.0000', xmt: '0.00000000', tipsSent: 0 });
       setIsMember(false);
