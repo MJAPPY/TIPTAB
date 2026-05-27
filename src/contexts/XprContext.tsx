@@ -98,9 +98,11 @@ export const XprProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
   const fetchDbCreators = useCallback(async () => {
     try {
+      // Query strictly active members for global viewports
       const { data, error } = await supabase
         .from('profiles')
         .select('*')
+        .eq('is_member', true)
         .order('created_at', { ascending: false });
       
       if (data && !error) {
@@ -224,9 +226,15 @@ export const XprProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       });
       const savedTips = parseInt(localStorage.getItem(`tiptab_tips_sent_${account}`) || "0");
       setBalances({ ...newBalances, tipsSent: savedTips });
+      
+      let currentlyMember = false;
+      let activeDateStr = null;
+
       if (ROOT_ADMINS.includes(account)) {
+        currentlyMember = true;
+        activeDateStr = new Date(2099, 11, 31).toISOString();
         setIsMember(true);
-        setMembershipDate(new Date(2099, 11, 31).toISOString());
+        setMembershipDate(activeDateStr);
       } else {
         const membershipKey = `tiptab_membership_${account}`;
         const membershipDateKey = `tiptab_membership_date_${account}`;
@@ -235,14 +243,28 @@ export const XprProvider: React.FC<{ children: React.ReactNode }> = ({ children 
           const activationDate = new Date(savedDate);
           const now = new Date();
           const diffYears = (now.getTime() - activationDate.getTime()) / (1000 * 60 * 60 * 24 * 365);
-          if (diffYears < 1) { setIsMember(true); setMembershipDate(savedDate); }
-          else { setIsMember(false); setMembershipDate(null); localStorage.removeItem(membershipKey); }
+          if (diffYears < 1) { 
+            currentlyMember = true;
+            activeDateStr = savedDate;
+            setIsMember(true); 
+            setMembershipDate(savedDate); 
+          }
+          else { 
+            setIsMember(false); 
+            setMembershipDate(null); 
+            localStorage.removeItem(membershipKey); 
+          }
         } else if (localStorage.getItem(membershipKey) === 'true') {
           const fakeDate = new Date().toISOString();
           localStorage.setItem(membershipDateKey, fakeDate);
+          currentlyMember = true;
+          activeDateStr = fakeDate;
           setMembershipDate(fakeDate);
           setIsMember(true);
-        } else { setIsMember(false); setMembershipDate(null); }
+        } else { 
+          setIsMember(false); 
+          setMembershipDate(null); 
+        }
       }
 
       // Sync user profile from Supabase first
@@ -314,6 +336,7 @@ export const XprProvider: React.FC<{ children: React.ReactNode }> = ({ children 
             tiktok: parsed.tiktok,
             youtube_live: parsed.youtubeLive,
             instagram_live: parsed.instagramLive,
+            is_member: currentlyMember
           });
         } else {
           const newProfile: Creator = {
@@ -329,6 +352,19 @@ export const XprProvider: React.FC<{ children: React.ReactNode }> = ({ children 
           };
           setUserProfile(newProfile);
           localStorage.setItem("tiptab_user_profile", JSON.stringify(newProfile));
+          
+          // Initial profile sync to Supabase database
+          await supabase.from('profiles').upsert({
+            handle: account,
+            name: account,
+            bio: "Just joined the TIP TAB network!",
+            location: "",
+            coordinates: [0, 0],
+            categories: ["Other"],
+            avatar: account.slice(0, 2).toUpperCase(),
+            color: "bg-purple-600",
+            is_member: currentlyMember
+          });
         }
       }
     } catch (error) { console.error('Balance sync error:', error); }
@@ -391,6 +427,9 @@ export const XprProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
       // Save global profile to Supabase
       try {
+        const membershipKey = `tiptab_membership_${actorName}`;
+        const activeMember = isMember || localStorage.getItem(membershipKey) === 'true';
+
         await supabase.from('profiles').upsert({
           handle: actorName,
           name: profile.name,
@@ -416,6 +455,7 @@ export const XprProvider: React.FC<{ children: React.ReactNode }> = ({ children 
           tiktok: profile.tiktok || "",
           youtube_live: profile.youtubeLive || "",
           instagram_live: profile.instagramLive || "",
+          is_member: activeMember
         });
         // Re-fetch creator list to immediately update live preview
         fetchDbCreators();

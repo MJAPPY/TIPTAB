@@ -24,6 +24,7 @@ import { useToast } from "@/hooks/use-toast";
 import { useXpr, PromoCode } from "@/contexts/XprContext";
 import { cn } from "@/lib/utils";
 import { TOKEN_LOGOS } from "@/constants/logos";
+import { supabase } from "@/integrations/supabase/client";
 
 interface MembershipModalProps {
   isOpen: boolean;
@@ -46,7 +47,7 @@ export const MembershipModal = ({ isOpen, onOpenChange }: MembershipModalProps) 
   const [isProcessing, setIsProcessing] = useState(false);
   const [paymentAsset, setPaymentAsset] = useState<keyof typeof ASSET_CONTRACTS>("XPR");
   const { toast } = useToast();
-  const { session, actor, login, isConnected, setIsMember, isMember, membershipFee, membershipFeeXmd, membershipFeeXusdc, membershipFeeMetal, membershipFeeLoan, membershipFeeXmt, applyPromoCode, usePromoCode } = useXpr();
+  const { session, actor, login, isConnected, setIsMember, isMember, membershipFee, membershipFeeXmd, membershipFeeXusdc, membershipFeeMetal, membershipFeeLoan, membershipFeeXmt, applyPromoCode, usePromoCode, userProfile, fetchDbCreators } = useXpr();
 
   const [promoInput, setPromoInput] = useState("");
   const [appliedPromo, setAppliedPromo] = useState<PromoCode | null>(null);
@@ -103,7 +104,7 @@ export const MembershipModal = ({ isOpen, onOpenChange }: MembershipModalProps) 
       const assetConfig = ASSET_CONTRACTS[paymentAsset];
       
       if (discountedVal === 0) {
-        finishActivation();
+        await finishActivation();
         return;
       }
 
@@ -116,18 +117,55 @@ export const MembershipModal = ({ isOpen, onOpenChange }: MembershipModalProps) 
       };
 
       await session.transact({ actions: [membershipAction] }, { broadcast: true });
-      finishActivation();
+      await finishActivation();
     } catch (error: any) {
       toast({ title: "Transaction Failed", description: error.message || "Network error.", variant: "destructive" });
     } finally { setIsProcessing(false); }
   };
 
-  const finishActivation = () => {
+  const finishActivation = async () => {
     const now = new Date().toISOString();
     localStorage.setItem(`tiptab_membership_${actor}`, 'true');
     localStorage.setItem(`tiptab_membership_date_${actor}`, now);
     setIsMember(true);
     if (appliedPromo) usePromoCode(appliedPromo.code);
+    
+    // Save/Upsert profile to Supabase with membership active
+    if (actor && userProfile) {
+      try {
+        await supabase.from('profiles').upsert({
+          handle: actor,
+          name: userProfile.name || actor,
+          bio: userProfile.bio || "Just joined the TIP TAB network!",
+          location: userProfile.location || "",
+          coordinates: userProfile.coordinates || [0, 0],
+          categories: userProfile.categories || ["Other"],
+          avatar: userProfile.avatar || actor.slice(0, 2).toUpperCase(),
+          avatar_image: userProfile.avatarImage || "",
+          cover_image: userProfile.coverImage || "",
+          cover_position: userProfile.coverPosition ?? 50,
+          color: userProfile.color || "bg-purple-600",
+          twitter: userProfile.twitter || "",
+          website: userProfile.website || "",
+          video_url: userProfile.videoUrl || "",
+          instagram: userProfile.instagram || "",
+          spotify: userProfile.spotify || "",
+          snipverse: userProfile.snipverse || "",
+          facebook: userProfile.facebook || "",
+          kick: userProfile.kick || "",
+          rumble: userProfile.rumble || "",
+          twitch: userProfile.twitch || "",
+          tiktok: userProfile.tiktok || "",
+          youtube_live: userProfile.youtubeLive || "",
+          instagram_live: userProfile.instagramLive || "",
+          is_member: true
+        });
+        await fetchDbCreators();
+      } catch (err) {
+        console.error("Failed to sync profile to Supabase on activation", err);
+      }
+    }
+
     setStep("success");
     toast({ title: "Membership Activated!" });
   };
