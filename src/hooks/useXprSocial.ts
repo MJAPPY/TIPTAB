@@ -11,13 +11,18 @@ export const useXprSocial = (activeActor: string | null) => {
       if (saved) {
         try {
           const parsed = JSON.parse(saved);
-          // Check if cached data contains legacy dummy handles
+          // Check if cached data contains ANY legacy/mock handles or text
           const hasLegacyData = parsed.some((act: any) => 
             act && act.text && (
-              act.text.includes("carlos_delivery") || 
-              act.text.includes("early") || 
-              act.text.includes("whaleshark") ||
-              act.text.includes("mayafit")
+              act.text.toLowerCase().includes("carlos_delivery") || 
+              act.text.toLowerCase().includes("early") || 
+              act.text.toLowerCase().includes("whaleshark") ||
+              act.text.toLowerCase().includes("mayafit") ||
+              act.text.toLowerCase().includes("alex_arts") ||
+              act.text.toLowerCase().includes("sarahcodes") ||
+              act.text.toLowerCase().includes("0x71") ||
+              act.text.toLowerCase().includes("priy") ||
+              act.text.toLowerCase().includes("milestone")
             )
           );
           
