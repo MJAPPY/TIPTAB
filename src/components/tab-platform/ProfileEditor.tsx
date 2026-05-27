@@ -205,6 +205,15 @@ export const ProfileEditor = ({ initialData, onSave, minimal = false }: ProfileE
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
+      // 512KB Limit (512 * 1024 bytes)
+      if (file.size > 512 * 1024) {
+        toast({
+          title: "Image Too Large",
+          description: "Please upload an avatar image under 512KB for optimal network speed.",
+          variant: "destructive",
+        });
+        return;
+      }
       const reader = new FileReader();
       reader.onloadend = () => {
         setFormData(prev => ({ ...prev, avatarImage: reader.result as string }));
@@ -226,6 +235,15 @@ export const ProfileEditor = ({ initialData, onSave, minimal = false }: ProfileE
       toast({
         title: "Invalid file type",
         description: "Please upload an image file (PNG, JPG, WEBP).",
+        variant: "destructive",
+      });
+      return;
+    }
+    // 512KB Limit (512 * 1024 bytes)
+    if (file.size > 512 * 1024) {
+      toast({
+        title: "Banner Too Large",
+        description: "Please upload a cover banner under 512KB to keep loading speeds instant.",
         variant: "destructive",
       });
       return;
@@ -361,7 +379,7 @@ export const ProfileEditor = ({ initialData, onSave, minimal = false }: ProfileE
                       <p className="text-sm font-black text-slate-200">
                         {isDraggingCover ? "Drop it here!" : "Drag & Drop cover photo here"}
                       </p>
-                      <p className="text-xs text-white/30 font-bold">PNG, JPG or WEBP • Best ratio 3.2:1</p>
+                      <p className="text-xs text-white/30 font-bold">PNG, JPG or WEBP • Max 512KB</p>
                     </div>
 
                     <input 
@@ -427,7 +445,7 @@ export const ProfileEditor = ({ initialData, onSave, minimal = false }: ProfileE
               
               <div className="space-y-2 text-center sm:text-left">
                 <h5 className="font-bold text-base">Profile Avatar</h5>
-                <p className="text-sm text-white/40">Upload a custom photo or use your generated initials.</p>
+                <p className="text-sm text-white/40">Upload a custom photo (Max 512KB) or use your generated initials.</p>
                 <div className="flex justify-center sm:justify-start gap-2">
                   <input 
                     type="file" 
@@ -677,7 +695,7 @@ export const ProfileEditor = ({ initialData, onSave, minimal = false }: ProfileE
                   <div className="space-y-2">
                     <Label htmlFor="tiktok" className="text-white/60 font-bold uppercase tracking-widest text-[10px]">TikTok Live</Label>
                     <div className="relative">
-                      <svg className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 fill-white" viewBox="0 0 24 24"><path d="M12.525.02c1.31-.02 2.61-.01 3.91-.02.08 1.53.63 3.09 1.75 4.17 1.12 1.11 2.7 1.62 4.24 1.79v4.03c-1.44-.05-2.89-.35-4.2-.97-.57-.26-1.1-.59-1.62-.93-.01 2.92.01 5.84-.02 8.75-.08 1.4-.54 2.79-1.35 3.94-1.31 1.92-3.58 3.17-5.91 3.21-1.43.08-2.86-.31-4.08-1.03-2.02-1.19-3.44-3.37-3.65-5.71-.28-2.26.74-4.63 2.58-5.91 1.64-1.15 3.7-1.49 5.66-1.02v4.53c-.31-.19-.71-.24-1.07-.23-.39.03-.77.17-1.02.47-.5.62-.14 1.53.55 1.81.47.24 1.13.14 1.51-.25.23-.27.35-.63.35-.98.01-3.55-.01-7.1.02-10.65z"/></svg>
+                      <svg className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 fill-white" viewBox="0 0 24 24"><path d="M12.525.02c1.31-.02 2.61-.01 3.91-.02.08 1.53.63 3.09 1.75 4.17 1.12 1.11 2.7 1.62 4.24 1.79v4.03c-1.44-.05-2.89-.35-4.2-.97-.57-.26-1.1-.59-1.62-.93-.01 2.92.01 5.84-.02 8.75-.08 1.4-.54 2.79-1.35 3.94-1.31 1.92-3.58 3.17-5.91 3.21-1.43.08-2.86-.31-4.08-1.03-2.02-1.19-3.34-3.37-3.65-5.71-.28-2.26.74-4.63 2.58-5.91 1.64-1.15 3.7-1.49 5.66-1.02v4.53c-.31-.19-.71-.24-1.07-.23-.39.03-.77.17-1.02.47-.5.62-.14 1.53.55 1.81.47.24 1.13.14 1.51-.25.23-.27.35-.63.35-.98.01-3.55-.01-7.1.02-10.65z"/></svg>
                       <Input 
                         id="tiktok"
                         value={formData.tiktok}
