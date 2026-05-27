@@ -8,7 +8,23 @@ export const useXprSocial = (activeActor: string | null) => {
   const [liveActivities, setLiveActivities] = useState(() => {
     if (typeof window !== "undefined") {
       const saved = localStorage.getItem("tiptab_live_activities");
-      return saved ? JSON.parse(saved) : [...DEFAULT_ACTIVITIES];
+      if (saved) {
+        try {
+          const parsed = JSON.parse(saved);
+          // Auto-sanitize legacy dummy ticker messages from localStorage
+          const filtered = parsed.filter((act: any) => 
+            act && 
+            act.text && 
+            !act.text.includes("carlos_delivery") && 
+            !act.text.includes("early") && 
+            !act.text.includes("whaleshark") &&
+            !act.text.includes("mayafit")
+          );
+          return filtered;
+        } catch (e) {
+          return [...DEFAULT_ACTIVITIES];
+        }
+      }
     }
     return [...DEFAULT_ACTIVITIES];
   });
@@ -31,7 +47,6 @@ export const useXprSocial = (activeActor: string | null) => {
   const isFavorite = (handle: string) => favorites.includes(handle.toLowerCase().replace('@', ''));
 
   const resetLiveTicker = () => {
-    // Spread into a new array to ensure reference equality change triggers re-render
     const freshDefaults = [...DEFAULT_ACTIVITIES];
     setLiveActivities(freshDefaults);
     localStorage.setItem("tiptab_live_activities", JSON.stringify(freshDefaults));
