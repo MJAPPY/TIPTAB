@@ -11,16 +11,22 @@ export const useXprSocial = (activeActor: string | null) => {
       if (saved) {
         try {
           const parsed = JSON.parse(saved);
-          // Auto-sanitize legacy dummy ticker messages from localStorage
-          const filtered = parsed.filter((act: any) => 
-            act && 
-            act.text && 
-            !act.text.includes("carlos_delivery") && 
-            !act.text.includes("early") && 
-            !act.text.includes("whaleshark") &&
-            !act.text.includes("mayafit")
+          // Check if cached data contains legacy dummy handles
+          const hasLegacyData = parsed.some((act: any) => 
+            act && act.text && (
+              act.text.includes("carlos_delivery") || 
+              act.text.includes("early") || 
+              act.text.includes("whaleshark") ||
+              act.text.includes("mayafit")
+            )
           );
-          return filtered;
+          
+          if (hasLegacyData) {
+            // Force reset the cached legacy mock data
+            localStorage.setItem("tiptab_live_activities", JSON.stringify([]));
+            return [];
+          }
+          return parsed;
         } catch (e) {
           return [...DEFAULT_ACTIVITIES];
         }
