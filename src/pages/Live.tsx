@@ -86,7 +86,7 @@ const Live = () => {
   // Unified Filter logic
   const filteredCreators = useMemo(() => {
     return allCreators.filter((c) => {
-      const hasLiveLink = c.twitch || c.youtubeLive || c.tiktok || c.instagramLive;
+      const hasLiveLink = c.twitch || c.youtubeLive || c.tiktok || c.instagramLive || c.kick || c.rumble;
       const matchesSearch = c.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
                            c.handle.toLowerCase().includes(searchQuery.toLowerCase()) ||
                            c.location.toLowerCase().includes(searchQuery.toLowerCase());
@@ -287,7 +287,7 @@ const Live = () => {
                     <div className="absolute top-4 left-4 flex gap-2">
                       <Badge className="bg-red-600 hover:bg-red-600 text-[10px] font-black tracking-widest rounded-lg border-none">LIVE</Badge>
                       <Badge className="bg-black/60 backdrop-blur-md text-[10px] font-black tracking-widest rounded-lg border-white/10 uppercase">
-                        {creator.twitch ? 'TWITCH' : creator.youtubeLive ? 'YOUTUBE' : 'BROADCAST'}
+                        {creator.twitch ? 'TWITCH' : creator.youtubeLive ? 'YOUTUBE' : creator.kick ? 'KICK' : creator.rumble ? 'RUMBLE' : 'BROADCAST'}
                       </Badge>
                     </div>
                   </div>

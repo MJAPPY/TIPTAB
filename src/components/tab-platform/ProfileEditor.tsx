@@ -101,6 +101,8 @@ export const ProfileEditor = ({ initialData, onSave, minimal = false }: ProfileE
     spotify: initialData.spotify || "",
     snipverse: initialData.snipverse || "",
     facebook: initialData.facebook || "",
+    kick: initialData.kick || "",
+    rumble: initialData.rumble || "",
     avatarImage: initialData.avatarImage || "",
     coverImage: initialData.coverImage || "",
     coverPosition: initialData.coverPosition ?? 50,
@@ -127,6 +129,8 @@ export const ProfileEditor = ({ initialData, onSave, minimal = false }: ProfileE
       spotify: initialData.spotify || "",
       snipverse: initialData.snipverse || "",
       facebook: initialData.facebook || "",
+      kick: initialData.kick || "",
+      rumble: initialData.rumble || "",
       avatarImage: initialData.avatarImage || "",
       coverImage: initialData.coverImage || "",
       coverPosition: initialData.coverPosition ?? 50,
@@ -636,6 +640,36 @@ export const ProfileEditor = ({ initialData, onSave, minimal = false }: ProfileE
                         value={formData.youtubeLive}
                         onChange={handleChange}
                         placeholder="https://youtube.com/c/username/live"
+                        className="pl-12 bg-white/5 border-white/10 h-14 rounded-2xl focus:ring-purple-500 focus:bg-white/10 transition-all text-white" 
+                      />
+                    </div>
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="kick" className="text-white/60 font-bold uppercase tracking-widest text-[10px]">Kick Live</Label>
+                    <div className="relative">
+                      <div className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 flex items-center justify-center">
+                        <div className="h-3 w-3 bg-[#53FC18] rounded-sm" />
+                      </div>
+                      <Input 
+                        id="kick"
+                        value={formData.kick}
+                        onChange={handleChange}
+                        placeholder="https://kick.com/username"
+                        className="pl-12 bg-white/5 border-white/10 h-14 rounded-2xl focus:ring-purple-500 focus:bg-white/10 transition-all text-white" 
+                      />
+                    </div>
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="rumble" className="text-white/60 font-bold uppercase tracking-widest text-[10px]">Rumble Live</Label>
+                    <div className="relative">
+                      <div className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 flex items-center justify-center">
+                        <div className="h-3 w-3 bg-[#85C742] rounded-full" />
+                      </div>
+                      <Input 
+                        id="rumble"
+                        value={formData.rumble}
+                        onChange={handleChange}
+                        placeholder="https://rumble.com/c/channel"
                         className="pl-12 bg-white/5 border-white/10 h-14 rounded-2xl focus:ring-purple-500 focus:bg-white/10 transition-all text-white" 
                       />
                     </div>

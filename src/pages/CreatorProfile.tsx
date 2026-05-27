@@ -318,7 +318,9 @@ const CreatorProfile = () => {
 
   const liveStreams = [
     { type: 'YouTube', url: creator.youtubeLive, icon: Youtube, color: 'text-red-500' },
-    { type: 'Twitch', url: creator.twitch, icon: Twitch, color: 'text-[#9146FF]' }
+    { type: 'Twitch', url: creator.twitch, icon: Twitch, color: 'text-[#9146FF]' },
+    { type: 'Kick', url: creator.kick, icon: Radio, color: 'text-[#53FC18]' },
+    { type: 'Rumble', url: creator.rumble, icon: Video, color: 'text-[#85C742]' }
   ].filter(s => s.url);
 
   const featuredEmbedUrl = creator.mediaEmbed || creator.videoUrl || "";
@@ -499,6 +501,16 @@ const CreatorProfile = () => {
                     {creator.snipverse && (
                       <a href={creator.snipverse} target="_blank" rel="noopener noreferrer" className="h-9 w-9 md:h-10 md:w-10 rounded-xl bg-white/5 flex items-center justify-center hover:bg-purple-600 transition-all shrink-0">
                         <MessageSquare className="h-4 md:h-5 w-4 md:w-5" />
+                      </a>
+                    )}
+                    {creator.kick && (
+                      <a href={creator.kick} target="_blank" rel="noopener noreferrer" className="h-9 w-9 md:h-10 md:w-10 rounded-xl bg-white/5 flex items-center justify-center hover:bg-[#53FC18] transition-all shrink-0">
+                        <Radio className="h-4 md:h-5 w-4 md:w-5" />
+                      </a>
+                    )}
+                    {creator.rumble && (
+                      <a href={creator.rumble} target="_blank" rel="noopener noreferrer" className="h-9 w-9 md:h-10 md:w-10 rounded-xl bg-white/5 flex items-center justify-center hover:bg-[#85C742] transition-all shrink-0">
+                        <Video className="h-4 md:h-5 w-4 md:w-5" />
                       </a>
                     )}
                     {creator.facebook && (

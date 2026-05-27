@@ -18,6 +18,8 @@ export interface Creator {
   spotify?: string;
   snipverse?: string;
   facebook?: string;
+  kick?: string;
+  rumble?: string;
   mediaEmbed?: string; // Specific field for the player
   // Live Stream Links
   twitch?: string;
