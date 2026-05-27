@@ -285,7 +285,7 @@ export const MembershipModal = ({ isOpen, onOpenChange }: MembershipModalProps) 
                     </div>
                   ) : (
                     <div className="flex gap-2">
-                      <Input placeholder="WELCOME100" value={promoInput} onChange={(e) => setPromoInput(e.target.value)} className="bg-white/5 border-white/10 h-11 rounded-xl px-4 text-white font-black" />
+                      <Input placeholder="code here" value={promoInput} onChange={(e) => setPromoInput(e.target.value)} className="bg-white/5 border-white/10 h-11 rounded-xl px-4 text-white font-black" />
                       <Button onClick={handleApplyPromo} className="h-11 bg-purple-600 hover:bg-purple-700 text-white font-black px-5 rounded-xl uppercase text-xs">Apply</Button>
                     </div>
                   )}
