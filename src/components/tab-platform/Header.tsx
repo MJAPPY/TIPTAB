@@ -75,6 +75,7 @@ export const Header = ({ onBecomeCreator }: HeaderProps) => {
   const handleLogout = async () => {
     await logout();
     setIsOpen(false);
+    navigate("/");
     toast({
       title: "Disconnected",
       description: "Wallet session cleared.",
