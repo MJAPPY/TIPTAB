@@ -112,7 +112,7 @@ export const Tab = () => {
               rel="noopener noreferrer" 
               className="hover:text-purple-400 transition-colors"
             >
-              Twitter
+              X
             </a>
             <a 
               href="https://snipverse.com/tabxpr" 
