@@ -730,14 +730,14 @@ export const ProfileEditor = ({ initialData, onSave, minimal = false }: ProfileE
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-10">
                   <div className="space-y-2">
-                    <Label htmlFor="twitter" className="text-white/60 font-bold uppercase tracking-widest text-[10px]">Twitter / X URL</Label>
+                    <Label htmlFor="twitter" className="text-white/60 font-bold uppercase tracking-widest text-[10px]">X URL</Label>
                     <div className="relative">
                       <Twitter className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-[#1DA1F2]" />
                       <Input 
                         id="twitter"
                         value={formData.twitter}
                         onChange={handleChange}
-                        placeholder="https://twitter.com/username"
+                        placeholder="https://x.com/username"
                         className="pl-12 bg-white/5 border-white/10 h-14 rounded-2xl focus:ring-purple-500 focus:bg-white/10 transition-all text-white" 
                       />
                     </div>
