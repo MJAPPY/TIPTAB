@@ -1042,7 +1042,7 @@ const AdminHub = () => {
                             <th className="px-10 py-5 text-left text-[10px] font-black uppercase tracking-widest text-white">Recipient</th>
                             <th className="px-10 py-5 text-center text-[10px] font-black uppercase tracking-widest text-white">Network Role</th>
                             <th className="px-10 py-5 text-center text-[10px] font-black uppercase tracking-widest text-white">Current Rank</th>
-                            <th className="px-10 py-5 text-right text-[10px] font-black uppercase tracking-widest text-white">Reward Value (TAB)</th>
+                            <th className="px-10 py-5 text-right text-[10px] font-black uppercase tracking-widest text-white">Reward Value (XPR)</th>
                           </tr>
                         </thead>
                         <tbody className="divide-y divide-white/5">
@@ -1080,7 +1080,7 @@ const AdminHub = () => {
                                     onChange={(e) => handleRewardValueChange(i, e.target.value)}
                                     className="bg-white/5 border-white/10 text-right font-black text-lg h-12 pr-14 focus:ring-yellow-500/50 rounded-xl text-white"
                                    />
-                                   <span className="absolute right-4 top-1/2 -translate-y-1/2 font-black text-[10px] text-white/20 uppercase">TAB</span>
+                                   <span className="absolute right-4 top-1/2 -translate-y-1/2 font-black text-[10px] text-white/20 uppercase">XPR</span>
                                 </div>
                               </td>
                             </tr>
@@ -1096,7 +1096,7 @@ const AdminHub = () => {
                            <Badge className="bg-yellow-500/20 text-yellow-500 border-none font-black text-[9px]">READY</Badge>
                         </div>
                         <p className="text-4xl font-black text-white tracking-tighter italic">
-                           {totalRewardsValue.toLocaleString()} <span className="text-lg text-orange-500">TAB</span>
+                           {totalRewardsValue.toLocaleString()} <span className="text-lg text-orange-500">XPR</span>
                         </p>
                      </div>
                      <Button 

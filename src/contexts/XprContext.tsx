@@ -186,15 +186,10 @@ export const XprProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     if (!session || !adminHook.currentAdminObj || (adminHook.currentAdminObj.role !== 'super' && adminHook.currentAdminObj.role !== 'treasurer')) return false;
     try {
       const actions = winners.map(winner => ({
-        account: 'tokencreate', // Modified to TAB's contract
+        account: 'eosio.token',
         name: 'transfer',
         authorization: [{ actor: session.auth.actor, permission: session.auth.permission }],
-        data: { 
-          from: activeActor, 
-          to: winner.account, 
-          quantity: `${Math.floor(parseFloat(winner.amount))} TAB`, // Modified to 0-precision TAB
-          memo: 'TIPTAB Network Reward (TAB Payout)' 
-        },
+        data: { from: activeActor, to: winner.account, quantity: `${parseFloat(winner.amount).toFixed(4)} XPR`, memo: 'TIPTAB Network Reward' },
       }));
       await session.transact({ actions }, { broadcast: true });
       return true;
