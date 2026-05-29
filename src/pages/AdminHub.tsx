@@ -1081,7 +1081,7 @@ const AdminHub = () => {
             </h1>
           </div>
           
-          <div className="grid grid-cols-2 sm:flex items-center gap-2 sm:gap-4 bg-white/5 border border-white/10 p-2 rounded-3xl backdrop-blur-xl">
+          <div className="flex flex-wrap items-center gap-2 md:gap-3 bg-white/5 border border-white/10 p-2 rounded-3xl backdrop-blur-xl max-w-full">
              {adminNavItems.map((item) => (
                <Button
                 key={item.id}
@@ -1253,7 +1253,7 @@ const AdminHub = () => {
 
           {activeTab === "treasury" && (adminRole === 'super' || adminRole === 'treasurer') && (
             <div className="space-y-10 animate-in fade-in duration-300">
-               <Card className="bg-[#1a112d] border-[4px] border-slate-300/40 rounded-[48px] overflow-hidden shadow-[0_0_100px_rgba(0,0,0,0.9)] relative ring-2 ring-white/10">
+               <Card className="bg-[#1a112d] border-[4px] border-slate-300/40 rounded-[48px] overflow-hidden shadow-[0_0_100px_rgba(0,0,0,0.8)] relative ring-2 ring-white/10">
                   <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-white/[0.03] to-transparent pointer-events-none" />
                   <CardHeader className="p-12 pb-6 relative z-10">
                     <div className="flex items-center justify-between">
