@@ -347,9 +347,11 @@ const CreatorProfile = () => {
   // Clean recipient XPR address handle
   const cleanRecipient = creator.handle.replace('@', '').toLowerCase().trim();
 
-  // Official universal transfer redirect link format.
-  // This launches WebAuth securely into the custom transfer prompt screen with the creator's username preselected as recipient.
-  const rawTransferScheme = `https://link.protonchain.com/transfer?to=${cleanRecipient}`;
+  // 1. Native Custom App Protocol (Highly recommended on mobile browsers to launch WebAuth directly)
+  const nativeAppDeepLink = `proton://transfer?to=${cleanRecipient}`;
+  
+  // 2. Official Universal URL Scheme (Secure fallback to prevent loop conditions)
+  const fallbackUniversalLink = `https://link.protonchain.com/transfer?to=${cleanRecipient}`;
 
   return (
     <div className="min-h-screen bg-[#0a0514] text-white selection:bg-purple-500/30">
@@ -757,7 +759,7 @@ const CreatorProfile = () => {
           <div className="flex flex-col items-center justify-center gap-6 my-6">
             <div className="bg-white p-4 rounded-[24px] shadow-2xl">
               <QRCodeSVG 
-                value={rawTransferScheme}
+                value={nativeAppDeepLink}
                 size={180}
                 level="H"
                 includeMargin={false}
@@ -766,18 +768,20 @@ const CreatorProfile = () => {
             
             <div className="space-y-1">
               <p className="text-xs font-black text-purple-400 uppercase tracking-widest">Recipient: @{cleanRecipient}</p>
-              <p className="text-[10px] text-white/30 font-bold uppercase tracking-widest">Open Profile inside WebAuth Wallet</p>
+              <p className="text-[10px] text-white/30 font-bold uppercase tracking-widest">Scan or tap to load recipient in Wallet</p>
             </div>
           </div>
 
           <div className="space-y-3">
             <Button asChild className="w-full h-14 bg-gradient-to-r from-orange-500 to-purple-600 text-white font-black text-sm uppercase tracking-widest rounded-2xl shadow-lg transition-all active:scale-95">
-              <a href={rawTransferScheme}>
-                Open WebAuth Wallet
+              <a href={nativeAppDeepLink}>
+                Open WebAuth App
               </a>
             </Button>
-            <Button variant="ghost" onClick={() => setIsQrModalOpen(false)} className="w-full h-12 text-white/40 hover:text-white font-black text-xs uppercase tracking-widest rounded-xl">
-              Cancel
+            <Button asChild variant="outline" className="w-full h-12 text-white/60 border-white/10 hover:text-white bg-white/5 rounded-xl text-xs uppercase font-black">
+              <a href={fallbackUniversalLink} target="_blank" rel="noopener noreferrer">
+                Browser Fallback Link
+              </a>
             </Button>
           </div>
         </DialogContent>
