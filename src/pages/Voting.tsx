@@ -18,7 +18,7 @@ const Voting = () => {
   const [isMembershipOpen, setIsMembershipOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [isProcessing, setIsProcessing] = useState(false);
-  const [voteAmount, setVoteAmount] = useState("10");
+  const [voteAmount, setVoteAmount] = useState("5");
   const { actor, session, dbCreators, isConnected, login } = useXpr();
   const { toast } = useToast();
 
@@ -64,7 +64,7 @@ const Voting = () => {
 
     const amount = parseInt(voteAmount);
     if (isNaN(amount) || amount <= 0) {
-      toast({ title: "Invalid Amount", variant: "destructive" });
+      toast({ title: "Invalid Amount", description: "Please enter a valid positive vote amount.", variant: "destructive" });
       return;
     }
 
@@ -113,6 +113,8 @@ const Voting = () => {
     }
   };
 
+  const quickAmounts = ["5", "25", "50", "250"];
+
   return (
     <div className="min-h-screen bg-[#0a0514] text-white selection:bg-orange-500/30">
       <Header onBecomeCreator={() => setIsMembershipOpen(true)} />
@@ -147,19 +149,31 @@ const Voting = () => {
 
               <div className="space-y-4">
                 <Label className="text-[10px] font-black uppercase tracking-widest text-white/40 ml-2">Vote Weight (TAB per click)</Label>
-                <div className="flex gap-2">
-                  {["10", "50", "100", "500"].map(amt => (
-                    <Button 
-                      key={amt}
-                      onClick={() => setVoteAmount(amt)}
-                      className={cn(
-                        "h-12 flex-1 rounded-xl font-black text-xs transition-all",
-                        voteAmount === amt ? "bg-orange-500 text-white shadow-lg shadow-orange-500/20" : "bg-white/5 border border-white/10 text-white/40 hover:bg-white/10"
-                      )}
-                    >
-                      {amt} TAB
-                    </Button>
-                  ))}
+                <div className="flex flex-col sm:flex-row gap-3">
+                  <div className="flex gap-2 flex-1">
+                    {quickAmounts.map(amt => (
+                      <Button 
+                        key={amt}
+                        onClick={() => setVoteAmount(amt)}
+                        className={cn(
+                          "h-12 flex-1 rounded-xl font-black text-xs transition-all",
+                          voteAmount === amt ? "bg-orange-500 text-white shadow-lg shadow-orange-500/20" : "bg-white/5 border border-white/10 text-white/40 hover:bg-white/10"
+                        )}
+                      >
+                        {amt} TAB
+                      </Button>
+                    ))}
+                  </div>
+                  <div className="relative group w-full sm:w-44">
+                    <Input 
+                      type="number"
+                      placeholder="Custom" 
+                      value={quickAmounts.includes(voteAmount) ? "" : voteAmount}
+                      onChange={(e) => setVoteAmount(e.target.value)}
+                      className="bg-white/5 border-white/10 h-12 rounded-xl text-center font-black pr-10 focus-visible:ring-1 focus-visible:ring-orange-500/50 text-white placeholder:text-white/20"
+                    />
+                    <span className="absolute right-3 top-1/2 -translate-y-1/2 text-[9px] font-black text-white/30 uppercase tracking-widest">TAB</span>
+                  </div>
                 </div>
               </div>
 
