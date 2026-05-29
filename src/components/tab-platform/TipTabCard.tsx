@@ -139,7 +139,7 @@ export const TipTabCard = ({ creator }: TipTabCardProps) => {
               <div className="flex items-center gap-1.5">
                 <p className="text-purple-400 font-black text-[13px] md:text-sm tracking-tight">@{cleanHandle}</p>
                 <div className="h-0.5 w-0.5 rounded-full bg-white/20" />
-                <span className="text-white/40 text-[9px] font-black uppercase tracking-widest truncate">{creator.categories?.[0] || 'Creator'}</span>
+                <span className="text-white/40 text-[9px] font-black uppercase tracking-widest truncate">WebAuth Name</span>
               </div>
             </div>
           </div>
