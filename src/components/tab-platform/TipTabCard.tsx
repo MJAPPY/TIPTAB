@@ -176,15 +176,9 @@ export const TipTabCard = ({ creator }: TipTabCardProps) => {
               </p>
             </div>
             
-            <div className="flex items-center gap-2 flex-wrap">
-              <div className="flex items-center gap-1.5 px-3 py-1 rounded-lg bg-green-500/10 border border-green-500/30 w-fit shadow-[0_0_20px_rgba(34,197,94,0.1)]">
-                <ShieldCheck className="h-3 w-3 md:h-3.5 md:w-3.5 text-green-400" />
-                <span className="text-[9px] font-black uppercase tracking-[0.2em] text-green-400">Zero Fees</span>
-              </div>
-              <div className="flex items-center gap-1.5 px-3 py-1 rounded-lg bg-[#a855f7]/10 border border-[#a855f7]/30 w-fit shadow-[0_0_20px_rgba(168,85,247,0.15)] animate-shimmer">
-                <img src="/webAuth-logo.jpg" alt="WebAuth Logo" className="h-3.5 w-3.5 rounded-full object-cover" />
-                <span className="text-[9px] font-black uppercase tracking-[0.2em] text-[#a855f7] brightness-125">WebAuth</span>
-              </div>
+            <div className="flex items-center gap-2 px-3 py-1 rounded-lg bg-green-500/10 border border-green-500/30 w-fit shadow-[0_0_20px_rgba(34,197,94,0.1)]">
+              <ShieldCheck className="h-3 w-3 md:h-3.5 md:w-3.5 text-green-400" />
+              <span className="text-[9px] font-black uppercase tracking-[0.2em] text-green-400">Zero Fees</span>
             </div>
           </div>
 
@@ -247,5 +241,3 @@ export const TipTabCard = ({ creator }: TipTabCardProps) => {
     </div>
   );
 };
-
-export default TipTabCard;
