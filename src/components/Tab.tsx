@@ -137,10 +137,10 @@ export const Tab = () => {
                 TIP<span className="text-orange-500">TAB</span>
               </span>
             </Link>
-            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-purple-500/10 border border-purple-500/20 text-[10px] sm:text-xs font-black uppercase tracking-[0.3em] text-purple-400 shadow-[0_0_20px_rgba(168,85,247,0.15)] animate-pulse">
+            <Link to="/showcase" className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-purple-500/10 border border-purple-500/20 text-[10px] sm:text-xs font-black uppercase tracking-[0.3em] text-purple-400 hover:bg-purple-500/20 hover:border-purple-500/40 transition-all shadow-[0_0_20px_rgba(168,85,247,0.15)] animate-pulse">
               <Sparkles className="h-3.5 w-3.5 fill-purple-400" />
               XPR Site Showcase
-            </div>
+            </Link>
           </div>
           <div className="space-y-4 mb-10 sm:mb-12 max-w-xl mx-auto px-4">
             <p className="text-white/40 text-sm sm:text-lg font-medium">
