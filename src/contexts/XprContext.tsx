@@ -19,6 +19,7 @@ interface XprContextType {
   balances: Balances;
   isMember: boolean;
   membershipDate: string | null;
+  membershipExpiry: string | null;
   setIsMember: (status: boolean) => void;
   login: () => Promise<LinkSession | null>;
   logout: () => Promise<void>;
@@ -78,6 +79,7 @@ export const XprProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const [balances, setBalances] = useState<Balances>({ xpr: '0.0000', tab: '0', xmd: '0.000000', xusdc: '0.000000', metal: '0.00000000', loan: '0.0000', xmt: '0.00000000', tipsSent: 0 });
   const [isMember, setIsMember] = useState(false);
   const [membershipDate, setMembershipDate] = useState<string | null>(null);
+  const [membershipExpiry, setMembershipExpiry] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(() => {
     if (typeof window !== "undefined") {
       return localStorage.getItem("tiptab_has_session") === "true";
@@ -234,41 +236,65 @@ export const XprProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       
       let currentlyMember = false;
       let activeDateStr = null;
+      let expiryDateStr = null;
 
       if (ROOT_ADMINS.includes(account)) {
         currentlyMember = true;
-        activeDateStr = new Date(2099, 11, 31).toISOString();
+        activeDateStr = new Date(2026, 4, 29).toISOString();
+        expiryDateStr = new Date(2099, 11, 31).toISOString();
         setIsMember(true);
         setMembershipDate(activeDateStr);
+        setMembershipExpiry(expiryDateStr);
       } else {
         const membershipKey = `tiptab_membership_${account}`;
         const membershipDateKey = `tiptab_membership_date_${account}`;
+        const expiryKey = `tiptab_membership_expiry_${account}`;
         const savedDate = localStorage.getItem(membershipDateKey);
+        let savedExpiry = localStorage.getItem(expiryKey);
+        
         if (savedDate) {
           const activationDate = new Date(savedDate);
           const now = new Date();
-          const diffYears = (now.getTime() - activationDate.getTime()) / (1000 * 60 * 60 * 24 * 365);
-          if (diffYears < 1) { 
+          
+          if (!savedExpiry) {
+            const fallbackExpiry = new Date(activationDate);
+            fallbackExpiry.setFullYear(fallbackExpiry.getFullYear() + 1);
+            savedExpiry = fallbackExpiry.toISOString();
+            localStorage.setItem(expiryKey, savedExpiry);
+          }
+          
+          const isExpired = new Date(savedExpiry) <= now;
+          if (!isExpired) {
             currentlyMember = true;
             activeDateStr = savedDate;
-            setIsMember(true); 
-            setMembershipDate(savedDate); 
-          }
-          else { 
-            setIsMember(false); 
-            setMembershipDate(null); 
-            localStorage.removeItem(membershipKey); 
+            expiryDateStr = savedExpiry;
+            setIsMember(true);
+            setMembershipDate(savedDate);
+            setMembershipExpiry(savedExpiry);
+          } else {
+            setIsMember(false);
+            setMembershipDate(null);
+            setMembershipExpiry(null);
+            localStorage.removeItem(membershipKey);
           }
         } else if (localStorage.getItem(membershipKey) === 'true') {
-          const fakeDate = new Date().toISOString();
-          localStorage.setItem(membershipDateKey, fakeDate);
+          const fakeJoinDate = new Date().toISOString();
+          const fakeExpiryDate = new Date();
+          fakeExpiryDate.setFullYear(fakeExpiryDate.getFullYear() + 1);
+          
+          localStorage.setItem(membershipDateKey, fakeJoinDate);
+          localStorage.setItem(expiryKey, fakeExpiryDate.toISOString());
+          
           currentlyMember = true;
-          activeDateStr = fakeDate;
-          setMembershipDate(fakeDate);
+          activeDateStr = fakeJoinDate;
+          expiryDateStr = fakeExpiryDate.toISOString();
+          setMembershipDate(fakeJoinDate);
+          setMembershipExpiry(fakeExpiryDate.toISOString());
           setIsMember(true);
-        } else { 
-          setIsMember(false); 
-          setMembershipDate(null); 
+        } else {
+          setIsMember(false);
+          setMembershipDate(null);
+          setMembershipExpiry(null);
         }
       }
 
@@ -431,6 +457,7 @@ export const XprProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       setBalances({ xpr: '0.0000', tab: '0', xmd: '0.000000', xusdc: '0.000000', metal: '0.00000000', loan: '0.0000', xmt: '0.00000000', tipsSent: 0 });
       setIsMember(false);
       setMembershipDate(null);
+      setMembershipExpiry(null);
       setUserProfile(null);
       localStorage.removeItem("tiptab_user_profile");
     }
@@ -486,7 +513,7 @@ export const XprProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   };
 
   const value = {
-    session, actor: activeActor, balances, isMember, membershipDate, setIsMember, login, logout, refreshBalances, recordTip,
+    session, actor: activeActor, balances, isMember, membershipDate, membershipExpiry, setIsMember, login, logout, refreshBalances, recordTip,
     isConnected: !!session, isLoading, isAdmin: !!adminHook.currentAdminObj, adminRole: adminHook.currentAdminObj ? adminHook.currentAdminObj.role : null,
     isPermanentAdmin: adminHook.isCurrentAdminPermanent, ...adminHook, ...platformHook, ...socialHook,
     userProfile, updateUserProfile, featuredHandles, boostStream, distributeXprRewards, dbCreators, fetchDbCreators

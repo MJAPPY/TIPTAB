@@ -52,7 +52,7 @@ const ASSET_MAP: Record<string, { code: string; precision: number }> = {
 };
 
 const Dashboard = () => {
-  const { isConnected, actor, balances, refreshBalances, recordTip, session, login, isLoading: isAuthLoading, isMember, membershipDate, userProfile, updateUserProfile, favorites, toggleFavorite } = useXpr();
+  const { isConnected, actor, balances, refreshBalances, recordTip, session, login, isLoading: isAuthLoading, isMember, membershipDate, membershipExpiry, userProfile, updateUserProfile, favorites, toggleFavorite } = useXpr();
   const navigate = useNavigate();
   const { toast } = useToast();
   
@@ -225,6 +225,9 @@ const Dashboard = () => {
 
   const getExpiryDate = () => {
     if (actor === 'tiptab') return "Lifetime";
+    if (membershipExpiry) {
+      return new Date(membershipExpiry).toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric' });
+    }
     if (!membershipDate) return null;
     const date = new Date(membershipDate);
     date.setFullYear(date.getFullYear() + 1);
@@ -233,9 +236,15 @@ const Dashboard = () => {
 
   const isNearingExpiry = () => {
     if (actor === 'tiptab') return false; 
-    if (!membershipDate) return false;
-    const expiry = new Date(membershipDate);
-    expiry.setFullYear(expiry.getFullYear() + 1);
+    let expiry;
+    if (membershipExpiry) {
+      expiry = new Date(membershipExpiry);
+    } else if (membershipDate) {
+      expiry = new Date(membershipDate);
+      expiry.setFullYear(expiry.getFullYear() + 1);
+    } else {
+      return false;
+    }
     const now = new Date();
     const diffDays = (expiry.getTime() - now.getTime()) / (1000 * 60 * 60 * 24);
     return diffDays < 30; 
@@ -458,7 +467,7 @@ const Dashboard = () => {
                   </CardContent>
                 </Card>
 
-                {isMember && membershipDate ? (
+                {isMember && (membershipDate || membershipExpiry) ? (
                   <Card className="bg-[#130b21]/40 border-white/10 text-white rounded-[32px] p-6 sm:p-8 shadow-2xl relative overflow-hidden group hover:border-purple-500/30 transition-all flex flex-col h-[220px]">
                     <CardHeader className="p-0">
                       <div className="flex items-center justify-between">
