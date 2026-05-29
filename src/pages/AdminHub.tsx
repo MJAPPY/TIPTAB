@@ -53,6 +53,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
 import { useXpr, AdminUser } from "@/contexts/XprContext";
 import { Header } from "@/components/tab-platform/Header";
 import { CREATORS, Creator } from "@/data/creators";
@@ -83,6 +84,55 @@ import {
 } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
 import { DetailedReportModal } from "@/components/tab-platform/DetailedReportModal";
+
+interface ShowcaseSite {
+  id: string;
+  title: string;
+  site_url: string;
+  screenshot_url: string;
+  description: string;
+  submitted_by: string;
+  likes: number;
+}
+
+const SEED_SITES: ShowcaseSite[] = [
+  {
+    id: "seed-askguy",
+    title: "AskGuy",
+    site_url: "https://askguy.vercel.app/",
+    screenshot_url: "https://images.unsplash.com/photo-1614741118887-7a4ee193a5fa?auto=format&fit=crop&w=800&q=80",
+    description: "The ultimate AI assistant and guide for the XPR Network ecosystem. Ask questions, explore on-chain data, and get instant guidance about wallets, tokens, and dApps.",
+    submitted_by: "askguy",
+    likes: 95
+  },
+  {
+    id: "seed-alcor",
+    title: "Alcor Exchange",
+    site_url: "https://proton.alcor.exchange/",
+    screenshot_url: "https://images.unsplash.com/photo-1642790106117-e829e14a795f?auto=format&fit=crop&w=800&q=80",
+    description: "The premier zero-fee decentralized exchange (DEX) for the XPR Network ecosystem. Swap tokens instantly and provide liquidity to pools.",
+    submitted_by: "alcor",
+    likes: 84
+  },
+  {
+    id: "seed-metalpay",
+    title: "Metal Pay",
+    site_url: "https://www.metalpay.com/",
+    screenshot_url: "https://images.unsplash.com/photo-1559526324-4b87b5e36e44?auto=format&fit=crop&w=800&q=80",
+    description: "Buy, sell, and send XPR Network assets along with standard crypto securely. Seamless fiat onramp and offramp platform.",
+    submitted_by: "metalpay",
+    likes: 67
+  },
+  {
+    id: "seed-snipverse",
+    title: "Snipverse",
+    site_url: "https://snipverse.com/",
+    screenshot_url: "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&w=800&q=80",
+    description: "A next-generation on-chain social media hub built on XPR Network. Post, share content, earn rewards, and connect with other creators.",
+    submitted_by: "snipverse",
+    likes: 52
+  }
+];
 
 const AdminHub = () => {
   const { 
@@ -157,6 +207,14 @@ const AdminHub = () => {
     return parseInt(localStorage.getItem("tiptab_last_parity_sync") || "0");
   });
 
+  // Showcase Moderation States
+  const [showcaseSites, setShowcaseSites] = useState<ShowcaseSite[]>([]);
+  const [editingSite, setEditingSite] = useState<ShowcaseSite | null>(null);
+  const [isEditSiteOpen, setIsEditSiteOpen] = useState(false);
+  const [isDeleteSiteOpen, setIsDeleteSiteOpen] = useState(false);
+  const [siteToDelete, setSiteToDelete] = useState<ShowcaseSite | null>(null);
+  const [showcaseSearch, setShowcaseSearch] = useState("");
+
   // Analytics Metrics State loaded from Supabase live data
   const [analyticsStats, setAnalyticsStats] = useState({
     activeMembers: 0,
@@ -183,7 +241,7 @@ const AdminHub = () => {
       // Fetch votes count and calculate analytics metrics
       const { data: voteData, error: voteError } = await supabase
         .from('votes')
-        .select('voter_handle, tab_amount, created_at');
+        .select('voter_handle, candidate_handle, tab_amount, created_at');
 
       let uniqueVoters = new Set<string>();
       let totalTabAmount = 0;
@@ -224,9 +282,44 @@ const AdminHub = () => {
     }
   }, [dbCreators]);
 
+  // Fetch showcase sites from Supabase/Local Storage
+  const fetchShowcaseSites = useCallback(async () => {
+    try {
+      const { data, error } = await supabase
+        .from("showcase_sites")
+        .select("*")
+        .order("created_at", { ascending: false });
+      
+      let list = data ? (data as ShowcaseSite[]) : [];
+      
+      const savedLocal = localStorage.getItem("tiptab_showcase_local");
+      if (savedLocal) {
+        const parsed = JSON.parse(savedLocal);
+        parsed.forEach((s: any) => {
+          if (!list.some(item => item.id === s.id)) {
+            list.push(s);
+          }
+        });
+      }
+
+      // Inject seeds that aren't hidden
+      const hiddenSeeds = JSON.parse(localStorage.getItem("tiptab_hidden_seeds") || "[]");
+      SEED_SITES.forEach(seed => {
+        if (!hiddenSeeds.includes(seed.id) && !list.some(s => s.title.toLowerCase() === seed.title.toLowerCase())) {
+          list.push(seed);
+        }
+      });
+
+      setShowcaseSites(list);
+    } catch (e) {
+      console.error("Failed to load showcase sites", e);
+    }
+  }, []);
+
   useEffect(() => {
     fetchLiveStats();
-  }, [fetchLiveStats]);
+    fetchShowcaseSites();
+  }, [fetchLiveStats, fetchShowcaseSites]);
 
   // Fetch live winners (both Candidates as 'Creator' and Voters as 'Supporter') from Supabase votes database for Rewards Console
   useEffect(() => {
@@ -430,7 +523,7 @@ const AdminHub = () => {
   }, [isAdmin, isConnected, navigate, toast]);
 
   useEffect(() => {
-    if (adminRole === 'moderator' && !['moderation', 'config', 'analytics'].includes(activeTab)) {
+    if (adminRole === 'moderator' && !['moderation', 'config', 'analytics', 'showcase'].includes(activeTab)) {
       setActiveTab("analytics");
     } else if (adminRole === 'treasurer' && !['treasury', 'codes', 'rewards', 'analytics'].includes(activeTab)) {
       setActiveTab("analytics");
@@ -830,6 +923,100 @@ const AdminHub = () => {
     setCreatorToDelete(null);
   };
 
+  // Showcase Moderation Handlers
+  const handleOpenSiteEdit = (site: ShowcaseSite) => {
+    setEditingSite({ ...site });
+    setIsEditSiteOpen(true);
+  };
+
+  const handleSaveSiteEdit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!editingSite) return;
+
+    try {
+      if (editingSite.id.startsWith("seed-")) {
+        // Migration logic: Migrating static seeds to live Supabase entries once edited
+        const payload = {
+          title: editingSite.title,
+          site_url: editingSite.site_url,
+          screenshot_url: editingSite.screenshot_url,
+          description: editingSite.description,
+          submitted_by: editingSite.submitted_by,
+          likes: editingSite.likes
+        };
+        const { error } = await supabase.from("showcase_sites").insert(payload);
+        if (!error) {
+          toast({ title: "Seed Project Migrated", description: "Successfully upgraded static seed data to database." });
+          // Add to local hidden blocklist so the raw seed is hidden in place of this new DB record
+          const blocklist = JSON.parse(localStorage.getItem("tiptab_hidden_seeds") || "[]");
+          blocklist.push(editingSite.id);
+          localStorage.setItem("tiptab_hidden_seeds", JSON.stringify(blocklist));
+        }
+      } else if (editingSite.id.startsWith("local-")) {
+        const saved = localStorage.getItem("tiptab_showcase_local");
+        const list = saved ? JSON.parse(saved) : [];
+        const updated = list.map((s: any) => s.id === editingSite.id ? editingSite : s);
+        localStorage.setItem("tiptab_showcase_local", JSON.stringify(updated));
+        toast({ title: "Local Project Updated" });
+      } else {
+        const { error } = await supabase
+          .from("showcase_sites")
+          .update({
+            title: editingSite.title,
+            site_url: editingSite.site_url,
+            screenshot_url: editingSite.screenshot_url,
+            description: editingSite.description,
+            likes: editingSite.likes
+          })
+          .eq("id", editingSite.id);
+        if (!error) {
+          toast({ title: "Showcase Project Updated" });
+        }
+      }
+
+      fetchShowcaseSites();
+      setIsEditSiteOpen(false);
+      setEditingSite(null);
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  const handleOpenSiteDelete = (site: ShowcaseSite) => {
+    setSiteToDelete(site);
+    setIsDeleteSiteOpen(true);
+  };
+
+  const handleConfirmSiteDelete = async () => {
+    if (!siteToDelete) return;
+
+    try {
+      if (siteToDelete.id.startsWith("seed-")) {
+        const blocklist = JSON.parse(localStorage.getItem("tiptab_hidden_seeds") || "[]");
+        blocklist.push(siteToDelete.id);
+        localStorage.setItem("tiptab_hidden_seeds", JSON.stringify(blocklist));
+        toast({ title: "Seed Project Hidden", variant: "destructive" });
+      } else if (siteToDelete.id.startsWith("local-")) {
+        const saved = localStorage.getItem("tiptab_showcase_local");
+        const list = saved ? JSON.parse(saved) : [];
+        const updated = list.filter((s: any) => s.id !== siteToDelete.id);
+        localStorage.setItem("tiptab_showcase_local", JSON.stringify(updated));
+        toast({ title: "Local Project Removed", variant: "destructive" });
+      } else {
+        const { error } = await supabase.from("showcase_sites").delete().eq("id", siteToDelete.id);
+        if (!error) {
+          toast({ title: "Showcase Project Deleted", variant: "destructive" });
+        }
+      }
+
+      fetchShowcaseSites();
+      setIsDeleteSiteOpen(false);
+      setSiteToDelete(null);
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
   const filteredCreators = useMemo(() => {
     return moderatedCreators.filter(c => {
       const matchesSearch = c.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
@@ -844,6 +1031,17 @@ const AdminHub = () => {
     return ["All", ...Array.from(new Set(allCats)).sort()];
   }, [moderatedCreators]);
 
+  const filteredShowcaseSites = useMemo(() => {
+    return showcaseSites.filter(site => {
+      const q = showcaseSearch.toLowerCase();
+      return (
+        site.title.toLowerCase().includes(q) ||
+        site.description.toLowerCase().includes(q) ||
+        site.submitted_by.toLowerCase().includes(q)
+      );
+    });
+  }, [showcaseSites, showcaseSearch]);
+
   const adminNavItems = useMemo(() => {
     const items = [{ id: "analytics", label: "Analytics", icon: BarChart3 }];
     if (adminRole === 'super' || adminRole === 'treasurer') items.push({ id: "treasury", label: "Treasury", icon: Activity });
@@ -852,7 +1050,10 @@ const AdminHub = () => {
       items.push({ id: "codes", label: "Promo Codes", icon: Gift });
       items.push({ id: "rewards", label: "Rewards", icon: Trophy });
     }
-    if (adminRole === 'super' || adminRole === 'moderator') items.push({ id: "moderation", label: "Moderation", icon: Users });
+    if (adminRole === 'super' || adminRole === 'moderator') {
+      items.push({ id: "moderation", label: "Moderation", icon: Users });
+      items.push({ id: "showcase", label: "Showcase", icon: Globe });
+    }
     if (adminRole === 'super') items.push({ id: "admins", label: "Admins", icon: ShieldCheck });
     return items;
   }, [adminRole]);
@@ -967,7 +1168,7 @@ const AdminHub = () => {
                                 <DialogHeader>
                                   <DialogTitle className="text-3xl font-black italic uppercase text-center tracking-tighter">RESET ANALYTICS?</DialogTitle>
                                   <DialogDescription className="text-white/60 font-bold text-center">
-                                    This will zero out all platform velocity metrics, member growth counts, and engagement stats. This action is irreversible.
+                                    This will zero out all platform activity metrics, member growth counts, and engagement stats. This action is irreversible.
                                   </DialogDescription>
                                 </DialogHeader>
                                 <div className="flex gap-4">
@@ -1700,6 +1901,92 @@ const AdminHub = () => {
             </div>
           )}
 
+          {activeTab === "showcase" && (adminRole === 'super' || adminRole === 'moderator') && (
+            <div className="space-y-8 animate-in fade-in duration-300">
+               <Card className="bg-[#1a112d] border border-white/10 rounded-[40px] overflow-hidden shadow-2xl">
+                  <CardHeader className="p-10 border-b border-white/5 space-y-8">
+                    <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
+                      <div className="space-y-1">
+                        <CardTitle className="text-3xl font-black italic tracking-tighter flex items-center gap-3 text-white uppercase">
+                          <Globe className="h-8 w-8 text-purple-400" /> Showcase Manager
+                        </CardTitle>
+                        <CardDescription className="text-white/40 font-bold text-sm uppercase tracking-widest"> Ecosytem Directory Project Registry</CardDescription>
+                      </div>
+                      <div className="relative group shrink-0">
+                         <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-white/30 group-focus-within:text-purple-400 transition-colors" />
+                         <Input 
+                           placeholder="Search directory..." 
+                           value={showcaseSearch}
+                           onChange={(e) => setShowcaseSearch(e.target.value)}
+                           className="bg-white/5 border-white/10 h-12 w-[240px] md:w-[320px] pl-12 rounded-2xl font-bold text-sm text-white focus:ring-purple-500/50 transition-all"
+                         />
+                      </div>
+                    </div>
+                  </CardHeader>
+                  <CardContent className="p-0">
+                    <div className="overflow-x-auto no-scrollbar">
+                      <table className="w-full min-w-[900px]">
+                        <thead className="bg-white/[0.03]">
+                          <tr>
+                            <th className="px-10 py-5 text-left text-[10px] font-black uppercase tracking-widest text-white/30">Screenshot</th>
+                            <th className="px-10 py-5 text-left text-[10px] font-black uppercase tracking-widest text-white/30">Title</th>
+                            <th className="px-10 py-5 text-center text-[10px] font-black uppercase tracking-widest text-white/30">Likes</th>
+                            <th className="px-10 py-5 text-center text-[10px] font-black uppercase tracking-widest text-white/30">Author</th>
+                            <th className="px-10 py-5 text-right text-[10px] font-black uppercase tracking-widest text-white/30">Controls</th>
+                          </tr>
+                        </thead>
+                        <tbody className="divide-y divide-white/5">
+                          {filteredShowcaseSites.map((site) => (
+                            <tr key={site.id} className="group hover:bg-white/[0.01] transition-colors">
+                              <td className="px-10 py-4">
+                                <div className="h-14 w-24 rounded-lg overflow-hidden border border-white/10 bg-black/40 relative">
+                                  <img src={site.screenshot_url} alt="" className="w-full h-full object-cover" />
+                                </div>
+                              </td>
+                              <td className="px-10 py-6">
+                                <div className="space-y-0.5">
+                                  <p className="text-lg font-black text-white">{site.title}</p>
+                                  <p className="text-xs text-purple-400 font-bold truncate max-w-[200px]">{site.site_url}</p>
+                                </div>
+                              </td>
+                              <td className="px-10 py-6 text-center">
+                                <Badge className="bg-purple-600/20 text-purple-400 border-none font-black text-xs px-2.5 py-1 rounded-lg">
+                                  {site.likes} likes
+                                </Badge>
+                              </td>
+                              <td className="px-10 py-6 text-center">
+                                <span className="text-sm font-bold text-white/50">@{site.submitted_by}</span>
+                              </td>
+                              <td className="px-10 py-6 text-right space-x-2">
+                                <Button 
+                                  onClick={() => handleOpenSiteEdit(site)}
+                                  className="h-10 px-4 rounded-xl bg-white/5 hover:bg-white/15 text-white/80 font-black text-[10px] uppercase tracking-widest border border-white/10"
+                                >
+                                  Edit
+                                </Button>
+                                <Button 
+                                  onClick={() => handleOpenSiteDelete(site)}
+                                  className="h-10 px-4 rounded-xl bg-red-500/10 hover:bg-red-500 hover:text-white text-red-500 font-black text-[10px] uppercase tracking-widest border border-red-500/20"
+                                >
+                                  Delete
+                                </Button>
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  </CardContent>
+                  {filteredShowcaseSites.length === 0 && (
+                    <div className="p-20 text-center space-y-4">
+                       <Globe className="h-12 w-12 mx-auto text-white/10 animate-pulse" />
+                       <p className="text-white/20 font-black uppercase tracking-widest text-xs">No matching showcase projects found.</p>
+                    </div>
+                  )}
+               </Card>
+            </div>
+          )}
+
           {activeTab === "admins" && adminRole === 'super' && (
             <div className="space-y-8 animate-in fade-in duration-300">
               <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
@@ -1898,6 +2185,94 @@ const AdminHub = () => {
             <div className="flex gap-4">
               <Button onClick={() => setIsDeleteModalOpen(false)} className="flex-1 h-14 bg-white/5 hover:bg-white/10 rounded-2xl font-black uppercase">Cancel</Button>
               <Button onClick={confirmDeleteProfile} className="flex-1 h-14 bg-red-500 hover:bg-red-600 rounded-2xl font-black uppercase">Yes, Purge</Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Edit Showcase Site Modal */}
+      <Dialog open={isEditSiteOpen} onOpenChange={setIsEditSiteOpen}>
+        <DialogContent className="bg-[#1e1438] border-white/10 text-white rounded-[40px] p-8 max-w-lg shadow-[0_0_100px_rgba(0,0,0,0.8)] max-h-[85vh] overflow-y-auto">
+          <DialogHeader className="space-y-3">
+            <div className="flex items-center gap-3">
+              <Globe className="h-6 w-6 text-purple-400" />
+              <DialogTitle className="text-2xl font-black italic uppercase">Edit Showcase Project</DialogTitle>
+            </div>
+            <DialogDescription className="text-white/50 font-bold">Adjust information details about this ecosystem project.</DialogDescription>
+          </DialogHeader>
+
+          {editingSite && (
+            <form onSubmit={handleSaveSiteEdit} className="space-y-6 pt-6">
+              <div className="space-y-2">
+                <Label className="text-[10px] font-black uppercase tracking-widest text-white/40">Project Name</Label>
+                <Input 
+                  value={editingSite.title} 
+                  onChange={(e) => setEditingSite({ ...editingSite, title: e.target.value })} 
+                  className="bg-white/5 border-white/10 h-12 rounded-xl text-white font-bold"
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label className="text-[10px] font-black uppercase tracking-widest text-white/40">Website URL</Label>
+                <Input 
+                  value={editingSite.site_url} 
+                  onChange={(e) => setEditingSite({ ...editingSite, site_url: e.target.value })} 
+                  className="bg-white/5 border-white/10 h-12 rounded-xl text-white font-bold"
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label className="text-[10px] font-black uppercase tracking-widest text-white/40">Screenshot URL</Label>
+                <Input 
+                  value={editingSite.screenshot_url} 
+                  onChange={(e) => setEditingSite({ ...editingSite, screenshot_url: e.target.value })} 
+                  className="bg-white/5 border-white/10 h-12 rounded-xl text-white"
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label className="text-[10px] font-black uppercase tracking-widest text-white/40">Short Description</Label>
+                <Textarea 
+                  value={editingSite.description} 
+                  onChange={(e) => setEditingSite({ ...editingSite, description: e.target.value })} 
+                  className="bg-white/5 border-white/10 min-h-[100px] rounded-xl text-white font-medium p-4"
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label className="text-[10px] font-black uppercase tracking-widest text-white/40">Likes / Votes</Label>
+                <Input 
+                  type="number"
+                  value={editingSite.likes} 
+                  onChange={(e) => setEditingSite({ ...editingSite, likes: parseInt(e.target.value) || 0 })} 
+                  className="bg-white/5 border-white/10 h-12 rounded-xl text-white font-bold"
+                />
+              </div>
+
+              <Button type="submit" className="w-full h-14 bg-purple-600 hover:bg-purple-700 text-white font-black rounded-xl">
+                Save Project Changes
+              </Button>
+            </form>
+          )}
+        </DialogContent>
+      </Dialog>
+
+      {/* Delete Showcase Site Confirmation Modal */}
+      <Dialog open={isDeleteSiteOpen} onOpenChange={setIsDeleteSiteOpen}>
+        <DialogContent className="bg-[#2a1b4d] border-2 border-red-500/50 text-white rounded-[40px] p-10 max-w-md">
+          <div className="text-center space-y-6">
+            <div className="h-16 w-16 rounded-full bg-red-500/10 flex items-center justify-center mx-auto border border-red-500/20">
+              <Trash2 className="h-8 w-8 text-red-500" />
+            </div>
+            <DialogHeader>
+              <DialogTitle className="text-2xl font-black italic uppercase text-center tracking-tighter">DELETE SHOWCASE PROJECT?</DialogTitle>
+              <DialogDescription className="text-white/60 font-bold text-center">
+                Are you sure you want to permanently remove '{siteToDelete?.title}' from the Ecosystem Showcase? This action cannot be reversed.
+              </DialogDescription>
+            </DialogHeader>
+            <div className="flex gap-4">
+              <Button onClick={() => setIsDeleteSiteOpen(false)} className="flex-1 h-12 bg-white/5 hover:bg-white/10 rounded-xl font-black uppercase">Cancel</Button>
+              <Button onClick={handleConfirmSiteDelete} className="flex-1 h-12 bg-red-500 hover:bg-red-600 rounded-xl font-black uppercase">Yes, Delete</Button>
             </div>
           </div>
         </DialogContent>

@@ -133,9 +133,11 @@ const Showcase = () => {
 
   const allSites = useMemo(() => {
     const list = [...dbSites];
-    // Append seed sites if they are not already overridden or empty
+    const hiddenSeeds = typeof window !== "undefined" ? JSON.parse(localStorage.getItem("tiptab_hidden_seeds") || "[]") : [];
+    
+    // Append seed sites if they are not blocklisted or already in list
     SEED_SITES.forEach(seed => {
-      if (!list.some(s => s.title.toLowerCase() === seed.title.toLowerCase())) {
+      if (!hiddenSeeds.includes(seed.id) && !list.some(s => s.title.toLowerCase() === seed.title.toLowerCase())) {
         list.push(seed);
       }
     });
