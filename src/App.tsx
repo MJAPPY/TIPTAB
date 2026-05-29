@@ -9,7 +9,6 @@ import Leaderboard from "./pages/Leaderboard";
 import Live from "./pages/Live";
 import Voting from "./pages/Voting";
 import CreatorProfile from "./pages/CreatorProfile";
-import Calculator from "./pages/Calculator";
 import AdminHub from "./pages/AdminHub";
 import Docs from "./pages/Docs";
 import Assets from "./pages/Assets";
@@ -37,7 +36,6 @@ const AppRoutes = () => {
         <Route path="/leaderboard" element={<Leaderboard />} />
         <Route path="/live" element={<Live />} />
         <Route path="/voting" element={<Voting />} />
-        <Route path="/calculator" element={<Calculator />} />
         <Route path="/admin" element={<AdminHub />} />
         <Route path="/docs" element={<Docs />} />
         <Route path="/assets" element={<Assets />} />
@@ -51,6 +49,7 @@ const AppRoutes = () => {
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <TooltipProvider>
+      <Toaster />
       <Toaster />
       <Sonner />
       <BrowserRouter>

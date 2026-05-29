@@ -9,7 +9,6 @@ import {
   Menu,
   Home,
   Map as MapIcon,
-  Calculator as CalcIcon,
   LogOut,
   User,
   ChevronDown,
@@ -165,18 +164,6 @@ export const Header = ({ onBecomeCreator }: HeaderProps) => {
           </Button>
         </Link>
       )}
-      <Link to="/calculator" onClick={() => setIsOpen(false)} className={cn(isMobile ? "w-full" : "lg:w-auto")}>
-        <Button 
-          variant="ghost" 
-          className={cn(
-            "w-full text-slate-200 hover:text-cyan-400 hover:bg-purple-500/15 flex items-center justify-start lg:justify-center font-bold bg-white/5 border border-white/10 rounded-2xl px-4 transition-all",
-            isMobile ? "h-12 text-sm" : "h-10 xl:h-11 2xl:h-12 lg:px-2 2xl:px-5 lg:gap-1.5 2xl:gap-3 lg:text-[11px] 2xl:text-sm"
-          )}
-        >
-          <CalcIcon className={cn(isMobile ? "h-5 w-5" : "h-3.5 w-3.5 2xl:h-4 2xl:w-4")} />
-          Calculator
-        </Button>
-      </Link>
       {isConnected && (
         <Link to="/dashboard" onClick={() => setIsOpen(false)} className={cn(isMobile ? "w-full" : "lg:w-auto")}>
           <Button 
