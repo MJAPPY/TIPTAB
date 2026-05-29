@@ -167,7 +167,7 @@ const AdminHub = () => {
     performanceBoosts24h: 0
   });
 
-  // Live leaderboard winners state for Rewards Console
+  // Live leaderboard winners state for Rewards Console (initialized cleanly)
   const [winners, setWinners] = useState<{ account: string; role: string; rank: number; reward: string }[]>([]);
 
   // Sync moderated list with real database creators
@@ -254,7 +254,7 @@ const AdminHub = () => {
           .sort((a, b) => b[1] - a[1])
           .map(([handle]) => handle);
 
-        // Fill list of handles up to 10 using dbCreators
+        // Fill list of handles using active dbCreators (actual registered users)
         const filledHandles = [...sortedVotes];
         dbCreators.forEach(c => {
           const handleClean = c.handle.toLowerCase().replace('@', '').trim();
@@ -263,20 +263,11 @@ const AdminHub = () => {
           }
         });
 
-        // Ensure fallback static candidates if database is entirely fresh
-        const fallbackCandidates = ["whaleshark", "tiptab", "carlos_delivery", "early", "mayafit", "fanatic", "cking", "kofibuilds", "sarah_serves", "mwright"];
-        fallbackCandidates.forEach(h => {
-          if (!filledHandles.includes(h)) {
-            filledHandles.push(h);
-          }
-        });
-
-        const finalWinners = Array.from({ length: 10 }).map((_, idx) => {
-          const handle = filledHandles[idx];
+        const finalWinners = filledHandles.map((handle, idx) => {
           const creator = dbCreators.find(c => c.handle.toLowerCase().replace('@', '').trim() === handle);
           return {
             account: handle,
-            role: creator ? (creator.categories?.[0] || "Creator") : (idx % 2 === 0 ? "Creator" : "Supporter"),
+            role: creator ? (creator.categories?.[0] || "Creator") : "Supporter",
             rank: idx + 1,
             reward: "0"
           };
@@ -1000,7 +991,7 @@ const AdminHub = () => {
                </div>
 
                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                  <div className="bg-white/5 border border-white/10 rounded-[32px] p-6 flex items-center justify-between group hover:border-green-500/30 transition-all">
+                  <div className="bg-white/5 border border-white/10 rounded-[32px] p-6 flex items-center justify-between group hover:bg-green-500/30 transition-all">
                      <div className="space-y-1">
                         <p className="text-[10px] font-black uppercase tracking-widest text-white/40">Broadcast Stability</p>
                         <p className="text-xl font-black text-white">99.9%</p>
