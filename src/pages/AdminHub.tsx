@@ -630,7 +630,8 @@ const AdminHub = () => {
     toast({ title: "Ledger Cleared", description: "All payout fields reset to zero." });
   };
 
-  // Auto-balance top 3 gets 80%, other 7 gets 20% total share of the TAB pool
+  // Auto-balance top 3 gets 80%, other slots gets 20% total share of the TAB pool
+  // Specifically: Top 1 (50%), Top 2 (20%), Top 3 (10%). All others split the remaining 20% equally.
   const handleAutoBalanceRewards = () => {
     const pool = treasuryData.find(d => d.symbol === "TAB")?.rewards || 0;
     if (pool <= 0) {
@@ -642,16 +643,14 @@ const AdminHub = () => {
       return;
     }
     
-    // Top 3 splits 80% (45%, 23%, 12%)
-    // Remaining split 20% equally
     setWinners(prev => {
       const count = prev.length;
       return prev.map((w, idx) => {
         let rewardShare = 0;
         if (count >= 3) {
-          if (idx === 0) rewardShare = Math.floor(pool * 0.45);
-          else if (idx === 1) rewardShare = Math.floor(pool * 0.23);
-          else if (idx === 2) rewardShare = Math.floor(pool * 0.12);
+          if (idx === 0) rewardShare = Math.floor(pool * 0.50);
+          else if (idx === 1) rewardShare = Math.floor(pool * 0.20);
+          else if (idx === 2) rewardShare = Math.floor(pool * 0.10);
           else rewardShare = Math.floor((pool * 0.20) / (count - 3));
         } else {
           rewardShare = Math.floor(pool / count);
@@ -662,7 +661,7 @@ const AdminHub = () => {
         };
       });
     });
-    toast({ title: "Rewards Balanced", description: "TAB Reward pool distributed: 80% split among Top 3, 20% shared among remaining slots." });
+    toast({ title: "Rewards Balanced", description: "TAB Reward pool distributed: 50% to 1st, 20% to 2nd, 10% to 3rd, and 20% shared among others." });
   };
 
   const handleBroadcast = () => {
@@ -1419,7 +1418,7 @@ const AdminHub = () => {
                             value={newPromoUses} 
                             onChange={(e) => setNewPromoUses(e.target.value)} 
                             className="pl-12 bg-[#2a1d4a] border-white/10 rounded-xl h-12 px-4 focus:ring-purple-500/50 font-black text-white" 
-                          />
+                            />
                         </div>
                       </div>
 
