@@ -331,12 +331,29 @@ export const Header = ({ onBecomeCreator }: HeaderProps) => {
                       </Link>
                     </DropdownMenuItem>
                   )}
-                  <DropdownMenuItem asChild className="focus:bg-purple-500/15 focus:text-purple-400 rounded-xl cursor-pointer">
-                    <Link to="/dashboard" className="flex items-center gap-3 px-3 py-2.5">
-                      <LayoutDashboard className="h-4 w-4 text-purple-400" />
-                      <span className="font-bold text-slate-200">{isMember ? "Creator Hub" : "Supporter Hub"}</span>
-                    </Link>
-                  </DropdownMenuItem>
+                  {isMember ? (
+                    <>
+                      <DropdownMenuItem asChild className="focus:bg-purple-500/15 focus:text-purple-400 rounded-xl cursor-pointer">
+                        <Link to="/dashboard" onClick={() => localStorage.setItem("tiptab_dash_mode", "creator")} className="flex items-center gap-3 px-3 py-2.5">
+                          <LayoutDashboard className="h-4 w-4 text-purple-400" />
+                          <span className="font-bold text-slate-200">Creator Hub</span>
+                        </Link>
+                      </DropdownMenuItem>
+                      <DropdownMenuItem asChild className="focus:bg-purple-500/15 focus:text-purple-400 rounded-xl cursor-pointer">
+                        <Link to="/dashboard" onClick={() => localStorage.setItem("tiptab_dash_mode", "supporter")} className="flex items-center gap-3 px-3 py-2.5">
+                          <Heart className="h-4 w-4 text-red-400" />
+                          <span className="font-bold text-slate-200">Supporters Hub</span>
+                        </Link>
+                      </DropdownMenuItem>
+                    </>
+                  ) : (
+                    <DropdownMenuItem asChild className="focus:bg-purple-500/15 focus:text-purple-400 rounded-xl cursor-pointer">
+                      <Link to="/dashboard" className="flex items-center gap-3 px-3 py-2.5">
+                        <LayoutDashboard className="h-4 w-4 text-purple-400" />
+                        <span className="font-bold text-slate-200">Supporter Hub</span>
+                      </Link>
+                    </DropdownMenuItem>
+                  )}
                   <DropdownMenuItem onClick={handleLogout} className="focus:bg-red-500/10 focus:text-red-500 rounded-xl cursor-pointer text-red-400 flex items-center gap-3 px-3 py-2.5">
                     <LogOut className="h-4 w-4" />
                     <span className="font-bold">Logout Wallet</span>
@@ -408,14 +425,37 @@ export const Header = ({ onBecomeCreator }: HeaderProps) => {
                   <NavItems isMobile={true} />
                   
                   {isConnected && (
-                    <Button 
-                      variant="ghost" 
-                      onClick={handleLogout}
-                      className="w-full text-red-400 hover:text-red-500 hover:bg-red-500/10 flex items-center justify-start gap-4 font-bold border border-red-500/20 rounded-2xl h-14 px-6 mt-4 transition-all"
-                    >
-                      <LogOut className="h-5 w-5" />
-                      Logout Wallet
-                    </Button>
+                    <div className="flex flex-col gap-3 mt-4">
+                      {isMember ? (
+                        <>
+                          <Link to="/dashboard" onClick={() => { localStorage.setItem("tiptab_dash_mode", "creator"); setIsOpen(false); }} className="w-full">
+                            <Button variant="ghost" className="w-full text-slate-200 hover:text-purple-400 hover:bg-purple-500/15 flex items-center justify-start font-bold bg-white/5 border border-white/10 rounded-2xl h-12 px-6">
+                              <LayoutDashboard className="h-5 w-5 text-purple-400" /> Creator Hub
+                            </Button>
+                          </Link>
+                          <Link to="/dashboard" onClick={() => { localStorage.setItem("tiptab_dash_mode", "supporter"); setIsOpen(false); }} className="w-full">
+                            <Button variant="ghost" className="w-full text-slate-200 hover:text-red-400 hover:bg-red-500/15 flex items-center justify-start font-bold bg-white/5 border border-white/10 rounded-2xl h-12 px-6">
+                              <Heart className="h-5 w-5 text-red-400" /> Supporters Hub
+                            </Button>
+                          </Link>
+                        </>
+                      ) : (
+                        <Link to="/dashboard" onClick={() => setIsOpen(false)} className="w-full">
+                          <Button variant="ghost" className="w-full text-slate-200 hover:text-purple-400 hover:bg-purple-500/15 flex items-center justify-start font-bold bg-white/5 border border-white/10 rounded-2xl h-12 px-6">
+                            <LayoutDashboard className="h-5 w-5 text-purple-400" /> Supporter Hub
+                          </Button>
+                        </Link>
+                      )}
+                      
+                      <Button 
+                        variant="ghost" 
+                        onClick={handleLogout}
+                        className="w-full text-red-400 hover:text-red-500 hover:bg-red-500/10 flex items-center justify-start gap-4 font-bold border border-red-500/20 rounded-2xl h-14 px-6 mt-2 transition-all"
+                      >
+                        <LogOut className="h-5 w-5" />
+                        Logout Wallet
+                      </Button>
+                    </div>
                   )}
                 </div>
               </SheetContent>

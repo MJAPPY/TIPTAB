@@ -56,6 +56,14 @@ const Dashboard = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
   
+  const [dashboardMode, setDashboardMode] = useState<"creator" | "supporter">(() => {
+    if (typeof window !== "undefined") {
+      const saved = localStorage.getItem("tiptab_dash_mode");
+      if (saved === "creator" || saved === "supporter") return saved;
+    }
+    return isMember ? "creator" : "supporter";
+  });
+
   const [activeTab, setActiveTab] = useState("analytics");
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [isMembershipModalOpen, setIsMembershipModalOpen] = useState(false);
@@ -74,6 +82,19 @@ const Dashboard = () => {
 
   const alcorUrl = "https://alcor.exchange/v/xpr/swap?input=xpr-eosio.token&output=tab-tokencreate";
   const metalPayUrl = "https://onramp.metalpay.com/buy/xpr";
+
+  // Watch storage updates to cleanly sync workspace modes clicked in the dropdown
+  useEffect(() => {
+    const checkMode = () => {
+      const saved = localStorage.getItem("tiptab_dash_mode");
+      if (saved === "creator" || saved === "supporter") {
+        setDashboardMode(saved);
+      } else {
+        setDashboardMode(isMember ? "creator" : "supporter");
+      }
+    };
+    checkMode();
+  }, [isMember, activeTab]);
 
   useEffect(() => {
     if (!actor) return;
@@ -115,16 +136,18 @@ const Dashboard = () => {
     setEngagementRate(parseFloat(savedEngagement));
   }, [actor]);
 
+  const viewIsMember = useMemo(() => isMember && dashboardMode === "creator", [isMember, dashboardMode]);
+
   const navigationItems = useMemo(() => {
     const items = [
       { id: "analytics", icon: TrendingUp, label: "Analytics" },
       { id: "payouts", icon: Wallet, label: "Payouts" },
       { id: "favorites", icon: Star, label: "Favorites" },
     ];
-    if (isMember) items.splice(1, 0, { id: "card", icon: CreditCard, label: "Card" });
+    if (viewIsMember) items.splice(1, 0, { id: "card", icon: CreditCard, label: "Card" });
     items.push({ id: "settings", icon: UserIcon, label: "Profile" });
     return items;
-  }, [isMember]);
+  }, [viewIsMember]);
 
   const formatPrecision = (val: string) => {
     const num = parseFloat(val);
@@ -240,10 +263,41 @@ const Dashboard = () => {
       <main className="container mx-auto px-4 md:px-6 py-8 pt-32 sm:pt-44 relative z-10 pb-24">
         <div className="flex flex-col xl:flex-row xl:items-end justify-between gap-8 mb-12 sm:mb-16">
           <div className="space-y-3 sm:space-y-4">
-             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/5 border border-white/10 text-[9px] font-black uppercase tracking-[0.2em] text-slate-400">
-              <Zap className="h-3 w-3 text-orange-500 fill-orange-500" />
-              {isMember ? "Creator Portal" : "Supporter Portal"}
-            </div>
+             <div className="flex items-center gap-3 flex-wrap">
+               <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/5 border border-white/10 text-[9px] font-black uppercase tracking-[0.2em] text-slate-400">
+                <Zap className="h-3 w-3 text-orange-500 fill-orange-500" />
+                {viewIsMember ? "Creator Portal" : "Supporter Portal"}
+              </div>
+              
+              {isMember && (
+                <div className="flex bg-white/5 border border-white/10 p-1 rounded-xl animate-in fade-in duration-300">
+                  <button
+                    onClick={() => {
+                      setDashboardMode("creator");
+                      localStorage.setItem("tiptab_dash_mode", "creator");
+                    }}
+                    className={cn(
+                      "h-8 px-4 rounded-lg font-black text-[10px] uppercase tracking-wider transition-all",
+                      dashboardMode === "creator" ? "bg-purple-600 text-white shadow-md" : "text-white/40 hover:text-white"
+                    )}
+                  >
+                    Creator Hub
+                  </button>
+                  <button
+                    onClick={() => {
+                      setDashboardMode("supporter");
+                      localStorage.setItem("tiptab_dash_mode", "supporter");
+                    }}
+                    className={cn(
+                      "h-8 px-4 rounded-lg font-black text-[10px] uppercase tracking-wider transition-all",
+                      dashboardMode === "supporter" ? "bg-purple-600 text-white shadow-md" : "text-white/40 hover:text-white"
+                    )}
+                  >
+                    Supporters Hub
+                  </button>
+                </div>
+              )}
+             </div>
             <h1 className="text-3xl sm:text-5xl md:text-7xl font-black tracking-tighter leading-none text-slate-100">
               Welcome, <br className="sm:hidden" />
               <span className="text-transparent bg-clip-text bg-gradient-to-r from-white via-white to-white/60">@{actor}</span>
@@ -457,15 +511,17 @@ const Dashboard = () => {
             </div>
           </TabsContent>
 
-          <TabsContent value="card" className="mt-0 animate-in zoom-in-95 duration-500">
-            <div className="max-w-xl mx-auto px-2">
-              <div className="text-center mb-10 space-y-2">
-                <h2 className="text-3xl font-black italic tracking-tighter text-slate-100">Your Network Pass</h2>
-                <p className="text-slate-400 font-medium">Share this card anywhere to receive zero-fee tips.</p>
+          {viewIsMember && (
+            <TabsContent value="card" className="mt-0 animate-in zoom-in-95 duration-500">
+              <div className="max-w-xl mx-auto px-2">
+                <div className="text-center mb-10 space-y-2">
+                  <h2 className="text-3xl font-black italic tracking-tighter text-slate-100">Your Network Pass</h2>
+                  <p className="text-slate-400 font-medium">Share this card anywhere to receive zero-fee tips.</p>
+                </div>
+                {userProfile && <TipTabCard creator={userProfile} />}
               </div>
-              {userProfile && <TipTabCard creator={userProfile} />}
-            </div>
-          </TabsContent>
+            </TabsContent>
+          )}
 
           <TabsContent value="favorites" className="space-y-8 mt-0 animate-in fade-in slide-in-from-left-4 duration-500">
             <div className="max-w-4xl mx-auto space-y-8">
@@ -530,7 +586,7 @@ const Dashboard = () => {
                 <h2 className="text-3xl font-black italic tracking-tighter text-slate-100">Account Settings</h2>
                 <p className="text-slate-400 font-medium">Manage your identity and discovery on the network.</p>
               </div>
-              {userProfile && <ProfileEditor initialData={userProfile} onSave={updateUserProfile} minimal={!isMember} />}
+              {userProfile && <ProfileEditor initialData={userProfile} onSave={updateUserProfile} minimal={!viewIsMember} />}
             </div>
           </TabsContent>
         </Tabs>
