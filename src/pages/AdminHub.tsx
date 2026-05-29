@@ -476,6 +476,7 @@ const AdminHub = () => {
 
       return {
         ...item,
+        revenue: netRevenue,
         rewards,
         splitPolicy: "50/50 Rewards Split"
       };
@@ -2250,7 +2251,7 @@ const AdminHub = () => {
                 <Label className="text-[10px] font-black uppercase tracking-widest text-white/40">Screenshot URL</Label>
                 <Input 
                   value={editingSite.screenshot_url} 
-                  onChange={(e) => setFormData ? undefined : setEditingSite({ ...editingSite, screenshot_url: e.target.value })} 
+                  onChange={(e) => setEditingSite({ ...editingSite, screenshot_url: e.target.value })} 
                   className="bg-white/5 border-white/10 h-12 rounded-xl text-white"
                 />
               </div>
