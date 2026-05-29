@@ -373,7 +373,7 @@ export const ProfileEditor = ({ initialData, onSave, minimal = false }: ProfileE
         <div className="space-y-12">
 
           {/* Membership Status Information Section */}
-          {isMember && membershipDate && (
+          {!minimal && isMember && membershipDate && (
             <div className="p-6 md:p-8 rounded-[32px] bg-gradient-to-r from-orange-500/10 via-purple-500/10 to-transparent border border-orange-500/20 space-y-6 animate-in fade-in slide-in-from-top-4 duration-500">
                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6">
                   <div className="space-y-1">
@@ -437,7 +437,7 @@ export const ProfileEditor = ({ initialData, onSave, minimal = false }: ProfileE
                       src={formData.coverImage} 
                       alt="Profile Cover" 
                       className="w-full h-full object-cover select-none pointer-events-none" 
-                      style={{ objectPosition: `50% ${formData.coverPosition}%` }}
+                      style={{ objectPosition: `50% ${formData.coverPosition || 50}%` }}
                     />
                     {/* Drag-over indicator overlay when an image is already uploaded */}
                     {isDraggingCover && (
@@ -447,6 +447,7 @@ export const ProfileEditor = ({ initialData, onSave, minimal = false }: ProfileE
                       </div>
                     )}
                     <button 
+                      type="button"
                       onClick={removeCoverImage}
                       className="absolute top-4 right-4 bg-red-500 hover:bg-red-600 text-white rounded-full p-2.5 shadow-xl transition-colors z-10"
                     >
@@ -522,6 +523,7 @@ export const ProfileEditor = ({ initialData, onSave, minimal = false }: ProfileE
                 </div>
                 {formData.avatarImage && (
                   <button 
+                    type="button"
                     onClick={removeImage}
                     className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-1 shadow-lg hover:bg-red-600 transition-colors"
                   >
