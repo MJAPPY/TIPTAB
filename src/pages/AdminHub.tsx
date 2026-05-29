@@ -228,7 +228,7 @@ const AdminHub = () => {
     fetchLiveStats();
   }, [fetchLiveStats]);
 
-  // Fetch live winners from Supabase votes database for Rewards Console
+  // Fetch live winners (both Candidates as 'Creator' and Voters as 'Supporter') from Supabase votes database for Rewards Console
   useEffect(() => {
     const fetchLiveWinners = async () => {
       try {
@@ -238,40 +238,98 @@ const AdminHub = () => {
 
         const { data, error } = await supabase
           .from('votes')
-          .select('candidate_handle, tab_amount')
+          .select('voter_handle, candidate_handle, tab_amount')
           .eq('week_identifier', quarterId);
 
-        const totals: Record<string, number> = {};
+        const creatorTotals: Record<string, number> = {};
+        const supporterTotals: Record<string, number> = {};
+
         if (data && !error) {
           data.forEach(v => {
-            const cleanHandle = v.candidate_handle.toLowerCase().replace('@', '').trim();
-            totals[cleanHandle] = (totals[cleanHandle] || 0) + Number(v.tab_amount);
+            const cleanCandidate = v.candidate_handle.toLowerCase().replace('@', '').trim();
+            const cleanVoter = v.voter_handle.toLowerCase().replace('@', '').trim();
+            
+            creatorTotals[cleanCandidate] = (creatorTotals[cleanCandidate] || 0) + Number(v.tab_amount);
+            supporterTotals[cleanVoter] = (supporterTotals[cleanVoter] || 0) + Number(v.tab_amount);
           });
         }
 
-        // Sort votes descending
-        const sortedVotes = Object.entries(totals)
+        // Sort creators and supporters descending
+        const sortedCreators = Object.entries(creatorTotals)
           .sort((a, b) => b[1] - a[1])
-          .map(([handle]) => handle);
+          .map(([handle]) => ({ handle, role: "Creator" }));
 
-        // Fill list of handles using active dbCreators (actual registered users)
-        const filledHandles = [...sortedVotes];
-        dbCreators.forEach(c => {
-          const handleClean = c.handle.toLowerCase().replace('@', '').trim();
-          if (!filledHandles.includes(handleClean)) {
-            filledHandles.push(handleClean);
+        const sortedSupporters = Object.entries(supporterTotals)
+          .sort((a, b) => b[1] - a[1])
+          .map(([handle]) => ({ handle, role: "Supporter" }));
+
+        // Alternate creators and supporters dynamically on the rewards ledger
+        const combinedList: { account: string; role: string; rank: number; reward: string }[] = [];
+        let cIdx = 0;
+        let sIdx = 0;
+
+        for (let i = 0; i < 10; i++) {
+          if (i % 2 === 0 && cIdx < sortedCreators.length) {
+            combinedList.push({
+              account: sortedCreators[cIdx].handle,
+              role: "Creator",
+              rank: combinedList.length + 1,
+              reward: "0"
+            });
+            cIdx++;
+          } else if (sIdx < sortedSupporters.length) {
+            combinedList.push({
+              account: sortedSupporters[sIdx].handle,
+              role: "Supporter",
+              rank: combinedList.length + 1,
+              reward: "0"
+            });
+            sIdx++;
+          } else if (cIdx < sortedCreators.length) {
+            combinedList.push({
+              account: sortedCreators[cIdx].handle,
+              role: "Creator",
+              rank: combinedList.length + 1,
+              reward: "0"
+            });
+            cIdx++;
+          }
+        }
+
+        // Fill remaining empty slots with dbCreators if less than 10 entries exist
+        if (combinedList.length < 10) {
+          dbCreators.forEach(c => {
+            if (combinedList.length >= 10) return;
+            const handleClean = c.handle.toLowerCase().replace('@', '').trim();
+            if (!combinedList.some(w => w.account === handleClean)) {
+              combinedList.push({
+                account: handleClean,
+                role: c.categories?.[0] || "Creator",
+                rank: combinedList.length + 1,
+                reward: "0"
+              });
+            }
+          });
+        }
+
+        // Apply fallback standard Supporters to meet the top 10 ledger format if database is fresh
+        const fallbackSupporters = ["early", "fanatic", "cking", "whaleshark"];
+        fallbackSupporters.forEach(h => {
+          if (combinedList.length >= 10) return;
+          if (!combinedList.some(w => w.account === h)) {
+            combinedList.push({
+              account: h,
+              role: "Supporter",
+              rank: combinedList.length + 1,
+              reward: "0"
+            });
           }
         });
 
-        const finalWinners = filledHandles.map((handle, idx) => {
-          const creator = dbCreators.find(c => c.handle.toLowerCase().replace('@', '').trim() === handle);
-          return {
-            account: handle,
-            role: creator ? (creator.categories?.[0] || "Creator") : "Supporter",
-            rank: idx + 1,
-            reward: "0"
-          };
-        });
+        const finalWinners = combinedList.slice(0, 10).map((w, idx) => ({
+          ...w,
+          rank: idx + 1
+        }));
 
         setWinners(finalWinners);
       } catch (err) {
@@ -457,13 +515,13 @@ const AdminHub = () => {
         const calculatedXmd = targetFeeUsd.toFixed(2);
         
         const calculatedMetal = (targetFeeUsd / (metalXpr * xprUsd)).toFixed(4);
-        const calculatedLoan = (targetFeeUsd / (loanXpr * xprUsd)).toFixed(0);
+        const calculatedText = (targetFeeUsd / (loanXpr * xprUsd)).toFixed(0);
         const calculatedXmt = (targetFeeUsd / (xmtXpr * xprUsd)).toFixed(4);
         
         updateMembershipFee(calculatedXpr, 'XPR');
         updateMembershipFee(calculatedXmd, 'XMD');
         updateMembershipFee(calculatedMetal, 'METAL');
-        updateMembershipFee(calculatedLoan, 'LOAN');
+        updateMembershipFee(calculatedText, 'LOAN');
         updateMembershipFee(calculatedXmt, 'XMT');
         
         if (!isAuto) updateMembershipFee(localFeeXusdc, 'XUSDC');
@@ -471,7 +529,7 @@ const AdminHub = () => {
         setLocalFee(calculatedXpr);
         setLocalFeeXmd(calculatedXmd);
         setLocalFeeMetal(calculatedMetal);
-        setLocalFeeLoan(calculatedLoan);
+        setLocalFeeLoan(calculatedText);
         setLocalFeeXmt(calculatedXmt);
       }
 
@@ -991,7 +1049,7 @@ const AdminHub = () => {
                </div>
 
                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                  <div className="bg-white/5 border border-white/10 rounded-[32px] p-6 flex items-center justify-between group hover:bg-green-500/30 transition-all">
+                  <div className="bg-white/5 border border-white/10 rounded-[32px] p-6 flex items-center justify-between group hover:border-green-500/30 transition-all">
                      <div className="space-y-1">
                         <p className="text-[10px] font-black uppercase tracking-widest text-white/40">Broadcast Stability</p>
                         <p className="text-xl font-black text-white">99.9%</p>
