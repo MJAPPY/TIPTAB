@@ -332,8 +332,12 @@ export const ProfileEditor = ({ initialData, onSave, minimal = false }: ProfileE
       });
 
       setIsDeleteModalOpen(false);
-      await logout();
+      
+      // Graceful unmount delay to prevent layout crashes
       navigate("/");
+      setTimeout(async () => {
+        await logout();
+      }, 100);
     } catch (err: any) {
       toast({
         title: "Deletion Failed",

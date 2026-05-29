@@ -893,8 +893,12 @@ const AdminHub = () => {
       title: "Self-Removal Verified",
       description: "You have revoked your admin status. Logging out...",
     });
-    await logout();
+    
+    // Graceful unmount redirect delay
     navigate("/");
+    setTimeout(async () => {
+      await logout();
+    }, 100);
   };
 
   const openAuditLogs = (creator: Creator) => {
