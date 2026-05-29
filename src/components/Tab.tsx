@@ -25,11 +25,14 @@ export const Tab = () => {
 
   useEffect(() => {
     const fetchTopVoted = async () => {
-      const weekId = `W${new Date().getFullYear()}-${Math.ceil(new Date().getDate() / 7)}`;
+      const year = new Date().getFullYear();
+      const quarter = Math.floor(new Date().getMonth() / 3) + 1;
+      const quarterId = `Q${year}-${quarter}`;
+
       const { data, error } = await supabase
         .from('votes')
         .select('candidate_handle, tab_amount')
-        .eq('week_identifier', weekId);
+        .eq('week_identifier', quarterId);
 
       if (data && !error) {
         const totals: Record<string, number> = {};

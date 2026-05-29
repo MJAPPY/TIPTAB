@@ -24,12 +24,18 @@ const Voting = () => {
 
   const [leaderboard, setLeaderboard] = useState<{ handle: string; votes: number }[]>([]);
 
+  const getQuarterIdentifier = () => {
+    const year = new Date().getFullYear();
+    const quarter = Math.floor(new Date().getMonth() / 3) + 1;
+    return `Q${year}-${quarter}`;
+  };
+
   const fetchVotes = async () => {
-    const weekId = `W${new Date().getFullYear()}-${Math.ceil(new Date().getDate() / 7)}`;
+    const quarterId = getQuarterIdentifier();
     const { data, error } = await supabase
       .from('votes')
       .select('candidate_handle, tab_amount')
-      .eq('week_identifier', weekId);
+      .eq('week_identifier', quarterId); // Using week_identifier column but storing quarterId
 
     if (data && !error) {
       const totals: Record<string, number> = {};
@@ -82,19 +88,19 @@ const Voting = () => {
           from: actor,
           to: 'tiptab',
           quantity: `${amount} TAB`,
-          memo: `Vote for @${candidateHandle}`,
+          memo: `Quarterly vote for @${candidateHandle}`,
         },
       };
 
       await session!.transact({ actions: [transferAction] }, { broadcast: true });
 
       // 2. Record in DB
-      const weekId = `W${new Date().getFullYear()}-${Math.ceil(new Date().getDate() / 7)}`;
+      const quarterId = getQuarterIdentifier();
       await supabase.from('votes').insert({
         voter_handle: actor!,
         candidate_handle: candidateHandle,
         tab_amount: amount,
-        week_identifier: weekId
+        week_identifier: quarterId
       });
 
       toast({
@@ -124,13 +130,13 @@ const Voting = () => {
           <div className="text-center space-y-6">
             <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-orange-500/10 border border-orange-500/20 text-xs font-black uppercase tracking-widest text-orange-500">
               <Zap className="h-4 w-4 fill-orange-500" />
-              Community Choice
+              Quarterly Selection
             </div>
             <h1 className="text-5xl md:text-8xl font-black tracking-tighter italic">
               FEATURED <span className="text-transparent bg-clip-text bg-gradient-to-r from-orange-400 to-purple-600">VOTING</span>
             </h1>
             <p className="text-xl text-white/60 max-w-2xl mx-auto font-medium">
-              Spend TAB to vote for your favorite pros. The top 3 every week earn a guaranteed spotlight on the home page.
+              Spend TAB to vote for your favorite pros. The top 3 every quarter earn a guaranteed spotlight on the home page.
             </p>
           </div>
 
@@ -211,9 +217,9 @@ const Voting = () => {
                 <div className="absolute top-0 right-0 p-8 opacity-10"><Trophy className="h-24 w-24 text-orange-500" /></div>
                 <CardHeader className="p-10 pb-4">
                   <CardTitle className="text-2xl font-black italic uppercase text-white flex items-center gap-3">
-                    <Flame className="h-6 w-6 text-red-500" /> LIVE STANDINGS
+                    <Flame className="h-6 w-6 text-red-500" /> QUARTERLY STANDINGS
                   </CardTitle>
-                  <CardDescription className="text-white/40 font-bold text-xs uppercase tracking-widest">Ending in 4 days</CardDescription>
+                  <CardDescription className="text-white/40 font-bold text-xs uppercase tracking-widest">Active Quarter</CardDescription>
                 </CardHeader>
                 <CardContent className="p-10 pt-4 space-y-6">
                   {leaderboard.length > 0 ? (
@@ -246,7 +252,7 @@ const Voting = () => {
                    <Heart className="h-4 w-4 text-red-500" /> REWARDS POOL
                  </h4>
                  <p className="text-sm text-white/50 font-bold leading-relaxed">
-                   100% of TAB spent on voting is added to the weekly Reward Pool and distributed back to the top Creators and Supporters.
+                   100% of TAB spent on voting is added to the quarterly Reward Pool and distributed back to the top Creators and Supporters.
                  </p>
               </div>
             </div>
