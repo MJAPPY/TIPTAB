@@ -1,6 +1,6 @@
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Search, Plus, MapPin, QrCode, Twitter, Globe, Instagram, Video, Zap, MessageSquare, Facebook } from "lucide-react";
+import { Search, Plus, MapPin, QrCode, Zap } from "lucide-react";
 import { useState, useMemo } from "react";
 import { Creator } from "@/data/creators";
 import { cn } from "@/lib/utils";
@@ -181,12 +181,8 @@ export const FeaturedCreators = ({ creators, onSelectCreator, onViewProfile, onA
                     <MapPin className="h-3.5 w-3.5 md:h-4 w-4" style={{ color: theme.color }} />
                     {creator.location}
                   </div>
-                  <div className="flex items-center gap-2.5 md:gap-3">
-                    {creator.twitter && <Twitter className="h-3.5 w-3.5 md:h-4 w-4 text-white/40 hover:text-purple-400 transition-colors" />}
-                    {creator.instagram && <Instagram className="h-3.5 w-3.5 md:h-4 w-4 text-white/40 hover:text-purple-400 transition-colors" />}
-                    {creator.snipverse && <MessageSquare className="h-3.5 w-3.5 md:h-4 w-4 text-white/40 hover:text-purple-400 transition-colors" />}
-                    {creator.facebook && <Facebook className="h-3.5 w-3.5 md:h-4 w-4 text-white/40 hover:text-purple-400 transition-colors" />}
-                    {creator.website && <Globe className="h-3.5 w-3.5 md:h-4 w-4 text-white/40 hover:text-purple-400 transition-colors" />}
+                  <div className="text-[9px] md:text-[10px] font-black uppercase tracking-[0.15em] text-white/30 group-hover:text-purple-400 transition-colors">
+                    Click to view Profile
                   </div>
                 </div>
                 
