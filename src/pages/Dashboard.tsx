@@ -115,6 +115,17 @@ const Dashboard = () => {
     setEngagementRate(parseFloat(savedEngagement));
   }, [actor]);
 
+  const navigationItems = useMemo(() => {
+    const items = [
+      { id: "analytics", icon: TrendingUp, label: "Analytics" },
+      { id: "payouts", icon: Wallet, label: "Payouts" },
+      { id: "favorites", icon: Star, label: "Favorites" },
+    ];
+    if (isMember) items.splice(1, 0, { id: "card", icon: CreditCard, label: "Card" });
+    items.push({ id: "settings", icon: UserIcon, label: "Profile" });
+    return items;
+  }, [isMember]);
+
   const formatPrecision = (val: string) => {
     const num = parseFloat(val);
     if (isNaN(num)) return "";
@@ -207,6 +218,7 @@ const Dashboard = () => {
     return diffDays < 30; 
   };
 
+  // Safe early returns below all hook definitions to comply with React Hook Rules
   if (!isConnected && !isAuthLoading) {
     return (
       <div className="min-h-screen bg-[#0a0514] flex flex-col items-center justify-center p-6 text-center">
@@ -218,17 +230,6 @@ const Dashboard = () => {
       </div>
     );
   }
-
-  const navigationItems = useMemo(() => {
-    const items = [
-      { id: "analytics", icon: TrendingUp, label: "Analytics" },
-      { id: "payouts", icon: Wallet, label: "Payouts" },
-      { id: "favorites", icon: Star, label: "Favorites" },
-    ];
-    if (isMember) items.splice(1, 0, { id: "card", icon: CreditCard, label: "Card" });
-    items.push({ id: "settings", icon: UserIcon, label: "Profile" });
-    return items;
-  }, [isMember]);
 
   return (
     <div className="min-h-screen bg-[#0a0514] text-white selection:bg-purple-500/30">
