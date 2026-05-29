@@ -1,4 +1,6 @@
-import { useState, useMemo } from "react";
+"use client";
+
+import { useState, useMemo, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Header } from "./tab-platform/Header";
 import { Hero } from "./tab-platform/Hero";
@@ -12,33 +14,53 @@ import { ActivityTicker } from "./tab-platform/ActivityTicker";
 import { Toaster } from "@/components/ui/toaster";
 import { Creator } from "@/data/creators";
 import { useXpr } from "@/contexts/XprContext";
+import { supabase } from "@/integrations/supabase/client";
 
 export const Tab = () => {
   const [isMembershipOpen, setIsMembershipOpen] = useState(false);
   const [selectedCreator, setSelectedCreator] = useState<Creator | null>(null);
   const { actor, userProfile, isMember, dbCreators } = useXpr();
+  const [topVotedHandles, setTopVotedHandles] = useState<string[]>([]);
   const navigate = useNavigate();
 
+  useEffect(() => {
+    const fetchTopVoted = async () => {
+      const weekId = `W${new Date().getFullYear()}-${Math.ceil(new Date().getDate() / 7)}`;
+      const { data, error } = await supabase
+        .from('votes')
+        .select('candidate_handle, tab_amount')
+        .eq('week_identifier', weekId);
+
+      if (data && !error) {
+        const totals: Record<string, number> = {};
+        data.forEach(v => {
+          totals[v.candidate_handle] = (totals[v.candidate_handle] || 0) + Number(v.tab_amount);
+        });
+        const sorted = Object.entries(totals)
+          .sort((a, b) => b[1] - a[1])
+          .slice(0, 3)
+          .map(([handle]) => handle);
+        setTopVotedHandles(sorted);
+      }
+    };
+    fetchTopVoted();
+  }, []);
+
   // Optimized logic to ensure local user profile overrides seed data on the map and lists
+  // AND priorities Top Voted pros for the Hero section display logic
   const displayCreators = useMemo(() => {
-    // 1. Start with the database list
     let list = [...dbCreators];
 
-    // 2. If user is logged in, find their profile in storage to ensure we have latest local edits
     if (actor && userProfile) {
       const cleanActor = actor.toLowerCase();
-      
-      // Check if this actor is a member (either via local flag or context)
       const membershipKey = `tiptab_membership_${actor}`;
       const isActuallyMember = isMember || localStorage.getItem(membershipKey) === 'true';
 
       if (isActuallyMember) {
         const existsIdx = list.findIndex(c => c.handle.toLowerCase() === cleanActor);
         if (existsIdx !== -1) {
-          // Replace existing seed data with current user profile
           list[existsIdx] = userProfile;
         } else {
-          // Add new member to the top of the map/list
           list = [userProfile, ...list];
         }
       }
@@ -46,6 +68,14 @@ export const Tab = () => {
     
     return list;
   }, [actor, userProfile, isMember, dbCreators]);
+
+  const heroCreators = useMemo(() => {
+    if (topVotedHandles.length > 0) {
+      const voted = displayCreators.filter(c => topVotedHandles.includes(c.handle.toLowerCase().replace('@', '')));
+      if (voted.length > 0) return voted;
+    }
+    return displayCreators;
+  }, [displayCreators, topVotedHandles]);
 
   const handleViewProfile = (creator: Creator) => {
     navigate(`/tip/${creator.handle}`);
@@ -62,7 +92,7 @@ export const Tab = () => {
       
       <main className="pt-24 md:pt-32">
         <div className="relative">
-          <Hero creators={displayCreators} onJoin={() => setIsMembershipOpen(true)} />
+          <Hero creators={heroCreators} onJoin={() => setIsMembershipOpen(true)} />
         </div>
         <StatsBanner />
         
