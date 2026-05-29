@@ -324,6 +324,16 @@ const Dashboard = () => {
           </div>
         </div>
 
+        {isNearingExpiry() && (
+          <div className="p-4 mb-6 rounded-2xl bg-orange-500/10 border border-orange-500/30 text-orange-400 text-sm flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <Calendar className="h-5 w-5" />
+              <span>Your membership expires on <strong className="text-white">{getExpiryDate()}</strong>. Renew now to stay on the map!</span>
+            </div>
+            <Button onClick={() => setIsMembershipModalOpen(true)} className="h-9 px-4 bg-orange-500 hover:bg-orange-600 text-white font-bold rounded-xl text-xs uppercase">Renew Now</Button>
+          </div>
+        )}
+
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
           <TabsContent value="analytics" className="space-y-10 mt-0 animate-in fade-in slide-in-from-bottom-4 duration-500">
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
@@ -448,18 +458,40 @@ const Dashboard = () => {
                   </CardContent>
                 </Card>
 
-                <Card className="bg-[#130b21]/40 border-white/10 text-white rounded-[32px] p-6 sm:p-8 shadow-2xl relative overflow-hidden group hover:border-pink-500/30 transition-all flex flex-col h-[220px]">
-                  <CardHeader className="p-0">
-                    <div className="flex items-center justify-between">
-                      <CardDescription className="text-slate-400 font-black uppercase tracking-[0.2em] text-[10px]">Engagement</CardDescription>
-                      <Users className="h-4 w-4 text-pink-400" />
-                    </div>
-                  </CardHeader>
-                  <CardContent className="p-0 mt-4 flex flex-col flex-1 justify-between">
-                    <span className="text-3xl font-black tracking-tighter text-slate-100">{engagementRate}%</span>
-                    <p className="text-[10px] text-white/30 font-bold uppercase tracking-widest pt-2">Conversion Ratio</p>
-                  </CardContent>
-                </Card>
+                {isMember && membershipDate ? (
+                  <Card className="bg-[#130b21]/40 border-white/10 text-white rounded-[32px] p-6 sm:p-8 shadow-2xl relative overflow-hidden group hover:border-purple-500/30 transition-all flex flex-col h-[220px]">
+                    <CardHeader className="p-0">
+                      <div className="flex items-center justify-between">
+                        <CardDescription className="text-slate-400 font-black uppercase tracking-[0.2em] text-[10px]">Membership Pass</CardDescription>
+                        <ShieldCheck className="h-4 w-4 text-orange-500" />
+                      </div>
+                    </CardHeader>
+                    <CardContent className="p-0 mt-4 flex flex-col flex-1 justify-between">
+                      <div>
+                        <p className="text-xs text-white/50">Expires: <strong className="text-white">{getExpiryDate()}</strong></p>
+                        {isNearingExpiry() ? (
+                          <span className="text-[9px] text-red-400 font-black uppercase tracking-widest bg-red-500/10 px-2 py-0.5 rounded border border-red-500/20">Expiring Soon</span>
+                        ) : (
+                          <span className="text-[9px] text-green-400 font-black uppercase tracking-widest bg-green-500/10 px-2 py-0.5 rounded border border-green-500/20">Active</span>
+                        )}
+                      </div>
+                      <Button onClick={() => setIsMembershipModalOpen(true)} className="h-9 w-full bg-orange-500 hover:bg-orange-600 text-white font-bold rounded-xl text-xs uppercase">Renew Now</Button>
+                    </CardContent>
+                  </Card>
+                ) : (
+                  <Card className="bg-[#130b21]/40 border-white/10 text-white rounded-[32px] p-6 sm:p-8 shadow-2xl relative overflow-hidden group hover:border-pink-500/30 transition-all flex flex-col h-[220px]">
+                    <CardHeader className="p-0">
+                      <div className="flex items-center justify-between">
+                        <CardDescription className="text-slate-400 font-black uppercase tracking-[0.2em] text-[10px]">Engagement</CardDescription>
+                        <Users className="h-4 w-4 text-pink-400" />
+                      </div>
+                    </CardHeader>
+                    <CardContent className="p-0 mt-4 flex flex-col flex-1 justify-between">
+                      <span className="text-3xl font-black tracking-tighter text-slate-100">{engagementRate}%</span>
+                      <p className="text-[10px] text-white/30 font-bold uppercase tracking-widest pt-2">Conversion Ratio</p>
+                    </CardContent>
+                  </Card>
+                )}
               </div>
             </div>
           </TabsContent>
