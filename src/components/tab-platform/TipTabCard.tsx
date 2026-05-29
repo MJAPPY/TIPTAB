@@ -198,14 +198,22 @@ export const TipTabCard = ({ creator }: TipTabCardProps) => {
                 </div>
               </div>
             </div>
-            <div className="text-center space-y-1 w-full">
-              <div className="bg-orange-500 text-white font-black text-[9px] md:text-[10px] uppercase tracking-[0.15em] px-3.5 py-1.5 rounded-full shadow-lg shadow-orange-500/20 flex items-center justify-center gap-1.5">
+            <div className="text-center space-y-1 w-full flex flex-col items-center">
+              <div className="bg-orange-500 text-white font-black text-[9px] md:text-[10px] uppercase tracking-[0.15em] px-3.5 py-1.5 rounded-full shadow-lg shadow-orange-500/20 flex items-center justify-center gap-1.5 w-full">
                 <Zap className="h-2.5 w-2.5 fill-white" />
                 Scan to Tip
               </div>
-              <p className="text-[8px] font-black text-white/30 tracking-[0.3em] uppercase pt-0.5">
-                XPR Network
-              </p>
+              
+              <div className="pt-1.5 flex flex-col items-center justify-center">
+                <img 
+                  src="/webAuth-logo.jpg" 
+                  alt="WebAuth Logo" 
+                  className="h-3 md:h-3.5 object-contain brightness-100 filter contrast-125"
+                />
+                <p className="text-[6px] md:text-[7px] font-black text-white/20 tracking-[0.3em] uppercase pt-0.5">
+                  XPR Network
+                </p>
+              </div>
             </div>
           </div>
         </div>
