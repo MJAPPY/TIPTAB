@@ -347,11 +347,27 @@ const CreatorProfile = () => {
   // Clean recipient XPR address handle
   const cleanRecipient = creator.handle.replace('@', '').toLowerCase().trim();
 
-  // 1. Native Custom App Protocol (Highly recommended on mobile browsers to launch WebAuth directly)
-  const nativeAppDeepLink = `proton://transfer?to=${cleanRecipient}`;
-  
-  // 2. Official Universal URL Scheme (Secure fallback to prevent loop conditions)
-  const fallbackUniversalLink = `https://link.protonchain.com/transfer?to=${cleanRecipient}`;
+  // Helper functions to generate fully qualified signing-compatible deep links.
+  // Supplying the precise amount, decimal precision, symbol, and contract prevents the Error 54 schema parsing exception inside the WebAuth app.
+  const getTransferDetails = () => {
+    const config = ASSET_CONFIGS[asset];
+    const amountNum = parseFloat(tipAmount) || 0;
+    const formattedAmount = config.precision === 0 
+      ? Math.floor(amountNum).toString()
+      : amountNum.toFixed(config.precision);
+    const encodedMemo = encodeURIComponent(message.trim() || 'Tipped via TipTab');
+    return { formattedAmount, encodedMemo, config };
+  };
+
+  const getNativeAppDeepLink = () => {
+    const { formattedAmount, encodedMemo, config } = getTransferDetails();
+    return `proton://transfer?to=${cleanRecipient}&amount=${formattedAmount}&token=${asset}&symbol=${asset}&contract=${config.code}&code=${config.code}&memo=${encodedMemo}`;
+  };
+
+  const getFallbackUniversalLink = () => {
+    const { formattedAmount, encodedMemo, config } = getTransferDetails();
+    return `https://link.protonchain.com/transfer?to=${cleanRecipient}&amount=${formattedAmount}&token=${asset}&symbol=${asset}&contract=${config.code}&code=${config.code}&memo=${encodedMemo}`;
+  };
 
   return (
     <div className="min-h-screen bg-[#0a0514] text-white selection:bg-purple-500/30">
@@ -759,7 +775,7 @@ const CreatorProfile = () => {
           <div className="flex flex-col items-center justify-center gap-6 my-6">
             <div className="bg-white p-4 rounded-[24px] shadow-2xl">
               <QRCodeSVG 
-                value={nativeAppDeepLink}
+                value={getNativeAppDeepLink()}
                 size={180}
                 level="H"
                 includeMargin={false}
@@ -774,12 +790,12 @@ const CreatorProfile = () => {
 
           <div className="space-y-3">
             <Button asChild className="w-full h-14 bg-gradient-to-r from-orange-500 to-purple-600 text-white font-black text-sm uppercase tracking-widest rounded-2xl shadow-lg transition-all active:scale-95">
-              <a href={nativeAppDeepLink}>
+              <a href={getNativeAppDeepLink()}>
                 Open WebAuth App
               </a>
             </Button>
             <Button asChild variant="outline" className="w-full h-12 text-white/60 border-white/10 hover:text-white bg-white/5 rounded-xl text-xs uppercase font-black">
-              <a href={fallbackUniversalLink} target="_blank" rel="noopener noreferrer">
+              <a href={getFallbackUniversalLink()} target="_blank" rel="noopener noreferrer">
                 Browser Fallback Link
               </a>
             </Button>
