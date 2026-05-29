@@ -84,20 +84,6 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { DetailedReportModal } from "@/components/tab-platform/DetailedReportModal";
 
-// Initial leaderboard recipients with zero rewards for production
-const INITIAL_LEADERBOARD_WINNERS = [
-  { account: "whaleshark", role: "Supporter", rank: 1, reward: "0" },
-  { account: "tiptab", role: "Creator", rank: 2, reward: "0" },
-  { account: "carlos_delivery", role: "Creator", rank: 3, reward: "0" },
-  { account: "early", role: "Supporter", rank: 4, reward: "0" },
-  { account: "mayafit", role: "Creator", rank: 5, reward: "0" },
-  { account: "fanatic", role: "Supporter", rank: 6, reward: "0" },
-  { account: "cking", role: "Supporter", rank: 7, reward: "0" },
-  { account: "kofibuilds", role: "Creator", rank: 8, reward: "0" },
-  { account: "sarah_serves", role: "Creator", rank: 9, reward: "0" },
-  { account: "mwright", role: "Creator", rank: 10, reward: "0" },
-];
-
 const AdminHub = () => {
   const { 
     isAdmin, 
@@ -132,6 +118,7 @@ const AdminHub = () => {
     deletePromoCode,
     actor,
     logout,
+    session,
     resetLiveTicker,
     dbCreators,
     fetchDbCreators
@@ -179,6 +166,9 @@ const AdminHub = () => {
     newProfiles24h: 0,
     performanceBoosts24h: 0
   });
+
+  // Live leaderboard winners state for Rewards Console
+  const [winners, setWinners] = useState<{ account: string; role: string; rank: number; reward: string }[]>([]);
 
   // Sync moderated list with real database creators
   useEffect(() => {
@@ -238,6 +228,69 @@ const AdminHub = () => {
     fetchLiveStats();
   }, [fetchLiveStats]);
 
+  // Fetch live winners from Supabase votes database for Rewards Console
+  useEffect(() => {
+    const fetchLiveWinners = async () => {
+      try {
+        const year = new Date().getFullYear();
+        const quarter = Math.floor(new Date().getMonth() / 3) + 1;
+        const quarterId = `Q${year}-${quarter}`;
+
+        const { data, error } = await supabase
+          .from('votes')
+          .select('candidate_handle, tab_amount')
+          .eq('week_identifier', quarterId);
+
+        const totals: Record<string, number> = {};
+        if (data && !error) {
+          data.forEach(v => {
+            const cleanHandle = v.candidate_handle.toLowerCase().replace('@', '').trim();
+            totals[cleanHandle] = (totals[cleanHandle] || 0) + Number(v.tab_amount);
+          });
+        }
+
+        // Sort votes descending
+        const sortedVotes = Object.entries(totals)
+          .sort((a, b) => b[1] - a[1])
+          .map(([handle]) => handle);
+
+        // Fill list of handles up to 10 using dbCreators
+        const filledHandles = [...sortedVotes];
+        dbCreators.forEach(c => {
+          const handleClean = c.handle.toLowerCase().replace('@', '').trim();
+          if (!filledHandles.includes(handleClean)) {
+            filledHandles.push(handleClean);
+          }
+        });
+
+        // Ensure fallback static candidates if database is entirely fresh
+        const fallbackCandidates = ["whaleshark", "tiptab", "carlos_delivery", "early", "mayafit", "fanatic", "cking", "kofibuilds", "sarah_serves", "mwright"];
+        fallbackCandidates.forEach(h => {
+          if (!filledHandles.includes(h)) {
+            filledHandles.push(h);
+          }
+        });
+
+        const finalWinners = Array.from({ length: 10 }).map((_, idx) => {
+          const handle = filledHandles[idx];
+          const creator = dbCreators.find(c => c.handle.toLowerCase().replace('@', '').trim() === handle);
+          return {
+            account: handle,
+            role: creator ? (creator.categories?.[0] || "Creator") : (idx % 2 === 0 ? "Creator" : "Supporter"),
+            rank: idx + 1,
+            reward: "0"
+          };
+        });
+
+        setWinners(finalWinners);
+      } catch (err) {
+        console.error("Failed to load live winners data", err);
+      }
+    };
+
+    fetchLiveWinners();
+  }, [dbCreators]);
+
   // Build real dynamic audit logs based on the selected creator's actions and history
   const auditLogs = useMemo(() => {
     if (!selectedCreator) return [];
@@ -283,9 +336,6 @@ const AdminHub = () => {
   const [removalStep, setRemovalStep] = useState<"closed" | "warning1" | "warning2">("closed");
   const [confirmInput, setConfirmInput] = useState("");
   const [targetIdForRemoval, setTargetIdForRemoval] = useState<string | null>(null);
-
-  // Editable Leaderboard Payouts State
-  const [winners, setWinners] = useState(INITIAL_LEADERBOARD_WINNERS);
 
   // Promo Code Creation Form State
   const [newPromoCode, setNewPromoCode] = useState("");
@@ -510,12 +560,14 @@ const AdminHub = () => {
     }
   };
 
+  // Process payouts in TAB token instead of XPR
   const handleRewardWinners = async () => {
+    if (!session || !actor) return;
     setIsDistributing(true);
     try {
       const activeWinners = winners
         .filter(w => parseFloat(w.reward || "0") > 0)
-        .map(w => ({ account: w.account, amount: w.reward }));
+        .map(w => ({ account: w.account, amount: Math.floor(parseFloat(w.reward)) }));
         
       if (activeWinners.length === 0) {
         toast({ title: "Payout Skipped", description: "No positive reward values configured." });
@@ -523,15 +575,27 @@ const AdminHub = () => {
         return;
       }
 
-      const success = await distributeXprRewards(activeWinners);
-      if (success) {
-        toast({
-          title: "Rewards Distributed!",
-          description: `Successfully paid out rewards to the winners.`,
-        });
-      }
-    } catch (e) {
-      toast({ title: "Reward Error", description: "Failed to process batch payout.", variant: "destructive" });
+      // Execute on-chain contract actions using 'tokencreate' for TAB
+      const actions = activeWinners.map(winner => ({
+        account: 'tokencreate',
+        name: 'transfer',
+        authorization: [{ actor: session.auth.actor, permission: session.auth.permission }],
+        data: { 
+          from: actor, 
+          to: winner.account, 
+          quantity: `${winner.amount} TAB`, 
+          memo: 'TIPTAB Quarterly Performance Reward' 
+        },
+      }));
+
+      await session.transact({ actions }, { broadcast: true });
+
+      toast({
+        title: "Rewards Distributed!",
+        description: `Successfully disbursed TAB rewards to the quarterly winners list.`,
+      });
+    } catch (e: any) {
+      toast({ title: "Reward Error", description: e.message || "Failed to process batch payout.", variant: "destructive" });
     } finally {
       setIsDistributing(false);
     }
@@ -546,19 +610,33 @@ const AdminHub = () => {
     toast({ title: "Ledger Cleared", description: "All payout fields reset to zero." });
   };
 
+  // Auto-balance top 3 gets 80%, other 7 gets 20% total share of the TAB pool
   const handleAutoBalanceRewards = () => {
-    const pool = treasuryData.find(d => d.symbol === "XPR")?.rewards || 0;
+    const pool = treasuryData.find(d => d.symbol === "TAB")?.rewards || 0;
     if (pool <= 0) {
-      toast({ title: "Insufficient Pool", description: "XPR Reward pool is currently empty." });
+      toast({ title: "Insufficient Pool", description: "TAB Reward pool is currently empty." });
       return;
     }
     
-    const distribution = [0.4, 0.25, 0.15, 0.1, 0.1];
-    setWinners(prev => prev.map((w, idx) => ({
-      ...w,
-      reward: idx < 5 ? (pool * distribution[idx]).toFixed(0) : "0"
-    })));
-    toast({ title: "Rewards Balanced", description: "XPR Reward pool distributed via ranking algorithm." });
+    // Top 3 splits 80% (45%, 23%, 12%)
+    // Remaining 7 split 20% equally (20% / 7 ≈ 2.857% each)
+    setWinners(prev => prev.map((w, idx) => {
+      let rewardShare = 0;
+      if (idx === 0) {
+        rewardShare = Math.floor(pool * 0.45);
+      } else if (idx === 1) {
+        rewardShare = Math.floor(pool * 0.23);
+      } else if (idx === 2) {
+        rewardShare = Math.floor(pool * 0.12);
+      } else {
+        rewardShare = Math.floor((pool * 0.20) / 7);
+      }
+      return {
+        ...w,
+        reward: rewardShare.toString()
+      };
+    }));
+    toast({ title: "Rewards Balanced", description: "TAB Reward pool distributed: 80% split among Top 3, 20% shared among remaining 7." });
   };
 
   const handleBroadcast = () => {
@@ -1392,7 +1470,7 @@ const AdminHub = () => {
                             <th className="px-10 py-5 text-left text-[10px] font-black uppercase tracking-widest text-white">Recipient</th>
                             <th className="px-10 py-5 text-center text-[10px] font-black uppercase tracking-widest text-white">Network Role</th>
                             <th className="px-10 py-5 text-center text-[10px] font-black uppercase tracking-widest text-white">Current Rank</th>
-                            <th className="px-10 py-5 text-right text-[10px] font-black uppercase tracking-widest text-white">Reward Value (XPR)</th>
+                            <th className="px-10 py-5 text-right text-[10px] font-black uppercase tracking-widest text-white">Reward Value (TAB)</th>
                           </tr>
                         </thead>
                         <tbody className="divide-y divide-white/5">
@@ -1430,7 +1508,7 @@ const AdminHub = () => {
                                     onChange={(e) => handleRewardValueChange(i, e.target.value)}
                                     className="bg-white/5 border-white/10 text-right font-black text-lg h-12 pr-14 focus:ring-yellow-500/50 rounded-xl text-white"
                                    />
-                                   <span className="absolute right-4 top-1/2 -translate-y-1/2 font-black text-[10px] text-white/20 uppercase">XPR</span>
+                                   <span className="absolute right-4 top-1/2 -translate-y-1/2 font-black text-[10px] text-white/20 uppercase">TAB</span>
                                 </div>
                               </td>
                             </tr>
@@ -1443,10 +1521,10 @@ const AdminHub = () => {
                      <div className="space-y-1">
                         <div className="flex items-center gap-2">
                            <p className="text-[11px] font-black text-white/30 uppercase tracking-[0.4em]">Batch Total</p>
-                           <Badge className="bg-yellow-500/20 text-yellow-500 border-none font-black text-[9px]">READY</Badge>
+                           <Badge className="bg-purple-600/20 text-purple-400 border-none font-black text-[9px]">READY</Badge>
                         </div>
                         <p className="text-4xl font-black text-white tracking-tighter italic">
-                           {totalRewardsValue.toLocaleString()} <span className="text-lg text-orange-500">XPR</span>
+                           {totalRewardsValue.toLocaleString()} <span className="text-lg text-orange-500">TAB</span>
                         </p>
                      </div>
                      <Button 
