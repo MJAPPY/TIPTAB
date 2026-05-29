@@ -347,8 +347,9 @@ const CreatorProfile = () => {
   // Clean recipient XPR address handle
   const cleanRecipient = creator.handle.replace('@', '').toLowerCase().trim();
 
-  // Custom native deep link layout that directly launches standard transfer screens
-  const rawTransferScheme = `proton://transfer?to=${cleanRecipient}&symbol=${asset}`;
+  // Official universal user deep link. WebAuth natively handles this deep-link without signature protocol errors, 
+  // opening directly to the user's profile where the sender can type their custom tip amount.
+  const rawTransferScheme = `https://link.protonchain.com/${cleanRecipient}`;
 
   return (
     <div className="min-h-screen bg-[#0a0514] text-white selection:bg-purple-500/30">
@@ -765,7 +766,7 @@ const CreatorProfile = () => {
             
             <div className="space-y-1">
               <p className="text-xs font-black text-purple-400 uppercase tracking-widest">Recipient: @{cleanRecipient}</p>
-              <p className="text-[10px] text-white/30 font-bold uppercase tracking-widest">Asset: {asset}</p>
+              <p className="text-[10px] text-white/30 font-bold uppercase tracking-widest">Open Profile inside WebAuth Wallet</p>
             </div>
           </div>
 
