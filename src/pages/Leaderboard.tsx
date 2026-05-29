@@ -1,20 +1,34 @@
 "use client";
 
-import React, { useState, useMemo } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { Trophy, ArrowLeft, Zap, Star, Crown, Flame, Medal, Users, Heart } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Header } from "@/components/tab-platform/Header";
 import { MembershipModal } from "@/components/tab-platform/MembershipModal";
-import { CREATORS, Creator } from "@/data/creators";
 import { useXpr } from "@/contexts/XprContext";
+import { supabase } from "@/integrations/supabase/client";
 import { cn } from "@/lib/utils";
 
-// Removed hardcoded mock data. Leaderboard now populates from active members.
+interface LeaderboardEntry {
+  id: string;
+  name: string;
+  handle: string;
+  location: string;
+  color: string;
+  avatar: string;
+  avatarImage: string;
+  totalValue: number;
+  activityCount: number;
+}
+
 const Leaderboard = () => {
   const [isMembershipOpen, setIsMembershipOpen] = useState(false);
   const [activeTab, setActiveTab] = useState<"creators" | "supporters">("creators");
-  const { actor, isMember, userProfile } = useXpr();
+  const [creatorsList, setCreatorsList] = useState<LeaderboardEntry[]>([]);
+  const [supportersList, setSupportersList] = useState<LeaderboardEntry[]>([]);
+  const [isLoadingData, setIsLoadingData] = useState(true);
+  const { actor } = useXpr();
   const navigate = useNavigate();
   
   const handleBack = () => {
@@ -25,38 +39,102 @@ const Leaderboard = () => {
     }
   };
 
-  const currentData = useMemo(() => {
-    // In a live app, this would fetch from a database/API.
-    // For now, it shows the current user if they exist and are active.
-    let list: any[] = [];
+  const fetchLiveLeaderboard = async () => {
+    setIsLoadingData(true);
+    try {
+      // 1. Fetch all profiles to populate avatar/name details
+      const { data: profiles, error: profilesError } = await supabase
+        .from("profiles")
+        .select("*");
 
-    if (activeTab === "creators") {
-      // If user is a member, show them as the top creator for demo purposes
-      if (isMember && userProfile) {
-        list.push({
-          ...userProfile,
-          totalValue: 5000,
-          activityCount: 12,
+      const profileMap = new Map<string, any>();
+      if (profiles && !profilesError) {
+        profiles.forEach(p => {
+          profileMap.set(p.handle.toLowerCase().trim(), p);
         });
       }
-    } else {
-      // Supporter logic
-      if (actor && !isMember && userProfile) {
-        list.push({
-          ...userProfile,
-          totalValue: 1200,
-          activityCount: 5,
-          label: "Tips Sent"
+
+      // 2. Fetch all votes from database
+      const { data: votes, error: votesError } = await supabase
+        .from("votes")
+        .select("voter_handle, candidate_handle, tab_amount");
+
+      if (votes && !votesError) {
+        const creatorsGroup: Record<string, { totalValue: number; activityCount: number }> = {};
+        const supportersGroup: Record<string, { totalValue: number; activityCount: number }> = {};
+
+        votes.forEach(v => {
+          const candidate = v.candidate_handle?.toLowerCase().trim();
+          const voter = v.voter_handle?.toLowerCase().trim();
+          const amount = Number(v.tab_amount || 0);
+
+          if (candidate) {
+            if (!creatorsGroup[candidate]) creatorsGroup[candidate] = { totalValue: 0, activityCount: 0 };
+            creatorsGroup[candidate].totalValue += amount;
+            creatorsGroup[candidate].activityCount += 1;
+          }
+
+          if (voter) {
+            if (!supportersGroup[voter]) supportersGroup[voter] = { totalValue: 0, activityCount: 0 };
+            supportersGroup[voter].totalValue += amount;
+            supportersGroup[voter].activityCount += 1;
+          }
         });
+
+        // Map creators
+        const mappedCreators: LeaderboardEntry[] = Object.entries(creatorsGroup).map(([handle, stats]) => {
+          const profile = profileMap.get(handle);
+          return {
+            id: `creator-${handle}`,
+            name: profile?.name || handle,
+            handle: handle,
+            location: profile?.location || "Global Network",
+            color: profile?.color || "bg-purple-600",
+            avatar: profile?.avatar || handle.slice(0, 2).toUpperCase(),
+            avatarImage: profile?.avatar_image || "",
+            totalValue: stats.totalValue,
+            activityCount: stats.activityCount
+          };
+        }).sort((a, b) => b.totalValue - a.totalValue);
+
+        // Map supporters
+        const mappedSupporters: LeaderboardEntry[] = Object.entries(supportersGroup).map(([handle, stats]) => {
+          const profile = profileMap.get(handle);
+          return {
+            id: `supporter-${handle}`,
+            name: profile?.name || handle,
+            handle: handle,
+            location: profile?.location || "Supporter Hub",
+            color: profile?.color || "bg-cyan-600",
+            avatar: profile?.avatar || handle.slice(0, 2).toUpperCase(),
+            avatarImage: profile?.avatar_image || "",
+            totalValue: stats.totalValue,
+            activityCount: stats.activityCount
+          };
+        }).sort((a, b) => b.totalValue - a.totalValue);
+
+        setCreatorsList(mappedCreators);
+        setSupportersList(mappedSupporters);
       }
+    } catch (e) {
+      console.error("Failed to load live leaderboard stats:", e);
+    } finally {
+      setIsLoadingData(false);
     }
+  };
 
-    return list.sort((a, b) => b.activityCount - a.activityCount);
-  }, [activeTab, isMember, userProfile, actor]);
+  useEffect(() => {
+    fetchLiveLeaderboard();
+    const interval = setInterval(fetchLiveLeaderboard, 20000);
+    return () => clearInterval(interval);
+  }, []);
 
-  const DISPLAY_LIMIT = 20;
+  const currentData = useMemo(() => {
+    return activeTab === "creators" ? creatorsList : supportersList;
+  }, [activeTab, creatorsList, supportersList]);
+
   const topThree = currentData.slice(0, 3);
-  const others = currentData.slice(3, DISPLAY_LIMIT);
+  const others = currentData.slice(3, 20);
 
   return (
     <div className="min-h-screen bg-[#06030e] text-white overflow-x-hidden relative selection:bg-cyan-500/30">
@@ -105,10 +183,40 @@ const Leaderboard = () => {
           </div>
         </div>
 
-        {currentData.length > 0 ? (
+        {isLoadingData ? (
+          <div className="flex flex-col items-center justify-center py-20 gap-4">
+            <div className="h-12 w-12 border-4 border-purple-500/20 border-t-purple-500 rounded-full animate-spin" />
+            <p className="text-white/40 font-black tracking-widest text-xs uppercase">Syncing Leaderboard...</p>
+          </div>
+        ) : currentData.length > 0 ? (
           <>
             {/* Podium Section */}
             <div className="flex flex-col md:flex-row items-center md:items-end justify-center gap-8 md:gap-6 mb-24 lg:mb-32">
+              
+              {/* 2nd Place */}
+              {topThree[1] && (
+                <div className="w-full max-w-sm md:w-80 order-2 md:order-1 animate-in zoom-in-95 duration-1000">
+                  <div className="bg-[#100a21]/80 border-4 border-slate-300/40 rounded-[48px] p-8 text-center relative group hover:border-slate-300 transition-all shadow-[0_0_40px_rgba(148,163,184,0.15)] overflow-hidden">
+                    <div className="absolute top-2 right-2 p-4">
+                      <Medal className="h-6 w-6 text-slate-300" />
+                    </div>
+                    <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-slate-300 text-black font-black px-5 py-1 rounded-full text-xs uppercase tracking-widest">Runner Up</div>
+                    <div className={cn("h-28 w-28 rounded-[28px] mx-auto mb-6 border-4 border-slate-300 flex items-center justify-center text-3xl font-black overflow-hidden relative shadow-lg", topThree[1].color)}>
+                      {topThree[1].avatarImage ? (
+                        <img src={topThree[1].avatarImage} alt="Avatar" className="w-full h-full object-cover" />
+                      ) : (
+                        <span className="relative z-10 text-white">{topThree[1].avatar}</span>
+                      )}
+                    </div>
+                    <h3 className="text-xl md:text-2xl font-black mb-1 truncate px-2">{topThree[1].name}</h3>
+                    <p className="text-slate-400 font-black mb-6 text-xs">@{topThree[1].handle}</p>
+                    <div className="text-2xl md:text-3xl font-black text-white">
+                      {topThree[1].totalValue.toLocaleString()} <span className="text-[10px] text-slate-300 font-black">TAB</span>
+                    </div>
+                  </div>
+                </div>
+              )}
+
               {/* 1st Place */}
               {topThree[0] && (
                 <div className="w-full max-w-sm md:w-80 order-1 md:order-2 animate-in zoom-in-95 duration-1000 scale-105 md:scale-110">
@@ -128,7 +236,31 @@ const Leaderboard = () => {
                     <h3 className="text-2xl md:text-3xl font-black mb-1 truncate px-2">{topThree[0].name}</h3>
                     <p className="text-yellow-300 font-black mb-8 text-sm md:text-base">@{topThree[0].handle}</p>
                     <div className="text-3xl md:text-4xl font-black text-white drop-shadow-[0_0_15px_rgba(250,204,21,0.4)]">
-                      {topThree[0].activityCount.toLocaleString()} <span className="text-xs md:text-sm text-yellow-400 font-black">TIPS</span>
+                      {topThree[0].totalValue.toLocaleString()} <span className="text-xs md:text-sm text-yellow-400 font-black">TAB</span>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* 3rd Place */}
+              {topThree[2] && (
+                <div className="w-full max-w-sm md:w-80 order-3 animate-in zoom-in-95 duration-1000">
+                  <div className="bg-[#100a21]/80 border-4 border-orange-500/30 rounded-[48px] p-8 text-center relative group hover:border-orange-500 transition-all shadow-[0_0_40px_rgba(249,115,22,0.15)] overflow-hidden">
+                    <div className="absolute top-2 right-2 p-4">
+                      <Medal className="h-6 w-6 text-orange-500" />
+                    </div>
+                    <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-orange-500 text-white font-black px-5 py-1 rounded-full text-xs uppercase tracking-widest">3rd Place</div>
+                    <div className={cn("h-28 w-28 rounded-[28px] mx-auto mb-6 border-4 border-orange-500 flex items-center justify-center text-3xl font-black overflow-hidden relative shadow-lg", topThree[2].color)}>
+                      {topThree[2].avatarImage ? (
+                        <img src={topThree[2].avatarImage} alt="Avatar" className="w-full h-full object-cover" />
+                      ) : (
+                        <span className="relative z-10 text-white">{topThree[2].avatar}</span>
+                      )}
+                    </div>
+                    <h3 className="text-xl md:text-2xl font-black mb-1 truncate px-2">{topThree[2].name}</h3>
+                    <p className="text-orange-400 font-black mb-6 text-xs">@{topThree[2].handle}</p>
+                    <div className="text-2xl md:text-3xl font-black text-white">
+                      {topThree[2].totalValue.toLocaleString()} <span className="text-xs text-orange-500 font-black">TAB</span>
                     </div>
                   </div>
                 </div>
@@ -140,6 +272,7 @@ const Leaderboard = () => {
               {others.map((participant, i) => (
                 <div 
                   key={participant.id}
+                  onClick={() => navigate(`/tip/${participant.handle}`)}
                   className="bg-white/5 border border-white/10 rounded-[24px] md:rounded-3xl p-4 md:p-6 flex items-center justify-between group hover:bg-white/15 hover:border-cyan-400/50 transition-all cursor-pointer"
                 >
                   <div className="flex items-center gap-4 md:gap-8">
@@ -162,11 +295,11 @@ const Leaderboard = () => {
 
                   <div className="flex items-center gap-4 md:gap-12">
                     <div className="hidden sm:flex items-center gap-2 text-white/40 font-black text-xs md:text-sm">
-                      {participant.totalValue.toLocaleString()} <span className="text-[9px] uppercase tracking-widest">TAB Value</span>
+                      {participant.activityCount.toLocaleString()} <span className="text-[9px] uppercase tracking-widest">Activities</span>
                     </div>
-                    <div className="w-20 md:w-32 text-right">
-                      <span className="text-xl md:text-2xl font-black group-hover:text-purple-400 transition-colors">{participant.activityCount.toLocaleString()}</span>
-                      <span className="text-[9px] md:text-[10px] font-black text-orange-500 ml-1 uppercase tracking-widest">Tips</span>
+                    <div className="w-24 md:w-32 text-right">
+                      <span className="text-xl md:text-2xl font-black group-hover:text-purple-400 transition-colors">{participant.totalValue.toLocaleString()}</span>
+                      <span className="text-[9px] md:text-[10px] font-black text-orange-500 ml-1 uppercase tracking-widest">TAB</span>
                     </div>
                   </div>
                 </div>
