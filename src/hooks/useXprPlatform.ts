@@ -12,8 +12,9 @@ export const useXprPlatform = (currentAdmin: AdminUser | null) => {
   const [membershipFeeLoan, setMembershipFeeLoan] = useState("10000");
   const [membershipFeeXmt, setMembershipFeeXmt] = useState("2.50");
   
+  // Set default TAB price lower relative to XPR to incentivize use
   const [boostPrice, setBoostPrice] = useState("1000");
-  const [boostTabPrice, setBoostTabPrice] = useState("5000");
+  const [boostTabPrice, setBoostTabPrice] = useState("1800"); 
   const [boostPriceXusdc, setBoostPriceXusdc] = useState("1.00");
 
   const [promoCodes, setPromoCodes] = useState<PromoCode[]>(() => {

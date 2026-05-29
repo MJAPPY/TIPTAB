@@ -571,15 +571,16 @@ const CreatorProfile = () => {
                       <Button
                         onClick={() => onBoost('XPR')}
                         disabled={isProcessing}
-                        className="h-14 md:h-16 bg-gradient-to-r from-orange-500 to-purple-600 text-white font-black text-[10px] md:text-sm uppercase tracking-widest rounded-xl md:rounded-2xl shadow-[0_10px_30px_rgba(168,85,247,0.3)] transition-all active:scale-95 border-b-4 border-black/20"
+                        className="h-14 md:h-16 bg-white/5 border border-white/10 text-white/60 hover:text-white font-black text-[10px] md:text-sm uppercase tracking-widest rounded-xl md:rounded-2xl transition-all active:scale-95"
                       >
                         {isProcessing ? "Wait..." : `BOOST (${Number(boostPrice).toLocaleString()} XPR)`}
                       </Button>
                       <Button
                         onClick={() => onBoost('TAB')}
                         disabled={isProcessing}
-                        className="h-14 md:h-16 bg-gradient-to-r from-orange-500 to-purple-600 text-white font-black text-[10px] md:text-sm uppercase tracking-widest rounded-xl md:rounded-2xl shadow-[0_10px_30px_rgba(168,85,247,0.3)] transition-all active:scale-95 border-b-4 border-black/20"
+                        className="h-14 md:h-16 bg-gradient-to-r from-orange-500 to-purple-600 text-white font-black text-[10px] md:text-sm uppercase tracking-widest rounded-xl md:rounded-2xl shadow-[0_10px_30px_rgba(168,85,247,0.3)] transition-all active:scale-95 border-b-4 border-black/20 relative overflow-hidden group/btn"
                       >
+                        <div className="absolute top-0 right-0 bg-yellow-500 text-black text-[7px] font-black px-2 py-0.5 rounded-bl-lg tracking-tighter group-hover/btn:scale-110 transition-transform">BEST VALUE</div>
                         {isProcessing ? "Wait..." : `BOOST (${Number(boostTabPrice).toLocaleString()} TAB)`}
                       </Button>
                     </div>

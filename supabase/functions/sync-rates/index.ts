@@ -18,7 +18,7 @@ serve(async (req) => {
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
     )
 
-    console.log("[sync-rates] Starting precise rate synchronization...");
+    console.log("[sync-rates] Starting precise rate synchronization with TAB incentive...");
 
     // 1. Fetch live market anchor from CoinGecko
     const cgResponse = await fetch("https://api.coingecko.com/api/v3/simple/price?ids=proton&vs_currencies=usd");
@@ -68,7 +68,9 @@ serve(async (req) => {
     
     const boostTargetUsd = Number(settings.boost_price_xusdc);
     const boostPriceXpr = Math.round(boostTargetUsd / xprUsd);
-    const boostPriceTab = Math.round(boostPriceXpr / xprPerTab);
+    
+    // TAB INCENTIVE: Apply 30% discount to TAB boosts during sync
+    const boostPriceTab = Math.round((boostPriceXpr * 0.70) / xprPerTab);
 
     // 5. Update database table
     const { error: updateError } = await supabase
@@ -90,7 +92,7 @@ serve(async (req) => {
       throw updateError;
     }
 
-    console.log("[sync-rates] Successfully synced all precise DEX rates.");
+    console.log("[sync-rates] Successfully synced all precise DEX rates with TAB discounts.");
 
     return new Response(JSON.stringify({ success: true }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },

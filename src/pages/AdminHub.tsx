@@ -149,7 +149,7 @@ const AdminHub = () => {
   const [localFeeXmt, setLocalFeeXmt] = useState(membershipFeeXmt || "2.50");
   
   const [localBoost, setLocalBoost] = useState(boostPrice || "1000");
-  const [localBoostTab, setLocalBoostTab] = useState(boostTabPrice || "5000");
+  const [localBoostTab, setLocalBoostTab] = useState(boostTabPrice || "1800");
   const [localBoostXusdc, setLocalBoostXusdc] = useState(boostPriceXusdc || "1.00");
   
   const [searchQuery, setSearchQuery] = useState("");
@@ -316,11 +316,10 @@ const AdminHub = () => {
       };
 
       // Tickers return amount of XPR per 1 unit of token
-      // Based on user feedback: 1 XUSDC = 366 XPR, 3.3 XMT, 2143 LOAN, 5.9 METAL
       const tabXpr = getAlcorRate("TAB_XPR") || 0.36;
-      const xmtXpr = getAlcorRate("XMT_XPR") || 111.0;  // 366 / 3.3 approx
-      const loanXpr = getAlcorRate("LOAN_XPR") || 0.17; // 366 / 2143 approx
-      const metalXpr = getAlcorRate("METAL_XPR") || 62.0; // 366 / 5.9 approx
+      const xmtXpr = getAlcorRate("XMT_XPR") || 111.0; 
+      const loanXpr = getAlcorRate("LOAN_XPR") || 0.17;
+      const metalXpr = getAlcorRate("METAL_XPR") || 62.0;
 
       return { 
         xprUsd, 
@@ -349,7 +348,6 @@ const AdminHub = () => {
         const calculatedXpr = (targetFeeUsd / xprUsd).toFixed(0);
         const calculatedXmd = targetFeeUsd.toFixed(2);
         
-        // Precise Parity Calculation: TargetUSD / (Price_of_token_in_XPR * XPR_USD_Price)
         const calculatedMetal = (targetFeeUsd / (metalXpr * xprUsd)).toFixed(4);
         const calculatedLoan = (targetFeeUsd / (loanXpr * xprUsd)).toFixed(0);
         const calculatedXmt = (targetFeeUsd / (xmtXpr * xprUsd)).toFixed(4);
@@ -371,8 +369,10 @@ const AdminHub = () => {
 
       if (!isNaN(targetBoostUsd)) {
         const boostXprVal = (targetBoostUsd / xprUsd).toFixed(0);
-        // Precise TAB parity based on live liquidity
-        const boostTabVal = (parseFloat(boostXprVal) / tabXpr).toFixed(0);
+        
+        // TAB INCENTIVE: Apply a 30% discount to TAB boost pricing
+        const tabDiscountFactor = 0.70;
+        const boostTabVal = ((parseFloat(boostXprVal) * tabDiscountFactor) / tabXpr).toFixed(0);
         
         updateBoostPrice(boostXprVal);
         updateBoostTabPrice(boostTabVal);
@@ -388,7 +388,7 @@ const AdminHub = () => {
 
       toast({
         title: isAuto ? "Dynamic Parity Sync" : "DEX Parity Recalibrated",
-        description: `Fees precisely re-indexed against live XPR Network liquidity.`,
+        description: `Fees re-indexed. TAB boosting includes a 30% incentive discount.`,
       });
     } else if (!isAuto) {
       toast({
@@ -489,7 +489,6 @@ const AdminHub = () => {
       return;
     }
     
-    // Simple distribution: 40% to 1st, 25% to 2nd, 15% to 3rd, 10% to 4th, 10% to 5th
     const distribution = [0.4, 0.25, 0.15, 0.1, 0.1];
     setWinners(prev => prev.map((w, idx) => ({
       ...w,

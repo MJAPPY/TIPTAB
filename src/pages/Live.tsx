@@ -57,7 +57,7 @@ const Live = () => {
   const [selectedCategory, setSelectedCategory] = useState("All");
   const [sortBy, setSortBy] = useState("newest");
   const [isMembershipOpen, setIsMembershipOpen] = useState(false);
-  const { actor, userProfile, isMember, featuredHandles, boostStream, boostPrice, dbCreators } = useXpr();
+  const { actor, userProfile, isMember, featuredHandles, boostStream, boostPrice, boostTabPrice, dbCreators } = useXpr();
   const navigate = useNavigate();
 
   // Combined creator list including local updates
@@ -72,8 +72,10 @@ const Live = () => {
       if (isActuallyMember) {
         const existsIdx = list.findIndex(c => c.handle.toLowerCase() === cleanActor);
         if (existsIdx !== -1) {
+          // Replace existing seed data with current user profile
           list[existsIdx] = userProfile;
         } else {
+          // Add new member to the top of the map/list
           list = [userProfile, ...list];
         }
       }
@@ -124,7 +126,8 @@ const Live = () => {
       setIsMembershipOpen(true);
       return;
     }
-    await boostStream(handle);
+    // Default to TAB for the discount benefit
+    await boostStream(handle, 'TAB');
   };
 
   return (
@@ -324,14 +327,18 @@ const Live = () => {
                         <Button 
                           onClick={() => handleBoost(creator.handle)}
                           className={cn(
-                            "h-10 rounded-xl font-black text-[10px] uppercase tracking-widest px-5 transition-all shadow-lg",
+                            "h-10 rounded-xl font-black text-[10px] uppercase tracking-widest px-5 transition-all shadow-lg relative overflow-hidden",
                             isMember 
                               ? "bg-orange-500 hover:bg-orange-600 text-white shadow-orange-500/20" 
                               : "bg-white/10 text-white/40 hover:bg-orange-500 hover:text-white"
                           )}
                         >
                           {isMember ? (
-                            <><Zap className="h-3 w-3 mr-2 fill-white" /> Boost for {boostPrice} XPR</>
+                            <>
+                              <Zap className="h-3 w-3 mr-2 fill-white" /> 
+                              Boost ({Number(boostTabPrice).toLocaleString()} TAB)
+                              <span className="absolute top-0 right-0 bg-yellow-400 text-black text-[6px] px-1 font-bold">BEST VALUE</span>
+                            </>
                           ) : (
                             <><ShieldCheck className="h-3 w-3 mr-2" /> Verify to Boost</>
                           )}
