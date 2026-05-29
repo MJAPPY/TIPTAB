@@ -13,7 +13,7 @@ interface HeroProps {
 export const Hero = ({ creators, onJoin }: HeroProps) => {
   const { isMember } = useXpr();
   const previewCreators = creators.slice(0, 4);
-  const formattedCount = (10 + (creators.length / 1000)).toFixed(1);
+  const activeCount = creators.length;
 
   const rewardTokens = [
     { symbol: "TAB", color: "text-orange-500", glow: "rgba(249,115,22,0.3)" },
@@ -95,7 +95,7 @@ export const Hero = ({ creators, onJoin }: HeroProps) => {
                   ))}
                 </div>
                 <p className="text-xs font-bold text-white/40 tracking-wide">
-                  Join <span className="text-white/80">{formattedCount}k+</span> pros
+                  Join <span className="text-white/80">{activeCount}</span> active {activeCount === 1 ? 'pro' : 'pros'}
                 </p>
               </div>
             </div>
