@@ -15,12 +15,18 @@ interface TopVotedCreatorsProps {
 export const TopVotedCreators = ({ creators, topVotedHandles, onViewProfile }: TopVotedCreatorsProps) => {
   // Map and sort the creators based on their placement in topVotedHandles
   const topThree = useMemo(() => {
-    if (!topVotedHandles || topVotedHandles.length === 0) return [];
+    // If we have live votes in the database
+    if (topVotedHandles && topVotedHandles.length > 0) {
+      const voted = topVotedHandles
+        .map((handle) => creators.find((c) => c.handle.toLowerCase().replace("@", "") === handle.toLowerCase()))
+        .filter((c): c is Creator => !!c)
+        .slice(0, 3);
+      
+      if (voted.length > 0) return voted;
+    }
     
-    return topVotedHandles
-      .map((handle) => creators.find((c) => c.handle.toLowerCase().replace("@", "") === handle.toLowerCase()))
-      .filter((c): c is Creator => !!c)
-      .slice(0, 3);
+    // Fallback: Show the top 3 active network creators so the homepage is always gorgeous
+    return creators.slice(0, 3);
   }, [creators, topVotedHandles]);
 
   if (topThree.length === 0) return null;
