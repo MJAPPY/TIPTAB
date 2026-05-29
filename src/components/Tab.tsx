@@ -2,6 +2,7 @@
 
 import { useState, useMemo, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { Sparkles } from "lucide-react";
 import { Header } from "./tab-platform/Header";
 import { Hero } from "./tab-platform/Hero";
 import { StatsBanner } from "./tab-platform/Sections";
@@ -129,12 +130,18 @@ export const Tab = () => {
       
       <footer className="py-16 sm:py-24 border-t border-white/5 bg-black/20 mt-20">
         <div className="container mx-auto px-6 text-center">
-          <Link to="/" className="mb-8 sm:mb-12 flex flex-col items-center gap-4 sm:gap-8 group inline-flex">
-            <img src="/logo.png" alt="TIPTAB Logo" className="h-24 w-24 sm:h-40 sm:w-40 object-contain drop-shadow-[0_0_30px_rgba(168,85,247,0.2)] group-hover:scale-105 transition-transform duration-500" />
-            <span className="text-3xl sm:text-5xl font-black italic tracking-tighter text-white group-hover:text-[#a855f7] transition-colors duration-300">
-              TIP<span className="text-orange-500">TAB</span>
-            </span>
-          </Link>
+          <div className="mb-8 sm:mb-12 flex flex-col items-center gap-4 sm:gap-6 inline-flex">
+            <Link to="/" className="flex flex-col items-center gap-4 sm:gap-8 group">
+              <img src="/logo.png" alt="TIPTAB Logo" className="h-24 w-24 sm:h-40 sm:w-40 object-contain drop-shadow-[0_0_30px_rgba(168,85,247,0.2)] group-hover:scale-105 transition-transform duration-500" />
+              <span className="text-3xl sm:text-5xl font-black italic tracking-tighter text-white group-hover:text-[#a855f7] transition-colors duration-300">
+                TIP<span className="text-orange-500">TAB</span>
+              </span>
+            </Link>
+            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-purple-500/10 border border-purple-500/20 text-[10px] sm:text-xs font-black uppercase tracking-[0.3em] text-purple-400 shadow-[0_0_20px_rgba(168,85,247,0.15)] animate-pulse">
+              <Sparkles className="h-3.5 w-3.5 fill-purple-400" />
+              XPR Site Showcase
+            </div>
+          </div>
           <div className="space-y-4 mb-10 sm:mb-12 max-w-xl mx-auto px-4">
             <p className="text-white/40 text-sm sm:text-lg font-medium">
               Empowering the global workforce through direct, fee-free tipping on the <span className="text-purple-400">XPR Network</span>. Join the future of appreciation.
