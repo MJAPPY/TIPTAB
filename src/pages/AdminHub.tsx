@@ -912,10 +912,32 @@ const AdminHub = () => {
     const handle = creatorToDelete.handle.replace('@', '').toLowerCase();
     
     try {
-      // 1. Delete record from Supabase database profiles table
+      // Set is_member to false and clear profile metadata to completely remove them from the platform index
       const { error } = await supabase
         .from('profiles')
-        .delete()
+        .update({ 
+          is_member: false,
+          name: null,
+          bio: null,
+          location: null,
+          coordinates: null,
+          categories: null,
+          avatar_image: null,
+          cover_image: null,
+          twitter: null,
+          website: null,
+          video_url: null,
+          instagram: null,
+          spotify: null,
+          snipverse: null,
+          facebook: null,
+          kick: null,
+          rumble: null,
+          twitch: null,
+          tiktok: null,
+          youtube_live: null,
+          instagram_live: null
+        })
         .eq('handle', handle);
 
       if (error) throw error;
@@ -933,14 +955,14 @@ const AdminHub = () => {
 
       toast({
         title: "Profile Purged Successfully",
-        description: `@${handle}'s profile and map registrations have been completely removed from the database.`,
+        description: `@${handle}'s profile and map registrations have been completely removed.`,
         variant: "destructive"
       });
     } catch (err: any) {
       console.error("Failed to delete user profile from database:", err);
       toast({
         title: "Purge Failed",
-        description: err.message || "An error occurred while deleting the profile from Supabase.",
+        description: err.message || "An error occurred while deleting the profile.",
         variant: "destructive"
       });
     } finally {
