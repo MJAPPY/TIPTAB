@@ -34,7 +34,6 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
@@ -165,7 +164,7 @@ export const Header = ({ onBecomeCreator }: HeaderProps) => {
         </Link>
       )}
       {isConnected && (
-        <Link to="/dashboard" onClick={() => setIsOpen(false)} className={cn(isMobile ? "w-full" : "lg:w-auto")}>
+        <Link to={isMember ? "/dashboard?view=creator" : "/dashboard"} onClick={() => setIsOpen(false)} className={cn(isMobile ? "w-full" : "lg:w-auto")}>
           <Button 
             variant="ghost" 
             className={cn(
@@ -331,10 +330,18 @@ export const Header = ({ onBecomeCreator }: HeaderProps) => {
                       </Link>
                     </DropdownMenuItem>
                   )}
+                  {isMember && (
+                    <DropdownMenuItem asChild className="focus:bg-purple-500/15 focus:text-purple-400 rounded-xl cursor-pointer">
+                      <Link to="/dashboard?view=creator" className="flex items-center gap-3 px-3 py-2.5">
+                        <LayoutDashboard className="h-4 w-4 text-purple-400" />
+                        <span className="font-bold text-slate-200">Creator Hub</span>
+                      </Link>
+                    </DropdownMenuItem>
+                  )}
                   <DropdownMenuItem asChild className="focus:bg-purple-500/15 focus:text-purple-400 rounded-xl cursor-pointer">
-                    <Link to="/dashboard" className="flex items-center gap-3 px-3 py-2.5">
+                    <Link to={isMember ? "/dashboard?view=supporter" : "/dashboard"} className="flex items-center gap-3 px-3 py-2.5">
                       <LayoutDashboard className="h-4 w-4 text-purple-400" />
-                      <span className="font-bold text-slate-200">{isMember ? "Creator Hub" : "Supporter Hub"}</span>
+                      <span className="font-bold text-slate-200">Supporters Hub</span>
                     </Link>
                   </DropdownMenuItem>
                   <DropdownMenuItem onClick={handleLogout} className="focus:bg-red-500/10 focus:text-red-500 rounded-xl cursor-pointer text-red-400 flex items-center gap-3 px-3 py-2.5">
