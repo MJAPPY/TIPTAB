@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
-import { User, AtSign, MapPin, Globe, Twitter, Save, Image as ImageIcon, Upload, X, Video, Instagram, CheckCircle2, Music, Radio, Youtube, Twitch, ShieldCheck, Move, Facebook, MessageSquare, Trash2, AlertTriangle } from "lucide-react";
+import { User, AtSign, MapPin, Globe, Twitter, Save, Image as ImageIcon, Upload, X, Video, Instagram, CheckCircle2, Music, Radio, Youtube, Twitch, ShieldCheck, Move, Facebook, MessageSquare, Trash2, AlertTriangle, CalendarDays, Hourglass } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -14,6 +14,7 @@ import { cn } from "@/lib/utils";
 import { useXpr } from "@/contexts/XprContext";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
+import { MembershipModal } from "@/components/tab-platform/MembershipModal";
 
 const CITY_COORDINATES: Record<string, [number, number]> = {
   "london": [-0.1276, 51.5074],
@@ -84,13 +85,14 @@ interface ProfileEditorProps {
 }
 
 export const ProfileEditor = ({ initialData, onSave, minimal = false }: ProfileEditorProps) => {
-  const { actor, logout } = useXpr();
+  const { actor, logout, isMember, membershipDate } = useXpr();
   const navigate = useNavigate();
   const [isSaving, setIsSaving] = useState(false);
   const [hasChanged, setHasChanged] = useState(false);
   const [isCityRecognized, setIsCityRecognized] = useState(false);
   const [isDraggingCover, setIsDraggingCover] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [isMembershipOpen, setIsMembershipOpen] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const coverInputRef = useRef<HTMLInputElement>(null);
   
@@ -365,6 +367,46 @@ export const ProfileEditor = ({ initialData, onSave, minimal = false }: ProfileE
       </CardHeader>
       <CardContent className="p-8">
         <div className="space-y-12">
+
+          {/* Membership Status Information Section */}
+          {isMember && membershipDate && (
+            <div className="p-6 md:p-8 rounded-[32px] bg-gradient-to-r from-orange-500/10 via-purple-500/10 to-transparent border border-orange-500/20 space-y-6 animate-in fade-in slide-in-from-top-4 duration-500">
+               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6">
+                  <div className="space-y-1">
+                     <div className="flex items-center gap-2">
+                       <div className="h-2 w-2 rounded-full bg-orange-500 animate-pulse shadow-[0_0_8px_rgba(249,115,22,0.8)]" />
+                       <span className="text-[10px] font-black uppercase tracking-widest text-orange-400">Membership Status</span>
+                     </div>
+                     <h4 className="text-xl md:text-2xl font-black text-white uppercase italic tracking-tight">Active Premium Creator</h4>
+                  </div>
+                  <Button 
+                    onClick={() => setIsMembershipOpen(true)}
+                    className="h-12 rounded-xl bg-orange-500 hover:bg-orange-600 text-white font-black text-xs uppercase tracking-widest shadow-lg shadow-orange-500/20 active:scale-95 shrink-0"
+                  >
+                    Renew Membership
+                  </Button>
+               </div>
+               
+               <div className="grid grid-cols-2 gap-6 pt-5 border-t border-white/5">
+                  <div className="space-y-1">
+                     <span className="text-white/40 font-black uppercase tracking-widest text-[9px] flex items-center gap-1">
+                       <CalendarDays className="h-3 w-3" /> Date Joined
+                     </span>
+                     <p className="font-bold text-white text-sm md:text-base">
+                       {new Date(membershipDate).toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric' })}
+                     </p>
+                  </div>
+                  <div className="space-y-1 text-right">
+                     <span className="text-orange-500/60 font-black uppercase tracking-widest text-[9px] flex items-center gap-1 justify-end">
+                       <Hourglass className="h-3 w-3" /> Renewal Date
+                     </span>
+                     <p className="font-bold text-orange-400 text-sm md:text-base">
+                       {new Date(new Date(membershipDate).setFullYear(new Date(membershipDate).getFullYear() + 1)).toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric' })}
+                     </p>
+                  </div>
+               </div>
+            </div>
+          )}
           
           {/* Cover & Avatar Upload Section */}
           <div className="space-y-6 pb-8 border-b border-white/5">
@@ -892,6 +934,8 @@ export const ProfileEditor = ({ initialData, onSave, minimal = false }: ProfileE
 
         </div>
       </CardContent>
+
+      <MembershipModal isOpen={isMembershipOpen} onOpenChange={setIsMembershipOpen} />
     </Card>
   );
 };
