@@ -347,9 +347,9 @@ const CreatorProfile = () => {
   // Clean recipient XPR address handle
   const cleanRecipient = creator.handle.replace('@', '').toLowerCase().trim();
 
-  // Official universal user deep link. WebAuth natively handles this deep-link without signature protocol errors, 
-  // opening directly to the user's profile where the sender can type their custom tip amount.
-  const rawTransferScheme = `https://link.protonchain.com/${cleanRecipient}`;
+  // Official universal transfer redirect link format.
+  // This launches WebAuth securely into the custom transfer prompt screen with the creator's username preselected as recipient.
+  const rawTransferScheme = `https://link.protonchain.com/transfer?to=${cleanRecipient}`;
 
   return (
     <div className="min-h-screen bg-[#0a0514] text-white selection:bg-purple-500/30">
