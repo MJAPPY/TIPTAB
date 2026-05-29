@@ -14,9 +14,44 @@ import { supabase } from "@/integrations/supabase/client";
 import { cn } from "@/lib/utils";
 import { useToast } from "@/hooks/use-toast";
 
+const CATEGORIES = [
+  "All",
+  "Art",
+  "Automotive",
+  "Biblical",
+  "Blockchain",
+  "Business",
+  "Content",
+  "Critical Think",
+  "Delivery",
+  "DEVS",
+  "Education",
+  "Finance",
+  "Fishing",
+  "Fitness",
+  "Flips & Thrifters",
+  "Food",
+  "Gaming",
+  "Gardening & Farming",
+  "Health",
+  "Hospitality",
+  "Local News",
+  "Music",
+  "Other",
+  "Plane Spot",
+  "Property Reno",
+  "Realty",
+  "Reviewing",
+  "Service",
+  "Sports",
+  "Train Spot",
+  "Weather"
+];
+
 const Voting = () => {
   const [isMembershipOpen, setIsMembershipOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
+  const [selectedCategory, setSelectedCategory] = useState("All");
   const [isProcessing, setIsProcessing] = useState(false);
   const [voteAmount, setVoteAmount] = useState("5");
   const { actor, session, dbCreators, isConnected, login } = useXpr();
@@ -56,11 +91,13 @@ const Voting = () => {
   }, []);
 
   const filteredCandidates = useMemo(() => {
-    return dbCreators.filter(c => 
-      c.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
-      c.handle.toLowerCase().includes(searchQuery.toLowerCase())
-    );
-  }, [dbCreators, searchQuery]);
+    return dbCreators.filter(c => {
+      const matchesSearch = c.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
+                            c.handle.toLowerCase().includes(searchQuery.toLowerCase());
+      const matchesCategory = selectedCategory === "All" || (c.categories && c.categories.includes(selectedCategory));
+      return matchesSearch && matchesCategory;
+    });
+  }, [dbCreators, searchQuery, selectedCategory]);
 
   const handleVote = async (candidateHandle: string) => {
     if (!isConnected) {
@@ -143,14 +180,35 @@ const Voting = () => {
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-10">
             {/* Candidates List */}
             <div className="lg:col-span-7 space-y-8">
-              <div className="relative group">
-                <Search className="absolute left-6 top-1/2 -translate-y-1/2 h-5 w-5 text-white/30 group-focus-within:text-orange-500 transition-colors" />
-                <Input 
-                  placeholder="Search creators..." 
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className="pl-16 h-16 rounded-3xl bg-white/5 border-white/10 text-xl font-bold focus:ring-orange-500/50"
-                />
+              <div className="space-y-4 bg-white/[0.03] p-6 rounded-[32px] border border-white/10">
+                <div className="relative group">
+                  <Search className="absolute left-6 top-1/2 -translate-y-1/2 h-5 w-5 text-white/30 group-focus-within:text-orange-500 transition-colors" />
+                  <Input 
+                    placeholder="Search creators by name or handle..." 
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    className="pl-16 h-16 rounded-2xl bg-white/5 border-white/10 text-xl font-bold focus:ring-orange-500/50"
+                  />
+                </div>
+
+                {/* Categories Filter Selection */}
+                <div className="flex flex-wrap items-center gap-2 pt-2">
+                  {CATEGORIES.map(cat => (
+                    <Button
+                      key={cat}
+                      variant="ghost"
+                      onClick={() => setSelectedCategory(cat)}
+                      className={cn(
+                        "rounded-xl h-9 px-4 whitespace-nowrap font-black text-[10px] uppercase tracking-[0.15em] transition-all border-2",
+                        selectedCategory === cat 
+                        ? "bg-orange-500/20 border-orange-500/60 text-orange-400 shadow-[0_0_20px_rgba(249,115,22,0.3)]" 
+                        : "bg-white/5 border-transparent text-white/60 hover:text-orange-400 hover:bg-orange-500/10"
+                      )}
+                    >
+                      {cat}
+                    </Button>
+                  ))}
+                </div>
               </div>
 
               <div className="space-y-4">
