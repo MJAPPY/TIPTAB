@@ -476,7 +476,6 @@ const AdminHub = () => {
 
       return {
         ...item,
-        revenue: netRevenue,
         rewards,
         splitPolicy: "50/50 Rewards Split"
       };
@@ -907,20 +906,46 @@ const AdminHub = () => {
     setIsHistoryModalOpen(true);
   };
 
-  const confirmDeleteProfile = () => {
+  const confirmDeleteProfile = async () => {
     if (!creatorToDelete) return;
     const handle = creatorToDelete.handle.replace('@', '').toLowerCase();
-    setModeratedCreators(prev => prev.filter(c => c.id !== creatorToDelete.id));
-    localStorage.removeItem(`tiptab_profile_${handle}`);
-    localStorage.removeItem(`tiptab_membership_${handle}`);
-    localStorage.removeItem(`tiptab_membership_date_${handle}`);
-    toast({
-      title: "Profile Purged Successfully",
-      description: `@${handle}'s profile and map registrations have been completely removed.`,
-      variant: "destructive"
-    });
-    setIsDeleteModalOpen(false);
-    setCreatorToDelete(null);
+    
+    try {
+      // 1. Delete record from Supabase database profiles table
+      const { error } = await supabase
+        .from('profiles')
+        .delete()
+        .eq('handle', handle);
+
+      if (error) throw error;
+
+      // 2. Remove from local list state
+      setModeratedCreators(prev => prev.filter(c => c.id !== creatorToDelete.id));
+      
+      // 3. Purge cached local storage keys
+      localStorage.removeItem(`tiptab_profile_${handle}`);
+      localStorage.removeItem(`tiptab_membership_${handle}`);
+      localStorage.removeItem(`tiptab_membership_date_${handle}`);
+
+      // 4. Trigger global re-sync of creators across all context consumers
+      await fetchDbCreators();
+
+      toast({
+        title: "Profile Purged Successfully",
+        description: `@${handle}'s profile and map registrations have been completely removed from the database.`,
+        variant: "destructive"
+      });
+    } catch (err: any) {
+      console.error("Failed to delete user profile from database:", err);
+      toast({
+        title: "Purge Failed",
+        description: err.message || "An error occurred while deleting the profile from Supabase.",
+        variant: "destructive"
+      });
+    } finally {
+      setIsDeleteModalOpen(false);
+      setCreatorToDelete(null);
+    }
   };
 
   // Showcase Moderation Handlers
@@ -2225,7 +2250,7 @@ const AdminHub = () => {
                 <Label className="text-[10px] font-black uppercase tracking-widest text-white/40">Screenshot URL</Label>
                 <Input 
                   value={editingSite.screenshot_url} 
-                  onChange={(e) => setEditingSite({ ...editingSite, screenshot_url: e.target.value })} 
+                  onChange={(e) => setFormData ? undefined : setEditingSite({ ...editingSite, screenshot_url: e.target.value })} 
                   className="bg-white/5 border-white/10 h-12 rounded-xl text-white"
                 />
               </div>
