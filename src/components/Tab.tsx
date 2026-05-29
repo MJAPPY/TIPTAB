@@ -6,6 +6,7 @@ import { Header } from "./tab-platform/Header";
 import { Hero } from "./tab-platform/Hero";
 import { StatsBanner } from "./tab-platform/Sections";
 import { WorldMap } from "./tab-platform/WorldMap";
+import { TopVotedCreators } from "./tab-platform/TopVotedCreators";
 import { FeaturedCreators } from "./tab-platform/FeaturedCreators";
 import { HowItWorks } from "./tab-platform/HowItWorks";
 import { MembershipModal } from "@/components/tab-platform/MembershipModal";
@@ -111,6 +112,12 @@ export const Tab = () => {
         </section>
 
         <HowItWorks />
+
+        <TopVotedCreators 
+          creators={displayCreators}
+          topVotedHandles={topVotedHandles}
+          onViewProfile={handleViewProfile}
+        />
 
         <FeaturedCreators 
           creators={displayCreators}
