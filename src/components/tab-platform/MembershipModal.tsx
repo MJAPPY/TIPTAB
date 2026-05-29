@@ -47,7 +47,7 @@ export const MembershipModal = ({ isOpen, onOpenChange }: MembershipModalProps) 
   const [isProcessing, setIsProcessing] = useState(false);
   const [paymentAsset, setPaymentAsset] = useState<keyof typeof ASSET_CONTRACTS>("XPR");
   const { toast } = useToast();
-  const { session, actor, login, isConnected, setIsMember, isMember, membershipFee, membershipFeeXmd, membershipFeeXusdc, membershipFeeMetal, membershipFeeLoan, membershipFeeXmt, applyPromoCode, usePromoCode, userProfile, fetchDbCreators } = useXpr();
+  const { session, actor, login, isConnected, setIsMember, setMembershipDate, isMember, membershipFee, membershipFeeXmd, membershipFeeXusdc, membershipFeeMetal, membershipFeeLoan, membershipFeeXmt, applyPromoCode, usePromoCode, userProfile, fetchDbCreators } = useXpr();
 
   const [promoInput, setPromoInput] = useState("");
   const [appliedPromo, setAppliedPromo] = useState<PromoCode | null>(null);
@@ -128,6 +128,7 @@ export const MembershipModal = ({ isOpen, onOpenChange }: MembershipModalProps) 
     localStorage.setItem(`tiptab_membership_${actor}`, 'true');
     localStorage.setItem(`tiptab_membership_date_${actor}`, now);
     setIsMember(true);
+    setMembershipDate(now);
     if (appliedPromo) usePromoCode(appliedPromo.code);
     
     // Save/Upsert profile to Supabase with membership active

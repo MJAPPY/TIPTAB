@@ -20,6 +20,7 @@ interface XprContextType {
   isMember: boolean;
   membershipDate: string | null;
   setIsMember: (status: boolean) => void;
+  setMembershipDate: (date: string | null) => void;
   login: () => Promise<LinkSession | null>;
   logout: () => Promise<void>;
   refreshBalances: () => Promise<void>;
@@ -486,7 +487,7 @@ export const XprProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   };
 
   const value = {
-    session, actor: activeActor, balances, isMember, membershipDate, setIsMember, login, logout, refreshBalances, recordTip,
+    session, actor: activeActor, balances, isMember, membershipDate, setIsMember, setMembershipDate, login, logout, refreshBalances, recordTip,
     isConnected: !!session, isLoading, isAdmin: !!adminHook.currentAdminObj, adminRole: adminHook.currentAdminObj ? adminHook.currentAdminObj.role : null,
     isPermanentAdmin: adminHook.isCurrentAdminPermanent, ...adminHook, ...platformHook, ...socialHook,
     userProfile, updateUserProfile, featuredHandles, boostStream, distributeXprRewards, dbCreators, fetchDbCreators
