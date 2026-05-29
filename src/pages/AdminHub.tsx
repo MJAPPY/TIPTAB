@@ -263,12 +263,13 @@ const AdminHub = () => {
           .sort((a, b) => b[1] - a[1])
           .map(([handle]) => ({ handle, role: "Supporter" }));
 
-        // Alternate creators and supporters dynamically on the rewards ledger
+        // Alternate creators and supporters dynamically on the rewards ledger (strictly live data only, no fallbacks)
         const combinedList: { account: string; role: string; rank: number; reward: string }[] = [];
         let cIdx = 0;
         let sIdx = 0;
+        const maxElements = sortedCreators.length + sortedSupporters.length;
 
-        for (let i = 0; i < 10; i++) {
+        for (let i = 0; i < maxElements; i++) {
           if (i % 2 === 0 && cIdx < sortedCreators.length) {
             combinedList.push({
               account: sortedCreators[cIdx].handle,
@@ -296,37 +297,7 @@ const AdminHub = () => {
           }
         }
 
-        // Fill remaining empty slots with dbCreators if less than 10 entries exist
-        if (combinedList.length < 10) {
-          dbCreators.forEach(c => {
-            if (combinedList.length >= 10) return;
-            const handleClean = c.handle.toLowerCase().replace('@', '').trim();
-            if (!combinedList.some(w => w.account === handleClean)) {
-              combinedList.push({
-                account: handleClean,
-                role: c.categories?.[0] || "Creator",
-                rank: combinedList.length + 1,
-                reward: "0"
-              });
-            }
-          });
-        }
-
-        // Apply fallback standard Supporters to meet the top 10 ledger format if database is fresh
-        const fallbackSupporters = ["early", "fanatic", "cking", "whaleshark"];
-        fallbackSupporters.forEach(h => {
-          if (combinedList.length >= 10) return;
-          if (!combinedList.some(w => w.account === h)) {
-            combinedList.push({
-              account: h,
-              role: "Supporter",
-              rank: combinedList.length + 1,
-              reward: "0"
-            });
-          }
-        });
-
-        const finalWinners = combinedList.slice(0, 10).map((w, idx) => ({
+        const finalWinners = combinedList.map((w, idx) => ({
           ...w,
           rank: idx + 1
         }));
@@ -515,13 +486,13 @@ const AdminHub = () => {
         const calculatedXmd = targetFeeUsd.toFixed(2);
         
         const calculatedMetal = (targetFeeUsd / (metalXpr * xprUsd)).toFixed(4);
-        const calculatedText = (targetFeeUsd / (loanXpr * xprUsd)).toFixed(0);
+        const calculatedLoan = (targetFeeUsd / (loanXpr * xprUsd)).toFixed(0);
         const calculatedXmt = (targetFeeUsd / (xmtXpr * xprUsd)).toFixed(4);
         
         updateMembershipFee(calculatedXpr, 'XPR');
         updateMembershipFee(calculatedXmd, 'XMD');
         updateMembershipFee(calculatedMetal, 'METAL');
-        updateMembershipFee(calculatedText, 'LOAN');
+        updateMembershipFee(calculatedLoan, 'LOAN');
         updateMembershipFee(calculatedXmt, 'XMT');
         
         if (!isAuto) updateMembershipFee(localFeeXusdc, 'XUSDC');
@@ -529,7 +500,7 @@ const AdminHub = () => {
         setLocalFee(calculatedXpr);
         setLocalFeeXmd(calculatedXmd);
         setLocalFeeMetal(calculatedMetal);
-        setLocalFeeLoan(calculatedText);
+        setLocalFeeLoan(calculatedLoan);
         setLocalFeeXmt(calculatedXmt);
       }
 
@@ -666,26 +637,32 @@ const AdminHub = () => {
       toast({ title: "Insufficient Pool", description: "TAB Reward pool is currently empty." });
       return;
     }
+    if (winners.length === 0) {
+      toast({ title: "No Winners Available", description: "There are no active participants to distribute rewards to." });
+      return;
+    }
     
     // Top 3 splits 80% (45%, 23%, 12%)
-    // Remaining 7 split 20% equally (20% / 7 ≈ 2.857% each)
-    setWinners(prev => prev.map((w, idx) => {
-      let rewardShare = 0;
-      if (idx === 0) {
-        rewardShare = Math.floor(pool * 0.45);
-      } else if (idx === 1) {
-        rewardShare = Math.floor(pool * 0.23);
-      } else if (idx === 2) {
-        rewardShare = Math.floor(pool * 0.12);
-      } else {
-        rewardShare = Math.floor((pool * 0.20) / 7);
-      }
-      return {
-        ...w,
-        reward: rewardShare.toString()
-      };
-    }));
-    toast({ title: "Rewards Balanced", description: "TAB Reward pool distributed: 80% split among Top 3, 20% shared among remaining 7." });
+    // Remaining split 20% equally
+    setWinners(prev => {
+      const count = prev.length;
+      return prev.map((w, idx) => {
+        let rewardShare = 0;
+        if (count >= 3) {
+          if (idx === 0) rewardShare = Math.floor(pool * 0.45);
+          else if (idx === 1) rewardShare = Math.floor(pool * 0.23);
+          else if (idx === 2) rewardShare = Math.floor(pool * 0.12);
+          else rewardShare = Math.floor((pool * 0.20) / (count - 3));
+        } else {
+          rewardShare = Math.floor(pool / count);
+        }
+        return {
+          ...w,
+          reward: rewardShare.toString()
+        };
+      });
+    });
+    toast({ title: "Rewards Balanced", description: "TAB Reward pool distributed: 80% split among Top 3, 20% shared among remaining slots." });
   };
 
   const handleBroadcast = () => {
