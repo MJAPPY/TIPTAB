@@ -208,9 +208,9 @@ export const TipTabCard = ({ creator }: TipTabCardProps) => {
                 <img 
                   src="/webAuth-logo.jpg" 
                   alt="WebAuth Logo" 
-                  className="h-3 md:h-3.5 object-contain brightness-100 filter contrast-125"
+                  className="h-5 md:h-6 object-contain brightness-100 filter contrast-125"
                 />
-                <p className="text-[6px] md:text-[7px] font-black text-white/20 tracking-[0.3em] uppercase pt-0.5">
+                <p className="text-[6px] md:text-[7px] font-black text-white/20 tracking-[0.3em] uppercase pt-1">
                   XPR Network
                 </p>
               </div>
