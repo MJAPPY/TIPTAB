@@ -348,7 +348,7 @@ const CreatorProfile = () => {
     ? Math.floor(parseFloat(tipAmount)).toString() 
     : parseFloat(tipAmount).toFixed(assetConfig.precision);
     
-  const universalProtonLink = `https://proton.link/transfer?to=${cleanRecipient}&amount=${formattedAmountValue}&symbol=${asset}`;
+  const universalProtonLink = `https://link.protonchain.com/transfer?to=${cleanRecipient}&amount=${formattedAmountValue}&symbol=${asset}&memo=${encodeURIComponent(message)}`;
 
   return (
     <div className="min-h-screen bg-[#0a0514] text-white selection:bg-purple-500/30">
