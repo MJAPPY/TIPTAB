@@ -1,15 +1,19 @@
 import React, { useState, useEffect, useRef } from "react";
-import { User, AtSign, MapPin, Globe, Twitter, Save, Image as ImageIcon, Upload, X, Video, Instagram, CheckCircle2, Music, Radio, Youtube, Twitch, ShieldCheck, Move, Facebook, MessageSquare } from "lucide-react";
+import { User, AtSign, MapPin, Globe, Twitter, Save, Image as ImageIcon, Upload, X, Video, Instagram, CheckCircle2, Music, Radio, Youtube, Twitch, ShieldCheck, Move, Facebook, MessageSquare, Trash2, AlertTriangle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { useToast } from "@/hooks/use-toast";
 import { Creator } from "@/data/creators";
 import { EmbedPlayer } from "./EmbedPlayer";
 import { cn } from "@/lib/utils";
+import { useXpr } from "@/contexts/XprContext";
+import { useNavigate } from "react-router-dom";
+import { supabase } from "@/integrations/supabase/client";
 
 const CITY_COORDINATES: Record<string, [number, number]> = {
   "london": [-0.1276, 51.5074],
@@ -80,10 +84,13 @@ interface ProfileEditorProps {
 }
 
 export const ProfileEditor = ({ initialData, onSave, minimal = false }: ProfileEditorProps) => {
+  const { actor, logout } = useXpr();
+  const navigate = useNavigate();
   const [isSaving, setIsSaving] = useState(false);
   const [hasChanged, setHasChanged] = useState(false);
   const [isCityRecognized, setIsCityRecognized] = useState(false);
   const [isDraggingCover, setIsDraggingCover] = useState(false);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const coverInputRef = useRef<HTMLInputElement>(null);
   
@@ -298,6 +305,40 @@ export const ProfileEditor = ({ initialData, onSave, minimal = false }: ProfileE
     const pos = parseInt(e.target.value);
     setFormData(prev => ({ ...prev, coverPosition: pos }));
     setHasChanged(true);
+  };
+
+  const handleDeleteAccount = async () => {
+    if (!actor) return;
+    try {
+      const { error } = await supabase
+        .from('profiles')
+        .delete()
+        .eq('handle', actor);
+      
+      if (error) throw error;
+
+      const handleLower = actor.toLowerCase();
+      localStorage.removeItem(`tiptab_profile_${handleLower}`);
+      localStorage.removeItem(`tiptab_membership_${handleLower}`);
+      localStorage.removeItem(`tiptab_membership_date_${handleLower}`);
+      localStorage.removeItem(`tiptab_favorites_${handleLower}`);
+
+      toast({
+        title: "Account Deleted",
+        description: "Your profile has been removed from the network.",
+        variant: "destructive",
+      });
+
+      setIsDeleteModalOpen(false);
+      await logout();
+      navigate("/");
+    } catch (err: any) {
+      toast({
+        title: "Deletion Failed",
+        description: err.message || "An error occurred while deleting your account.",
+        variant: "destructive",
+      });
+    }
   };
 
   return (
@@ -816,6 +857,39 @@ export const ProfileEditor = ({ initialData, onSave, minimal = false }: ProfileE
               </div>
             </div>
           )}
+
+          {/* Danger Zone */}
+          <div className="pt-8 border-t border-red-500/20 space-y-4">
+            <h4 className="font-bold text-lg text-red-500 flex items-center gap-2">Danger Zone</h4>
+            <p className="text-sm text-slate-400">
+              Deleting your account will permanently remove your profile from the global map, wipe your metadata, and cancel your membership listing.
+            </p>
+            <Dialog open={isDeleteModalOpen} onOpenChange={setIsDeleteModalOpen}>
+              <DialogTrigger asChild>
+                <Button variant="destructive" className="rounded-xl h-12 px-6 font-bold bg-red-600 hover:bg-red-700 text-white">
+                  Delete Profile Account
+                </Button>
+              </DialogTrigger>
+              <DialogContent className="bg-[#2a1b4d] border-2 border-red-500/50 text-white rounded-[40px] p-10 max-w-md">
+                <div className="text-center space-y-6">
+                  <div className="h-20 w-20 rounded-full bg-red-500/10 flex items-center justify-center mx-auto border-2 border-red-500/20">
+                    <Trash2 className="h-10 w-10 text-red-500" />
+                  </div>
+                  <DialogHeader>
+                    <DialogTitle className="text-3xl font-black italic uppercase text-center tracking-tighter text-white">DELETE ACCOUNT?</DialogTitle>
+                    <DialogDescription className="text-white/60 font-bold text-center">
+                      Are you absolutely sure? This will permanently delete your profile, map pin, and verified member status from TIPTAB. This action is irreversible.
+                    </DialogDescription>
+                  </DialogHeader>
+                  <div className="flex gap-4">
+                    <Button type="button" onClick={() => setIsDeleteModalOpen(false)} className="flex-1 h-14 bg-white/5 hover:bg-white/10 rounded-2xl font-black uppercase text-white">Cancel</Button>
+                    <Button type="button" onClick={handleDeleteAccount} className="flex-1 h-14 bg-red-500 hover:bg-red-600 rounded-2xl font-black uppercase text-white">Yes, Delete Account</Button>
+                  </div>
+                </div>
+              </DialogContent>
+            </Dialog>
+          </div>
+
         </div>
       </CardContent>
     </Card>
