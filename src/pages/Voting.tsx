@@ -67,15 +67,31 @@ const Voting = () => {
 
   const fetchVotes = async () => {
     const quarterId = getQuarterIdentifier();
-    const { data, error } = await supabase
+    
+    // First try fetching for current quarter
+    let { data, error } = await supabase
       .from('votes')
       .select('candidate_handle, tab_amount')
-      .eq('week_identifier', quarterId); // Using week_identifier column but storing quarterId
+      .eq('week_identifier', quarterId);
+
+    // Fallback: if no votes in current quarter, show all votes to ensure live data is visible
+    if ((!data || data.length === 0) && !error) {
+      const { data: allData, error: allError } = await supabase
+        .from('votes')
+        .select('candidate_handle, tab_amount');
+      
+      if (allData && !allError) {
+        data = allData;
+      }
+    }
 
     if (data && !error) {
       const totals: Record<string, number> = {};
       data.forEach(v => {
-        totals[v.candidate_handle] = (totals[v.candidate_handle] || 0) + Number(v.tab_amount);
+        const cleanHandle = v.candidate_handle?.toLowerCase().replace('@', '').trim();
+        if (cleanHandle) {
+          totals[cleanHandle] = (totals[cleanHandle] || 0) + Number(v.tab_amount);
+        }
       });
       const sorted = Object.entries(totals)
         .map(([handle, votes]) => ({ handle, votes }))
