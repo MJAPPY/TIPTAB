@@ -42,6 +42,15 @@ interface ShowcaseSite {
 
 const SEED_SITES: ShowcaseSite[] = [
   {
+    id: "seed-askguy",
+    title: "AskGuy",
+    site_url: "https://askguy.vercel.app/",
+    screenshot_url: "https://images.unsplash.com/photo-1614741118887-7a4ee193a5fa?auto=format&fit=crop&w=800&q=80",
+    description: "The ultimate AI assistant and guide for the XPR Network ecosystem. Ask questions, explore on-chain data, and get instant guidance about wallets, tokens, and dApps.",
+    submitted_by: "askguy",
+    likes: 95
+  },
+  {
     id: "seed-alcor",
     title: "Alcor Exchange",
     site_url: "https://proton.alcor.exchange/",
