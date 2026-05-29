@@ -18,7 +18,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Zap, CheckCircle2, Wallet, ArrowRight, Sparkles, Calendar, Gift, Hourglass } from "lucide-react";
+import { Zap, CheckCircle2, Wallet, ArrowRight, Sparkles, Calendar, Gift } from "lucide-react";
 import { useState, useEffect } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { useXpr, PromoCode } from "@/contexts/XprContext";
@@ -44,7 +44,6 @@ const ASSET_CONTRACTS = {
 
 export const MembershipModal = ({ isOpen, onOpenChange }: MembershipModalProps) => {
   const [step, setStep] = useState<OnboardingStep>("intro");
-  const [years, setYears] = useState(1);
   const [isProcessing, setIsProcessing] = useState(false);
   const [paymentAsset, setPaymentAsset] = useState<keyof typeof ASSET_CONTRACTS>("XPR");
   const { toast } = useToast();
@@ -74,7 +73,7 @@ export const MembershipModal = ({ isOpen, onOpenChange }: MembershipModalProps) 
     const promo = applyPromoCode(promoInput);
     if (promo) {
       setAppliedPromo(promo);
-      toast({ title: "Promo Code Applied!", description: promo.type === "free" ? "Free pass applied!" : `${promo.value}% discount applied.` });
+      toast({ title: "Promo Code Applied!", description: promo.type === "free" ? "Free 1-year pass applied!" : `${promo.value}% discount applied.` });
     } else {
       toast({ title: "Invalid Code", description: "The code entered is invalid or expired.", variant: "destructive" });
     }
@@ -91,7 +90,7 @@ export const MembershipModal = ({ isOpen, onOpenChange }: MembershipModalProps) 
       LOAN: parseFloat(membershipFeeLoan),
       XMT: parseFloat(membershipFeeXmt)
     };
-    const original = feeLookup[paymentAsset] * years;
+    const original = feeLookup[paymentAsset];
     if (!appliedPromo) return original;
     if (appliedPromo.type === 'free') return 0;
     return original * (1 - appliedPromo.value / 100);
@@ -114,7 +113,7 @@ export const MembershipModal = ({ isOpen, onOpenChange }: MembershipModalProps) 
         account: assetConfig.account, 
         name: 'transfer',
         authorization: [{ actor: session.auth.actor, permission: session.auth.permission || 'active' }],
-        data: { from: actor, to: 'tiptab', quantity: formattedFee, memo: isMember ? `Renewal: ${years} Years` : `Activation: ${years} Years` },
+        data: { from: actor, to: 'tiptab', quantity: formattedFee, memo: isMember ? 'Renewal' : 'Activation' },
       };
 
       await session.transact({ actions: [membershipAction] }, { broadcast: true });
@@ -125,27 +124,9 @@ export const MembershipModal = ({ isOpen, onOpenChange }: MembershipModalProps) 
   };
 
   const finishActivation = async () => {
-    const now = new Date();
-    const expiryKey = `tiptab_membership_expiry_${actor}`;
-    const currentExpiryStr = localStorage.getItem(expiryKey);
-    let currentExpiry = new Date();
-    
-    // Extend existing expiry if active, otherwise set starting from now
-    if (currentExpiryStr && new Date(currentExpiryStr) > now) {
-      currentExpiry = new Date(currentExpiryStr);
-    }
-    
-    currentExpiry.setFullYear(currentExpiry.getFullYear() + years);
-    const newExpiryStr = currentExpiry.toISOString();
-
+    const now = new Date().toISOString();
     localStorage.setItem(`tiptab_membership_${actor}`, 'true');
-    localStorage.setItem(expiryKey, newExpiryStr);
-
-    const membershipDateKey = `tiptab_membership_date_${actor}`;
-    if (!localStorage.getItem(membershipDateKey)) {
-      localStorage.setItem(membershipDateKey, now.toISOString());
-    }
-
+    localStorage.setItem(`tiptab_membership_date_${actor}`, now);
     setIsMember(true);
     if (appliedPromo) usePromoCode(appliedPromo.code);
     
@@ -191,7 +172,7 @@ export const MembershipModal = ({ isOpen, onOpenChange }: MembershipModalProps) 
 
   const handleClose = () => {
     onOpenChange(false);
-    setTimeout(() => { setStep("intro"); setYears(1); setAppliedPromo(null); setPromoInput(""); }, 300);
+    setTimeout(() => { setStep("intro"); setAppliedPromo(null); setPromoInput(""); }, 300);
   };
 
   const feeLookup = {
@@ -231,7 +212,7 @@ export const MembershipModal = ({ isOpen, onOpenChange }: MembershipModalProps) 
                 
                 <div className="space-y-4">
                   {[
-                    { title: "Multi-Year Expirations", desc: "Pay up to 5 years in advance", icon: Calendar },
+                    { title: "Yearly Verification", desc: "Maintain your orange checkmark status", icon: Calendar },
                     { title: "Zero Platform Fees", desc: "Keep 100% of everything you earn", icon: Zap },
                     { title: "Global Discovery", desc: "Appear on the interactive creator map", icon: Sparkles },
                   ].map((item, i) => (
@@ -263,27 +244,6 @@ export const MembershipModal = ({ isOpen, onOpenChange }: MembershipModalProps) 
                   </DialogHeader>
                 </div>
 
-                <div className="space-y-3 bg-white/[0.03] p-4 border border-white/10 rounded-2xl">
-                  <Label className="text-[10px] font-black uppercase tracking-widest text-white/50 flex items-center gap-2"><Hourglass className="h-3.5 w-3.5 text-purple-400" /> Pass Duration</Label>
-                  <div className="grid grid-cols-5 gap-2">
-                    {[1, 2, 3, 4, 5].map((y) => (
-                      <Button
-                        key={y}
-                        type="button"
-                        onClick={() => setYears(y)}
-                        className={cn(
-                          "h-11 rounded-xl font-black text-xs transition-all border",
-                          years === y 
-                            ? "bg-orange-500 border-orange-600 text-white shadow-lg" 
-                            : "bg-white/5 border-white/10 text-white/40 hover:bg-white/10 hover:text-white"
-                        )}
-                      >
-                        {y} {y === 1 ? "Yr" : "Yrs"}
-                      </Button>
-                    ))}
-                  </div>
-                </div>
-
                 <div className="bg-white/5 border-2 border-white/10 rounded-[32px] md:rounded-[40px] p-6 md:p-8 text-center relative overflow-hidden group hover:border-purple-500/50 transition-all">
                   <div className="flex flex-col items-center justify-center gap-3">
                     <div className="flex items-center gap-3 mb-2">
@@ -306,7 +266,7 @@ export const MembershipModal = ({ isOpen, onOpenChange }: MembershipModalProps) 
                       </div>
                     </div>
 
-                    {appliedPromo && <span className="text-xl text-white/30 line-through font-black">{(feeLookup[paymentAsset] * years).toLocaleString()} {paymentAsset}</span>}
+                    {appliedPromo && <span className="text-xl text-white/30 line-through font-black">{feeLookup[paymentAsset].toLocaleString()} {paymentAsset}</span>}
                     <div className="flex items-center justify-center gap-3 md:gap-4">
                       <span className="text-4xl md:text-6xl font-black tracking-tighter text-white">
                         {finalFee.toLocaleString(undefined, { maximumFractionDigits: paymentAsset === 'XPR' || paymentAsset === 'LOAN' ? 0 : 4 })}

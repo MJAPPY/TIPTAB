@@ -85,7 +85,7 @@ interface ProfileEditorProps {
 }
 
 export const ProfileEditor = ({ initialData, onSave, minimal = false }: ProfileEditorProps) => {
-  const { actor, logout, isMember, membershipDate, membershipExpiry } = useXpr();
+  const { actor, logout, isMember, membershipDate } = useXpr();
   const navigate = useNavigate();
   const [isSaving, setIsSaving] = useState(false);
   const [hasChanged, setHasChanged] = useState(false);
@@ -405,7 +405,7 @@ export const ProfileEditor = ({ initialData, onSave, minimal = false }: ProfileE
                        <Hourglass className="h-3 w-3" /> Renewal Date
                      </span>
                      <p className="font-bold text-orange-400 text-sm md:text-base">
-                       {membershipExpiry ? new Date(membershipExpiry).toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric' }) : new Date(new Date(membershipDate).setFullYear(new Date(membershipDate).getFullYear() + 1)).toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric' })}
+                       {new Date(new Date(membershipDate).setFullYear(new Date(membershipDate).getFullYear() + 1)).toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric' })}
                      </p>
                   </div>
                </div>
@@ -447,7 +447,6 @@ export const ProfileEditor = ({ initialData, onSave, minimal = false }: ProfileE
                       </div>
                     )}
                     <button 
-                      type="button"
                       onClick={removeCoverImage}
                       className="absolute top-4 right-4 bg-red-500 hover:bg-red-600 text-white rounded-full p-2.5 shadow-xl transition-colors z-10"
                     >
@@ -523,7 +522,6 @@ export const ProfileEditor = ({ initialData, onSave, minimal = false }: ProfileE
                 </div>
                 {formData.avatarImage && (
                   <button 
-                    type="button"
                     onClick={removeImage}
                     className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-1 shadow-lg hover:bg-red-600 transition-colors"
                   >
