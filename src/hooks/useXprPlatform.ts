@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { supabase } from "@/integrations/supabase/client";
 import { PromoCode, AdminUser } from '@/types/xpr';
 
@@ -45,6 +45,11 @@ export const useXprPlatform = (currentAdmin: AdminUser | null) => {
       }
     } catch (err) { console.error("Settings sync error:", err); }
   }, []);
+
+  // Sync platform settings on initial load so the correct rates are stored in the state
+  useEffect(() => {
+    syncPlatformSettings();
+  }, [syncPlatformSettings]);
 
   const updateMembershipFee = async (fee: string, asset: 'XPR' | 'XMD' | 'XUSDC' | 'METAL' | 'LOAN' | 'XMT' = 'XPR') => {
     if (!currentAdmin || currentAdmin.role !== 'super') return;
