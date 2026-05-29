@@ -341,6 +341,15 @@ const CreatorProfile = () => {
   const isBoosted = featuredHandles.includes(creator.handle.replace('@', '').toLowerCase());
   const favorited = isFavorite(creator.handle);
 
+  // Construct a correct Universal Link format that native mobile apps register
+  const cleanRecipient = creator.handle.replace('@', '').toLowerCase().trim();
+  const assetConfig = ASSET_CONFIGS[asset];
+  const formattedAmountValue = assetConfig.precision === 0 
+    ? Math.floor(parseFloat(tipAmount)).toString() 
+    : parseFloat(tipAmount).toFixed(assetConfig.precision);
+    
+  const universalProtonLink = `https://proton.link/transfer?to=${cleanRecipient}&amount=${formattedAmountValue}&symbol=${asset}`;
+
   return (
     <div className="min-h-screen bg-[#0a0514] text-white selection:bg-purple-500/30">
       <Header onBecomeCreator={() => setIsMembershipOpen(true)} />
@@ -705,7 +714,7 @@ const CreatorProfile = () => {
                           className="w-full h-16 md:h-24 bg-gradient-to-r from-orange-500 to-purple-600 text-white font-black text-lg md:text-2xl rounded-2xl md:rounded-[32px] shadow-xl transition-all active:scale-95 flex items-center justify-center gap-3"
                         >
                           <a 
-                            href={`proton://transfer?to=${creator.handle.replace('@', '').toLowerCase().trim()}&amount=${tipAmount}&symbol=${asset}`}
+                            href={universalProtonLink}
                           >
                             Tip via WebAuth App <Zap className="h-5 w-5 fill-white" />
                           </a>
