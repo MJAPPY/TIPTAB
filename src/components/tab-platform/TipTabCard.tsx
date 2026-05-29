@@ -198,14 +198,26 @@ export const TipTabCard = ({ creator }: TipTabCardProps) => {
                 </div>
               </div>
             </div>
-            <div className="text-center space-y-1 w-full">
-              <div className="bg-orange-500 text-white font-black text-[9px] md:text-[10px] uppercase tracking-[0.15em] px-3.5 py-1.5 rounded-full shadow-lg shadow-orange-500/20 flex items-center justify-center gap-1.5">
+            <div className="text-center space-y-1 w-full flex flex-col items-center">
+              <div className="bg-orange-500 text-white font-black text-[9px] md:text-[10px] uppercase tracking-[0.15em] px-3.5 py-1.5 rounded-full shadow-lg shadow-orange-500/20 flex items-center justify-center gap-1.5 w-full">
                 <Zap className="h-2.5 w-2.5 fill-white" />
                 Scan to Tip
               </div>
-              <p className="text-[8px] font-black text-white/30 tracking-[0.3em] uppercase pt-0.5">
-                XPR Network
-              </p>
+              
+              {/* Blended WebAuth Logo Segment */}
+              <div className="flex items-center justify-center gap-1.5 pt-1 opacity-85 hover:opacity-100 transition-opacity">
+                <div className="h-4.5 w-4.5 rounded-full overflow-hidden border border-white/20 bg-black/60 shadow-inner flex items-center justify-center relative shrink-0">
+                  <img 
+                    src="/webAuth-logo.jpg" 
+                    alt="WebAuth" 
+                    className="h-full w-full object-cover mix-blend-screen scale-[1.3] relative z-10" 
+                    crossOrigin="anonymous"
+                  />
+                </div>
+                <p className="text-[8px] font-black text-white/50 tracking-[0.25em] uppercase whitespace-nowrap">
+                  WebAuth Pay
+                </p>
+              </div>
             </div>
           </div>
         </div>
@@ -241,3 +253,5 @@ export const TipTabCard = ({ creator }: TipTabCardProps) => {
     </div>
   );
 };
+
+export default TipTabCard;
