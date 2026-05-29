@@ -425,15 +425,19 @@ export const XprProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
   const logout = async () => {
     if (session) {
-      await session.remove();
-      localStorage.removeItem("tiptab_has_session");
-      setSession(null);
-      setBalances({ xpr: '0.0000', tab: '0', xmd: '0.000000', xusdc: '0.000000', metal: '0.00000000', loan: '0.0000', xmt: '0.00000000', tipsSent: 0 });
-      setIsMember(false);
-      setMembershipDate(null);
-      setUserProfile(null);
-      localStorage.removeItem("tiptab_user_profile");
+      try {
+        await session.remove();
+      } catch (err) {
+        console.warn("On-chain session removal warning:", err);
+      }
     }
+    localStorage.removeItem("tiptab_has_session");
+    setSession(null);
+    setBalances({ xpr: '0.0000', tab: '0', xmd: '0.000000', xusdc: '0.000000', metal: '0.00000000', loan: '0.0000', xmt: '0.00000000', tipsSent: 0 });
+    setIsMember(false);
+    setMembershipDate(null);
+    setUserProfile(null);
+    localStorage.removeItem("tiptab_user_profile");
   };
 
   const refreshBalances = async () => { if (session) await fetchBalances(session.auth.actor.toString()); };
@@ -459,7 +463,7 @@ export const XprProvider: React.FC<{ children: React.ReactNode }> = ({ children 
           categories: profile.categories,
           avatar: profile.avatar,
           avatar_image: profile.avatarImage || "",
-          cover_image: profile.coverImage || "",
+          cover_image: profile.cover_image || "",
           cover_position: profile.coverPosition ?? 50,
           color: profile.color,
           twitter: profile.twitter || "",
@@ -474,7 +478,7 @@ export const XprProvider: React.FC<{ children: React.ReactNode }> = ({ children 
           twitch: profile.twitch || "",
           tiktok: profile.tiktok || "",
           youtube_live: profile.youtubeLive || "",
-          instagram_live: profile.instagramLive || "",
+          instagram_live: profile.instagram_live || "",
           is_member: activeMember
         });
         // Re-fetch creator list to immediately update live preview
