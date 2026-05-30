@@ -518,7 +518,7 @@ const CreatorProfile = () => {
                     )}
                     {creator.kick && (
                       <a href={creator.kick} target="_blank" rel="noopener noreferrer" className="h-9 w-9 md:h-10 md:w-10 rounded-xl bg-white/5 flex items-center justify-center hover:bg-[#53FC18] transition-all shrink-0">
-                        <Radio className="h-4 md:h-5 w-4 md:w-5" />
+                        <Radio className="h-4 w-4" />
                       </a>
                     )}
                     {creator.rumble && (
@@ -705,7 +705,7 @@ const CreatorProfile = () => {
                           className="w-full h-16 md:h-24 bg-gradient-to-r from-orange-500 to-purple-600 text-white font-black text-lg md:text-2xl rounded-2xl md:rounded-[32px] shadow-xl transition-all active:scale-95 flex items-center justify-center gap-3"
                         >
                           <a 
-                            href={`proton://transfer?to=${creator.handle.replace('@', '').toLowerCase().trim()}&amount=${tipAmount}&symbol=${asset}`}
+                            href="proton://"
                           >
                             Tip via WebAuth App <Zap className="h-5 w-5 fill-white" />
                           </a>
