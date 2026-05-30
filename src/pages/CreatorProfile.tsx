@@ -158,6 +158,21 @@ const CreatorProfile = () => {
     loadCreator();
   }, [handle, navigate, actor, userProfile, dbCreators]);
 
+  // Load reactions dynamically based on creator and global reset flag
+  useEffect(() => {
+    if (!creator) return;
+    const handleLower = creator.handle.toLowerCase().replace('@', '').trim();
+    const globalReset = localStorage.getItem("tiptab_global_reactions_reset") === "true";
+    
+    const likes = localStorage.getItem(`tiptab_reactions_likes_${handleLower}`);
+    const fireworks = localStorage.getItem(`tiptab_reactions_fireworks_${handleLower}`);
+    const applause = localStorage.getItem(`tiptab_reactions_applause_${handleLower}`);
+    
+    setLikeCount(likes ? parseInt(likes) : (globalReset ? 0 : 130));
+    setFireworkCount(fireworks ? parseInt(fireworks) : (globalReset ? 0 : 42));
+    setApplauseCount(applause ? parseInt(applause) : (globalReset ? 0 : 84));
+  }, [creator]);
+
   const handleBack = () => {
     if (window.history.length > 1 && location.key !== 'default') {
       navigate(-1);
@@ -167,9 +182,30 @@ const CreatorProfile = () => {
   };
 
   const handleReaction = (type: 'heart' | 'firework' | 'applause') => {
-    if (type === 'heart') setLikeCount(prev => prev + 1);
-    if (type === 'firework') setFireworkCount(prev => prev + 1);
-    if (type === 'applause') setApplauseCount(prev => prev + 1);
+    if (!creator) return;
+    const handleLower = creator.handle.toLowerCase().replace('@', '').trim();
+
+    if (type === 'heart') {
+      setLikeCount(prev => {
+        const next = prev + 1;
+        localStorage.setItem(`tiptab_reactions_likes_${handleLower}`, next.toString());
+        return next;
+      });
+    }
+    if (type === 'firework') {
+      setFireworkCount(prev => {
+        const next = prev + 1;
+        localStorage.setItem(`tiptab_reactions_fireworks_${handleLower}`, next.toString());
+        return next;
+      });
+    }
+    if (type === 'applause') {
+      setApplauseCount(prev => {
+        const next = prev + 1;
+        localStorage.setItem(`tiptab_reactions_applause_${handleLower}`, next.toString());
+        return next;
+      });
+    }
     
     if ((window as any).triggerReaction) {
       (window as any).triggerReaction(type);

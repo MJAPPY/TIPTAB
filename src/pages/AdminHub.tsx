@@ -778,6 +778,25 @@ const AdminHub = () => {
     });
   };
 
+  const handleResetReactions = () => {
+    if (typeof window !== "undefined") {
+      // Find and remove all individual reaction localStorage keys
+      for (let i = localStorage.length - 1; i >= 0; i--) {
+        const key = localStorage.key(i);
+        if (key && key.startsWith("tiptab_reactions_")) {
+          localStorage.removeItem(key);
+        }
+      }
+      // Set the global reset flag
+      localStorage.setItem("tiptab_global_reactions_reset", "true");
+      
+      toast({
+        title: "Emoji Reactions Reset",
+        description: "Reactions on all profiles have been reset to 0.",
+      });
+    }
+  };
+
   const toggleMaintenance = () => {
     if (adminRole !== 'super') {
       toast({ title: "Unauthorized", description: "Only Super Admins can toggle maintenance mode.", variant: "destructive" });
@@ -1603,6 +1622,13 @@ const AdminHub = () => {
                       >
                         <RotateCcw className="h-5 w-5" /> Reset Live Feed Ticker
                       </Button>
+
+                      <Button 
+                        onClick={handleResetReactions}
+                        className="w-full h-16 rounded-[28px] bg-red-500/10 border border-red-500/20 text-red-400 hover:bg-red-500/20 font-black text-sm flex items-center justify-start gap-4 px-8"
+                      >
+                        <Trash2 className="h-5 w-5 text-red-500" /> Reset Emoji Reactions (All Profiles)
+                      </Button>
                     </div>
                   </div>
                   
@@ -2229,7 +2255,7 @@ const AdminHub = () => {
               <Trash2 className="h-10 w-10 text-red-500" />
             </div>
             <DialogHeader>
-              <DialogTitle className="text-3xl font-black italic uppercase text-center tracking-tighter">PURGE PROFILE?</DialogTitle>
+              <DialogTitle className="text-3xl font-black italic uppercase text-center tracking-tighter text-white">PURGE PROFILE?</DialogTitle>
               <DialogDescription className="text-white/60 font-bold text-center">
                 This will permanently remove @{creatorToDelete?.handle} from the map and wipe their metadata. This action is irreversible.
               </DialogDescription>
