@@ -250,7 +250,7 @@ const AdminHub = () => {
 
       if (voteData && !voteError) {
         voteData.forEach(v => {
-          if (v.voter_handle) uniqueVoters.add(v.voter_handle);
+          if (v.voter_handle) uniqueVoters.add(v.voter_handle.toLowerCase().trim());
           totalTabAmount += Number(v.tab_amount || 0);
         });
 
@@ -315,6 +315,21 @@ const AdminHub = () => {
       console.error("Failed to load showcase sites", e);
     }
   }, []);
+
+  // Compute live geographical distribution from dbCreators
+  const cityDistribution = useMemo(() => {
+    const counts: Record<string, number> = {};
+    dbCreators.forEach(c => {
+      if (c.location && c.location.trim() !== "" && c.location.toLowerCase().trim() !== "global") {
+        const city = c.location.trim();
+        counts[city] = (counts[city] || 0) + 1;
+      }
+    });
+    
+    return Object.entries(counts)
+      .map(([city, count]) => ({ city, count }))
+      .sort((a, b) => b.count - a.count);
+  }, [dbCreators]);
 
   useEffect(() => {
     fetchLiveStats();
@@ -1298,11 +1313,33 @@ const AdminHub = () => {
                       <CardDescription className="text-white/40">Geographical presence hotspots</CardDescription>
                     </CardHeader>
                     <CardContent className="p-0 space-y-6">
-                      <div className="py-12 text-center">
-                        <p className="text-[10px] font-black text-white/10 uppercase tracking-[0.3em]">No active geodata found.</p>
-                      </div>
+                      {cityDistribution.length > 0 ? (
+                        <div className="space-y-4 max-h-[220px] overflow-y-auto pr-2 custom-scrollbar">
+                          {cityDistribution.slice(0, 4).map((item, i) => (
+                            <div key={i} className="space-y-1.5">
+                              <div className="flex items-center justify-between text-xs">
+                                <span className="font-bold text-white/80">{item.city}</span>
+                                <span className="font-black text-purple-400">{item.count} {item.count === 1 ? 'pro' : 'pros'}</span>
+                              </div>
+                              <div className="h-1.5 w-full bg-white/5 rounded-full overflow-hidden">
+                                <div 
+                                  className="h-full bg-gradient-to-r from-purple-500 to-cyan-500 rounded-full" 
+                                  style={{ width: `${Math.min(100, (item.count / dbCreators.length) * 100)}%` }} 
+                                />
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      ) : (
+                        <div className="py-12 text-center space-y-2">
+                          <p className="text-[10px] font-black text-white/10 uppercase tracking-[0.3em]">No active geodata found.</p>
+                          <p className="text-[9px] text-white/20 font-bold uppercase tracking-widest">Awaiting profiles on the map</p>
+                        </div>
+                      )}
                       <div className="pt-4 mt-4 border-t border-white/5">
-                        <p className="text-[9px] font-black text-white/20 uppercase tracking-[0.3em] text-center">Global Coverage: Syncing...</p>
+                        <p className="text-[9px] font-black text-white/20 uppercase tracking-[0.3em] text-center">
+                          {cityDistribution.length > 0 ? `Tracking ${cityDistribution.length} active global hubs` : "Global Coverage: Syncing..."}
+                        </p>
                       </div>
                     </CardContent>
                  </Card>
@@ -2263,9 +2300,7 @@ const AdminHub = () => {
       <Dialog open={isDeleteModalOpen} onOpenChange={setIsDeleteModalOpen}>
         <DialogContent className="bg-[#2a1b4d] border-2 border-red-500/50 text-white rounded-[40px] p-10 max-w-md">
           <div className="text-center space-y-6">
-            <div className="h-20 w-20 rounded-full bg-red-500/10 flex items-center justify-center mx-auto border-2 border-red-500/20">
-              <Trash2 className="h-10 w-10 text-red-500" />
-            </div>
+            <Trash2 className="mx-auto h-20 w-20 text-red-500" />
             <DialogHeader>
               <DialogTitle className="text-3xl font-black italic uppercase text-center tracking-tighter text-white">PURGE PROFILE?</DialogTitle>
               <DialogDescription className="text-white/60 font-bold text-center">
