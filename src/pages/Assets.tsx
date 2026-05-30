@@ -20,17 +20,13 @@ const Assets = () => {
     if (!ref.current) return;
     setIsDownloading(true);
     try {
-      // Use pixelRatio 4 for high-resolution print quality
-      // backgroundColor: null ensures transparency for the export
-      // Added more generous padding and explicit horizontal margin for the right side
+      // Use pixelRatio 4 for clean, high-resolution vector-like printing outputs.
+      // backgroundColor null guarantees beautiful alpha-channel transparent background.
+      // Dynamic inline layout padding has been moved to natural DOM classes to avoid displacement artifacts.
       const dataUrl = await toPng(ref.current, { 
         quality: 1, 
         pixelRatio: 4, 
-        backgroundColor: null,
-        style: {
-          margin: '0',
-          padding: '60px 100px 60px 60px', // Extra padding on the right (100px)
-        }
+        backgroundColor: null
       });
       const link = document.createElement('a');
       link.download = `${fileName}.png`;
@@ -51,7 +47,7 @@ const Assets = () => {
       <main className="container mx-auto px-6 pt-44 pb-24 max-w-6xl">
         <div className="space-y-16">
           <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
-            <div className="space-y-4">
+            <div className="space-y-4 text-left">
               <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/5 border border-white/10 text-[10px] font-black uppercase tracking-widest text-white/40">
                 <ImageIcon className="h-3.5 w-3.5" />
                 Network Media Kit
@@ -71,8 +67,8 @@ const Assets = () => {
               <div className="absolute inset-0 bg-gradient-to-br from-purple-500/5 to-transparent pointer-events-none" />
               
               <div className="flex-1 flex items-center justify-center w-full min-h-[300px]">
-                {/* Tightly framed ref container for clean centering */}
-                <div ref={logoRef} className="inline-flex items-center justify-center bg-transparent">
+                {/* Natural padding on the captured wrapper element avoids displacement boundaries during export */}
+                <div ref={logoRef} className="p-16 bg-transparent flex items-center justify-center">
                   <BrandLogo size="lg" isStatic={true} />
                 </div>
               </div>
@@ -81,7 +77,7 @@ const Assets = () => {
                 <button 
                   onClick={() => downloadPng(logoRef, 'tiptab-full-logo')}
                   disabled={isDownloading}
-                  className="h-14 rounded-2xl bg-white text-black hover:bg-purple-500 hover:text-white font-black text-sm uppercase tracking-widest transition-all shadow-xl flex items-center justify-center gap-2"
+                  className="h-14 rounded-2xl bg-white text-black hover:bg-purple-600 hover:text-white font-black text-sm uppercase tracking-widest transition-all shadow-xl flex items-center justify-center gap-2"
                 >
                   <Download className="h-4 w-4" /> Download PNG
                 </button>
@@ -98,7 +94,8 @@ const Assets = () => {
               <div className="absolute inset-0 bg-gradient-to-br from-orange-500/5 to-transparent pointer-events-none" />
               
               <div className="flex-1 flex items-center justify-center w-full min-h-[300px]">
-                <div ref={tokenRef} className="inline-flex items-center justify-center bg-transparent">
+                {/* Natural padding wrapper for the token badge icon export */}
+                <div ref={tokenRef} className="p-16 bg-transparent flex items-center justify-center">
                   <BrandLogo size="lg" showText={false} isStatic={true} />
                 </div>
               </div>
