@@ -85,7 +85,7 @@ const Showcase = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
-  const { actor, isConnected, login } = useXpr();
+  const { actor, isConnected, login, session, refreshBalances } = useXpr();
   const { toast } = useToast();
 
   const [dbSites, setDbSites] = useState<ShowcaseSite[]>([]);
@@ -185,17 +185,45 @@ const Showcase = () => {
       return;
     }
 
-    setIsSaving(true);
-    const newSite = {
-      title: title.trim(),
-      site_url: siteUrl.trim().startsWith("http") ? siteUrl.trim() : `https://${siteUrl.trim()}`,
-      screenshot_url: screenshotUrl.trim() || "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&w=800&q=80",
-      description: description.trim(),
-      submitted_by: actor || "anonymous",
-      likes: 0
-    };
+    if (!session || !actor) {
+      toast({
+        title: "Session Required",
+        description: "Please connect your WebAuth wallet to submit.",
+        variant: "destructive"
+      });
+      return;
+    }
 
+    setIsSaving(true);
     try {
+      // 1. Charge 5,000 XPR Activation Fee via WebAuth
+      const transferAction = {
+        account: "eosio.token",
+        name: "transfer",
+        authorization: [{
+          actor: session.auth.actor,
+          permission: session.auth.permission || "active",
+        }],
+        data: {
+          from: actor,
+          to: "tiptab",
+          quantity: "5000.0000 XPR",
+          memo: `Showcase Listing: ${title.trim().slice(0, 30)}`,
+        },
+      };
+
+      await session.transact({ actions: [transferAction] }, { broadcast: true });
+
+      // 2. If transfer succeeds, save project to Directory
+      const newSite = {
+        title: title.trim(),
+        site_url: siteUrl.trim().startsWith("http") ? siteUrl.trim() : `https://${siteUrl.trim()}`,
+        screenshot_url: screenshotUrl.trim() || "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&w=800&q=80",
+        description: description.trim(),
+        submitted_by: actor,
+        likes: 0
+      };
+
       const { data, error } = await supabase
         .from("showcase_sites")
         .insert(newSite)
@@ -227,8 +255,17 @@ const Showcase = () => {
       setScreenshotUrl("");
       setDescription("");
       setIsSubmitOpen(false);
-    } catch (err) {
-      console.error("Submission failed:", err);
+
+      if (refreshBalances) {
+        refreshBalances();
+      }
+    } catch (err: any) {
+      console.error("Submission/Payment failed:", err);
+      toast({
+        title: "Submission Canceled",
+        description: err.message || "XPR transaction authorization was not completed.",
+        variant: "destructive"
+      });
     } finally {
       setIsSaving(false);
     }
@@ -304,7 +341,7 @@ const Showcase = () => {
                       <DialogTitle className="text-3xl font-black italic uppercase">Add Your Site</DialogTitle>
                     </div>
                     <DialogDescription className="text-white/50 font-bold text-sm leading-relaxed">
-                      Publish your XPR application or community site to the global platform index.
+                      Publish your XPR application or community site to the global platform index (requires a <strong className="text-orange-500">5,000 XPR</strong> listing fee).
                     </DialogDescription>
                   </DialogHeader>
 
@@ -392,7 +429,7 @@ const Showcase = () => {
                       disabled={isSaving}
                       className="w-full h-16 bg-gradient-to-r from-orange-500 to-purple-600 hover:from-purple-600 hover:to-purple-700 text-white font-black text-lg rounded-2xl shadow-xl transition-all"
                     >
-                      {isSaving ? "Publishing Project..." : "Publish Site Showcase"}
+                      {isSaving ? "Publishing Project..." : "Publish Site Showcase (5,000 XPR)"}
                     </Button>
                   </form>
                 </DialogContent>
