@@ -38,8 +38,6 @@ import { useToast } from "@/hooks/use-toast";
 import { useXpr } from "@/contexts/XprContext";
 import { cn } from "@/lib/utils";
 import { supabase } from "@/integrations/supabase/client";
-import { QRCodeSVG } from "qrcode.react";
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 
 const ASSET_CONFIGS: Record<string, { code: string; precision: number }> = {
   TAB: { code: 'tokencreate', precision: 0 },
@@ -64,12 +62,11 @@ const CreatorProfile = () => {
   const [isProcessing, setIsProcessing] = useState(false);
   const [isMembershipOpen, setIsMembershipOpen] = useState(false);
   const [isCopied, setIsCopied] = useState(false);
-  const [isQrModalOpen, setIsQrModalOpen] = useState(false);
   
   // Interaction Counts
-  const [likeCount, setLikeCount] = useState(0);
-  const [fireworkCount, setFireworkCount] = useState(0);
-  const [applauseCount, setApplauseCount] = useState(0);
+  const [likeCount, setLikeCount] = useState(130);
+  const [fireworkCount, setFireworkCount] = useState(42);
+  const [applauseCount, setApplauseCount] = useState(84);
 
   // Ensure page starts at top when handle changes
   useEffect(() => {
@@ -343,31 +340,6 @@ const CreatorProfile = () => {
   const isOwner = actor === creator.handle.replace('@', '').toLowerCase();
   const isBoosted = featuredHandles.includes(creator.handle.replace('@', '').toLowerCase());
   const favorited = isFavorite(creator.handle);
-
-  // Clean recipient XPR address handle
-  const cleanRecipient = creator.handle.replace('@', '').toLowerCase().trim();
-
-  // Helper functions to generate fully qualified signing-compatible deep links.
-  // Supplying the precise amount, decimal precision, symbol, and contract prevents the Error 54 schema parsing exception inside the WebAuth app.
-  const getTransferDetails = () => {
-    const config = ASSET_CONFIGS[asset];
-    const amountNum = parseFloat(tipAmount) || 0;
-    const formattedAmount = config.precision === 0 
-      ? Math.floor(amountNum).toString()
-      : amountNum.toFixed(config.precision);
-    const encodedMemo = encodeURIComponent(message.trim() || 'Tipped via TipTab');
-    return { formattedAmount, encodedMemo, config };
-  };
-
-  const getNativeAppDeepLink = () => {
-    const { formattedAmount, encodedMemo, config } = getTransferDetails();
-    return `proton://transfer?to=${cleanRecipient}&amount=${formattedAmount}&token=${asset}&symbol=${asset}&contract=${config.code}&code=${config.code}&memo=${encodedMemo}`;
-  };
-
-  const getFallbackUniversalLink = () => {
-    const { formattedAmount, encodedMemo, config } = getTransferDetails();
-    return `https://link.protonchain.com/transfer?to=${cleanRecipient}&amount=${formattedAmount}&token=${asset}&symbol=${asset}&contract=${config.code}&code=${config.code}&memo=${encodedMemo}`;
-  };
 
   return (
     <div className="min-h-screen bg-[#0a0514] text-white selection:bg-purple-500/30">
@@ -729,10 +701,14 @@ const CreatorProfile = () => {
                     ) : (
                       <div className="flex flex-col gap-3">
                         <Button 
-                          onClick={() => setIsQrModalOpen(true)}
+                          asChild
                           className="w-full h-16 md:h-24 bg-gradient-to-r from-orange-500 to-purple-600 text-white font-black text-lg md:text-2xl rounded-2xl md:rounded-[32px] shadow-xl transition-all active:scale-95 flex items-center justify-center gap-3"
                         >
-                          Tip via WebAuth App <Zap className="h-5 w-5 fill-white" />
+                          <a 
+                            href={`proton://transfer?to=${creator.handle.replace('@', '').toLowerCase().trim()}&amount=${tipAmount}&symbol=${asset}`}
+                          >
+                            Tip via WebAuth App <Zap className="h-5 w-5 fill-white" />
+                          </a>
                         </Button>
                         <Button 
                           onClick={handleConnect} 
@@ -762,46 +738,6 @@ const CreatorProfile = () => {
       </main>
 
       <MembershipModal isOpen={isMembershipOpen} onOpenChange={setIsMembershipOpen} />
-
-      <Dialog open={isQrModalOpen} onOpenChange={setIsQrModalOpen}>
-        <DialogContent className="bg-[#1e1438]/95 backdrop-blur-[32px] border-white/10 text-white sm:max-w-[420px] rounded-[40px] p-8 overflow-hidden shadow-[0_0_100px_rgba(0,0,0,0.8)] text-center">
-          <DialogHeader className="space-y-3">
-            <DialogTitle className="text-2xl font-black italic uppercase text-center">WebAuth Transfer</DialogTitle>
-            <DialogDescription className="text-white/60 font-bold text-center">
-              Scan this QR code with your WebAuth Wallet scanner, or tap open to initiate the transfer directly.
-            </DialogDescription>
-          </DialogHeader>
-          
-          <div className="flex flex-col items-center justify-center gap-6 my-6">
-            <div className="bg-white p-4 rounded-[24px] shadow-2xl">
-              <QRCodeSVG 
-                value={getNativeAppDeepLink()}
-                size={180}
-                level="H"
-                includeMargin={false}
-              />
-            </div>
-            
-            <div className="space-y-1">
-              <p className="text-xs font-black text-purple-400 uppercase tracking-widest">Recipient: @{cleanRecipient}</p>
-              <p className="text-[10px] text-white/30 font-bold uppercase tracking-widest">Scan or tap to load recipient in Wallet</p>
-            </div>
-          </div>
-
-          <div className="space-y-3">
-            <Button asChild className="w-full h-14 bg-gradient-to-r from-orange-500 to-purple-600 text-white font-black text-sm uppercase tracking-widest rounded-2xl shadow-lg transition-all active:scale-95">
-              <a href={getNativeAppDeepLink()}>
-                Open WebAuth App
-              </a>
-            </Button>
-            <Button asChild variant="outline" className="w-full h-12 text-white/60 border-white/10 hover:text-white bg-white/5 rounded-xl text-xs uppercase font-black">
-              <a href={getFallbackUniversalLink()} target="_blank" rel="noopener noreferrer">
-                Browser Fallback Link
-              </a>
-            </Button>
-          </div>
-        </DialogContent>
-      </Dialog>
 
       <style>{`
         @keyframes pulse-slow {
