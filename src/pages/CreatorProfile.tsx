@@ -67,9 +67,9 @@ const CreatorProfile = () => {
   const [isQrModalOpen, setIsQrModalOpen] = useState(false);
   
   // Interaction Counts
-  const [likeCount, setLikeCount] = useState(130);
-  const [fireworkCount, setFireworkCount] = useState(42);
-  const [applauseCount, setApplauseCount] = useState(84);
+  const [likeCount, setLikeCount] = useState(0);
+  const [fireworkCount, setFireworkCount] = useState(0);
+  const [applauseCount, setApplauseCount] = useState(0);
 
   // Ensure page starts at top when handle changes
   useEffect(() => {
