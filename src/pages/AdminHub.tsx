@@ -1089,21 +1089,21 @@ const AdminHub = () => {
         localStorage.setItem("tiptab_showcase_local", JSON.stringify(updated));
         toast({ title: "Local Project Removed", variant: "destructive" });
       } else {
-        // Fallback delete pattern: Try direct database deletion. If Row-Level Security (RLS) is active 
-        // and restricts client-side delete privileges, set the description to '[DELETED]' which acts 
-        // as a global soft-deletion flag across the platform index.
-        const { error: deleteError } = await supabase.from("showcase_sites").delete().eq("id", siteToDelete.id);
-        if (deleteError) {
-          const { error: updateError } = await supabase
-            .from("showcase_sites")
-            .update({ description: "[DELETED]" })
-            .eq("id", siteToDelete.id);
-          
-          if (!updateError) {
-            toast({ title: "Showcase Project Deleted", variant: "destructive" });
-          }
-        } else {
+        // Direct delete can quietly succeed without modifying records if RLS has no explicit DELETE policy.
+        // Thus, we directly execute the soft-delete via UPDATE which is permitted under RLS.
+        const { error: updateError } = await supabase
+          .from("showcase_sites")
+          .update({ description: "[DELETED]" })
+          .eq("id", siteToDelete.id);
+        
+        if (!updateError) {
           toast({ title: "Showcase Project Deleted", variant: "destructive" });
+        } else {
+          toast({ 
+            title: "Delete Failed", 
+            description: updateError.message, 
+            variant: "destructive" 
+          });
         }
       }
 
