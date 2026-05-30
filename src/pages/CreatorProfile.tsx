@@ -705,7 +705,7 @@ const CreatorProfile = () => {
                           className="w-full h-16 md:h-24 bg-gradient-to-r from-orange-500 to-purple-600 text-white font-black text-lg md:text-2xl rounded-2xl md:rounded-[32px] shadow-xl transition-all active:scale-95 flex items-center justify-center gap-3"
                         >
                           <a 
-                            href="https://link.protonchain.com"
+                            href="https://webauth.com"
                             target="_blank"
                             rel="noopener noreferrer"
                           >
