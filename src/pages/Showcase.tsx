@@ -112,12 +112,15 @@ const Showcase = () => {
         .order("created_at", { ascending: false });
 
       if (data && !error) {
-        setDbSites(data as ShowcaseSite[]);
+        const activeSites = (data as ShowcaseSite[]).filter(s => s.description !== "[DELETED]");
+        setDbSites(activeSites);
       } else {
         // Fallback to local storage if supabase table doesn't exist yet
         const saved = localStorage.getItem("tiptab_showcase_local");
         if (saved) {
-          setDbSites(JSON.parse(saved));
+          const parsed = JSON.parse(saved);
+          const activeSites = parsed.filter((s: ShowcaseSite) => s.description !== "[DELETED]");
+          setDbSites(activeSites);
         }
       }
     } catch (e) {
