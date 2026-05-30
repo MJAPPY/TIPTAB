@@ -136,9 +136,9 @@ export const TipTabCard = ({ creator }: TipTabCardProps) => {
               <h3 className="text-xl md:text-2xl font-black text-white leading-tight tracking-tighter drop-shadow-md truncate">
                 {creator.name}
               </h3>
-              <div className="flex items-center gap-1.5">
-                <p className="text-purple-400 font-black text-[13px] md:text-sm tracking-tight">@{cleanHandle}</p>
-                <div className="h-0.5 w-0.5 rounded-full bg-white/20" />
+              <div className="flex items-center gap-1.5 flex-wrap">
+                <p className="text-purple-400 font-black text-lg md:text-xl tracking-tight">@{cleanHandle}</p>
+                <div className="h-1 w-1 rounded-full bg-white/20" />
                 <span className="text-white/40 text-[9px] font-black uppercase tracking-widest truncate">WebAuth Name</span>
               </div>
             </div>
