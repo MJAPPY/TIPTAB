@@ -464,7 +464,7 @@ const CreatorProfile = () => {
                     <Button asChild className="flex-1 xs:flex-none rounded-xl md:rounded-2xl bg-gradient-to-tr from-[#f09433] via-[#e6683c] to-[#bc1888] h-11 md:h-12 px-4 md:px-6 gap-2.5 md:gap-3 group">
                       <a href={creator.instagramLive} target="_blank" rel="noopener noreferrer">
                         <div className="h-1.5 w-1.5 rounded-full bg-white animate-pulse" />
-                        <Instagram className="h-4 w-4 md:h-5 w-4 md:w-5" />
+                        <Instagram className="h-4 w-4 md:h-5 md:w-5" />
                         <span className="font-black text-[10px] md:text-xs uppercase tracking-widest">IG Live</span>
                       </a>
                     </Button>
@@ -701,16 +701,10 @@ const CreatorProfile = () => {
                     ) : (
                       <div className="flex flex-col gap-3">
                         <Button 
-                          asChild
+                          onClick={handleConnect}
                           className="w-full h-16 md:h-24 bg-gradient-to-r from-orange-500 to-purple-600 text-white font-black text-lg md:text-2xl rounded-2xl md:rounded-[32px] shadow-xl transition-all active:scale-95 flex items-center justify-center gap-3"
                         >
-                          <a 
-                            href="webauth://"
-                            target="_blank"
-                            rel="noopener noreferrer"
-                          >
-                            Tip via WebAuth App <Zap className="h-5 w-5 fill-white" />
-                          </a>
+                          Tip via WebAuth App <Zap className="h-5 w-5 fill-white" />
                         </Button>
                         <Button 
                           onClick={handleConnect} 
