@@ -26,7 +26,7 @@ export const TipTabCard = ({ creator }: TipTabCardProps) => {
   // Use a clean handle for the URL
   const cleanHandle = creator.handle.replace(/^@/, "").toLowerCase().trim();
   const tippingUrl = `${PRODUCTION_URL}/tip/${cleanHandle}`;
-  const customShareText = `Got some free time? have a bit of fun & check out ${creator.name} at the global appreciation hub on $xpr network.`;
+  const customShareText = `Got some free time? have a bit of fun & check out ${creator.name} at the global appreciation hub on $xpr network. ${PRODUCTION_URL}/tip/${cleanHandle}`;
 
   const copyToClipboard = () => {
     navigator.clipboard.writeText(tippingUrl).then(() => {

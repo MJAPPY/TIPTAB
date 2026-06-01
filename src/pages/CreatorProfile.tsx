@@ -379,7 +379,7 @@ const CreatorProfile = () => {
   const favorited = isFavorite(creator.handle);
   const cleanHandle = creator.handle.replace(/^@/, "").toLowerCase().trim();
   const shareUrl = `${PRODUCTION_URL}/tip/${cleanHandle}`;
-  const customShareText = `Got some free time? have a bit of fun & check out ${creator.name} at the global appreciation hub on $xpr network.`;
+  const customShareText = `Got some free time? have a bit of fun & check out ${creator.name} at the global appreciation hub on $xpr network. ${PRODUCTION_URL}/tip/${cleanHandle}`;
 
   return (
     <div className="min-h-screen bg-[#0a0514] text-white selection:bg-purple-500/30">
@@ -777,7 +777,7 @@ const CreatorProfile = () => {
 
       {/* Enhanced Share Options Dialog */}
       <Dialog open={isShareOpen} onOpenChange={setIsShareOpen}>
-        <DialogContent className="bg-[#1e1438]/95 backdrop-blur-3xl border-white/10 text-white rounded-[40px] p-8 max-w-sm shadow-[0_0_100px_rgba(0,0,0,0.8)] border-t-purple-500/20">
+        <DialogContent className="bg-[#1e1438]/95 backdrop-blur-3xl border-white/10 text-white rounded-[40px] p-8 max-sm shadow-[0_0_100px_rgba(0,0,0,0.8)] border-t-purple-500/20">
           <DialogHeader className="text-center space-y-3">
             <div className="mx-auto h-16 w-16 rounded-[24px] bg-purple-500/20 flex items-center justify-center border border-purple-500/30">
                <Share2 className="h-8 w-8 text-purple-400" />
