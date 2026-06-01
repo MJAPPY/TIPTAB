@@ -14,7 +14,7 @@ interface TipTabCardProps {
   creator: Creator;
 }
 
-const PRODUCTION_URL = "https://tiptab.sh";
+const PRODUCTION_URL = "https://tiptab.org";
 
 export const TipTabCard = ({ creator }: TipTabCardProps) => {
   const { toast } = useToast();
@@ -173,9 +173,9 @@ export const TipTabCard = ({ creator }: TipTabCardProps) => {
                 <div className="relative bg-white p-1.5 rounded-[24px] shadow-[0_20px_40px_rgba(0,0,0,0.5)]">
                   <div className="h-20 w-20 md:h-24 md:w-24 bg-white flex items-center justify-center rounded-xl overflow-hidden">
                     <QRCodeSVG 
+                      level="H"
                       value={tippingUrl}
                       size={110}
-                      level="H"
                       includeMargin={false}
                       className="w-full h-full"
                     />

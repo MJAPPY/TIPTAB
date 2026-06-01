@@ -52,7 +52,7 @@ const ASSET_CONFIGS: Record<string, { code: string; precision: number }> = {
 };
 
 // Target production URL for sharing
-const PRODUCTION_URL = "https://tiptab.sh";
+const PRODUCTION_URL = "https://tiptab.org";
 
 const CreatorProfile = () => {
   const { handle } = useParams<{ handle: string }>();
