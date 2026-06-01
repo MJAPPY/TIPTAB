@@ -23,7 +23,9 @@ import {
   Sparkles,
   MessageSquare,
   Star,
-  Facebook
+  Facebook,
+  ExternalLink,
+  Copy
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -38,6 +40,7 @@ import { useToast } from "@/hooks/use-toast";
 import { useXpr } from "@/contexts/XprContext";
 import { cn } from "@/lib/utils";
 import { supabase } from "@/integrations/supabase/client";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 
 const ASSET_CONFIGS: Record<string, { code: string; precision: number }> = {
   TAB: { code: 'tokencreate', precision: 0 },
@@ -47,6 +50,9 @@ const ASSET_CONFIGS: Record<string, { code: string; precision: number }> = {
   METAL: { code: 'token.metal', precision: 8 },
   LOAN: { code: 'loan.token', precision: 4 },
 };
+
+// Target production URL for sharing
+const PRODUCTION_URL = "https://tiptab.sh";
 
 const CreatorProfile = () => {
   const { handle } = useParams<{ handle: string }>();
@@ -61,6 +67,7 @@ const CreatorProfile = () => {
   const [message, setMessage] = useState("");
   const [isProcessing, setIsProcessing] = useState(false);
   const [isMembershipOpen, setIsMembershipOpen] = useState(false);
+  const [isShareOpen, setIsShareOpen] = useState(false);
   const [isCopied, setIsCopied] = useState(false);
   
   // Interaction Counts
@@ -294,8 +301,12 @@ const CreatorProfile = () => {
     }
   };
 
-  const copyToClipboard = (url: string) => {
-    navigator.clipboard.writeText(url).then(() => {
+  const copyToClipboard = () => {
+    if (!creator) return;
+    const cleanHandle = creator.handle.replace(/^@/, "").toLowerCase().trim();
+    const shareUrl = `${PRODUCTION_URL}/tip/${cleanHandle}`;
+    
+    navigator.clipboard.writeText(shareUrl).then(() => {
       setIsCopied(true);
       toast({ title: "Link Copied!", description: "Profile URL saved to clipboard." });
       setTimeout(() => setIsCopied(false), 2000);
@@ -304,32 +315,8 @@ const CreatorProfile = () => {
     });
   };
 
-  const handleShare = async () => {
-    if (!creator) return;
-    
-    // Generate a clean profile URL
-    const cleanHandle = creator.handle.replace(/^@/, "").toLowerCase().trim();
-    const shareUrl = `${window.location.origin}/tip/${cleanHandle}`;
-    const shareData = { 
-      title: `Support ${creator.name} on TIPTAB`, 
-      text: `Check out ${creator.name}'s profile on TIPTAB and show some appreciation!`,
-      url: shareUrl 
-    };
-
-    // Prioritize native share on mobile, always fallback to clipboard copy
-    if (navigator.share && navigator.canShare && navigator.canShare(shareData)) {
-      try {
-        await navigator.share(shareData);
-        toast({ title: "Shared Successfully" });
-      } catch (err) {
-        // Only trigger clipboard fallback if it wasn't a user cancellation
-        if ((err as Error).name !== 'AbortError') {
-          copyToClipboard(shareUrl);
-        }
-      }
-    } else {
-      copyToClipboard(shareUrl);
-    }
+  const handleShare = () => {
+    setIsShareOpen(true);
   };
 
   const onBoost = async (paymentAsset: 'XPR' | 'TAB') => {
@@ -389,6 +376,8 @@ const CreatorProfile = () => {
   const isOwner = actor === creator.handle.replace('@', '').toLowerCase();
   const isBoosted = featuredHandles.includes(creator.handle.replace('@', '').toLowerCase());
   const favorited = isFavorite(creator.handle);
+  const cleanHandle = creator.handle.replace(/^@/, "").toLowerCase().trim();
+  const shareUrl = `${PRODUCTION_URL}/tip/${cleanHandle}`;
 
   return (
     <div className="min-h-screen bg-[#0a0514] text-white selection:bg-purple-500/30">
@@ -681,7 +670,7 @@ const CreatorProfile = () => {
                     </Button>
 
                     <Button variant="ghost" size="icon" onClick={handleShare} className="h-8 md:h-9 w-8 md:w-9 rounded-lg md:rounded-xl bg-white/5 border border-white/10 hover:bg-white/10">
-                      {isCopied ? <Check className="h-3 w-3 md:h-3.5 md:w-3.5 text-green-500" /> : <Share2 className="h-3 w-3 md:h-3.5 md:w-3.5 text-white/40" />}
+                       <Share2 className="h-3 w-3 md:h-3.5 md:w-3.5 text-white/40" />
                     </Button>
                   </div>
                 </div>
@@ -783,6 +772,64 @@ const CreatorProfile = () => {
       </main>
 
       <MembershipModal isOpen={isMembershipOpen} onOpenChange={setIsMembershipOpen} />
+
+      {/* Enhanced Share Options Dialog */}
+      <Dialog open={isShareOpen} onOpenChange={setIsShareOpen}>
+        <DialogContent className="bg-[#1e1438]/95 backdrop-blur-3xl border-white/10 text-white rounded-[40px] p-8 max-w-sm shadow-[0_0_100px_rgba(0,0,0,0.8)] border-t-purple-500/20">
+          <DialogHeader className="text-center space-y-3">
+            <div className="mx-auto h-16 w-16 rounded-[24px] bg-purple-500/20 flex items-center justify-center border border-purple-500/30">
+               <Share2 className="h-8 w-8 text-purple-400" />
+            </div>
+            <DialogTitle className="text-2xl font-black italic uppercase tracking-tight">Share Profile</DialogTitle>
+            <DialogDescription className="text-white/40 font-bold text-sm">Let the network know about this creator.</DialogDescription>
+          </DialogHeader>
+
+          <div className="space-y-6 pt-6">
+            <div className="grid grid-cols-1 gap-3">
+               <Button 
+                onClick={copyToClipboard}
+                className="h-16 rounded-2xl bg-white/5 border border-white/10 hover:bg-white/10 text-white font-black text-sm uppercase tracking-widest gap-3 justify-start px-6 transition-all"
+               >
+                 {isCopied ? <Check className="h-5 w-5 text-green-400" /> : <Copy className="h-5 w-5 text-purple-400" />}
+                 {isCopied ? "Link Copied" : "Copy Profile Link"}
+               </Button>
+
+               <Button 
+                asChild
+                className="h-16 rounded-2xl bg-[#1DA1F2]/10 border border-[#1DA1F2]/30 hover:bg-[#1DA1F2]/20 text-white font-black text-sm uppercase tracking-widest gap-3 justify-start px-6 transition-all"
+               >
+                 <a 
+                  href={`https://twitter.com/intent/tweet?text=${encodeURIComponent(`Check out @${cleanHandle} on @tabtokenxpr!`)}&url=${encodeURIComponent(shareUrl)}`} 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                 >
+                   <Twitter className="h-5 w-5 text-[#1DA1F2] fill-[#1DA1F2]" />
+                   Share on X (Twitter)
+                 </a>
+               </Button>
+
+               <Button 
+                asChild
+                className="h-16 rounded-2xl bg-purple-600/10 border border-purple-600/30 hover:bg-purple-600/20 text-white font-black text-sm uppercase tracking-widest gap-3 justify-start px-6 transition-all"
+               >
+                 <a 
+                  href={`https://snipverse.com/submit?url=${encodeURIComponent(shareUrl)}`} 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                 >
+                   <MessageSquare className="h-5 w-5 text-purple-400 fill-purple-400" />
+                   Share on Snipverse
+                 </a>
+               </Button>
+            </div>
+
+            <div className="bg-white/5 border border-white/10 p-4 rounded-2xl">
+               <p className="text-[10px] font-black uppercase tracking-[0.2em] text-white/20 mb-2">Live production link</p>
+               <p className="text-[11px] font-bold text-purple-400 truncate select-all">{shareUrl}</p>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
 
       <style>{`
         @keyframes pulse-slow {
