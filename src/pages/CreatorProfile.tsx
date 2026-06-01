@@ -342,12 +342,13 @@ const CreatorProfile = () => {
   };
 
   const handleToggleFavorite = () => {
+    if (!creator) return;
     if (!isConnected) {
       handleConnect();
       return;
     }
-    toggleFavorite(creator!.handle);
-    const currentlyFav = isFavorite(creator!.handle);
+    toggleFavorite(creator.handle);
+    const currentlyFav = isFavorite(creator.handle);
     toast({
       title: currentlyFav ? "Removed from Favorites" : "Added to Favorites",
       description: currentlyFav ? `Removed @${creator?.handle} from your saves.` : `Saved @${creator?.handle} to your dashboard.`,
@@ -378,6 +379,7 @@ const CreatorProfile = () => {
   const favorited = isFavorite(creator.handle);
   const cleanHandle = creator.handle.replace(/^@/, "").toLowerCase().trim();
   const shareUrl = `${PRODUCTION_URL}/tip/${cleanHandle}`;
+  const customShareText = `Got some free time? have a bit of fun & check out ${creator.name} at the global appreciation hub on $xpr network.`;
 
   return (
     <div className="min-h-screen bg-[#0a0514] text-white selection:bg-purple-500/30">
@@ -791,7 +793,7 @@ const CreatorProfile = () => {
                 className="h-16 rounded-2xl bg-white/5 border border-white/10 hover:bg-white/10 text-white font-black text-sm uppercase tracking-widest gap-3 justify-start px-6 transition-all"
                >
                  {isCopied ? <Check className="h-5 w-5 text-green-400" /> : <Copy className="h-5 w-5 text-purple-400" />}
-                 {isCopied ? "Link Copied" : "Copy Profile Link"}
+                 {isCopied ? "Link Copied" : "Copy Tipping Link"}
                </Button>
 
                <Button 
@@ -799,7 +801,7 @@ const CreatorProfile = () => {
                 className="h-16 rounded-2xl bg-[#1DA1F2]/10 border border-[#1DA1F2]/30 hover:bg-[#1DA1F2]/20 text-white font-black text-sm uppercase tracking-widest gap-3 justify-start px-6 transition-all"
                >
                  <a 
-                  href={`https://twitter.com/intent/tweet?text=${encodeURIComponent(`Check out @${cleanHandle} on @tabtokenxpr!`)}&url=${encodeURIComponent(shareUrl)}`} 
+                  href={`https://twitter.com/intent/tweet?text=${encodeURIComponent(customShareText)}`} 
                   target="_blank" 
                   rel="noopener noreferrer"
                  >
@@ -813,7 +815,7 @@ const CreatorProfile = () => {
                 className="h-16 rounded-2xl bg-purple-600/10 border border-purple-600/30 hover:bg-purple-600/20 text-white font-black text-sm uppercase tracking-widest gap-3 justify-start px-6 transition-all"
                >
                  <a 
-                  href={`https://snipverse.com/submit?url=${encodeURIComponent(shareUrl)}`} 
+                  href={`https://snipverse.com/submit?title=${encodeURIComponent(customShareText)}&url=${encodeURIComponent(shareUrl)}`} 
                   target="_blank" 
                   rel="noopener noreferrer"
                  >
@@ -822,7 +824,6 @@ const CreatorProfile = () => {
                  </a>
                </Button>
             </div>
-
             <div className="bg-white/5 border border-white/10 p-4 rounded-2xl">
                <p className="text-[10px] font-black uppercase tracking-[0.2em] text-white/20 mb-2">Live production link</p>
                <p className="text-[11px] font-bold text-purple-400 truncate select-all">{shareUrl}</p>

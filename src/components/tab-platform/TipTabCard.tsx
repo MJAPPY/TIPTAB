@@ -26,6 +26,7 @@ export const TipTabCard = ({ creator }: TipTabCardProps) => {
   // Use a clean handle for the URL
   const cleanHandle = creator.handle.replace(/^@/, "").toLowerCase().trim();
   const tippingUrl = `${PRODUCTION_URL}/tip/${cleanHandle}`;
+  const customShareText = `Got some free time? have a bit of fun & check out ${creator.name} at the global appreciation hub on $xpr network.`;
 
   const copyToClipboard = () => {
     navigator.clipboard.writeText(tippingUrl).then(() => {
@@ -233,7 +234,7 @@ export const TipTabCard = ({ creator }: TipTabCardProps) => {
       </div>
 
       <Dialog open={isShareOpen} onOpenChange={setIsShareOpen}>
-        <DialogContent className="bg-[#1e1438]/95 backdrop-blur-3xl border-white/10 text-white rounded-[40px] p-8 max-w-sm shadow-[0_0_100px_rgba(0,0,0,0.8)] border-t-purple-500/20">
+        <DialogContent className="bg-[#1e1438]/95 backdrop-blur-3xl border-white/10 text-white rounded-[40px] p-8 max-sm shadow-[0_0_100px_rgba(0,0,0,0.8)] border-t-purple-500/20">
           <DialogHeader className="text-center space-y-3">
             <div className="mx-auto h-16 w-16 rounded-[24px] bg-purple-500/20 flex items-center justify-center border border-purple-500/30">
                <Share2 className="h-8 w-8 text-purple-400" />
@@ -257,7 +258,7 @@ export const TipTabCard = ({ creator }: TipTabCardProps) => {
                 className="h-16 rounded-2xl bg-[#1DA1F2]/10 border border-[#1DA1F2]/30 hover:bg-[#1DA1F2]/20 text-white font-black text-sm uppercase tracking-widest gap-3 justify-start px-6 transition-all"
                >
                  <a 
-                  href={`https://twitter.com/intent/tweet?text=${encodeURIComponent(`Show some appreciation on @tabtokenxpr!`)}&url=${encodeURIComponent(tippingUrl)}`} 
+                  href={`https://twitter.com/intent/tweet?text=${encodeURIComponent(customShareText)}`} 
                   target="_blank" 
                   rel="noopener noreferrer"
                  >
@@ -271,7 +272,7 @@ export const TipTabCard = ({ creator }: TipTabCardProps) => {
                 className="h-16 rounded-2xl bg-purple-600/10 border border-purple-600/30 hover:bg-purple-600/20 text-white font-black text-sm uppercase tracking-widest gap-3 justify-start px-6 transition-all"
                >
                  <a 
-                  href={`https://snipverse.com/submit?url=${encodeURIComponent(tippingUrl)}`} 
+                  href={`https://snipverse.com/submit?title=${encodeURIComponent(customShareText)}&url=${encodeURIComponent(tippingUrl)}`} 
                   target="_blank" 
                   rel="noopener noreferrer"
                  >
