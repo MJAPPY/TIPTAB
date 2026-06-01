@@ -305,14 +305,27 @@ const CreatorProfile = () => {
   };
 
   const handleShare = async () => {
-    const shareUrl = window.location.href;
-    const shareData = { title: `Support ${creator?.name} on TIPTAB`, url: shareUrl };
+    if (!creator) return;
+    
+    // Generate a clean profile URL
+    const cleanHandle = creator.handle.replace(/^@/, "").toLowerCase().trim();
+    const shareUrl = `${window.location.origin}/tip/${cleanHandle}`;
+    const shareData = { 
+      title: `Support ${creator.name} on TIPTAB`, 
+      text: `Check out ${creator.name}'s profile on TIPTAB and show some appreciation!`,
+      url: shareUrl 
+    };
 
-    if (navigator.share) {
+    // Prioritize native share on mobile, always fallback to clipboard copy
+    if (navigator.share && navigator.canShare && navigator.canShare(shareData)) {
       try {
         await navigator.share(shareData);
+        toast({ title: "Shared Successfully" });
       } catch (err) {
-        copyToClipboard(shareUrl);
+        // Only trigger clipboard fallback if it wasn't a user cancellation
+        if ((err as Error).name !== 'AbortError') {
+          copyToClipboard(shareUrl);
+        }
       }
     } else {
       copyToClipboard(shareUrl);
