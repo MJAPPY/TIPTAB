@@ -19,8 +19,10 @@ interface XprContextType {
   balances: Balances;
   isMember: boolean;
   membershipDate: string | null;
+  membershipLevel: 'basic' | 'pro' | null;
   setIsMember: (status: boolean) => void;
   setMembershipDate: (date: string | null) => void;
+  setMembershipLevel: (level: 'basic' | 'pro' | null) => void;
   login: () => Promise<LinkSession | null>;
   logout: () => Promise<void>;
   refreshBalances: () => Promise<void>;
@@ -79,6 +81,7 @@ export const XprProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const [balances, setBalances] = useState<Balances>({ xpr: '0.0000', tab: '0', xmd: '0.000000', xusdc: '0.000000', metal: '0.00000000', loan: '0.0000', xmt: '0.00000000', tipsSent: 0 });
   const [isMember, setIsMember] = useState(false);
   const [membershipDate, setMembershipDate] = useState<string | null>(null);
+  const [membershipLevel, setMembershipLevel] = useState<'basic' | 'pro' | null>(null);
   const [isLoading, setIsLoading] = useState(() => {
     if (typeof window !== "undefined") {
       return localStorage.getItem("tiptab_has_session") === "true";
@@ -138,6 +141,8 @@ export const XprProvider: React.FC<{ children: React.ReactNode }> = ({ children 
           tiktok: item.tiktok || "",
           youtubeLive: item.youtube_live || "",
           instagramLive: item.instagram_live || "",
+          // Custom check for level based on profile parameters if loaded from remote database
+          membershipLevel: item.cover_image || item.twitch || item.youtube_live || item.kick || item.rumble || (item.categories && item.categories.length > 1) ? 'pro' : 'basic'
         }));
         setDbCreators(mapped);
       }
@@ -235,16 +240,21 @@ export const XprProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       
       let currentlyMember = false;
       let activeDateStr = null;
+      let level: 'basic' | 'pro' | null = null;
 
       if (ROOT_ADMINS.includes(account)) {
         currentlyMember = true;
         activeDateStr = new Date(2099, 11, 31).toISOString();
         setIsMember(true);
         setMembershipDate(activeDateStr);
+        setMembershipLevel('pro');
+        level = 'pro';
       } else {
         const membershipKey = `tiptab_membership_${account}`;
         const membershipDateKey = `tiptab_membership_date_${account}`;
         const savedDate = localStorage.getItem(membershipDateKey);
+        const storedLevel = localStorage.getItem(`tiptab_membership_level_${account}`) as 'basic' | 'pro' | null;
+
         if (savedDate) {
           const activationDate = new Date(savedDate);
           const now = new Date();
@@ -254,22 +264,33 @@ export const XprProvider: React.FC<{ children: React.ReactNode }> = ({ children 
             activeDateStr = savedDate;
             setIsMember(true); 
             setMembershipDate(savedDate); 
+            setMembershipLevel('pro');
+            level = 'pro';
           }
           else { 
             setIsMember(false); 
             setMembershipDate(null); 
+            setMembershipLevel(null);
             localStorage.removeItem(membershipKey); 
           }
         } else if (localStorage.getItem(membershipKey) === 'true') {
-          const fakeDate = new Date().toISOString();
-          localStorage.setItem(membershipDateKey, fakeDate);
           currentlyMember = true;
-          activeDateStr = fakeDate;
-          setMembershipDate(fakeDate);
           setIsMember(true);
+          if (storedLevel === 'basic') {
+            setMembershipLevel('basic');
+            level = 'basic';
+          } else {
+            const fakeDate = new Date().toISOString();
+            localStorage.setItem(membershipDateKey, fakeDate);
+            activeDateStr = fakeDate;
+            setMembershipDate(fakeDate);
+            setMembershipLevel('pro');
+            level = 'pro';
+          }
         } else { 
           setIsMember(false); 
           setMembershipDate(null); 
+          setMembershipLevel(null);
         }
       }
 
@@ -432,6 +453,7 @@ export const XprProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       setBalances({ xpr: '0.0000', tab: '0', xmd: '0.000000', xusdc: '0.000000', metal: '0.00000000', loan: '0.0000', xmt: '0.00000000', tipsSent: 0 });
       setIsMember(false);
       setMembershipDate(null);
+      setMembershipLevel(null);
       setUserProfile(null);
       localStorage.removeItem("tiptab_user_profile");
     }
@@ -487,7 +509,7 @@ export const XprProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   };
 
   const value = {
-    session, actor: activeActor, balances, isMember, membershipDate, setIsMember, setMembershipDate, login, logout, refreshBalances, recordTip,
+    session, actor: activeActor, balances, isMember, membershipDate, membershipLevel, setIsMember, setMembershipDate, setMembershipLevel, login, logout, refreshBalances, recordTip,
     isConnected: !!session, isLoading, isAdmin: !!adminHook.currentAdminObj, adminRole: adminHook.currentAdminObj ? adminHook.currentAdminObj.role : null,
     isPermanentAdmin: adminHook.isCurrentAdminPermanent, ...adminHook, ...platformHook, ...socialHook,
     userProfile, updateUserProfile, featuredHandles, boostStream, distributeXprRewards, dbCreators, fetchDbCreators

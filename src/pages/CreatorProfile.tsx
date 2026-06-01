@@ -133,6 +133,7 @@ const CreatorProfile = () => {
             tiktok: dbProfile.tiktok || "",
             youtubeLive: dbProfile.youtube_live || "",
             instagramLive: dbProfile.instagram_live || "",
+            membershipLevel: dbProfile.cover_image || dbProfile.twitch || dbProfile.youtube_live || dbProfile.kick || dbProfile.rumble || (dbProfile.categories && dbProfile.categories.length > 1) ? 'pro' : 'basic'
           };
           setCreator(mappedProfile);
           return;
@@ -431,8 +432,18 @@ const CreatorProfile = () => {
               
               <div className="text-center md:text-left space-y-2 pb-2 md:pb-4 flex-1 w-full">
                 <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-                  <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/5 border border-white/10 text-[9px] md:text-[10px] font-black uppercase tracking-widest text-white/40 mb-1 md:mb-2 w-fit mx-auto md:mx-0">
-                    <ShieldCheck className="h-3 md:h-3.5 w-3 md:w-3.5 text-orange-500" /> Verified Creator
+                  <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/5 border border-white/10 text-[9px] md:text-[10px] font-black uppercase tracking-widest mb-1 md:mb-2 w-fit mx-auto md:mx-0">
+                    {creator.membershipLevel === "pro" ? (
+                      <>
+                        <ShieldCheck className="h-3 md:h-3.5 w-3 md:w-3.5 text-orange-500 drop-shadow-[0_0_8px_rgba(249,115,22,0.4)]" />
+                        <span className="text-orange-400">Pro Verified Creator</span>
+                      </>
+                    ) : (
+                      <>
+                        <Sparkles className="h-3 md:h-3.5 w-3 md:w-3.5 text-green-400" />
+                        <span className="text-green-400">Basic Creator</span>
+                      </>
+                    )}
                   </div>
                   <Button 
                     onClick={handleToggleFavorite}

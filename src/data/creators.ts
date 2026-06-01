@@ -26,6 +26,7 @@ export interface Creator {
   tiktok?: string;
   youtubeLive?: string;
   instagramLive?: string;
+  membershipLevel?: 'basic' | 'pro' | null;
 }
 
 // Hardcoded dummy profiles have been removed. 

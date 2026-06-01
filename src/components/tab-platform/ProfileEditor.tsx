@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
-import { User, AtSign, MapPin, Globe, Twitter, Save, Image as ImageIcon, Upload, X, Video, Instagram, CheckCircle2, Music, Radio, Youtube, Twitch, ShieldCheck, Move, Facebook, MessageSquare, Trash2, AlertTriangle, CalendarDays, Hourglass } from "lucide-react";
+import { User, AtSign, MapPin, Globe, Twitter, Save, Image as ImageIcon, Upload, X, Video, Instagram, CheckCircle2, Music, Radio, Youtube, Twitch, ShieldCheck, Move, Facebook, MessageSquare, Trash2, AlertTriangle, CalendarDays, Hourglass, Lock, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -7,6 +7,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
 import { Creator } from "@/data/creators";
 import { EmbedPlayer } from "./EmbedPlayer";
@@ -85,7 +86,7 @@ interface ProfileEditorProps {
 }
 
 export const ProfileEditor = ({ initialData, onSave, minimal = false }: ProfileEditorProps) => {
-  const { actor, logout, isMember, membershipDate } = useXpr();
+  const { actor, logout, isMember, membershipDate, membershipLevel } = useXpr();
   const navigate = useNavigate();
   const [isSaving, setIsSaving] = useState(false);
   const [hasChanged, setHasChanged] = useState(false);
@@ -122,6 +123,8 @@ export const ProfileEditor = ({ initialData, onSave, minimal = false }: ProfileE
   });
 
   const { toast } = useToast();
+
+  const isBasicLevel = membershipLevel === 'basic';
 
   useEffect(() => {
     setFormData({
@@ -233,6 +236,10 @@ export const ProfileEditor = ({ initialData, onSave, minimal = false }: ProfileE
   };
 
   const handleCoverChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (isBasicLevel) {
+      setIsMembershipOpen(true);
+      return;
+    }
     const file = e.target.files?.[0];
     if (file) {
       processCoverFile(file);
@@ -273,7 +280,9 @@ export const ProfileEditor = ({ initialData, onSave, minimal = false }: ProfileE
   const handleDragOver = (e: React.DragEvent<HTMLDivElement>) => {
     e.preventDefault();
     e.stopPropagation();
-    setIsDraggingCover(true);
+    if (!isBasicLevel) {
+      setIsDraggingCover(true);
+    }
   };
 
   const handleDragLeave = (e: React.DragEvent<HTMLDivElement>) => {
@@ -286,6 +295,10 @@ export const ProfileEditor = ({ initialData, onSave, minimal = false }: ProfileE
     e.preventDefault();
     e.stopPropagation();
     setIsDraggingCover(false);
+    if (isBasicLevel) {
+      setIsMembershipOpen(true);
+      return;
+    }
     
     const file = e.dataTransfer.files?.[0];
     if (file) {
@@ -373,39 +386,43 @@ export const ProfileEditor = ({ initialData, onSave, minimal = false }: ProfileE
         <div className="space-y-12">
 
           {/* Membership Status Information Section */}
-          {!minimal && isMember && membershipDate && (
+          {!minimal && isMember && (
             <div className="p-6 md:p-8 rounded-[32px] bg-gradient-to-r from-orange-500/10 via-purple-500/10 to-transparent border border-orange-500/20 space-y-6 animate-in fade-in slide-in-from-top-4 duration-500">
                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6">
                   <div className="space-y-1">
                      <div className="flex items-center gap-2">
-                       <div className="h-2 w-2 rounded-full bg-orange-500 animate-pulse shadow-[0_0_8px_rgba(249,115,22,0.8)]" />
-                       <span className="text-[10px] font-black uppercase tracking-widest text-orange-400">Membership Status</span>
+                       <div className={cn("h-2 w-2 rounded-full animate-pulse", isBasicLevel ? "bg-green-400" : "bg-orange-500 shadow-[0_0_8px_rgba(249,115,22,0.8)]")} />
+                       <span className={cn("text-[10px] font-black uppercase tracking-widest", isBasicLevel ? "text-green-400" : "text-orange-400")}>
+                         {isBasicLevel ? "Basic Membership" : "Pro Membership"}
+                       </span>
                      </div>
-                     <h4 className="text-xl md:text-2xl font-black text-white uppercase italic tracking-tight">Active Premium Creator</h4>
+                     <h4 className="text-xl md:text-2xl font-black text-white uppercase italic tracking-tight">
+                       {isBasicLevel ? "Active Free Creator Slot" : "Active Premium Pro Creator"}
+                     </h4>
                   </div>
                   <Button 
                     onClick={() => setIsMembershipOpen(true)}
                     className="h-12 rounded-xl bg-orange-500 hover:bg-orange-600 text-white font-black text-xs uppercase tracking-widest shadow-lg shadow-orange-500/20 active:scale-95 shrink-0"
                   >
-                    Renew Membership
+                    {isBasicLevel ? "Upgrade to Pro" : "Renew Membership"}
                   </Button>
                </div>
                
                <div className="grid grid-cols-2 gap-6 pt-5 border-t border-white/5">
                   <div className="space-y-1">
                      <span className="text-white/40 font-black uppercase tracking-widest text-[9px] flex items-center gap-1">
-                       <CalendarDays className="h-3 w-3" /> Date Joined
+                       <CalendarDays className="h-3 w-3" /> Level Type
                      </span>
-                     <p className="font-bold text-white text-sm md:text-base">
-                       {new Date(membershipDate).toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric' })}
+                     <p className="font-bold text-white text-sm md:text-base capitalize">
+                       {membershipLevel} Plan
                      </p>
                   </div>
                   <div className="space-y-1 text-right">
                      <span className="text-orange-500/60 font-black uppercase tracking-widest text-[9px] flex items-center gap-1 justify-end">
-                       <Hourglass className="h-3 w-3" /> Renewal Date
+                       <Hourglass className="h-3 w-3" /> Status
                      </span>
                      <p className="font-bold text-orange-400 text-sm md:text-base">
-                       {new Date(new Date(membershipDate).setFullYear(new Date(membershipDate).getFullYear() + 1)).toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric' })}
+                       {isBasicLevel ? "Lifetime Free" : "Active Verified"}
                      </p>
                   </div>
                </div>
@@ -418,7 +435,15 @@ export const ProfileEditor = ({ initialData, onSave, minimal = false }: ProfileE
             
             {/* Interactive Drag & Drop Cover Image Upload Container */}
             <div className="space-y-3">
-              <Label className="text-white/60 font-bold uppercase tracking-widest text-[10px]">Cover Banner</Label>
+              <div className="flex items-center justify-between">
+                <Label className="text-white/60 font-bold uppercase tracking-widest text-[10px]">Cover Banner</Label>
+                {isBasicLevel && (
+                  <Badge variant="outline" className="border-orange-500/30 text-orange-400 text-[8px] font-black tracking-widest uppercase">
+                    <Lock className="h-2.5 w-2.5 mr-1" /> Pro Feature
+                  </Badge>
+                )}
+              </div>
+              
               <div 
                 onDragOver={handleDragOver}
                 onDragLeave={handleDragLeave}
@@ -431,7 +456,24 @@ export const ProfileEditor = ({ initialData, onSave, minimal = false }: ProfileE
                     : "border-white/20 hover:border-purple-500/50 hover:bg-white/[0.03]"
                 )}
               >
-                {formData.coverImage ? (
+                {isBasicLevel ? (
+                  <div className="text-center p-6 flex flex-col items-center gap-3 select-none">
+                    <div className="h-12 w-12 rounded-2xl bg-orange-500/10 flex items-center justify-center text-orange-400">
+                      <Lock className="h-6 w-6" />
+                    </div>
+                    <div className="space-y-1">
+                      <p className="text-xs font-black text-slate-200">Custom Banners Locked</p>
+                      <p className="text-[10px] text-white/40 font-bold">Upgrade to Pro to customize your profile banner!</p>
+                    </div>
+                    <Button 
+                      onClick={() => setIsMembershipOpen(true)}
+                      size="sm" 
+                      className="rounded-xl bg-orange-500 hover:bg-orange-600 text-white font-black text-[9px] uppercase tracking-widest mt-1 shadow-md shadow-orange-500/20"
+                    >
+                      Unlock Pro
+                    </Button>
+                  </div>
+                ) : formData.coverImage ? (
                   <>
                     <img 
                       src={formData.coverImage} 
@@ -491,7 +533,7 @@ export const ProfileEditor = ({ initialData, onSave, minimal = false }: ProfileE
                 )}
               </div>
 
-              {formData.coverImage && (
+              {!isBasicLevel && formData.coverImage && (
                 <div className="p-4 bg-white/[0.03] border border-white/10 rounded-2xl space-y-3 animate-in fade-in slide-in-from-top-2 duration-300">
                   <div className="flex items-center justify-between text-xs font-bold text-white/60">
                     <span className="flex items-center gap-2">
@@ -646,23 +688,45 @@ export const ProfileEditor = ({ initialData, onSave, minimal = false }: ProfileE
                     </div>
 
                     <div className="space-y-2">
-                      <Label className="text-white/60 font-bold uppercase tracking-widest text-[10px]">Secondary Category (Optional)</Label>
-                      <Select 
-                        value={formData.categories[1] || "None"}
-                        onValueChange={(val) => handleCategoryChange(1, val)}
-                      >
-                        <SelectTrigger className="bg-white/5 border-white/10 h-14 rounded-2xl focus:ring-purple-500 focus:bg-white/10 transition-all text-white">
-                          <SelectValue placeholder="None" />
-                        </SelectTrigger>
-                        <SelectContent className="bg-[#1a102d] border-white/20 text-white rounded-xl">
-                          <SelectItem value="None" className="focus:bg-red-500 focus:text-white cursor-pointer font-bold">None</SelectItem>
-                          {CATEGORIES.filter(c => c !== formData.categories[0]).map((cat) => (
-                            <SelectItem key={cat} value={cat} className="focus:bg-purple-500 focus:text-white cursor-pointer font-bold">
-                              {cat}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
+                      <div className="flex items-center justify-between">
+                        <Label className="text-white/60 font-bold uppercase tracking-widest text-[10px]">Secondary Category (Optional)</Label>
+                        {isBasicLevel && (
+                          <span className="text-[8px] font-black uppercase tracking-widest text-orange-400 flex items-center gap-1">
+                            <Lock className="h-2.5 w-2.5" /> Pro
+                          </span>
+                        )}
+                      </div>
+                      
+                      {isBasicLevel ? (
+                        <div className="h-14 rounded-2xl border border-dashed border-white/15 bg-white/[0.01] flex items-center justify-between px-4">
+                          <span className="text-xs text-white/40 font-bold">Upgrade to select second category</span>
+                          <Button 
+                            onClick={() => setIsMembershipOpen(true)}
+                            size="sm" 
+                            variant="ghost" 
+                            className="h-8 rounded-lg bg-orange-500/10 text-orange-400 hover:bg-orange-500 hover:text-white font-black text-[9px] uppercase tracking-widest"
+                          >
+                            Upgrade
+                          </Button>
+                        </div>
+                      ) : (
+                        <Select 
+                          value={formData.categories[1] || "None"}
+                          onValueChange={(val) => handleCategoryChange(1, val)}
+                        >
+                          <SelectTrigger className="bg-white/5 border-white/10 h-14 rounded-2xl focus:ring-purple-500 focus:bg-white/10 transition-all text-white">
+                            <SelectValue placeholder="None" />
+                          </SelectTrigger>
+                          <SelectContent className="bg-[#1a102d] border-white/20 text-white rounded-xl">
+                            <SelectItem value="None" className="focus:bg-red-500 focus:text-white cursor-pointer font-bold">None</SelectItem>
+                            {CATEGORIES.filter(c => c !== formData.categories[0]).map((cat) => (
+                              <SelectItem key={cat} value={cat} className="focus:bg-purple-500 focus:text-white cursor-pointer font-bold">
+                                {cat}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      )}
                     </div>
                   </div>
                 </>
@@ -688,126 +752,176 @@ export const ProfileEditor = ({ initialData, onSave, minimal = false }: ProfileE
             <div className="space-y-12 pt-4">
               {/* Featured Media */}
               <div className="space-y-8">
-                <div className="flex items-center gap-3">
-                  <Video className="h-4 w-4 text-purple-500" />
-                  <h3 className="text-[10px] font-black uppercase tracking-[0.3em] text-white/40">Featured Media Player</h3>
-                </div>
-
-                <div className="space-y-6">
-                  <div className="space-y-2">
-                    <Label htmlFor="videoUrl" className="text-white/60 font-bold uppercase tracking-widest text-[10px]">Featured Media Link (YouTube, Spotify, Apple Music)</Label>
-                    <div className="relative">
-                      <Music className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-purple-500/50" />
-                      <Input 
-                        id="videoUrl"
-                        value={formData.videoUrl}
-                        onChange={handleChange}
-                        placeholder="https://youtube.com/watch?v=... or Spotify link"
-                        className="pl-12 bg-white/5 border-white/10 h-14 rounded-2xl focus:ring-purple-500 focus:bg-white/10 transition-all text-white" 
-                      />
-                    </div>
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <Video className="h-4 w-4 text-purple-500" />
+                    <h3 className="text-[10px] font-black uppercase tracking-[0.3em] text-white/40">Featured Media Player</h3>
                   </div>
-                  
-                  {formData.videoUrl && (
-                    <div className="space-y-3 animate-in fade-in slide-in-from-top-2 duration-500">
-                      <Label className="text-[9px] font-black uppercase tracking-[0.2em] text-purple-400/60 ml-2">Player Preview</Label>
-                      <EmbedPlayer url={formData.videoUrl} className="bg-black/20" />
-                    </div>
+                  {isBasicLevel && (
+                    <Badge variant="outline" className="border-orange-500/30 text-orange-400 text-[8px] font-black tracking-widest uppercase">
+                      <Lock className="h-2.5 w-2.5 mr-1" /> Pro Feature
+                    </Badge>
                   )}
                 </div>
+
+                {isBasicLevel ? (
+                  <div className="p-8 rounded-[32px] border border-dashed border-white/15 bg-white/[0.01] text-center space-y-4">
+                    <div className="h-12 w-12 rounded-2xl bg-orange-500/10 flex items-center justify-center text-orange-400 mx-auto">
+                      <Lock className="h-6 w-6" />
+                    </div>
+                    <div className="space-y-1">
+                      <h4 className="font-black text-sm text-slate-200">Custom Media Players Locked</h4>
+                      <p className="text-xs text-white/40 font-bold">Show off your YouTube videos, Spotify playlists, and Apple Music embeds directly on your profile. Upgrade to Pro now!</p>
+                    </div>
+                    <Button 
+                      onClick={() => setIsMembershipOpen(true)}
+                      className="rounded-xl bg-orange-500 hover:bg-orange-600 text-white font-black text-[10px] uppercase tracking-widest h-10 px-6 shadow-md shadow-orange-500/20"
+                    >
+                      Upgrade to Pro
+                    </Button>
+                  </div>
+                ) : (
+                  <div className="space-y-6">
+                    <div className="space-y-2">
+                      <Label htmlFor="videoUrl" className="text-white/60 font-bold uppercase tracking-widest text-[10px]">Featured Media Link (YouTube, Spotify, Apple Music)</Label>
+                      <div className="relative">
+                        <Music className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-purple-500/50" />
+                        <Input 
+                          id="videoUrl"
+                          value={formData.videoUrl}
+                          onChange={handleChange}
+                          placeholder="https://youtube.com/watch?v=... or Spotify link"
+                          className="pl-12 bg-white/5 border-white/10 h-14 rounded-2xl focus:ring-purple-500 focus:bg-white/10 transition-all text-white" 
+                        />
+                      </div>
+                    </div>
+                    
+                    {formData.videoUrl && (
+                      <div className="space-y-3 animate-in fade-in slide-in-from-top-2 duration-500">
+                        <Label className="text-[9px] font-black uppercase tracking-[0.2em] text-purple-400/60 ml-2">Player Preview</Label>
+                        <EmbedPlayer url={formData.videoUrl} className="bg-black/20" />
+                      </div>
+                    )}
+                  </div>
+                )}
               </div>
 
               {/* Live Stream Integration */}
               <div className="pt-8 border-t border-white/5 space-y-8">
-                <div className="flex items-center gap-3">
-                  <Radio className="h-4 w-4 text-orange-500" />
-                  <h3 className="text-[10px] font-black uppercase tracking-[0.3em] text-white/40">Live Broadcast Channels</h3>
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <Radio className="h-4 w-4 text-orange-500" />
+                    <h3 className="text-[10px] font-black uppercase tracking-[0.3em] text-white/40">Live Broadcast Channels</h3>
+                  </div>
+                  {isBasicLevel && (
+                    <Badge variant="outline" className="border-orange-500/30 text-orange-400 text-[8px] font-black tracking-widest uppercase">
+                      <Lock className="h-2.5 w-2.5 mr-1" /> Pro Feature
+                    </Badge>
+                  )}
                 </div>
                 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-10">
-                  <div className="space-y-2">
-                    <Label htmlFor="twitch" className="text-white/60 font-bold uppercase tracking-widest text-[10px]">Twitch Channel</Label>
-                    <div className="relative">
-                      <Twitch className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-[#9146FF]" />
-                      <Input 
-                        id="twitch"
-                        value={formData.twitch}
-                        onChange={handleChange}
-                        placeholder="https://twitch.tv/username"
-                        className="pl-12 bg-white/5 border-white/10 h-14 rounded-2xl focus:ring-purple-500 focus:bg-white/10 transition-all text-white" 
-                      />
+                {isBasicLevel ? (
+                  <div className="p-8 rounded-[32px] border border-dashed border-white/15 bg-white/[0.01] text-center space-y-4">
+                    <div className="h-12 w-12 rounded-2xl bg-orange-500/10 flex items-center justify-center text-orange-400 mx-auto">
+                      <Lock className="h-6 w-6" />
                     </div>
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="youtubeLive" className="text-white/60 font-bold uppercase tracking-widest text-[10px]">YouTube Live</Label>
-                    <div className="relative">
-                      <Youtube className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-[#FF0000]" />
-                      <Input 
-                        id="youtubeLive"
-                        value={formData.youtubeLive}
-                        onChange={handleChange}
-                        placeholder="https://youtube.com/c/username/live"
-                        className="pl-12 bg-white/5 border-white/10 h-14 rounded-2xl focus:ring-purple-500 focus:bg-white/10 transition-all text-white" 
-                      />
+                    <div className="space-y-1">
+                      <h4 className="font-black text-sm text-slate-200">Live Video Broadcasting Locked</h4>
+                      <p className="text-xs text-white/40 font-bold">Unlocks real-time media streams and embeds (Twitch, Kick, YouTube Live, Rumble, TikTok, Instagram Live) directly on your profile card!</p>
                     </div>
+                    <Button 
+                      onClick={() => setIsMembershipOpen(true)}
+                      className="rounded-xl bg-orange-500 hover:bg-orange-600 text-white font-black text-[10px] uppercase tracking-widest h-10 px-6 shadow-md shadow-orange-500/20"
+                    >
+                      Upgrade to Pro
+                    </Button>
                   </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="kick" className="text-white/60 font-bold uppercase tracking-widest text-[10px]">Kick Live</Label>
-                    <div className="relative">
-                      <div className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 flex items-center justify-center">
-                        <div className="h-3 w-3 bg-[#53FC18] rounded-sm" />
+                ) : (
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-10">
+                    <div className="space-y-2">
+                      <Label htmlFor="twitch" className="text-white/60 font-bold uppercase tracking-widest text-[10px]">Twitch Channel</Label>
+                      <div className="relative">
+                        <Twitch className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-[#9146FF]" />
+                        <Input 
+                          id="twitch"
+                          value={formData.twitch}
+                          onChange={handleChange}
+                          placeholder="https://twitch.tv/username"
+                          className="pl-12 bg-white/5 border-white/10 h-14 rounded-2xl focus:ring-purple-500 focus:bg-white/10 transition-all text-white" 
+                        />
                       </div>
-                      <Input 
-                        id="kick"
-                        value={formData.kick}
-                        onChange={handleChange}
-                        placeholder="https://kick.com/username"
-                        className="pl-12 bg-white/5 border-white/10 h-14 rounded-2xl focus:ring-purple-500 focus:bg-white/10 transition-all text-white" 
-                      />
                     </div>
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="rumble" className="text-white/60 font-bold uppercase tracking-widest text-[10px]">Rumble Live</Label>
-                    <div className="relative">
-                      <div className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 flex items-center justify-center">
-                        <div className="h-3 w-3 bg-[#85C742] rounded-full" />
+                    <div className="space-y-2">
+                      <Label htmlFor="youtubeLive" className="text-white/60 font-bold uppercase tracking-widest text-[10px]">YouTube Live</Label>
+                      <div className="relative">
+                        <Youtube className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-[#FF0000]" />
+                        <Input 
+                          id="youtubeLive"
+                          value={formData.youtubeLive}
+                          onChange={handleChange}
+                          placeholder="https://youtube.com/c/username/live"
+                          className="pl-12 bg-white/5 border-white/10 h-14 rounded-2xl focus:ring-purple-500 focus:bg-white/10 transition-all text-white" 
+                        />
                       </div>
-                      <Input 
-                        id="rumble"
-                        value={formData.rumble}
-                        onChange={handleChange}
-                        placeholder="https://rumble.com/c/channel"
-                        className="pl-12 bg-white/5 border-white/10 h-14 rounded-2xl focus:ring-purple-500 focus:bg-white/10 transition-all text-white" 
-                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="kick" className="text-white/60 font-bold uppercase tracking-widest text-[10px]">Kick Live</Label>
+                      <div className="relative">
+                        <div className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 flex items-center justify-center">
+                          <div className="h-3 w-3 bg-[#53FC18] rounded-sm" />
+                        </div>
+                        <Input 
+                          id="kick"
+                          value={formData.kick}
+                          onChange={handleChange}
+                          placeholder="https://kick.com/username"
+                          className="pl-12 bg-white/5 border-white/10 h-14 rounded-2xl focus:ring-purple-500 focus:bg-white/10 transition-all text-white" 
+                        />
+                      </div>
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="rumble" className="text-white/60 font-bold uppercase tracking-widest text-[10px]">Rumble Live</Label>
+                      <div className="relative">
+                        <div className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 flex items-center justify-center">
+                          <div className="h-3 w-3 bg-[#85C742] rounded-full" />
+                        </div>
+                        <Input 
+                          id="rumble"
+                          value={formData.rumble}
+                          onChange={handleChange}
+                          placeholder="https://rumble.com/c/channel"
+                          className="pl-12 bg-white/5 border-white/10 h-14 rounded-2xl focus:ring-purple-500 focus:bg-white/10 transition-all text-white" 
+                        />
+                      </div>
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="tiktok" className="text-white/60 font-bold uppercase tracking-widest text-[10px]">TikTok Live</Label>
+                      <div className="relative">
+                        <svg className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 fill-white" viewBox="0 0 24 24"><path d="M12.525.02c1.31-.02 2.61-.01 3.91-.02.08 1.53.63 3.09 1.75 4.17 1.12 1.11 2.7 1.62 4.24 1.79v4.03c-1.44-.05-2.89-.35-4.2-.97-.57-.26-1.1-.59-1.62-.93-.01 2.92.01 5.84-.02 8.75-.08 1.4-.54 2.79-1.35 3.94-1.31 1.92-3.58 3.17-5.91 3.21-1.43.08-2.86-.31-4.08-1.03-2.02-1.19-3.34-3.37-3.65-5.71-.28-2.26.74-4.63 2.58-5.91 1.64-1.15 3.7-1.49 5.66-1.02v4.53c-.31-.19-.71-.24-1.07-.23-.39.03-.77.17-1.02.47-.5.62-.14 1.53.55 1.81.47.24 1.13.14 1.51-.25.23-.27.35-.63.35-.98.01-3.55-.01-7.1.02-10.65z"/></svg>
+                        <Input 
+                          id="tiktok"
+                          value={formData.tiktok}
+                          onChange={handleChange}
+                          placeholder="https://tiktok.com/@username"
+                          className="pl-12 bg-white/5 border-white/10 h-14 rounded-2xl focus:ring-purple-500 focus:bg-white/10 transition-all text-white" 
+                        />
+                      </div>
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="instagramLive" className="text-white/60 font-bold uppercase tracking-widest text-[10px]">Instagram Live</Label>
+                      <div className="relative">
+                        <Instagram className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-[#E4405F]" />
+                        <Input 
+                          id="instagramLive"
+                          value={formData.instagramLive}
+                          onChange={handleChange}
+                          placeholder="https://instagram.com/username/live"
+                          className="pl-12 bg-white/5 border-white/10 h-14 rounded-2xl focus:ring-purple-500 focus:bg-white/10 transition-all text-white" 
+                        />
+                      </div>
                     </div>
                   </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="tiktok" className="text-white/60 font-bold uppercase tracking-widest text-[10px]">TikTok Live</Label>
-                    <div className="relative">
-                      <svg className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 fill-white" viewBox="0 0 24 24"><path d="M12.525.02c1.31-.02 2.61-.01 3.91-.02.08 1.53.63 3.09 1.75 4.17 1.12 1.11 2.7 1.62 4.24 1.79v4.03c-1.44-.05-2.89-.35-4.2-.97-.57-.26-1.1-.59-1.62-.93-.01 2.92.01 5.84-.02 8.75-.08 1.4-.54 2.79-1.35 3.94-1.31 1.92-3.58 3.17-5.91 3.21-1.43.08-2.86-.31-4.08-1.03-2.02-1.19-3.34-3.37-3.65-5.71-.28-2.26.74-4.63 2.58-5.91 1.64-1.15 3.7-1.49 5.66-1.02v4.53c-.31-.19-.71-.24-1.07-.23-.39.03-.77.17-1.02.47-.5.62-.14 1.53.55 1.81.47.24 1.13.14 1.51-.25.23-.27.35-.63.35-.98.01-3.55-.01-7.1.02-10.65z"/></svg>
-                      <Input 
-                        id="tiktok"
-                        value={formData.tiktok}
-                        onChange={handleChange}
-                        placeholder="https://tiktok.com/@username"
-                        className="pl-12 bg-white/5 border-white/10 h-14 rounded-2xl focus:ring-purple-500 focus:bg-white/10 transition-all text-white" 
-                      />
-                    </div>
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="instagramLive" className="text-white/60 font-bold uppercase tracking-widest text-[10px]">Instagram Live</Label>
-                    <div className="relative">
-                      <Instagram className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-[#E4405F]" />
-                      <Input 
-                        id="instagramLive"
-                        value={formData.instagramLive}
-                        onChange={handleChange}
-                        placeholder="https://instagram.com/username/live"
-                        className="pl-12 bg-white/5 border-white/10 h-14 rounded-2xl focus:ring-purple-500 focus:bg-white/10 transition-all text-white" 
-                      />
-                    </div>
-                  </div>
-                </div>
+                )}
               </div>
 
               {/* Social Profiles */}
@@ -924,14 +1038,14 @@ export const ProfileEditor = ({ initialData, onSave, minimal = false }: ProfileE
                     <Trash2 className="h-10 w-10 text-red-500" />
                   </div>
                   <DialogHeader>
-                    <DialogTitle className="text-3xl font-black italic uppercase text-center tracking-tighter text-white">DELETE ACCOUNT?</DialogTitle>
+                    <DialogTitle className="text-3xl font-black italic uppercase text-center tracking-tighter">DELETE ACCOUNT?</DialogTitle>
                     <DialogDescription className="text-white/60 font-bold text-center">
                       Are you absolutely sure? This will permanently delete your profile, map pin, and verified member status from TIPTAB. This action is irreversible.
                     </DialogDescription>
                   </DialogHeader>
                   <div className="flex gap-4">
-                    <Button type="button" onClick={() => setIsDeleteModalOpen(false)} className="flex-1 h-14 bg-white/5 hover:bg-white/10 rounded-2xl font-black uppercase text-white">Cancel</Button>
-                    <Button type="button" onClick={handleDeleteAccount} className="flex-1 h-14 bg-red-500 hover:bg-red-600 rounded-2xl font-black uppercase text-white">Yes, Delete Account</Button>
+                    <Button type="button" onClick={() => setIsDeleteModalOpen(false)} className="flex-1 h-14 bg-white/5 hover:bg-white/10 rounded-2xl font-black uppercase">Cancel</Button>
+                    <Button type="button" onClick={handleDeleteAccount} className="flex-1 h-14 bg-red-500 hover:bg-red-600 rounded-2xl font-black uppercase">Yes, Delete Account</Button>
                   </div>
                 </div>
               </DialogContent>
