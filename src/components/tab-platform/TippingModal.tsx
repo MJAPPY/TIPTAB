@@ -97,7 +97,7 @@ export const TippingModal = ({ creator, onClose }: TippingModalProps) => {
       );
       
       if (asset === "TAB") {
-        recordTip(Math.floor(amountNum));
+        recordTip(Math.floor(amountNum), creator.handle);
       }
 
       toast({

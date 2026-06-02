@@ -275,7 +275,7 @@ const CreatorProfile = () => {
       await session.transact({ actions }, { broadcast: true });
       
       if (asset === "TAB") {
-        recordTip(Math.floor(amountNum));
+        recordTip(Math.floor(amountNum), creator.handle);
       }
 
       toast({
@@ -383,7 +383,7 @@ const CreatorProfile = () => {
   const customShareText = `Got some free time? have a bit of fun & check out ${creator.name} at the global appreciation hub on $xpr network. ${PRODUCTION_URL}/tip/${cleanHandle}`;
 
   return (
-    <div className="min-h-screen bg-[#0a0514] text-white selection:bg-purple-500/30">
+    <div className="min-h-screen bg-[#0a0514] text-white selection:bg-orange-500/30">
       <Header onBecomeCreator={() => setIsMembershipOpen(true)} />
       <LiveReactions />
 
@@ -506,7 +506,7 @@ const CreatorProfile = () => {
                     <Button asChild className="flex-1 xs:flex-none rounded-xl md:rounded-2xl bg-black border border-white/20 hover:bg-white/10 h-11 md:h-12 px-4 md:px-6 gap-2.5 md:gap-3 group">
                       <a href={creator.tiktok} target="_blank" rel="noopener noreferrer">
                         <div className="h-1.5 w-1.5 rounded-full bg-red-500 animate-pulse" />
-                        <svg className="h-4 w-4 md:h-5 md:w-5 fill-white" viewBox="0 0 24 24"><path d="M12.525.02c1.31-.02 2.61-.01 3.91-.02.08 1.53.63 3.09 1.75 4.17 1.12 1.11 2.7 1.62 4.24 1.79v4.03c-1.44-.05-2.89-.35-4.2-.97-.57-.26-1.1-.59-1.62-.93-.01 2.92.01 5.84-.02 8.75-.08 1.4-.54 2.79-1.35 3.94-1.31 1.92-3.58 3.17-5.91 3.21-1.43.08-2.86-.31-4.08-1.03-2.02-1.19-3.34-3.37-3.65-5.71-.28-2.26.74-4.63 2.58-5.91 1.64-1.15 3.7-1.49 5.66-1.02v4.53c-.31-.19-.71-.24-1.07-.23-.39.03-.77.17-1.02.47-.5.62-.14 1.53.55 1.81.47.24 1.13.14 1.51-.25.23-.27.35-.63.35-.98.01-3.55-.01-7.1.02-10.65z"/></svg>
+                        <svg className="h-4 w-4 md:h-5 md:w-5 fill-white" viewBox="0 0 24 24"><path d="M12.525.02c1.31-.02 2.61-.01 3.91-.02.08 1.53.63 3.09 1.75 4.17 1.12 1.11 2.7 1.62 4.24 1.79v4.03c-1.44-.05-2.89-.35-4.2-.97-.57-.26-1.1-.59-1.62-.93-.01 2.92.01 5.84-.02 8.75-.08 1.4-.54 2.79-1.35 3.94-1.31 1.92-3.58 3.17-5.91 3.21-1.43.08-2.86-.31-4.08-1.03-2.02-1.19-3.34-3.37-3.65-5.71-.28-2.26.74-4.63 2.58-5.91 1.64-1.49 3.7-1.49 5.66-1.02v4.53c-.31-.19-.71-.24-1.07-.23-.39.03-.77.17-1.02.47-.5.62-.14 1.53.55 1.81.47.24 1.13.14 1.51-.25.23-.27.35-.63.35-.98.01-3.55-.01-7.1.02-10.65z"/></svg>
                         <span className="font-black text-[10px] md:text-xs uppercase tracking-widest">TikTok Live</span>
                       </a>
                     </Button>
