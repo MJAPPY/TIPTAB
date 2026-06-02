@@ -162,13 +162,34 @@ export const ProfileEditor = ({ initialData, onSave, minimal = false }: ProfileE
   const handleSave = async () => {
     setIsSaving(true);
     try {
-      await new Promise((resolve) => setTimeout(resolve, 800));
-      
       let finalCoordinates = formData.coordinates;
-      const typedLocation = formData.location.split(',')[0].trim().toLowerCase();
+      const typedLocation = formData.location.trim();
       
-      if (CITY_COORDINATES[typedLocation]) {
-        finalCoordinates = CITY_COORDINATES[typedLocation];
+      if (typedLocation) {
+        const typedLower = typedLocation.split(',')[0].trim().toLowerCase();
+        
+        // Step 1: Use hardcoded fast local dictionary
+        if (CITY_COORDINATES[typedLower]) {
+          finalCoordinates = CITY_COORDINATES[typedLower];
+        } else {
+          // Step 2: Dynamic Geocoding fallback via free OpenStreetMap Nominatim API
+          try {
+            const response = await fetch(
+              `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(typedLocation)}&format=json&limit=1`,
+              { headers: { 'User-Agent': 'TipTab-Map-App' } }
+            );
+            const data = await response.json();
+            if (data && data.length > 0) {
+              const lon = parseFloat(data[0].lon);
+              const lat = parseFloat(data[0].lat);
+              if (!isNaN(lon) && !isNaN(lat)) {
+                finalCoordinates = [lon, lat];
+              }
+            }
+          } catch (e) {
+            console.error("OSM Geocoding query failed:", e);
+          }
+        }
       }
       
       const updatedCreator: Creator = {

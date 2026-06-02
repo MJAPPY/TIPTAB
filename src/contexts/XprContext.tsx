@@ -76,6 +76,25 @@ interface XprContextType {
 
 const XprContext = createContext<XprContextType | undefined>(undefined);
 
+// Safe helper to parse coordinates from Postgres curly braces or standard arrays
+const parseCoords = (coords: any): [number, number] => {
+  if (!coords) return [0, 0];
+  if (Array.isArray(coords)) {
+    return [
+      typeof coords[0] === 'string' ? parseFloat(coords[0]) : Number(coords[0] || 0),
+      typeof coords[1] === 'string' ? parseFloat(coords[1]) : Number(coords[1] || 0)
+    ];
+  }
+  if (typeof coords === 'string') {
+    // Matches postgres string representation like "{115.8605,-31.9505}"
+    const match = coords.match(/\{?(-?\d+\.?\d*)\s*,\s*(-?\d+\.?\d*)\}?/);
+    if (match) {
+      return [parseFloat(match[1]), parseFloat(match[2])];
+    }
+  }
+  return [0, 0];
+};
+
 export const XprProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [session, setSession] = useState<LinkSession | null>(null);
   const [balances, setBalances] = useState<Balances>({ xpr: '0.0000', tab: '0', xmd: '0.000000', xusdc: '0.000000', metal: '0.00000000', loan: '0.0000', xmt: '0.00000000', tipsSent: 0 });
@@ -123,7 +142,7 @@ export const XprProvider: React.FC<{ children: React.ReactNode }> = ({ children 
             handle: item.handle,
             bio: item.bio || "",
             location: item.location || "",
-            coordinates: item.coordinates || [0, 0],
+            coordinates: parseCoords(item.coordinates),
             categories: item.categories || ["Other"],
             avatar: item.avatar || item.handle.slice(0, 2).toUpperCase(),
             avatarImage: item.avatar_image || "",
@@ -152,22 +171,6 @@ export const XprProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       console.error("Error fetching creators from Supabase:", e);
     }
   }, []);
-
-  // One-time Database cleanup to force crownxpr's is_member field to false
-  useEffect(() => {
-    const purgeSpecificAccount = async () => {
-      try {
-        await supabase
-          .from('profiles')
-          .update({ is_member: false })
-          .eq('handle', 'crownxpr');
-        fetchDbCreators();
-      } catch (e) {
-        console.error("Manual purge error:", e);
-      }
-    };
-    purgeSpecificAccount();
-  }, [fetchDbCreators]);
 
   // Supabase Keep-Alive to prevent auto-pause (Free Tier)
   useEffect(() => {
@@ -326,7 +329,7 @@ export const XprProvider: React.FC<{ children: React.ReactNode }> = ({ children 
           handle: dbProfile.handle,
           bio: dbProfile.bio || "",
           location: dbProfile.location || "",
-          coordinates: dbProfile.coordinates || [0, 0],
+          coordinates: parseCoords(dbProfile.coordinates),
           categories: dbProfile.categories || ["Other"],
           avatar: dbProfile.avatar || account.slice(0, 2).toUpperCase(),
           avatarImage: dbProfile.avatar_image || "",
