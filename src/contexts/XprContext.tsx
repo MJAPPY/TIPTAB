@@ -115,41 +115,59 @@ export const XprProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         .order('created_at', { ascending: false });
       
       if (data && !error) {
-        const mapped: Creator[] = data.map(item => ({
-          id: `user_${item.handle}`,
-          name: item.name || item.handle,
-          handle: item.handle,
-          bio: item.bio || "",
-          location: item.location || "",
-          coordinates: item.coordinates || [0, 0],
-          categories: item.categories || ["Other"],
-          avatar: item.avatar || item.handle.slice(0, 2).toUpperCase(),
-          avatarImage: item.avatar_image || "",
-          coverImage: item.cover_image || "",
-          coverPosition: item.cover_position ?? 50,
-          color: item.color || "bg-purple-600",
-          twitter: item.twitter || "",
-          website: item.website || "",
-          videoUrl: item.video_url || "",
-          instagram: item.instagram || "",
-          spotify: item.spotify || "",
-          snipverse: item.snipverse || "",
-          facebook: item.facebook || "",
-          kick: item.kick || "",
-          rumble: item.rumble || "",
-          twitch: item.twitch || "",
-          tiktok: item.tiktok || "",
-          youtubeLive: item.youtube_live || "",
-          instagramLive: item.instagram_live || "",
-          // Custom check for level based on profile parameters if loaded from remote database
-          membershipLevel: item.cover_image || item.twitch || item.youtube_live || item.kick || item.rumble || (item.categories && item.categories.length > 1) ? 'pro' : 'basic'
-        }));
+        const mapped: Creator[] = data
+          .filter(item => item.handle.toLowerCase().trim() !== 'crownxpr')
+          .map(item => ({
+            id: `user_${item.handle}`,
+            name: item.name || item.handle,
+            handle: item.handle,
+            bio: item.bio || "",
+            location: item.location || "",
+            coordinates: item.coordinates || [0, 0],
+            categories: item.categories || ["Other"],
+            avatar: item.avatar || item.handle.slice(0, 2).toUpperCase(),
+            avatarImage: item.avatar_image || "",
+            coverImage: item.cover_image || "",
+            coverPosition: item.cover_position ?? 50,
+            color: item.color || "bg-purple-600",
+            twitter: item.twitter || "",
+            website: item.website || "",
+            videoUrl: item.video_url || "",
+            instagram: item.instagram || "",
+            spotify: item.spotify || "",
+            snipverse: item.snipverse || "",
+            facebook: item.facebook || "",
+            kick: item.kick || "",
+            rumble: item.rumble || "",
+            twitch: item.twitch || "",
+            tiktok: item.tiktok || "",
+            youtubeLive: item.youtube_live || "",
+            instagramLive: item.instagram_live || "",
+            // Custom check for level based on profile parameters if loaded from remote database
+            membershipLevel: item.cover_image || item.twitch || item.youtube_live || item.kick || item.rumble || (item.categories && item.categories.length > 1) ? 'pro' : 'basic'
+          }));
         setDbCreators(mapped);
       }
     } catch (e) {
       console.error("Error fetching creators from Supabase:", e);
     }
   }, []);
+
+  // One-time Database cleanup to force crownxpr's is_member field to false
+  useEffect(() => {
+    const purgeSpecificAccount = async () => {
+      try {
+        await supabase
+          .from('profiles')
+          .update({ is_member: false })
+          .eq('handle', 'crownxpr');
+        fetchDbCreators();
+      } catch (e) {
+        console.error("Manual purge error:", e);
+      }
+    };
+    purgeSpecificAccount();
+  }, [fetchDbCreators]);
 
   // Supabase Keep-Alive to prevent auto-pause (Free Tier)
   useEffect(() => {
