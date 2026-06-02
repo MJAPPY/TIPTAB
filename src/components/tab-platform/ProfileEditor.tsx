@@ -434,124 +434,126 @@ export const ProfileEditor = ({ initialData, onSave, minimal = false }: ProfileE
             <h4 className="font-bold text-lg">Profile Graphics</h4>
             
             {/* Interactive Drag & Drop Cover Image Upload Container */}
-            <div className="space-y-3">
-              <div className="flex items-center justify-between">
-                <Label className="text-white/60 font-bold uppercase tracking-widest text-[10px]">Cover Banner</Label>
-                {isBasicLevel && (
-                  <Badge variant="outline" className="border-orange-500/30 text-orange-400 text-[8px] font-black tracking-widest uppercase">
-                    <Lock className="h-2.5 w-2.5 mr-1" /> Pro Feature
-                  </Badge>
-                )}
-              </div>
-              
-              <div 
-                onDragOver={handleDragOver}
-                onDragLeave={handleDragLeave}
-                onDrop={handleDrop}
-                className={cn(
-                  "relative group rounded-[32px] overflow-hidden border-2 aspect-[3.2/1] flex flex-col items-center justify-center transition-all duration-300",
-                  formData.coverImage ? "border-white/10 bg-black/40" : "border-dashed bg-white/[0.01]",
-                  isDraggingCover 
-                    ? "border-purple-500 bg-purple-500/10 scale-[1.01] shadow-[0_0_30px_rgba(168,85,247,0.3)]" 
-                    : "border-white/20 hover:border-purple-500/50 hover:bg-white/[0.03]"
-                )}
-              >
-                {isBasicLevel ? (
-                  <div className="text-center p-6 flex flex-col items-center gap-3 select-none">
-                    <div className="h-12 w-12 rounded-2xl bg-orange-500/10 flex items-center justify-center text-orange-400">
-                      <Lock className="h-6 w-6" />
-                    </div>
-                    <div className="space-y-1">
-                      <p className="text-xs font-black text-slate-200">Custom Banners Locked</p>
-                      <p className="text-[10px] text-white/40 font-bold">Upgrade to Pro to customize your profile banner!</p>
-                    </div>
-                    <Button 
-                      onClick={() => setIsMembershipOpen(true)}
-                      size="sm" 
-                      className="rounded-xl bg-orange-500 hover:bg-orange-600 text-white font-black text-[9px] uppercase tracking-widest mt-1 shadow-md shadow-orange-500/20"
-                    >
-                      Unlock Pro
-                    </Button>
-                  </div>
-                ) : formData.coverImage ? (
-                  <>
-                    <img 
-                      src={formData.coverImage} 
-                      alt="Profile Cover" 
-                      className="w-full h-full object-cover select-none pointer-events-none" 
-                      style={{ objectPosition: `50% ${formData.coverPosition || 50}%` }}
-                    />
-                    {/* Drag-over indicator overlay when an image is already uploaded */}
-                    {isDraggingCover && (
-                      <div className="absolute inset-0 bg-purple-600/80 backdrop-blur-sm flex flex-col items-center justify-center gap-3 animate-in fade-in duration-200">
-                        <Upload className="h-10 w-10 text-white animate-bounce" />
-                        <span className="font-black text-sm uppercase tracking-widest text-white">Drop to Replace Cover</span>
-                      </div>
-                    )}
-                    <button 
-                      type="button"
-                      onClick={removeCoverImage}
-                      className="absolute top-4 right-4 bg-red-500 hover:bg-red-600 text-white rounded-full p-2.5 shadow-xl transition-colors z-10"
-                    >
-                      <X className="h-4 w-4" />
-                    </button>
-                  </>
-                ) : (
-                  <div className="text-center p-6 flex flex-col items-center gap-4 select-none">
-                    <div className={cn(
-                      "h-14 w-14 rounded-2xl flex items-center justify-center transition-transform",
-                      isDraggingCover ? "scale-110 bg-purple-500 text-white" : "bg-white/5 text-purple-400"
-                    )}>
-                      {isDraggingCover ? <Upload className="h-7 w-7" /> : <ImageIcon className="h-7 w-7" />}
-                    </div>
-                    
-                    <div className="space-y-1">
-                      <p className="text-sm font-black text-slate-200">
-                        {isDraggingCover ? "Drop it here!" : "Drag & Drop cover photo here"}
-                      </p>
-                      <p className="text-xs text-white/30 font-bold">PNG, JPG or WEBP • Max 512KB</p>
-                    </div>
-
-                    <input 
-                      type="file" 
-                      id="coverImageInput"
-                      ref={coverInputRef} 
-                      className="hidden" 
-                      accept="image/*" 
-                      onChange={handleCoverChange} 
-                    />
-                    
-                    <Button 
-                      variant="outline" 
-                      size="sm" 
-                      onClick={() => coverInputRef.current?.click()}
-                      className="rounded-xl border-white/10 text-white/60 hover:text-white bg-white/5 shadow-lg active:scale-95 transition-transform"
-                    >
-                      <Upload className="h-4 w-4 mr-2" /> Or Browse File
-                    </Button>
-                  </div>
-                )}
-              </div>
-
-              {!isBasicLevel && formData.coverImage && (
-                <div className="p-4 bg-white/[0.03] border border-white/10 rounded-2xl space-y-3 animate-in fade-in slide-in-from-top-2 duration-300">
-                  <div className="flex items-center justify-between text-xs font-bold text-white/60">
-                    <span className="flex items-center gap-2">
-                      <Move className="h-3.5 w-3.5 text-purple-400" /> Adjust Cover Position (Vertical Offset)
-                    </span>
-                    <span className="font-mono text-purple-400">{formData.coverPosition}%</span>
-                  </div>
-                  <input 
-                    type="range" 
-                    min="0" 
-                    max="100" 
-                    value={formData.coverPosition} 
-                    onChange={handlePositionChange} 
-                    className="w-full h-1 bg-white/10 rounded-lg appearance-none cursor-pointer accent-purple-500 focus:outline-none"
-                  />
+            {!minimal && (
+              <div className="space-y-3">
+                <div className="flex items-center justify-between">
+                  <Label className="text-white/60 font-bold uppercase tracking-widest text-[10px]">Cover Banner</Label>
+                  {isBasicLevel && (
+                    <Badge variant="outline" className="border-orange-500/30 text-orange-400 text-[8px] font-black tracking-widest uppercase">
+                      <Lock className="h-2.5 w-2.5 mr-1" /> Pro Feature
+                    </Badge>
+                  )}
                 </div>
-              )}
-            </div>
+                
+                <div 
+                  onDragOver={handleDragOver}
+                  onDragLeave={handleDragLeave}
+                  onDrop={handleDrop}
+                  className={cn(
+                    "relative group rounded-[32px] overflow-hidden border-2 aspect-[3.2/1] flex flex-col items-center justify-center transition-all duration-300",
+                    formData.coverImage ? "border-white/10 bg-black/40" : "border-dashed bg-white/[0.01]",
+                    isDraggingCover 
+                      ? "border-purple-500 bg-purple-500/10 scale-[1.01] shadow-[0_0_30px_rgba(168,85,247,0.3)]" 
+                      : "border-white/20 hover:border-purple-500/50 hover:bg-white/[0.03]"
+                  )}
+                >
+                  {isBasicLevel ? (
+                    <div className="text-center p-6 flex flex-col items-center gap-3 select-none">
+                      <div className="h-12 w-12 rounded-2xl bg-orange-500/10 flex items-center justify-center text-orange-400">
+                        <Lock className="h-6 w-6" />
+                      </div>
+                      <div className="space-y-1">
+                        <p className="text-xs font-black text-slate-200">Custom Banners Locked</p>
+                        <p className="text-[10px] text-white/40 font-bold">Upgrade to Pro to customize your profile banner!</p>
+                      </div>
+                      <Button 
+                        onClick={() => setIsMembershipOpen(true)}
+                        size="sm" 
+                        className="rounded-xl bg-orange-500 hover:bg-orange-600 text-white font-black text-[9px] uppercase tracking-widest mt-1 shadow-md shadow-orange-500/20"
+                      >
+                        Unlock Pro
+                      </Button>
+                    </div>
+                  ) : formData.coverImage ? (
+                    <>
+                      <img 
+                        src={formData.coverImage} 
+                        alt="Profile Cover" 
+                        className="w-full h-full object-cover select-none pointer-events-none" 
+                        style={{ objectPosition: `50% ${formData.coverPosition || 50}%` }}
+                      />
+                      {/* Drag-over indicator overlay when an image is already uploaded */}
+                      {isDraggingCover && (
+                        <div className="absolute inset-0 bg-purple-600/80 backdrop-blur-sm flex flex-col items-center justify-center gap-3 animate-in fade-in duration-200">
+                          <Upload className="h-10 w-10 text-white animate-bounce" />
+                          <span className="font-black text-sm uppercase tracking-widest text-white">Drop to Replace Cover</span>
+                        </div>
+                      )}
+                      <button 
+                        type="button"
+                        onClick={removeCoverImage}
+                        className="absolute top-4 right-4 bg-red-500 hover:bg-red-600 text-white rounded-full p-2.5 shadow-xl transition-colors z-10"
+                      >
+                        <X className="h-4 w-4" />
+                      </button>
+                    </>
+                  ) : (
+                    <div className="text-center p-6 flex flex-col items-center gap-4 select-none">
+                      <div className={cn(
+                        "h-14 w-14 rounded-2xl flex items-center justify-center transition-transform",
+                        isDraggingCover ? "scale-110 bg-purple-500 text-white" : "bg-white/5 text-purple-400"
+                      )}>
+                        {isDraggingCover ? <Upload className="h-7 w-7" /> : <ImageIcon className="h-7 w-7" />}
+                      </div>
+                      
+                      <div className="space-y-1">
+                        <p className="text-sm font-black text-slate-200">
+                          {isDraggingCover ? "Drop it here!" : "Drag & Drop cover photo here"}
+                        </p>
+                        <p className="text-xs text-white/30 font-bold">PNG, JPG or WEBP • Max 512KB</p>
+                      </div>
+
+                      <input 
+                        type="file" 
+                        id="coverImageInput"
+                        ref={coverInputRef} 
+                        className="hidden" 
+                        accept="image/*" 
+                        onChange={handleCoverChange} 
+                      />
+                      
+                      <Button 
+                        variant="outline" 
+                        size="sm" 
+                        onClick={() => coverInputRef.current?.click()}
+                        className="rounded-xl border-white/10 text-white/60 hover:text-white bg-white/5 shadow-lg active:scale-95 transition-transform"
+                      >
+                        <Upload className="h-4 w-4 mr-2" /> Or Browse File
+                      </Button>
+                    </div>
+                  )}
+                </div>
+
+                {!isBasicLevel && formData.coverImage && (
+                  <div className="p-4 bg-white/[0.03] border border-white/10 rounded-2xl space-y-3 animate-in fade-in slide-in-from-top-2 duration-300">
+                    <div className="flex items-center justify-between text-xs font-bold text-white/60">
+                      <span className="flex items-center gap-2">
+                        <Move className="h-3.5 w-3.5 text-purple-400" /> Adjust Cover Position (Vertical Offset)
+                      </span>
+                      <span className="font-mono text-purple-400">{formData.coverPosition}%</span>
+                    </div>
+                    <input 
+                      type="range" 
+                      min="0" 
+                      max="100" 
+                      value={formData.coverPosition} 
+                      onChange={handlePositionChange} 
+                      className="w-full h-1 bg-white/10 rounded-lg appearance-none cursor-pointer accent-purple-500 focus:outline-none"
+                    />
+                  </div>
+                )}
+              </div>
+            )}
 
             {/* Avatar Section */}
             <div className="flex flex-col sm:flex-row items-center gap-6 pt-4">
@@ -897,7 +899,7 @@ export const ProfileEditor = ({ initialData, onSave, minimal = false }: ProfileE
                     <div className="space-y-2">
                       <Label htmlFor="tiktok" className="text-white/60 font-bold uppercase tracking-widest text-[10px]">TikTok Live</Label>
                       <div className="relative">
-                        <svg className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 fill-white" viewBox="0 0 24 24"><path d="M12.525.02c1.31-.02 2.61-.01 3.91-.02.08 1.53.63 3.09 1.75 4.17 1.12 1.11 2.7 1.62 4.24 1.79v4.03c-1.44-.05-2.89-.35-4.2-.97-.57-.26-1.1-.59-1.62-.93-.01 2.92.01 5.84-.02 8.75-.08 1.4-.54 2.79-1.35 3.94-1.31 1.92-3.58 3.17-5.91 3.21-1.43.08-2.86-.31-4.08-1.03-2.02-1.19-3.34-3.37-3.65-5.71-.28-2.26.74-4.63 2.58-5.91 1.64-1.15 3.7-1.49 5.66-1.02v4.53c-.31-.19-.71-.24-1.07-.23-.39.03-.77.17-1.02.47-.5.62-.14 1.53.55 1.81.47.24 1.13.14 1.51-.25.23-.27.35-.63.35-.98.01-3.55-.01-7.1.02-10.65z"/></svg>
+                        <svg className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 fill-white" viewBox="0 0 24 24"><path d="M12.525.02c1.31-.02 2.61-.01 3.91-.02.08 1.53.63 3.09 1.75 4.17 1.12 1.11 2.7 1.62 4.24 1.79v4.03c-1.44-.05-2.89-.35-4.2-.97-.57-.26-1.1-.59-1.62-.93-.01 2.92.01 5.84-.02 8.75-.08 1.4-.54 2.79-1.35 3.94-1.31 1.92-3.58 3.17-5.91 3.21-1.43.08-2.86-.31-4.08-1.03-2.02-1.19-3.34-3.37-3.65-5.71-.28-2.26.74-4.63 2.58-5.91 1.64-1.49 3.7-1.49 5.66-1.02v4.53c-.31-.19-.71-.24-1.07-.23-.39.03-.77.17-1.02.47-.5.62-.14 1.53.55 1.81.47.24 1.13.14 1.51-.25.23-.27.35-.63.35-.98.01-3.55-.01-7.1.02-10.65z"/></svg>
                         <Input 
                           id="tiktok"
                           value={formData.tiktok}
@@ -1045,7 +1047,7 @@ export const ProfileEditor = ({ initialData, onSave, minimal = false }: ProfileE
                   </DialogHeader>
                   <div className="flex gap-4">
                     <Button type="button" onClick={() => setIsDeleteModalOpen(false)} className="flex-1 h-14 bg-white/5 hover:bg-white/10 rounded-2xl font-black uppercase">Cancel</Button>
-                    <Button type="button" onClick={handleDeleteAccount} className="flex-1 h-14 bg-red-500 hover:bg-red-600 rounded-2xl font-black uppercase">Yes, Delete Account</Button>
+                    <Button type="button" onClick={handleDeleteAccount} className="flex-1 h-14 bg-red-500 hover:bg-red-700 rounded-2xl font-black uppercase">Yes, Delete Account</Button>
                   </div>
                 </div>
               </DialogContent>
