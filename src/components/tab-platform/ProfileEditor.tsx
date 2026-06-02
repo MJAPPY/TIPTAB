@@ -351,15 +351,27 @@ export const ProfileEditor = ({ initialData, onSave, minimal = false }: ProfileE
           youtube_live: null,
           instagram_live: null
         })
-        .eq('handle', actor);
+        .ilike('handle', actor);
       
       if (error) throw error;
 
+      // Clean up all possible variant keys from localStorage
       const handleLower = actor.toLowerCase();
-      localStorage.removeItem(`tiptab_profile_${handleLower}`);
-      localStorage.removeItem(`tiptab_membership_${handleLower}`);
-      localStorage.removeItem(`tiptab_membership_date_${handleLower}`);
-      localStorage.removeItem(`tiptab_favorites_${handleLower}`);
+      const keysToRemove = [
+        `tiptab_profile_${actor}`,
+        `tiptab_profile_${handleLower}`,
+        `tiptab_membership_${actor}`,
+        `tiptab_membership_${handleLower}`,
+        `tiptab_membership_level_${actor}`,
+        `tiptab_membership_level_${handleLower}`,
+        `tiptab_membership_date_${actor}`,
+        `tiptab_membership_date_${handleLower}`,
+        `tiptab_favorites_${actor}`,
+        `tiptab_favorites_${handleLower}`,
+        "tiptab_user_profile"
+      ];
+
+      keysToRemove.forEach(key => localStorage.removeItem(key));
 
       toast({
         title: "Account Deleted",
