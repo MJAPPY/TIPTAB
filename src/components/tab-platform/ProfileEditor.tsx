@@ -381,11 +381,9 @@ export const ProfileEditor = ({ initialData, onSave, minimal = false }: ProfileE
 
       setIsDeleteModalOpen(false);
       
-      // Graceful unmount delay to prevent layout crashes
+      // Perform full wallet de-authentication first to prevent rendering a logged-in state mismatch
+      await logout();
       navigate("/");
-      setTimeout(async () => {
-        await logout();
-      }, 100);
     } catch (err: any) {
       toast({
         title: "Deletion Failed",
