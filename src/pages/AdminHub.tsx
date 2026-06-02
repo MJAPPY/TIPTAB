@@ -243,24 +243,28 @@ const AdminHub = () => {
         .from('votes')
         .select('voter_handle, candidate_handle, tab_amount, created_at');
 
+      const compiledVotes = voteData || [];
+
+      // Merge with Local Storage backup for real-time responsiveness
+      const localVotes = JSON.parse(localStorage.getItem('tiptab_local_votes') || '[]');
+      const combinedVotes = [...compiledVotes, ...localVotes];
+
       let uniqueVoters = new Set<string>();
       let totalTabAmount = 0;
       let tippingVelocity = 0;
       let avgTipSize = 0;
 
-      if (voteData && !voteError) {
-        voteData.forEach(v => {
-          if (v.voter_handle) uniqueVoters.add(v.voter_handle.toLowerCase().trim());
-          totalTabAmount += Number(v.tab_amount || 0);
-        });
+      combinedVotes.forEach(v => {
+        if (v.voter_handle) uniqueVoters.add(v.voter_handle.toLowerCase().trim());
+        totalTabAmount += Number(v.tab_amount || 0);
+      });
 
-        const totalTipsCount = voteData.length;
-        avgTipSize = totalTipsCount > 0 ? Math.round(totalTabAmount / totalTipsCount) : 0;
-        
-        const dayAgo = new Date(Date.now() - 24 * 60 * 60 * 1000);
-        const recentTips = voteData.filter(v => new Date(v.created_at) >= dayAgo).length;
-        tippingVelocity = Math.ceil(recentTips / 24) || 0;
-      }
+      const totalTipsCount = combinedVotes.length;
+      avgTipSize = totalTipsCount > 0 ? Math.round(totalTabAmount / totalTipsCount) : 0;
+      
+      const dayAgo = new Date(Date.now() - 24 * 60 * 60 * 1000);
+      const recentTips = combinedVotes.filter(v => new Date(v.created_at) >= dayAgo).length;
+      tippingVelocity = Math.ceil(recentTips / 24) || 0;
 
       // Profiles created in last 24h
       const dayAgoStr = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
@@ -2055,7 +2059,7 @@ const AdminHub = () => {
                       <table className="w-full min-w-[900px]">
                         <thead className="bg-white/[0.03]">
                           <tr>
-                            <th className="px-10 py-5 text-left text-[10px] font-black uppercase tracking-widest text-white/30">Screenshot</th>
+                            <th className="px-10 py-4 text-left text-[10px] font-black uppercase tracking-widest text-white/30">Screenshot</th>
                             <th className="px-10 py-5 text-left text-[10px] font-black uppercase tracking-widest text-white/30">Title</th>
                             <th className="px-10 py-5 text-center text-[10px] font-black uppercase tracking-widest text-white/30">Likes</th>
                             <th className="px-10 py-5 text-center text-[10px] font-black uppercase tracking-widest text-white/30">Author</th>
