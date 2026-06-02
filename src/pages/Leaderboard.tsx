@@ -54,30 +54,12 @@ const Leaderboard = () => {
         });
       }
 
-      // 2. Fetch all votes with highly resilient local storage ledger merging fallback
-      let votes: any[] = [];
-      try {
-        const { data, error } = await supabase
-          .from("votes")
-          .select("voter_handle, candidate_handle, tab_amount, created_at");
-        if (data && !error) {
-          votes = [...data];
-        }
-      } catch (e) {}
+      // 2. Fetch all votes from database
+      const { data: votes, error: votesError } = await supabase
+        .from("votes")
+        .select("voter_handle, candidate_handle, tab_amount");
 
-      const localVotes = JSON.parse(localStorage.getItem("tiptab_votes_local") || "[]");
-      localVotes.forEach((lv: any) => {
-        if (!votes.some(mv => 
-          mv.voter_handle === lv.voter_handle && 
-          mv.candidate_handle === lv.candidate_handle && 
-          mv.tab_amount === lv.tab_amount &&
-          mv.created_at === lv.created_at
-        )) {
-          votes.push(lv);
-        }
-      });
-
-      if (votes.length > 0) {
+      if (votes && !votesError) {
         const creatorsGroup: Record<string, { totalValue: number; activityCount: number }> = {};
         const supportersGroup: Record<string, { totalValue: number; activityCount: number }> = {};
 

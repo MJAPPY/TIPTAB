@@ -238,45 +238,27 @@ const AdminHub = () => {
     try {
       const activeCount = dbCreators.length;
 
-      // Fetch votes count and calculate analytics metrics with safe fallback
-      let votes: any[] = [];
-      try {
-        const { data, error } = await supabase
-          .from('votes')
-          .select('voter_handle, candidate_handle, tab_amount, created_at');
-        if (data && !error) {
-          votes = [...data];
-        }
-      } catch (err) {}
-
-      const localVotes = JSON.parse(localStorage.getItem("tiptab_votes_local") || "[]");
-      localVotes.forEach((lv: any) => {
-        if (!votes.some(mv => 
-          mv.voter_handle === lv.voter_handle && 
-          mv.candidate_handle === lv.candidate_handle && 
-          mv.tab_amount === lv.tab_amount &&
-          mv.created_at === lv.created_at
-        )) {
-          votes.push(lv);
-        }
-      });
+      // Fetch votes count and calculate analytics metrics
+      const { data: voteData, error: voteError } = await supabase
+        .from('votes')
+        .select('voter_handle, candidate_handle, tab_amount, created_at');
 
       let uniqueVoters = new Set<string>();
       let totalTabAmount = 0;
       let tippingVelocity = 0;
       let avgTipSize = 0;
 
-      if (votes.length > 0) {
-        votes.forEach(v => {
+      if (voteData && !voteError) {
+        voteData.forEach(v => {
           if (v.voter_handle) uniqueVoters.add(v.voter_handle.toLowerCase().trim());
           totalTabAmount += Number(v.tab_amount || 0);
         });
 
-        const totalTipsCount = votes.length;
+        const totalTipsCount = voteData.length;
         avgTipSize = totalTipsCount > 0 ? Math.round(totalTabAmount / totalTipsCount) : 0;
         
         const dayAgo = new Date(Date.now() - 24 * 60 * 60 * 1000);
-        const recentTips = votes.filter(v => new Date(v.created_at) >= dayAgo).length;
+        const recentTips = voteData.filter(v => new Date(v.created_at) >= dayAgo).length;
         tippingVelocity = Math.ceil(recentTips / 24) || 0;
       }
 
@@ -354,7 +336,7 @@ const AdminHub = () => {
     fetchShowcaseSites();
   }, [fetchLiveStats, fetchShowcaseSites]);
 
-  // Fetch live winners (both Candidates as 'Creator' and Voters as 'Supporter') from Supabase votes database/localStorage fallback for Rewards Console
+  // Fetch live winners (both Candidates as 'Creator' and Voters as 'Supporter') from Supabase votes database for Rewards Console
   useEffect(() => {
     const fetchLiveWinners = async () => {
       try {
@@ -362,34 +344,16 @@ const AdminHub = () => {
         const quarter = Math.floor(new Date().getMonth() / 3) + 1;
         const quarterId = `Q${year}-${quarter}`;
 
-        let votes: any[] = [];
-        try {
-          const { data, error } = await supabase
-            .from('votes')
-            .select('voter_handle, candidate_handle, tab_amount, created_at')
-            .eq('week_identifier', quarterId);
-          if (data && !error) {
-            votes = [...data];
-          }
-        } catch (err) {}
-
-        const localVotes = JSON.parse(localStorage.getItem("tiptab_votes_local") || "[]");
-        localVotes.forEach((lv: any) => {
-          if (lv.week_identifier === quarterId && !votes.some(mv => 
-            mv.voter_handle === lv.voter_handle && 
-            mv.candidate_handle === lv.candidate_handle && 
-            mv.tab_amount === lv.tab_amount &&
-            mv.created_at === lv.created_at
-          )) {
-            votes.push(lv);
-          }
-        });
+        const { data, error } = await supabase
+          .from('votes')
+          .select('voter_handle, candidate_handle, tab_amount')
+          .eq('week_identifier', quarterId);
 
         const creatorTotals: Record<string, number> = {};
         const supporterTotals: Record<string, number> = {};
 
-        if (votes.length > 0) {
-          votes.forEach(v => {
+        if (data && !error) {
+          data.forEach(v => {
             const cleanCandidate = v.candidate_handle.toLowerCase().replace('@', '').trim();
             const cleanVoter = v.voter_handle.toLowerCase().replace('@', '').trim();
             
@@ -2345,7 +2309,7 @@ const AdminHub = () => {
             </DialogHeader>
             <div className="flex gap-4">
               <Button onClick={() => setIsDeleteModalOpen(false)} className="flex-1 h-14 bg-white/5 hover:bg-white/10 rounded-2xl font-black uppercase">Cancel</Button>
-              <Button onClick={confirmDeleteProfile} className="flex-1 h-14 bg-red-500 hover:bg-red-700 rounded-2xl font-black uppercase">Yes, Purge</Button>
+              <Button onClick={confirmDeleteProfile} className="flex-1 h-14 bg-red-500 hover:bg-red-600 rounded-2xl font-black uppercase">Yes, Purge</Button>
             </div>
           </div>
         </DialogContent>
