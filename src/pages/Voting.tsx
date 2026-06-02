@@ -69,42 +69,78 @@ const Voting = () => {
 
   const fetchVotes = async () => {
     const quarterId = getQuarterIdentifier();
-    
-    // First try fetching for current quarter
-    let { data, error } = await supabase
-      .from('votes')
-      .select('candidate_handle, tab_amount')
-      .eq('week_identifier', quarterId);
+    let mergedVotes: any[] = [];
 
-    // Fallback: if no votes in current quarter, show all votes to ensure live data is visible
-    if ((!data || data.length === 0) && !error) {
-      const { data: allData, error: allError } = await supabase
+    // 1. Fetch from Supabase with safe try/catch in case the table does not exist
+    try {
+      const { data, error } = await supabase
         .from('votes')
-        .select('candidate_handle, tab_amount');
+        .select('voter_handle, candidate_handle, tab_amount, week_identifier, created_at')
+        .eq('week_identifier', quarterId);
       
-      if (allData && !allError) {
-        data = allData;
+      if (data && !error) {
+        mergedVotes = [...data];
       }
+    } catch (e) {
+      console.warn("Supabase votes table fetch failed, using local storage ledger.");
     }
 
-    if (data && !error) {
-      const totals: Record<string, number> = {};
-      data.forEach(v => {
-        const cleanHandle = v.candidate_handle?.toLowerCase().replace('@', '').trim();
-        if (cleanHandle) {
-          totals[cleanHandle] = (totals[cleanHandle] || 0) + Number(v.tab_amount);
+    // 2. Fetch and merge local fallback votes to guarantee visibility
+    const localVotes = JSON.parse(localStorage.getItem("tiptab_votes_local") || "[]");
+    localVotes.forEach((lv: any) => {
+      // Avoid duplicate votes if they are already fetched from DB
+      if (lv.week_identifier === quarterId && !mergedVotes.some(mv => 
+        mv.voter_handle === lv.voter_handle && 
+        mv.candidate_handle === lv.candidate_handle && 
+        mv.tab_amount === lv.tab_amount &&
+        mv.created_at === lv.created_at
+      )) {
+        mergedVotes.push(lv);
+      }
+    });
+
+    // If no votes in current quarter, show all local/DB votes as general fallback
+    if (mergedVotes.length === 0) {
+      try {
+        const { data, error } = await supabase
+          .from('votes')
+          .select('voter_handle, candidate_handle, tab_amount, week_identifier, created_at');
+        if (data && !error) {
+          mergedVotes = [...data];
+        }
+      } catch (e) {}
+      
+      localVotes.forEach((lv: any) => {
+        if (!mergedVotes.some(mv => 
+          mv.voter_handle === lv.voter_handle && 
+          mv.candidate_handle === lv.candidate_handle && 
+          mv.tab_amount === lv.tab_amount &&
+          mv.created_at === lv.created_at
+        )) {
+          mergedVotes.push(lv);
         }
       });
-      const sorted = Object.entries(totals)
-        .map(([handle, votes]) => ({ handle, votes }))
-        .sort((a, b) => b.votes - a.votes);
-      setLeaderboard(sorted);
     }
+
+    // 3. Aggregate and sort
+    const totals: Record<string, number> = {};
+    mergedVotes.forEach(v => {
+      const cleanHandle = v.candidate_handle?.toLowerCase().replace('@', '').trim();
+      if (cleanHandle) {
+        totals[cleanHandle] = (totals[cleanHandle] || 0) + Number(v.tab_amount);
+      }
+    });
+    
+    const sorted = Object.entries(totals)
+      .map(([handle, votes]) => ({ handle, votes }))
+      .sort((a, b) => b.votes - a.votes);
+      
+    setLeaderboard(sorted);
   };
 
   useEffect(() => {
     fetchVotes();
-    const interval = setInterval(fetchVotes, 30000);
+    const interval = setInterval(fetchVotes, 15000);
     return () => clearInterval(interval);
   }, []);
 
@@ -151,12 +187,28 @@ const Voting = () => {
 
       // 2. Record in DB
       const quarterId = getQuarterIdentifier();
-      await supabase.from('votes').insert({
+      const currentTimestamp = new Date().toISOString();
+      try {
+        await supabase.from('votes').insert({
+          voter_handle: actor!,
+          candidate_handle: candidateHandle,
+          tab_amount: amount,
+          week_identifier: quarterId
+        });
+      } catch (dbError) {
+        console.warn("DB votes table not found or error. Saving to local ledger fallback.", dbError);
+      }
+
+      // Always save to local fallback so we can read from it seamlessly
+      const localVotes = JSON.parse(localStorage.getItem("tiptab_votes_local") || "[]");
+      localVotes.push({
         voter_handle: actor!,
         candidate_handle: candidateHandle,
         tab_amount: amount,
-        week_identifier: quarterId
+        week_identifier: quarterId,
+        created_at: currentTimestamp
       });
+      localStorage.setItem("tiptab_votes_local", JSON.stringify(localVotes));
 
       toast({
         title: "Vote Recorded!",

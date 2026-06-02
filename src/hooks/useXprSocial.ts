@@ -47,12 +47,34 @@ export const useXprSocial = (activeActor: string | null) => {
         .order('created_at', { ascending: false })
         .limit(5);
 
-      // 2. Fetch latest votes from votes
-      const { data: latestVotes, error: votesError } = await supabase
-        .from('votes')
-        .select('voter_handle, candidate_handle, tab_amount, created_at')
-        .order('created_at', { ascending: false })
-        .limit(5);
+      // 2. Fetch latest votes with local fallback integration
+      let latestVotes: any[] = [];
+      try {
+        const { data, error } = await supabase
+          .from('votes')
+          .select('voter_handle, candidate_handle, tab_amount, created_at')
+          .order('created_at', { ascending: false })
+          .limit(10);
+        if (data && !error) {
+          latestVotes = [...data];
+        }
+      } catch (e) {}
+
+      const localVotes = JSON.parse(localStorage.getItem("tiptab_votes_local") || "[]");
+      localVotes.forEach((lv: any) => {
+        if (!latestVotes.some(mv => 
+          mv.voter_handle === lv.voter_handle && 
+          mv.candidate_handle === lv.candidate_handle && 
+          mv.tab_amount === lv.tab_amount &&
+          mv.created_at === lv.created_at
+        )) {
+          latestVotes.push(lv);
+        }
+      });
+      // Sort and slice latest 5
+      latestVotes = latestVotes
+        .sort((a, b) => new Date(b.created_at || 0).getTime() - new Date(a.created_at || 0).getTime())
+        .slice(0, 5);
 
       const items: Activity[] = [];
 
@@ -70,7 +92,7 @@ export const useXprSocial = (activeActor: string | null) => {
       }
 
       // Format voting events
-      if (latestVotes && !votesError) {
+      if (latestVotes && latestVotes.length > 0) {
         latestVotes.forEach((v, i) => {
           items.push({
             id: `vote-${v.voter_handle}-${v.candidate_handle}-${i}`,

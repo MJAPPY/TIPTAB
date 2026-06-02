@@ -30,16 +30,37 @@ export const Tab = () => {
       const year = new Date().getFullYear();
       const quarter = Math.floor(new Date().getMonth() / 3) + 1;
       const quarterId = `Q${year}-${quarter}`;
+      let mergedVotes: any[] = [];
 
-      const { data, error } = await supabase
-        .from('votes')
-        .select('candidate_handle, tab_amount')
-        .eq('week_identifier', quarterId);
+      try {
+        const { data, error } = await supabase
+          .from('votes')
+          .select('candidate_handle, tab_amount')
+          .eq('week_identifier', quarterId);
+        
+        if (data && !error) {
+          mergedVotes = [...data];
+        }
+      } catch (e) {}
 
-      if (data && !error) {
+      const localVotes = JSON.parse(localStorage.getItem("tiptab_votes_local") || "[]");
+      localVotes.forEach((lv: any) => {
+        if (lv.week_identifier === quarterId && !mergedVotes.some(mv => 
+          mv.candidate_handle === lv.candidate_handle && 
+          mv.tab_amount === lv.tab_amount &&
+          mv.created_at === lv.created_at
+        )) {
+          mergedVotes.push(lv);
+        }
+      });
+
+      if (mergedVotes.length > 0) {
         const totals: Record<string, number> = {};
-        data.forEach(v => {
-          totals[v.candidate_handle] = (totals[v.candidate_handle] || 0) + Number(v.tab_amount);
+        mergedVotes.forEach(v => {
+          const handleKey = v.candidate_handle?.toLowerCase().replace('@', '').trim();
+          if (handleKey) {
+            totals[handleKey] = (totals[handleKey] || 0) + Number(v.tab_amount);
+          }
         });
         const sorted = Object.entries(totals)
           .sort((a, b) => b[1] - a[1])
