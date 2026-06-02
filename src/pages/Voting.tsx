@@ -366,7 +366,7 @@ const Voting = () => {
                    <Heart className="h-4 w-4 text-red-500" /> REWARDS POOL
                  </h4>
                  <p className="text-sm text-white/50 font-bold leading-relaxed">
-                   100% of TAB spent on voting is added to the quarterly Reward Pool and distributed back to the top Creators and Supporters.
+                   TAB spent on voting is added to the quarterly Reward Pool and distributed back to the top Creators and Supporters.
                  </p>
               </div>
             </div>
