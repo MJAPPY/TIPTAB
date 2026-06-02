@@ -19,13 +19,21 @@ interface WorldMapProps {
 }
 
 export const WorldMap = ({ creators, onSelectCreator }: WorldMapProps) => {
-  // Filter out any creators with invalid coordinates OR whose location is set to "Global" or empty
-  const mapVisibleCreators = creators.filter(c => 
+  // Convert any string coordinate slices to actual numbers and filter out any invalid coords
+  const mapVisibleCreators = creators.map(c => {
+    let coords: [number, number] = [0, 0];
+    if (c.coordinates && Array.isArray(c.coordinates)) {
+      coords = [
+        typeof c.coordinates[0] === 'string' ? parseFloat(c.coordinates[0]) : Number(c.coordinates[0] || 0),
+        typeof c.coordinates[1] === 'string' ? parseFloat(c.coordinates[1]) : Number(c.coordinates[1] || 0)
+      ];
+    }
+    return { ...c, coordinates: coords };
+  }).filter(c => 
     c.coordinates && 
-    Array.isArray(c.coordinates) && 
     c.coordinates.length === 2 &&
-    typeof c.coordinates[0] === 'number' &&
-    typeof c.coordinates[1] === 'number' &&
+    !isNaN(c.coordinates[0]) &&
+    !isNaN(c.coordinates[1]) &&
     (c.coordinates[0] !== 0 || c.coordinates[1] !== 0) && // Ensure coordinates are not the default [0,0]
     c.location &&
     c.location.trim() !== "" &&

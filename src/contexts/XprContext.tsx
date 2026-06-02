@@ -172,6 +172,22 @@ export const XprProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     }
   }, []);
 
+  // One-time Database cleanup to force crownxpr's is_member field to false
+  useEffect(() => {
+    const purgeSpecificAccount = async () => {
+      try {
+        await supabase
+          .from('profiles')
+          .update({ is_member: false })
+          .eq('handle', 'crownxpr');
+        fetchDbCreators();
+      } catch (e) {
+        console.error("Manual purge error:", e);
+      }
+    };
+    purgeSpecificAccount();
+  }, [fetchDbCreators]);
+
   // Supabase Keep-Alive to prevent auto-pause (Free Tier)
   useEffect(() => {
     const keepAlive = async () => {
