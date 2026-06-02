@@ -195,16 +195,16 @@ const Leaderboard = () => {
         ) : currentData.length > 0 ? (
           <>
             {/* Podium Section */}
-            <div className="flex flex-col md:flex-row items-center md:items-end justify-center gap-8 md:gap-6 mb-24 lg:mb-32">
+            <div className="flex flex-col md:flex-row items-center md:items-end justify-center gap-8 md:gap-6 mb-24 lg:mb-32 pt-6">
               
               {/* 2nd Place */}
               {topThree[1] && (
                 <div className="w-full max-w-sm md:w-80 order-2 md:order-1 animate-in zoom-in-95 duration-1000">
-                  <div className="bg-[#100a21]/80 border-4 border-slate-300/40 rounded-[48px] p-8 text-center relative group hover:border-slate-300 transition-all shadow-[0_0_40px_rgba(148,163,184,0.15)] overflow-hidden">
+                  <div className="bg-[#100a21]/80 border-4 border-slate-300/40 rounded-[48px] p-8 text-center relative group hover:border-slate-300 transition-all shadow-[0_0_40px_rgba(148,163,184,0.15)]">
                     <div className="absolute top-2 right-2 p-4">
                       <Medal className="h-6 w-6 text-slate-300" />
                     </div>
-                    <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-slate-300 text-black font-black px-5 py-1 rounded-full text-xs uppercase tracking-widest">Runner Up</div>
+                    <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-slate-300 text-black font-black px-5 py-1 rounded-full text-xs uppercase tracking-widest shadow-lg">Runner Up</div>
                     <div className={cn("h-28 w-28 rounded-[28px] mx-auto mb-6 border-4 border-slate-300 flex items-center justify-center text-3xl font-black overflow-hidden relative shadow-lg", topThree[1].color)}>
                       {topThree[1].avatarImage ? (
                         <img src={topThree[1].avatarImage} alt="Avatar" className="w-full h-full object-cover" />
@@ -224,7 +224,7 @@ const Leaderboard = () => {
               {/* 1st Place */}
               {topThree[0] && (
                 <div className="w-full max-w-sm md:w-80 order-1 md:order-2 animate-in zoom-in-95 duration-1000 scale-105 md:scale-110">
-                  <div className="bg-[#1a0f2e]/80 border-4 border-yellow-400/60 rounded-[48px] p-8 md:p-10 text-center relative group hover:border-yellow-400 transition-all shadow-[0_0_60px_rgba(250,204,21,0.2)] md:-translate-y-8 overflow-hidden">
+                  <div className="bg-[#1a0f2e]/80 border-4 border-yellow-400/60 rounded-[48px] p-8 md:p-10 text-center relative group hover:border-yellow-400 transition-all shadow-[0_0_60px_rgba(250,204,21,0.2)] md:-translate-y-8">
                     <div className="absolute top-2 right-2 p-2 md:p-4">
                       <Crown className="h-6 w-6 md:h-8 md:w-8 text-yellow-400 animate-bounce" />
                     </div>
@@ -249,11 +249,11 @@ const Leaderboard = () => {
               {/* 3rd Place */}
               {topThree[2] && (
                 <div className="w-full max-w-sm md:w-80 order-3 animate-in zoom-in-95 duration-1000">
-                  <div className="bg-[#100a21]/80 border-4 border-orange-500/30 rounded-[48px] p-8 text-center relative group hover:border-orange-500 transition-all shadow-[0_0_40px_rgba(249,115,22,0.15)] overflow-hidden">
+                  <div className="bg-[#100a21]/80 border-4 border-orange-500/30 rounded-[48px] p-8 text-center relative group hover:border-orange-500 transition-all shadow-[0_0_40px_rgba(249,115,22,0.15)]">
                     <div className="absolute top-2 right-2 p-4">
                       <Medal className="h-6 w-6 text-orange-500" />
                     </div>
-                    <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-orange-500 text-white font-black px-5 py-1 rounded-full text-xs uppercase tracking-widest">3rd Place</div>
+                    <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-orange-500 text-white font-black px-5 py-1 rounded-full text-xs uppercase tracking-widest shadow-lg">3rd Place</div>
                     <div className={cn("h-28 w-28 rounded-[28px] mx-auto mb-6 border-4 border-orange-500 flex items-center justify-center text-3xl font-black overflow-hidden relative shadow-lg", topThree[2].color)}>
                       {topThree[2].avatarImage ? (
                         <img src={topThree[2].avatarImage} alt="Avatar" className="w-full h-full object-cover" />
