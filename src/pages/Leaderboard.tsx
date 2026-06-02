@@ -59,63 +59,67 @@ const Leaderboard = () => {
         .from("votes")
         .select("voter_handle, candidate_handle, tab_amount");
 
-      if (votes && !votesError) {
-        const creatorsGroup: Record<string, { totalValue: number; activityCount: number }> = {};
-        const supportersGroup: Record<string, { totalValue: number; activityCount: number }> = {};
+      const compiledVotes = votes || [];
 
-        votes.forEach(v => {
-          const candidate = v.candidate_handle?.toLowerCase().trim();
-          const voter = v.voter_handle?.toLowerCase().trim();
-          const amount = Number(v.tab_amount || 0);
+      // Merge with Local Storage backup for real-time responsiveness
+      const localVotes = JSON.parse(localStorage.getItem('tiptab_local_votes') || '[]');
+      const combinedVotes = [...compiledVotes, ...localVotes];
 
-          if (candidate) {
-            if (!creatorsGroup[candidate]) creatorsGroup[candidate] = { totalValue: 0, activityCount: 0 };
-            creatorsGroup[candidate].totalValue += amount;
-            creatorsGroup[candidate].activityCount += 1;
-          }
+      const creatorsGroup: Record<string, { totalValue: number; activityCount: number }> = {};
+      const supportersGroup: Record<string, { totalValue: number; activityCount: number }> = {};
 
-          if (voter) {
-            if (!supportersGroup[voter]) supportersGroup[voter] = { totalValue: 0, activityCount: 0 };
-            supportersGroup[voter].totalValue += amount;
-            supportersGroup[voter].activityCount += 1;
-          }
-        });
+      combinedVotes.forEach((v: any) => {
+        const candidate = v.candidate_handle?.toLowerCase().trim();
+        const voter = v.voter_handle?.toLowerCase().trim();
+        const amount = Number(v.tab_amount || 0);
 
-        // Map creators
-        const mappedCreators: LeaderboardEntry[] = Object.entries(creatorsGroup).map(([handle, stats]) => {
-          const profile = profileMap.get(handle);
-          return {
-            id: `creator-${handle}`,
-            name: profile?.name || handle,
-            handle: handle,
-            location: profile?.location || "Global Network",
-            color: profile?.color || "bg-purple-600",
-            avatar: profile?.avatar || handle.slice(0, 2).toUpperCase(),
-            avatarImage: profile?.avatar_image || "",
-            totalValue: stats.totalValue,
-            activityCount: stats.activityCount
-          };
-        }).sort((a, b) => b.totalValue - a.totalValue);
+        if (candidate) {
+          if (!creatorsGroup[candidate]) creatorsGroup[candidate] = { totalValue: 0, activityCount: 0 };
+          creatorsGroup[candidate].totalValue += amount;
+          creatorsGroup[candidate].activityCount += 1;
+        }
 
-        // Map supporters
-        const mappedSupporters: LeaderboardEntry[] = Object.entries(supportersGroup).map(([handle, stats]) => {
-          const profile = profileMap.get(handle);
-          return {
-            id: `supporter-${handle}`,
-            name: profile?.name || handle,
-            handle: handle,
-            location: profile?.location || "Supporter Hub",
-            color: profile?.color || "bg-cyan-600",
-            avatar: profile?.avatar || handle.slice(0, 2).toUpperCase(),
-            avatarImage: profile?.avatar_image || "",
-            totalValue: stats.totalValue,
-            activityCount: stats.activityCount
-          };
-        }).sort((a, b) => b.totalValue - a.totalValue);
+        if (voter) {
+          if (!supportersGroup[voter]) supportersGroup[voter] = { totalValue: 0, activityCount: 0 };
+          supportersGroup[voter].totalValue += amount;
+          supportersGroup[voter].activityCount += 1;
+        }
+      });
 
-        setCreatorsList(mappedCreators);
-        setSupportersList(mappedSupporters);
-      }
+      // Map creators
+      const mappedCreators: LeaderboardEntry[] = Object.entries(creatorsGroup).map(([handle, stats]) => {
+        const profile = profileMap.get(handle);
+        return {
+          id: `creator-${handle}`,
+          name: profile?.name || handle,
+          handle: handle,
+          location: profile?.location || "Global Network",
+          color: profile?.color || "bg-purple-600",
+          avatar: profile?.avatar || handle.slice(0, 2).toUpperCase(),
+          avatarImage: profile?.avatar_image || "",
+          totalValue: stats.totalValue,
+          activityCount: stats.activityCount
+        };
+      }).sort((a, b) => b.totalValue - a.totalValue);
+
+      // Map supporters
+      const mappedSupporters: LeaderboardEntry[] = Object.entries(supportersGroup).map(([handle, stats]) => {
+        const profile = profileMap.get(handle);
+        return {
+          id: `supporter-${handle}`,
+          name: profile?.name || handle,
+          handle: handle,
+          location: profile?.location || "Supporter Hub",
+          color: profile?.color || "bg-cyan-600",
+          avatar: profile?.avatar || handle.slice(0, 2).toUpperCase(),
+          avatarImage: profile?.avatar_image || "",
+          totalValue: stats.totalValue,
+          activityCount: stats.activityCount
+        };
+      }).sort((a, b) => b.totalValue - a.totalValue);
+
+      setCreatorsList(mappedCreators);
+      setSupportersList(mappedSupporters);
     } catch (e) {
       console.error("Failed to load live leaderboard stats:", e);
     } finally {
@@ -143,7 +147,7 @@ const Leaderboard = () => {
       <div className="absolute top-0 left-1/4 w-[300px] md:w-[500px] h-[300px] md:h-[500px] bg-magenta-500/20 blur-[120px] md:blur-[180px] rounded-full -z-10 animate-pulse" />
       <div className="absolute bottom-0 right-1/4 w-[400px] md:w-[600px] h-[400px] md:h-[600px] bg-cyan-500/10 blur-[150px] md:blur-[200px] rounded-full -z-10" />
       
-      <main className="container mx-auto px-4 md:px-6 pt-48 pb-24 relative z-10">
+      <main className="container mx-auto px-4 md:px-6 py-8 pt-48 pb-24 relative z-10">
         <div className="flex flex-col items-center text-center mb-12 md:mb-16">
           <div className="w-full flex justify-start mb-8 lg:hidden">
              <Button variant="ghost" onClick={handleBack} className="text-white/40 hover:text-purple-400 gap-2 p-0 h-auto">

@@ -278,6 +278,34 @@ const CreatorProfile = () => {
         recordTip(Math.floor(amountNum));
       }
 
+      // Record successful tip/vote to DB and Local Storage to ensure real-time standings update
+      try {
+        const quarterId = `Q${new Date().getFullYear()}-${Math.floor(new Date().getMonth() / 3) + 1}`;
+        const cleanRecipient = creator.handle.toLowerCase().replace('@', '').trim();
+        const cleanVoter = actor.toLowerCase().replace('@', '').trim();
+        
+        const newVote = {
+          voter_handle: cleanVoter,
+          candidate_handle: cleanRecipient,
+          tab_amount: Math.floor(amountNum),
+          week_identifier: quarterId,
+          created_at: new Date().toISOString()
+        };
+
+        const localVotes = JSON.parse(localStorage.getItem('tiptab_local_votes') || '[]');
+        localVotes.push(newVote);
+        localStorage.setItem('tiptab_local_votes', JSON.stringify(localVotes));
+
+        await supabase.from('votes').insert({
+          voter_handle: cleanVoter,
+          candidate_handle: cleanRecipient,
+          tab_amount: Math.floor(amountNum),
+          week_identifier: quarterId
+        });
+      } catch (dbErr) {
+        console.error("Database sync tip record omitted:", dbErr);
+      }
+
       toast({
         title: "Tip Sent!",
         description: `Successfully sent ${quantityString} to ${creator?.name}.`,

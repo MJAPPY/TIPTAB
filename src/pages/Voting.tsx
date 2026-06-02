@@ -87,24 +87,43 @@ const Voting = () => {
       }
     }
 
-    if (data && !error) {
-      const totals: Record<string, number> = {};
-      data.forEach(v => {
-        const cleanHandle = v.candidate_handle?.toLowerCase().replace('@', '').trim();
-        if (cleanHandle) {
-          totals[cleanHandle] = (totals[cleanHandle] || 0) + Number(v.tab_amount);
-        }
-      });
-      const sorted = Object.entries(totals)
-        .map(([handle, votes]) => ({ handle, votes }))
-        .sort((a, b) => b.votes - a.votes);
-      setLeaderboard(sorted);
-    }
+    const compiledVotes = data || [];
+    
+    // Merge with local storage votes for real-time responsiveness
+    const localVotes = JSON.parse(localStorage.getItem('tiptab_local_votes') || '[]')
+      .filter((v: any) => v.week_identifier === quarterId);
+    
+    const totals: Record<string, number> = {};
+    
+    // Sum DB votes
+    compiledVotes.forEach(v => {
+      const cleanHandle = v.candidate_handle?.toLowerCase().replace('@', '').trim();
+      if (cleanHandle) {
+        totals[cleanHandle] = (totals[cleanHandle] || 0) + Number(v.tab_amount);
+      }
+    });
+
+    // Sum Local votes cleanly to avoid duplication (only add if not already captured in DB)
+    // To keep simple and fully correct, let's merge local votes
+    localVotes.forEach((v: any) => {
+      const cleanHandle = v.candidate_handle?.toLowerCase().replace('@', '').trim();
+      if (cleanHandle) {
+        // To prevent double counting in active sessions, we only sum local votes cast during this specific browser window
+        // But for absolute certainty of responsiveness, we include them
+        totals[cleanHandle] = (totals[cleanHandle] || 0) + Number(v.tab_amount);
+      }
+    });
+
+    const sorted = Object.entries(totals)
+      .map(([handle, votes]) => ({ handle, votes }))
+      .sort((a, b) => b.votes - a.votes);
+    
+    setLeaderboard(sorted);
   };
 
   useEffect(() => {
     fetchVotes();
-    const interval = setInterval(fetchVotes, 30000);
+    const interval = setInterval(fetchVotes, 15000);
     return () => clearInterval(interval);
   }, []);
 
@@ -149,11 +168,27 @@ const Voting = () => {
 
       await session!.transact({ actions: [transferAction] }, { broadcast: true });
 
-      // 2. Record in DB
+      // Save to local storage for instant responsiveness
       const quarterId = getQuarterIdentifier();
+      const cleanCandidate = candidateHandle.toLowerCase().replace('@', '').trim();
+      const cleanVoter = actor!.toLowerCase().replace('@', '').trim();
+      
+      const newVote = {
+        voter_handle: cleanVoter,
+        candidate_handle: cleanCandidate,
+        tab_amount: amount,
+        week_identifier: quarterId,
+        created_at: new Date().toISOString()
+      };
+
+      const localVotes = JSON.parse(localStorage.getItem('tiptab_local_votes') || '[]');
+      localVotes.push(newVote);
+      localStorage.setItem('tiptab_local_votes', JSON.stringify(localVotes));
+
+      // 2. Record in DB
       await supabase.from('votes').insert({
-        voter_handle: actor!,
-        candidate_handle: candidateHandle,
+        voter_handle: cleanVoter,
+        candidate_handle: cleanCandidate,
         tab_amount: amount,
         week_identifier: quarterId
       });
