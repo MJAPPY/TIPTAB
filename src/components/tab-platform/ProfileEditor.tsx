@@ -328,7 +328,8 @@ export const ProfileEditor = ({ initialData, onSave, minimal = false }: ProfileE
       // Set is_member to false and clear profile metadata to completely remove them from the platform index
       const { error } = await supabase
         .from('profiles')
-        .update({ 
+        .upsert({ 
+          handle: actor,
           is_member: false,
           name: null,
           bio: null,
@@ -350,8 +351,7 @@ export const ProfileEditor = ({ initialData, onSave, minimal = false }: ProfileE
           tiktok: null,
           youtube_live: null,
           instagram_live: null
-        })
-        .ilike('handle', actor);
+        });
       
       if (error) throw error;
 
