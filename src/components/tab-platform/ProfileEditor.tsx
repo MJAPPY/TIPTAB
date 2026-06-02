@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
-import { User, AtSign, MapPin, Globe, Twitter, Save, Image as ImageIcon, Upload, X, Video, Instagram, CheckCircle2, Music, Radio, Youtube, Twitch, ShieldCheck, Move, Facebook, MessageSquare, Trash2, AlertTriangle, CalendarDays, Hourglass, Lock, Sparkles } from "lucide-react";
+import { User, AtSign, MapPin, Globe, Twitter, Save, Image as ImageIcon, Upload, X, Video, Instagram, CheckCircle2, Music, Radio, Youtube, Twitch, ShieldCheck, Move, Facebook, MessageSquare, Trash2, AlertTriangle, CalendarDays, Hourglass, Lock, Sparkles, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -95,8 +95,15 @@ export const ProfileEditor = ({ initialData, onSave, minimal = false }: ProfileE
   const [isDraggingCover, setIsDraggingCover] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [isMembershipOpen, setIsMembershipOpen] = useState(false);
+  
+  // Real-time Autocomplete States
+  const [suggestions, setSuggestions] = useState<any[]>([]);
+  const [showSuggestions, setShowSuggestions] = useState(false);
+  const [isSearchingLocation, setIsSearchingLocation] = useState(false);
+  
   const fileInputRef = useRef<HTMLInputElement>(null);
   const coverInputRef = useRef<HTMLInputElement>(null);
+  const suggestionsRef = useRef<HTMLDivElement>(null);
   
   const [formData, setFormData] = useState({
     name: initialData.name,
@@ -157,8 +164,73 @@ export const ProfileEditor = ({ initialData, onSave, minimal = false }: ProfileE
 
   useEffect(() => {
     const typedLocation = formData.location.split(',')[0].trim().toLowerCase();
-    setIsCityRecognized(!!CITY_COORDINATES[typedLocation]);
-  }, [formData.location]);
+    setIsCityRecognized(!!CITY_COORDINATES[typedLocation] || (formData.coordinates && (formData.coordinates[0] !== 0 || formData.coordinates[1] !== 0)));
+  }, [formData.location, formData.coordinates]);
+
+  // Handle outside clicks to close the suggestion dropdown safely
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (suggestionsRef.current && !suggestionsRef.current.contains(event.target as Node)) {
+        setShowSuggestions(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  const handleLocationChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    setFormData(prev => ({ ...prev, location: value }));
+    setHasChanged(true);
+
+    if (value.trim().length < 3) {
+      setSuggestions([]);
+      setShowSuggestions(false);
+      return;
+    }
+
+    setIsSearchingLocation(true);
+    try {
+      const response = await fetch(
+        `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(value)}&format=json&limit=5&addressdetails=1`,
+        { headers: { 'User-Agent': 'TipTab-Map-App' } }
+      );
+      const data = await response.json();
+      setSuggestions(data || []);
+      setShowSuggestions(true);
+    } catch (err) {
+      console.error("Failed to fetch autocomplete suggestions:", err);
+    } finally {
+      setIsSearchingLocation(false);
+    }
+  };
+
+  const handleSelectSuggestion = (sug: any) => {
+    // Format descriptive clean name (e.g. City, Country)
+    const address = sug.address;
+    const city = address.city || address.town || address.village || address.suburb || address.state || "";
+    const country = address.country || "";
+    const cleanLabel = city && country ? `${city}, ${country}` : sug.display_name.split(',').slice(0, 2).join(',').trim();
+    
+    const lon = parseFloat(sug.lon);
+    const lat = parseFloat(sug.lat);
+
+    setFormData(prev => ({
+      ...prev,
+      location: cleanLabel,
+      coordinates: [lon, lat]
+    }));
+    
+    setSuggestions([]);
+    setShowSuggestions(false);
+    setHasChanged(true);
+    setIsCityRecognized(true);
+
+    toast({
+      title: "Location Calibrated",
+      description: `Target set to ${cleanLabel} [${lon.toFixed(4)}, ${lat.toFixed(4)}]`
+    });
+  };
 
   const handleSave = async () => {
     setIsSaving(true);
@@ -166,14 +238,14 @@ export const ProfileEditor = ({ initialData, onSave, minimal = false }: ProfileE
       let finalCoordinates = formData.coordinates;
       const typedLocation = formData.location.trim();
       
-      if (typedLocation) {
+      if (typedLocation && (formData.coordinates[0] === 0 && formData.coordinates[1] === 0)) {
         const typedLower = typedLocation.split(',')[0].trim().toLowerCase();
         
-        // Step 1: Use hardcoded fast local dictionary
+        // Step 1: Check fast local dictionary
         if (CITY_COORDINATES[typedLower]) {
           finalCoordinates = CITY_COORDINATES[typedLower];
         } else {
-          // Step 2: Dynamic Geocoding fallback via free OpenStreetMap Nominatim API
+          // Step 2: OSM dynamic fallback
           try {
             const response = await fetch(
               `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(typedLocation)}&format=json&limit=1`,
@@ -678,12 +750,13 @@ export const ProfileEditor = ({ initialData, onSave, minimal = false }: ProfileE
                 </div>
               </div>
 
-              <div className="space-y-2">
+              {/* Autocomplete Location Search */}
+              <div className="space-y-2 relative" ref={suggestionsRef}>
                 <div className="flex items-center justify-between">
-                  <Label htmlFor="location" className="text-white/60 font-bold uppercase tracking-widest text-[10px]">Location (Typed City Pin)</Label>
+                  <Label htmlFor="location" className="text-white/60 font-bold uppercase tracking-widest text-[10px]">Location (Search and autoselect)</Label>
                   {isCityRecognized && (
-                    <div className="flex items-center gap-1.5 text-[9px] font-black text-green-400 uppercase tracking-widest animate-in fade-in slide-in-from-right-2">
-                      <CheckCircle2 className="h-3 w-3" /> Recognized
+                    <div className="flex items-center gap-1.5 text-[9px] font-black text-green-400 uppercase tracking-widest animate-in fade-in">
+                      <CheckCircle2 className="h-3 w-3" /> Position Calibrated
                     </div>
                   )}
                 </div>
@@ -692,14 +765,44 @@ export const ProfileEditor = ({ initialData, onSave, minimal = false }: ProfileE
                   <Input 
                     id="location"
                     value={formData.location}
-                    onChange={handleChange}
-                    placeholder="e.g. London or Tokyo"
+                    onChange={handleLocationChange}
+                    onFocus={() => formData.location.trim().length >= 3 && setShowSuggestions(true)}
+                    placeholder="Search any town, city, or address..."
                     className={cn(
-                      "pl-12 bg-white/5 border-white/10 h-14 rounded-2xl focus:ring-purple-500 focus:bg-white/10 transition-all text-white",
+                      "pl-12 pr-10 bg-white/5 border-white/10 h-14 rounded-2xl focus:ring-purple-500 focus:bg-white/10 transition-all text-white",
                       isCityRecognized && "border-green-500/30"
                     )} 
                   />
+                  {isSearchingLocation && (
+                    <Loader2 className="absolute right-4 top-1/2 -translate-y-1/2 h-4 w-4 text-purple-400 animate-spin" />
+                  )}
                 </div>
+
+                {/* Floating Autocomplete Suggestions list */}
+                {showSuggestions && suggestions.length > 0 && (
+                  <div className="absolute top-[84px] left-0 right-0 z-50 bg-[#1a102d] border border-white/10 rounded-2xl shadow-2xl p-2 max-h-60 overflow-y-auto no-scrollbar animate-in fade-in duration-200">
+                    {suggestions.map((sug, i) => {
+                      const addr = sug.address;
+                      const city = addr.city || addr.town || addr.village || addr.suburb || addr.state || "";
+                      const country = addr.country || "";
+                      const formattedTitle = city && country ? `${city}, ${country}` : sug.display_name.split(',').slice(0, 3).join(',').trim();
+
+                      return (
+                        <div
+                          key={i}
+                          onClick={() => handleSelectSuggestion(sug)}
+                          className="flex items-center gap-3 px-4 py-3 hover:bg-purple-600/20 hover:text-purple-400 rounded-xl cursor-pointer text-sm font-semibold text-white/80 transition-colors"
+                        >
+                          <Globe className="h-4 w-4 text-purple-400 shrink-0" />
+                          <div className="truncate">
+                            <p className="font-bold text-white text-xs truncate">{formattedTitle}</p>
+                            <p className="text-[10px] text-white/30 font-medium truncate">{sug.display_name}</p>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
               </div>
 
               {!minimal && (
