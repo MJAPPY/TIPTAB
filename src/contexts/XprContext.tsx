@@ -26,7 +26,7 @@ interface XprContextType {
   login: () => Promise<LinkSession | null>;
   logout: () => Promise<void>;
   refreshBalances: () => Promise<void>;
-  recordTip: (amount: number, recipient?: string) => void;
+  recordTip: (amount: number) => void;
   isConnected: boolean;
   isLoading: boolean;
   isAdmin: boolean;
@@ -239,7 +239,7 @@ export const XprProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     } catch (e) { return false; }
   };
 
-  const recordTip = useCallback((amount: number, recipient?: string) => {
+  const recordTip = useCallback((amount: number) => {
     if (!session?.auth.actor) return;
     const actorName = session.auth.actor.toString();
     const key = `tiptab_tips_sent_${actorName}`;
@@ -247,33 +247,6 @@ export const XprProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     const updated = current + amount;
     localStorage.setItem(key, updated.toString());
     setBalances(prev => ({ ...prev, tipsSent: updated }));
-
-    if (recipient) {
-      const cleanRecipient = recipient.replace('@', '').toLowerCase().trim();
-      const quarterId = `Q${new Date().getFullYear()}-${Math.floor(new Date().getMonth() / 3) + 1}`;
-      const currentTimestamp = new Date().toISOString();
-      
-      // Attempt database record entry safely
-      try {
-        supabase.from('votes').insert({
-          voter_handle: actorName,
-          candidate_handle: cleanRecipient,
-          tab_amount: amount,
-          week_identifier: quarterId
-        }).then();
-      } catch (e) {}
-
-      // Write to client local storage ledger
-      const localVotes = JSON.parse(localStorage.getItem("tiptab_votes_local") || "[]");
-      localVotes.push({
-        voter_handle: actorName,
-        candidate_handle: cleanRecipient,
-        tab_amount: amount,
-        week_identifier: quarterId,
-        created_at: currentTimestamp
-      });
-      localStorage.setItem("tiptab_votes_local", JSON.stringify(localVotes));
-    }
   }, [session]);
 
   const fetchBalances = useCallback(async (account: string) => {
