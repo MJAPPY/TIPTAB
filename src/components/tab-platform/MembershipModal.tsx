@@ -55,19 +55,26 @@ export const MembershipModal = ({ isOpen, onOpenChange }: MembershipModalProps) 
 
   useEffect(() => {
     if (isOpen) {
-      if (isConnected) setStep("payment");
-      else setStep("intro");
+      if (isConnected) {
+        setStep("payment");
+      } else {
+        const triggerLogin = async () => {
+          try {
+            const session = await login();
+            if (session) {
+              setStep("payment");
+            } else {
+              onOpenChange(false);
+            }
+          } catch (err) {
+            console.error(err);
+            onOpenChange(false);
+          }
+        };
+        triggerLogin();
+      }
     }
   }, [isOpen, isConnected]); 
-
-  const handleNextStep = async () => {
-    if (!isConnected) {
-      try {
-        const newSession = await login();
-        if (newSession) setStep("payment");
-      } catch (err) { console.error(err); }
-    } else { setStep("payment"); }
-  };
 
   const handleApplyPromo = () => {
     if (!promoInput.trim()) return;
@@ -229,7 +236,7 @@ export const MembershipModal = ({ isOpen, onOpenChange }: MembershipModalProps) 
                       {isMember ? "SELECT LEVEL" : "CHOOSE YOUR SLOTS"}
                     </DialogTitle>
                     <DialogDescription className="text-white/80 text-center text-sm md:text-base font-medium">
-                      Select between our Free Basic level or verify with premium features.
+                      Select between our Free Basic level or upgrade to premium features.
                     </DialogDescription>
                   </DialogHeader>
                 </div>
@@ -250,27 +257,21 @@ export const MembershipModal = ({ isOpen, onOpenChange }: MembershipModalProps) 
                     <div>
                       <div className="flex items-center justify-between mb-2">
                         <span className="text-[10px] font-black uppercase tracking-widest text-orange-400">Pro Level</span>
-                        <span className="text-[10px] font-black uppercase tracking-widest text-orange-400 bg-orange-500/10 px-2 py-0.5 rounded">Paid Verification</span>
+                        <span className="text-[10px] font-black uppercase tracking-widest text-orange-400 bg-orange-500/10 px-2 py-0.5 rounded">Premium Tier</span>
                       </div>
                       <h4 className="font-black text-white text-lg tracking-tight flex items-center gap-2">
-                        Premium Verified Pass <ShieldCheck className="h-4 w-4 text-orange-500" />
+                        Premium Pro Pass <Sparkles className="h-4 w-4 text-orange-500" />
                       </h4>
-                      <p className="text-xs text-white/80 font-bold mt-1">Unlocks custom cover banners, live stream video broadcasts (Twitch, YouTube Live, Kick), multi-category listings, Snipverse verification, and 30% TAB discount on promotions.</p>
+                      <p className="text-xs text-white/80 font-bold mt-1">Unlocks custom cover banners, live stream video broadcasts (Twitch, YouTube Live, Kick), multi-category listings, Snipverse integration, and 30% TAB discount on promotions.</p>
                     </div>
                   </div>
                 </div>
-
-                <button onClick={handleNextStep} className="w-full h-16 md:h-20 bg-white text-black hover:bg-purple-600 hover:text-white font-black text-lg md:text-2xl rounded-[28px] md:rounded-[32px] shadow-2xl transition-all flex items-center justify-center gap-3">
-                  <span>{isConnected ? "Continue to Selection" : "Connect WebAuth"}</span>
-                  <ArrowRight className="h-5 w-5 md:h-6 md:w-6" />
-                </button>
               </div>
             )}
 
             {step === "payment" && isConnected && (
               <div className="space-y-6 md:space-y-8 animate-in fade-in slide-in-from-right-4 duration-500">
                 <div className="space-y-2">
-                  <Button variant="ghost" onClick={() => setStep("intro")} className="text-white/60 hover:text-purple-400 -ml-4 font-black tracking-widest uppercase text-[10px]">← Back</Button>
                   <DialogHeader>
                     <DialogTitle className="text-3xl md:text-4xl font-black italic tracking-tighter uppercase leading-tight">Select Membership Tier</DialogTitle>
                   </DialogHeader>
@@ -294,7 +295,7 @@ export const MembershipModal = ({ isOpen, onOpenChange }: MembershipModalProps) 
                       selectedTier === "pro" ? "bg-orange-500 text-white shadow-lg shadow-orange-500/20" : "text-white/50 hover:text-white"
                     )}
                   >
-                    Pro (Paid) <ShieldCheck className="h-3.5 w-3.5" />
+                    Pro (Paid) <Sparkles className="h-3.5 w-3.5" />
                   </button>
                 </div>
 
