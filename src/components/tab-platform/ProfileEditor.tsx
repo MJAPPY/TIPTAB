@@ -325,9 +325,32 @@ export const ProfileEditor = ({ initialData, onSave, minimal = false }: ProfileE
   const handleDeleteAccount = async () => {
     if (!actor) return;
     try {
+      // Set is_member to false and clear profile metadata to completely remove them from the platform index
       const { error } = await supabase
         .from('profiles')
-        .delete()
+        .update({ 
+          is_member: false,
+          name: null,
+          bio: null,
+          location: null,
+          coordinates: null,
+          categories: null,
+          avatar_image: null,
+          cover_image: null,
+          twitter: null,
+          website: null,
+          video_url: null,
+          instagram: null,
+          spotify: null,
+          snipverse: null,
+          facebook: null,
+          kick: null,
+          rumble: null,
+          twitch: null,
+          tiktok: null,
+          youtube_live: null,
+          instagram_live: null
+        })
         .eq('handle', actor);
       
       if (error) throw error;
