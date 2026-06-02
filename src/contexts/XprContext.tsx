@@ -364,7 +364,7 @@ export const XprProvider: React.FC<{ children: React.ReactNode }> = ({ children 
             youtube_live: parsed.youtubeLive,
             instagram_live: parsed.instagramLive,
             is_member: currentlyMember
-          });
+          }, { onConflict: 'handle' });
         } else {
           const newProfile: Creator = {
             id: `user_${account}`,
@@ -391,7 +391,7 @@ export const XprProvider: React.FC<{ children: React.ReactNode }> = ({ children 
             avatar: account.slice(0, 2).toUpperCase(),
             color: "bg-purple-600",
             is_member: currentlyMember
-          });
+          }, { onConflict: 'handle' });
         }
       }
     } catch (error) { console.error('Balance sync error:', error); }
@@ -499,7 +499,7 @@ export const XprProvider: React.FC<{ children: React.ReactNode }> = ({ children 
           youtube_live: profile.youtubeLive || "",
           instagram_live: profile.instagramLive || "",
           is_member: activeMember
-        });
+        }, { onConflict: 'handle' });
         // Re-fetch creator list to immediately update live preview
         fetchDbCreators();
       } catch (err) {

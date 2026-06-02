@@ -351,7 +351,7 @@ export const ProfileEditor = ({ initialData, onSave, minimal = false }: ProfileE
           tiktok: null,
           youtube_live: null,
           instagram_live: null
-        });
+        }, { onConflict: 'handle' });
       
       if (error) throw error;
 
