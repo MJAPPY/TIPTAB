@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, useMemo } from "react";
+import React, { useState, useEffect, useMemo, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { 
   User as UserIcon, 
@@ -97,56 +97,55 @@ const Dashboard = () => {
     checkMode();
   }, [isMember, activeTab]);
 
-  useEffect(() => {
+  const fetchDashboardAnalytics = useCallback(async () => {
     if (!actor) return;
+    try {
+      // Query the live Supabase votes/tips table for real-time totals
+      const { data: voteData, error } = await supabase
+        .from('votes')
+        .select('tab_amount, voter_handle, created_at')
+        .eq('candidate_handle', actor.toLowerCase().trim());
 
-    const fetchDashboardAnalytics = async () => {
-      try {
-        // Query the live Supabase votes/tips table for real-time totals
-        const { data: voteData, error } = await supabase
-          .from('votes')
-          .select('tab_amount, voter_handle, created_at')
-          .eq('candidate_handle', actor.toLowerCase().trim());
-
-        if (voteData && !error) {
-          const totalTips = voteData.reduce((sum, v) => sum + Number(v.tab_amount || 0), 0);
-          setTipsReceived(totalTips);
-          
-          // Get saved custom parameters
-          const viewsKey = `tiptab_views_${actor}`;
-          let savedViews = localStorage.getItem(viewsKey);
-          if (!savedViews) {
-            const calculatedViews = Math.max(12, voteData.length * 4 + 8);
-            localStorage.setItem(viewsKey, calculatedViews.toString());
-            savedViews = calculatedViews.toString();
-          }
-          const viewsNum = parseInt(savedViews);
-          setProfileViews(viewsNum);
-
-          // Get unique voters as engagement signal
-          const uniqueVoters = new Set(voteData.map(v => v.voter_handle?.toLowerCase().trim())).size;
-          const rate = viewsNum > 0 ? ((uniqueVoters / viewsNum) * 100).toFixed(1) : "0.0";
-          setEngagementRate(parseFloat(rate));
+      if (voteData && !error) {
+        const totalTips = voteData.reduce((sum, v) => sum + Number(v.tab_amount || 0), 0);
+        setTipsReceived(totalTips);
+        
+        // Get saved custom parameters
+        const viewsKey = `tiptab_views_${actor}`;
+        let savedViews = localStorage.getItem(viewsKey);
+        if (!savedViews) {
+          const calculatedViews = Math.max(12, voteData.length * 4 + 8);
+          localStorage.setItem(viewsKey, calculatedViews.toString());
+          savedViews = calculatedViews.toString();
         }
+        const viewsNum = parseInt(savedViews);
+        setProfileViews(viewsNum);
 
-        // Keep local backups for other custom metrics
-        const localXpr = localStorage.getItem(`tiptab_xpr_received_${actor}`);
-        if (localXpr) {
-          setXprReceived(parseInt(localXpr));
-        } else {
-          setXprReceived(0);
-        }
-      } catch (err) {
-        console.error("Dashboard database fetch error:", err);
+        // Get unique voters as engagement signal
+        const uniqueVoters = new Set(voteData.map(v => v.voter_handle?.toLowerCase().trim())).size;
+        const rate = viewsNum > 0 ? ((uniqueVoters / viewsNum) * 100).toFixed(1) : "0.0";
+        setEngagementRate(parseFloat(rate));
       }
-    };
 
+      // Keep local backups for other custom metrics
+      const localXpr = localStorage.getItem(`tiptab_xpr_received_${actor}`);
+      if (localXpr) {
+        setXprReceived(parseInt(localXpr));
+      } else {
+        setXprReceived(0);
+      }
+    } catch (err) {
+      console.error("Dashboard database fetch error:", err);
+    }
+  }, [actor]);
+
+  useEffect(() => {
     fetchDashboardAnalytics();
 
     // Query interval to keep current dashboard statistics always up to date
     const interval = setInterval(fetchDashboardAnalytics, 15000);
     return () => clearInterval(interval);
-  }, [actor]);
+  }, [actor, fetchDashboardAnalytics]);
 
   const viewIsMember = useMemo(() => isMember && dashboardMode === "creator", [isMember, dashboardMode]);
 
@@ -171,6 +170,7 @@ const Dashboard = () => {
   const handleManualRefresh = async () => {
     setIsRefreshing(true);
     await refreshBalances();
+    await fetchDashboardAnalytics();
     if (actor) {
       setProfileViews(prev => {
         const next = prev + 1;
@@ -179,7 +179,7 @@ const Dashboard = () => {
       });
     }
     setTimeout(() => setIsRefreshing(false), 800);
-    toast({ title: "Balances Updated", description: "Synced with XPR Network." });
+    toast({ title: "Workspace Synced", description: "All balances and metrics updated with live chain telemetry." });
   };
 
   const handleTransfer = async () => {
@@ -348,6 +348,17 @@ const Dashboard = () => {
 
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
           <TabsContent value="analytics" className="space-y-10 mt-0 animate-in fade-in slide-in-from-bottom-4 duration-500">
+            <div className="flex justify-end">
+              <Button
+                onClick={handleManualRefresh}
+                disabled={isRefreshing}
+                className="h-10 px-4 rounded-xl bg-white/5 border border-white/10 hover:bg-white/10 text-[10px] font-black uppercase tracking-widest gap-2 text-slate-300"
+              >
+                <RefreshCw className={cn("h-3.5 w-3.5", isRefreshing && "animate-spin")} />
+                Sync Workspace
+              </Button>
+            </div>
+
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
               {/* TAB Balance */}
               <Card className="bg-[#130b21]/60 border-white/10 text-white rounded-[32px] sm:rounded-[40px] p-6 sm:p-10 shadow-2xl relative overflow-hidden group hover:border-orange-500/30 transition-all flex flex-col h-[280px]">
@@ -355,9 +366,6 @@ const Dashboard = () => {
                 <CardHeader className="p-0">
                   <div className="flex items-center justify-between">
                     <CardDescription className="text-slate-400 font-black uppercase tracking-[0.2em] text-[10px]">TAB Balance</CardDescription>
-                    <Button variant="ghost" size="icon" onClick={handleManualRefresh} className="h-8 w-8 rounded-xl bg-white/5 text-white/30 hover:text-purple-400 transition-all">
-                      <RefreshCw className={cn("h-4 w-4", isRefreshing && "animate-spin")} />
-                    </Button>
                   </div>
                 </CardHeader>
                 <CardContent className="p-0 mt-6 flex flex-col flex-1">

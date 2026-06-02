@@ -1156,6 +1156,18 @@ const AdminHub = () => {
     return items;
   }, [adminRole]);
 
+  const handleSyncAnalytics = async () => {
+    setIsSyncingPrices(true);
+    await fetchLiveStats();
+    await fetchShowcaseSites();
+    await fetchDbCreators();
+    toast({
+      title: "Admin Analytics Synced",
+      description: "Admin dashboards updated with the latest network telemetry.",
+    });
+    setIsSyncingPrices(false);
+  };
+
   if (!isAdmin) return null;
 
   const totalRewardsValue = winners.reduce((acc, curr) => acc + parseFloat(curr.reward || "0"), 0);
@@ -1202,6 +1214,16 @@ const AdminHub = () => {
         <div className="w-full">
           {activeTab === "analytics" && (
             <div className="space-y-10 animate-in fade-in duration-500">
+               <div className="flex justify-end">
+                 <Button
+                   onClick={handleSyncAnalytics}
+                   disabled={isSyncingPrices}
+                   className="h-10 px-4 rounded-xl bg-white/5 border border-white/10 hover:bg-white/10 text-[10px] font-black uppercase tracking-widest gap-2 text-slate-300"
+                 >
+                   <RefreshCw className={cn("h-3.5 w-3.5", isSyncingPrices && "animate-spin")} />
+                   Sync Latest Data
+                 </Button>
+               </div>
                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
                  {[
                    { label: "Active Members", value: analyticsStats.activeMembers.toLocaleString(), change: "+0%", icon: UserCheck, color: "text-orange-400", sub: "Growth (MoM)" },
@@ -1417,6 +1439,7 @@ const AdminHub = () => {
                                       {asset.revenue.toLocaleString()} <span className={cn("text-lg", asset.color)}>{asset.symbol}</span>
                                     </p>
                                   </div>
+                                animate-pulse
                                </div>
 
                                <div className="grid grid-cols-2 gap-6 pt-6 border-t border-white/5">
