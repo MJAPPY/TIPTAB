@@ -44,6 +44,7 @@ const CITY_COORDINATES: Record<string, [number, number]> = {
   "san francisco": [-122.4194, 37.7749],
   "brisbane": [153.0251, -27.4698],
   "adelaide": [138.6007, -34.9285],
+  "bundaberg": [152.3489, -24.8660],
 };
 
 const CATEGORIES = [
