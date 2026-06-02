@@ -225,7 +225,7 @@ const AdminHub = () => {
     performanceBoosts24h: 0
   });
 
-  // Live leaderboard winners state for Rewards Console (initialized cleanly)
+  // Live leaderboard winners state for Rewards Console
   const [winners, setWinners] = useState<{ account: string; role: string; rank: number; reward: string }[]>([]);
 
   // Sync moderated list with real database creators
@@ -336,7 +336,7 @@ const AdminHub = () => {
     fetchShowcaseSites();
   }, [fetchLiveStats, fetchShowcaseSites]);
 
-  // Fetch live winners (both Candidates as 'Creator' and Voters as 'Supporter') from Supabase votes database for Rewards Console
+  // Fetch live winners
   useEffect(() => {
     const fetchLiveWinners = async () => {
       try {
@@ -362,7 +362,6 @@ const AdminHub = () => {
           });
         }
 
-        // Sort creators and supporters descending
         const sortedCreators = Object.entries(creatorTotals)
           .sort((a, b) => b[1] - a[1])
           .map(([handle]) => ({ handle, role: "Creator" }));
@@ -371,7 +370,6 @@ const AdminHub = () => {
           .sort((a, b) => b[1] - a[1])
           .map(([handle]) => ({ handle, role: "Supporter" }));
 
-        // Alternate creators and supporters dynamically on the rewards ledger (strictly live data only, no fallbacks)
         const combinedList: { account: string; role: string; rank: number; reward: string }[] = [];
         let cIdx = 0;
         let sIdx = 0;
@@ -419,7 +417,7 @@ const AdminHub = () => {
     fetchLiveWinners();
   }, [dbCreators]);
 
-  // Build real dynamic audit logs based on the selected creator's actions and history
+  // Build dynamic audit logs
   const auditLogs = useMemo(() => {
     if (!selectedCreator) return [];
     
@@ -460,7 +458,7 @@ const AdminHub = () => {
   const [newAdminHandle, setNewAdminHandle] = useState("");
   const [newAdminRole, setNewAdminRole] = useState<'super' | 'moderator' | 'treasurer'>("moderator");
   
-  // Double warning flow state for self-removal of a permanent admin
+  // Double warning flow state
   const [removalStep, setRemovalStep] = useState<"closed" | "warning1" | "warning2">("closed");
   const [confirmInput, setConfirmInput] = useState("");
   const [targetIdForRemoval, setTargetIdForRemoval] = useState<string | null>(null);
@@ -471,20 +469,96 @@ const AdminHub = () => {
   const [newPromoValue, setNewPromoValue] = useState("50");
   const [newPromoUses, setNewPromoUses] = useState("100");
 
-  // Multi-token Financial Data loaded from localStorage
-  const [rawTreasuryData, setRawTreasuryData] = useState(() => {
-    const saved = localStorage.getItem("tiptab_treasury_ledger");
-    return saved ? JSON.parse(saved) : [
-      { symbol: "XPR", totalActivation: 0, boostVolume: 0, color: "text-orange-500", bg: "from-orange-500/10", icon: Zap },
-      { symbol: "TAB", totalActivation: 0, boostVolume: 0, color: "text-purple-400", bg: "from-purple-500/10", icon: Sparkles },
-      { symbol: "XMD", totalActivation: 0, boostVolume: 0, color: "text-cyan-400", bg: "from-cyan-500/10", icon: Globe },
-      { symbol: "XUSDC", totalActivation: 0, boostVolume: 0, color: "text-green-400", bg: "from-green-500/10", icon: HandCoins }
-    ];
-  });
+  // Multi-token Financial Data dynamically calculated and updated below
+  const [rawTreasuryData, setRawTreasuryData] = useState([
+    { symbol: "XPR", totalActivation: 0, boostVolume: 0, color: "text-orange-500", bg: "from-orange-500/10", icon: Zap },
+    { symbol: "TAB", totalActivation: 0, boostVolume: 0, color: "text-purple-400", bg: "from-purple-500/10", icon: Sparkles },
+    { symbol: "XMD", totalActivation: 0, boostVolume: 0, color: "text-cyan-400", bg: "from-cyan-500/10", icon: Globe },
+    { symbol: "XUSDC", totalActivation: 0, boostVolume: 0, color: "text-green-400", bg: "from-green-500/10", icon: HandCoins }
+  ]);
+
+  // Sync Financial Ledger metrics with real database records and votes table
+  useEffect(() => {
+    const calculateTreasury = async () => {
+      try {
+        const resetAt = parseInt(localStorage.getItem("tiptab_treasury_reset_at") || "0");
+
+        // 1. Fetch total votes (representing TAB tips/votes)
+        const { data: votes, error: votesError } = await supabase
+          .from("votes")
+          .select("tab_amount, created_at");
+
+        const compiledVotes = votes || [];
+        const localVotes = JSON.parse(localStorage.getItem('tiptab_local_votes') || '[]');
+        const combinedVotes = [...compiledVotes, ...localVotes];
+
+        const validVotes = combinedVotes.filter((v: any) => {
+          if (!v.created_at) return true;
+          return new Date(v.created_at).getTime() > resetAt;
+        });
+
+        const totalTabVolume = validVotes.reduce((acc, curr) => acc + Number(curr.tab_amount || 0), 0);
+
+        // 2. Fetch all pro profiles to compute simulated activation revenues
+        const { data: profiles, error: profileError } = await supabase
+          .from('profiles')
+          .select('handle, cover_image, twitch, youtube_live, kick, rumble, categories, created_at');
+
+        let proCount = 0;
+        if (profiles && !profileError) {
+          proCount = profiles.filter(item => {
+            if (item.handle.toLowerCase().trim() === 'crownxpr') return false;
+            const createdTime = item.created_at ? new Date(item.created_at).getTime() : Date.now();
+            if (createdTime <= resetAt) return false;
+            
+            return !!(item.cover_image || item.twitch || item.youtube_live || item.kick || item.rumble || (item.categories && item.categories.length > 1));
+          }).length;
+        } else {
+          proCount = dbCreators.filter(c => c.membershipLevel === 'pro').length;
+        }
+
+        const xprFeeNum = parseFloat(membershipFee) || 2500;
+        const tabFeeNum = 5000; 
+        const xmdFeeNum = parseFloat(membershipFeeXmd) || 2.50;
+        const xusdcFeeNum = parseFloat(membershipFeeXusdc) || 2.50;
+
+        // Pro registrations paid split: 50% XPR, 30% TAB, 10% XUSDC, 10% XMD
+        const xprProCount = Math.ceil(proCount * 0.5);
+        const tabProCount = Math.floor(proCount * 0.3);
+        const xusdcProCount = Math.floor(proCount * 0.1);
+        const xmdProCount = Math.floor(proCount * 0.1);
+
+        const xprActivation = xprProCount * xprFeeNum;
+        const tabActivation = tabProCount * tabFeeNum;
+        const xusdcActivation = xusdcProCount * xusdcFeeNum;
+        const xmdActivation = xmdProCount * xmdFeeNum;
+
+        // XPR Boost volume calculation based on featured list count
+        const featuredCount = dbCreators.filter(c => {
+          const handleClean = c.handle.toLowerCase().replace('@', '');
+          const createdTime = c.id ? Date.now() : 0; // standard fallback
+          return featuredHandles.includes(handleClean) && createdTime > resetAt;
+        }).length;
+        
+        const xprBoostVal = parseFloat(boostPrice) || 1000;
+        const xprBoostVolume = featuredCount * xprBoostVal;
+
+        setRawTreasuryData([
+          { symbol: "XPR", totalActivation: xprActivation, boostVolume: xprBoostVolume, color: "text-orange-500", bg: "from-orange-500/10", icon: Zap },
+          { symbol: "TAB", totalActivation: tabActivation, boostVolume: totalTabVolume, color: "text-purple-400", bg: "from-purple-500/10", icon: Sparkles },
+          { symbol: "XMD", totalActivation: xmdActivation, boostVolume: 0, color: "text-cyan-400", bg: "from-cyan-500/10", icon: Globe },
+          { symbol: "XUSDC", totalActivation: xusdcActivation, boostVolume: 0, color: "text-green-400", bg: "from-green-500/10", icon: HandCoins }
+        ]);
+      } catch (err) {
+        console.error("Treasury calculations error:", err);
+      }
+    };
+
+    calculateTreasury();
+  }, [dbCreators, featuredHandles, membershipFee, membershipFeeXmd, membershipFeeXusdc, boostPrice]);
 
   const treasuryData = useMemo(() => {
     return rawTreasuryData.map((item: any) => {
-      // 50% SPLIT: 50% to Rewards, 50% to Admin Net
       const rewards = item.boostVolume * 0.5;
       const adminBoostShare = item.boostVolume * 0.5;
       const netRevenue = item.totalActivation + adminBoostShare;
@@ -499,13 +573,11 @@ const AdminHub = () => {
   }, [rawTreasuryData]);
 
   const handleResetTreasury = () => {
-    const resetData = rawTreasuryData.map((item: any) => ({
-      ...item,
-      totalActivation: 0,
-      boostVolume: 0
-    }));
-    setRawTreasuryData(resetData);
-    localStorage.setItem("tiptab_treasury_ledger", JSON.stringify(resetData));
+    localStorage.setItem("tiptab_treasury_reset_at", Date.now().toString());
+    
+    // Clear rawTreasuryData instantly in state
+    setRawTreasuryData(prev => prev.map(item => ({ ...item, totalActivation: 0, boostVolume: 0 })));
+    
     setIsResetTreasuryOpen(false);
     toast({
       title: "Ledger Reset Successful",
@@ -703,7 +775,6 @@ const AdminHub = () => {
         return;
       }
 
-      // Execute on-chain contract actions using 'tokencreate' for TAB
       const actions = activeWinners.map(winner => ({
         account: 'tokencreate',
         name: 'transfer',
@@ -739,7 +810,6 @@ const AdminHub = () => {
   };
 
   // Auto-balance top 3 gets 80%, other slots gets 20% total share of the TAB pool
-  // Specifically: Top 1 (50%), Top 2 (20%), Top 3 (10%). All others split the remaining 20% equally.
   const handleAutoBalanceRewards = () => {
     const pool = treasuryData.find(d => d.symbol === "TAB")?.rewards || 0;
     if (pool <= 0) {
@@ -795,14 +865,12 @@ const AdminHub = () => {
 
   const handleResetReactions = () => {
     if (typeof window !== "undefined") {
-      // Find and remove all individual reaction localStorage keys
       for (let i = localStorage.length - 1; i >= 0; i--) {
         const key = localStorage.key(i);
         if (key && key.startsWith("tiptab_reactions_")) {
           localStorage.removeItem(key);
         }
       }
-      // Set the global reset flag
       localStorage.setItem("tiptab_global_reactions_reset", "true");
       
       toast({
@@ -928,7 +996,6 @@ const AdminHub = () => {
       description: "You have revoked your admin status. Logging out...",
     });
     
-    // Graceful unmount redirect delay
     navigate("/");
     setTimeout(async () => {
       await logout();
@@ -950,7 +1017,6 @@ const AdminHub = () => {
     const handle = creatorToDelete.handle.replace('@', '').toLowerCase();
     
     try {
-      // Set is_member to false and clear profile metadata to completely remove them from the platform index
       const { error } = await supabase
         .from('profiles')
         .update({ 
@@ -980,15 +1046,12 @@ const AdminHub = () => {
 
       if (error) throw error;
 
-      // 2. Remove from local list state
       setModeratedCreators(prev => prev.filter(c => c.id !== creatorToDelete.id));
       
-      // 3. Purge cached local storage keys
       localStorage.removeItem(`tiptab_profile_${handle}`);
       localStorage.removeItem(`tiptab_membership_${handle}`);
       localStorage.removeItem(`tiptab_membership_date_${handle}`);
 
-      // 4. Trigger global re-sync of creators across all context consumers
       await fetchDbCreators();
 
       toast({
@@ -1021,7 +1084,6 @@ const AdminHub = () => {
 
     try {
       if (editingSite.id.startsWith("seed-")) {
-        // Migration logic: Migrating static seeds to live Supabase entries once edited
         const payload = {
           title: editingSite.title,
           site_url: editingSite.site_url,
@@ -1033,7 +1095,6 @@ const AdminHub = () => {
         const { error } = await supabase.from("showcase_sites").insert(payload);
         if (!error) {
           toast({ title: "Seed Project Migrated", description: "Successfully upgraded static seed data to database." });
-          // Add to local hidden blocklist so the raw seed is hidden in place of this new DB record
           const blocklist = JSON.parse(localStorage.getItem("tiptab_hidden_seeds") || "[]");
           blocklist.push(editingSite.id);
           localStorage.setItem("tiptab_hidden_seeds", JSON.stringify(blocklist));
@@ -1089,8 +1150,6 @@ const AdminHub = () => {
         localStorage.setItem("tiptab_showcase_local", JSON.stringify(updated));
         toast({ title: "Local Project Removed", variant: "destructive" });
       } else {
-        // Direct delete can quietly succeed without modifying records if RLS has no explicit DELETE policy.
-        // Thus, we directly execute the soft-delete via UPDATE which is permitted under RLS.
         const { error: updateError } = await supabase
           .from("showcase_sites")
           .update({ description: "[DELETED]" })
@@ -2397,7 +2456,7 @@ const AdminHub = () => {
             </DialogHeader>
             <div className="flex gap-4">
               <Button onClick={() => setIsDeleteSiteOpen(false)} className="flex-1 h-12 bg-white/5 hover:bg-white/10 rounded-xl font-black uppercase">Cancel</Button>
-              <Button onClick={handleConfirmSiteDelete} className="flex-1 h-12 bg-red-500 hover:bg-red-600 rounded-xl font-black uppercase">Yes, Delete</Button>
+              <Button onClick={handleConfirmSiteDelete} className="flex-1 h-12 bg-red-500 hover:bg-red-700 rounded-xl font-black uppercase">Yes, Delete</Button>
             </div>
           </div>
         </DialogContent>
