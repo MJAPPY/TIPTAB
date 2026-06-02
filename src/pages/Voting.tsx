@@ -13,6 +13,7 @@ import { useXpr } from "@/contexts/XprContext";
 import { supabase } from "@/integrations/supabase/client";
 import { cn } from "@/lib/utils";
 import { useToast } from "@/hooks/use-toast";
+import { useNavigate } from "react-router-dom";
 
 const CATEGORIES = [
   "All",
@@ -56,6 +57,7 @@ const Voting = () => {
   const [voteAmount, setVoteAmount] = useState("5");
   const { actor, session, dbCreators, isConnected, login } = useXpr();
   const { toast } = useToast();
+  const navigate = useNavigate();
 
   const [leaderboard, setLeaderboard] = useState<{ handle: string; votes: number }[]>([]);
 
@@ -262,7 +264,10 @@ const Voting = () => {
                   {filteredCandidates.map(candidate => (
                     <Card key={candidate.handle} className="bg-white/5 border-white/10 rounded-[32px] overflow-hidden group hover:border-orange-500/40 transition-all">
                       <CardContent className="p-6 flex items-center justify-between gap-4">
-                        <div className="flex items-center gap-4">
+                        <div 
+                          onClick={() => navigate(`/tip/${candidate.handle}`)}
+                          className="flex items-center gap-4 cursor-pointer hover:opacity-80 transition-opacity"
+                        >
                           <div className={cn("h-16 w-16 rounded-2xl flex items-center justify-center text-xl font-black shadow-xl", candidate.color)}>
                             {candidate.avatarImage ? <img src={candidate.avatarImage} alt="" className="w-full h-full object-cover" /> : candidate.avatar}
                           </div>
