@@ -99,9 +99,6 @@ const Maintenance = () => {
               </div>
             </div>
           </div>
-          <p className="text-[10px] text-white/30 uppercase tracking-[0.3em] font-black mt-2">
-            Admin Bypass Portal (Click 3x to Authenticate)
-          </p>
         </div>
 
         <div className="space-y-6">
