@@ -3,7 +3,7 @@
 import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import ProtonWebSDK, { LinkSession } from '@proton/web-sdk';
 import { supabase } from "@/integrations/supabase/client";
-import { CREATORS, Creator } from '@/data/creators';
+import { Creator } from '@/data/creators';
 import { Balances, PromoCode, AdminUser } from '@/types/xpr';
 import { PROTON_ENDPOINTS, APP_IDENTIFIER, ROOT_ADMINS, TOKENS } from '@/constants/xpr';
 import { useXprAdmin } from '@/hooks/useXprAdmin';
@@ -274,6 +274,13 @@ export const XprProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       });
       const savedTips = parseInt(localStorage.getItem(`tiptab_tips_sent_${account}`) || "0");
       setBalances({ ...newBalances, tipsSent: savedTips });
+
+      // Secure, database-first validation of active memberships
+      const { data: dbProfile, error: dbError } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('handle', account)
+        .maybeSingle();
       
       let currentlyMember = false;
       let activeDateStr = null;
@@ -286,7 +293,34 @@ export const XprProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         setMembershipDate(activeDateStr);
         setMembershipLevel('pro');
         level = 'pro';
+      } else if (dbProfile && !dbError) {
+        currentlyMember = dbProfile.is_member === true;
+        if (currentlyMember) {
+          setIsMember(true);
+          const hasProFeatures = dbProfile.cover_image || dbProfile.twitch || dbProfile.youtube_live || dbProfile.kick || dbProfile.rumble || (dbProfile.categories && dbProfile.categories.length > 1);
+          level = hasProFeatures ? 'pro' : 'basic';
+          setMembershipLevel(level);
+
+          const savedDate = localStorage.getItem(`tiptab_membership_date_${account}`);
+          activeDateStr = savedDate || dbProfile.created_at || new Date().toISOString();
+          setMembershipDate(activeDateStr);
+
+          // Sync back clean credentials to localStorage
+          localStorage.setItem(`tiptab_membership_${account}`, 'true');
+          localStorage.setItem(`tiptab_membership_level_${account}`, level);
+          if (level === 'pro') {
+            localStorage.setItem(`tiptab_membership_date_${account}`, activeDateStr);
+          }
+        } else {
+          setIsMember(false);
+          setMembershipDate(null);
+          setMembershipLevel(null);
+          localStorage.removeItem(`tiptab_membership_${account}`);
+          localStorage.removeItem(`tiptab_membership_date_${account}`);
+          localStorage.removeItem(`tiptab_membership_level_${account}`);
+        }
       } else {
+        // Safe Offline / Fallback path if database is unreachable
         const membershipKey = `tiptab_membership_${account}`;
         const membershipDateKey = `tiptab_membership_date_${account}`;
         const savedDate = localStorage.getItem(membershipDateKey);
@@ -303,8 +337,7 @@ export const XprProvider: React.FC<{ children: React.ReactNode }> = ({ children 
             setMembershipDate(savedDate); 
             setMembershipLevel('pro');
             level = 'pro';
-          }
-          else { 
+          } else { 
             setIsMember(false); 
             setMembershipDate(null); 
             setMembershipLevel(null);
@@ -313,30 +346,14 @@ export const XprProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         } else if (localStorage.getItem(membershipKey) === 'true') {
           currentlyMember = true;
           setIsMember(true);
-          if (storedLevel === 'basic') {
-            setMembershipLevel('basic');
-            level = 'basic';
-          } else {
-            const fakeDate = new Date().toISOString();
-            localStorage.setItem(membershipDateKey, fakeDate);
-            activeDateStr = fakeDate;
-            setMembershipDate(fakeDate);
-            setMembershipLevel('pro');
-            level = 'pro';
-          }
+          level = storedLevel || 'basic';
+          setMembershipLevel(level);
         } else { 
           setIsMember(false); 
           setMembershipDate(null); 
           setMembershipLevel(null);
         }
       }
-
-      // Sync user profile from Supabase first
-      const { data: dbProfile, error: dbError } = await supabase
-        .from('profiles')
-        .select('*')
-        .eq('handle', account)
-        .maybeSingle();
 
       if (dbProfile && !dbError) {
         const mappedProfile: Creator = {
