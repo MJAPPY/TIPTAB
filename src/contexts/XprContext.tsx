@@ -25,6 +25,13 @@ interface XprContextType {
   setMembershipLevel: (level: 'basic' | 'pro' | null) => void;
   login: () => Promise<LinkSession | null>;
   logout: () => Promise<void>;
+  runningAutoSync?: boolean;
+  loginError?: string | null;
+  loginStatus?: 'idle' | 'authenticating' | 'syncing' | 'connected' | 'failed';
+  linkSessionId?: string | null;
+  selectedEndpoint?: string;
+  isCustomEndpoint?: boolean;
+  setCustomEndpoint?: (endpoint: string) => void;
   refreshBalances: () => Promise<void>;
   recordTip: (amount: number) => void;
   isConnected: boolean;
@@ -38,7 +45,7 @@ interface XprContextType {
   updateAdminRole: (id: string, role: 'super' | 'moderator' | 'treasurer') => void;
   makeAdminPermanent: (id: string, status: boolean) => void; 
   userProfile: Creator | null;
-  updateUserProfile: (profile: Creator) => void;
+  updateUserProfile: (profile: Creator) => Promise<boolean>;
   isMaintenanceMode: boolean;
   setMaintenanceMode: (status: boolean) => void;
   networkAlert: string | null;
@@ -86,7 +93,6 @@ const parseCoords = (coords: any): [number, number] => {
     ];
   }
   if (typeof coords === 'string') {
-    // Matches postgres string representation like "{115.8605,-31.9505}"
     const match = coords.match(/\{?(-?\d+\.?\d*)\s*,\s*(-?\d+\.?\d*)\}?/);
     if (match) {
       return [parseFloat(match[1]), parseFloat(match[2])];
@@ -126,7 +132,6 @@ export const XprProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
   const fetchDbCreators = useCallback(async () => {
     try {
-      // Query strictly active members for global viewports
       const { data, error } = await supabase
         .from('profiles')
         .select('*')
@@ -162,7 +167,6 @@ export const XprProvider: React.FC<{ children: React.ReactNode }> = ({ children 
             tiktok: item.tiktok || "",
             youtubeLive: item.youtube_live || "",
             instagramLive: item.instagram_live || "",
-            // Custom check for level based on profile parameters if loaded from remote database
             membershipLevel: item.cover_image || item.twitch || item.youtube_live || item.kick || item.rumble || (item.categories && item.categories.length > 1) ? 'pro' : 'basic'
           }));
         setDbCreators(mapped);
@@ -172,7 +176,6 @@ export const XprProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     }
   }, []);
 
-  // One-time Database cleanup to force crownxpr's is_member field to false
   useEffect(() => {
     const purgeSpecificAccount = async () => {
       try {
@@ -188,17 +191,15 @@ export const XprProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     purgeSpecificAccount();
   }, [fetchDbCreators]);
 
-  // Supabase Keep-Alive to prevent auto-pause (Free Tier)
   useEffect(() => {
     const keepAlive = async () => {
       const lastPing = localStorage.getItem('supabase_keep_alive');
       const now = Date.now();
-      // Only ping if last ping was more than 24h ago to keep it ultra light
       if (!lastPing || now - parseInt(lastPing) > 86400000) {
         try {
           await supabase.from('platform_settings').select('id').limit(1);
           localStorage.setItem('supabase_keep_alive', now.toString());
-        } catch (e) { /* ignore ping errors */ }
+        } catch (e) { /* ignore */ }
       }
     };
     keepAlive();
@@ -305,7 +306,6 @@ export const XprProvider: React.FC<{ children: React.ReactNode }> = ({ children 
           activeDateStr = savedDate || dbProfile.created_at || new Date().toISOString();
           setMembershipDate(activeDateStr);
 
-          // Sync back clean credentials to localStorage
           localStorage.setItem(`tiptab_membership_${account}`, 'true');
           localStorage.setItem(`tiptab_membership_level_${account}`, level);
           if (level === 'pro') {
@@ -320,7 +320,6 @@ export const XprProvider: React.FC<{ children: React.ReactNode }> = ({ children 
           localStorage.removeItem(`tiptab_membership_level_${account}`);
         }
       } else {
-        // Safe Offline / Fallback path if database is unreachable
         const membershipKey = `tiptab_membership_${account}`;
         const membershipDateKey = `tiptab_membership_date_${account}`;
         const savedDate = localStorage.getItem(membershipDateKey);
@@ -391,7 +390,6 @@ export const XprProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         if (savedProfile) {
           const parsed = JSON.parse(savedProfile);
           setUserProfile(parsed);
-          // Auto-sync local backup to database
           await supabase.from('profiles').upsert({
             handle: account,
             name: parsed.name,
@@ -434,7 +432,6 @@ export const XprProvider: React.FC<{ children: React.ReactNode }> = ({ children 
           setUserProfile(newProfile);
           localStorage.setItem("tiptab_user_profile", JSON.stringify(newProfile));
           
-          // Initial profile sync to Supabase database
           await supabase.from('profiles').upsert({
             handle: account,
             name: account,
@@ -453,7 +450,7 @@ export const XprProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
   const restoreSession = useCallback(async () => {
     try {
-      await fetchDbCreators(); // Load global database profiles on load
+      await fetchDbCreators();
       
       const hasSavedSession = localStorage.getItem("tiptab_has_session") === "true";
       if (!hasSavedSession) {
@@ -515,50 +512,64 @@ export const XprProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
   const refreshBalances = async () => { if (session) await fetchBalances(session.auth.actor.toString()); };
 
-  const updateUserProfile = async (profile: Creator) => {
-    if (session?.auth.actor) {
-      const actorName = session.auth.actor.toString();
-      localStorage.setItem(`tiptab_profile_${actorName}`, JSON.stringify(profile));
+  // Secure update with on-chain cryptographic signature verification via Edge Function
+  const updateUserProfile = async (profile: Creator): Promise<boolean> => {
+    if (!session || !activeActor) return false;
+
+    try {
+      const membershipKey = `tiptab_membership_${activeActor}`;
+      const activeMember = isMember || localStorage.getItem(membershipKey) === 'true';
+      const proofMemo = `Update Profile Proof: ${Date.now()}`;
+
+      // 1. Prompt WebAuth to sign a completely free 0.0000 XPR verification proof transfer
+      const actions = [{
+        account: 'eosio.token',
+        name: 'transfer',
+        authorization: [{
+          actor: activeActor,
+          permission: session.auth.permission || 'active',
+        }],
+        data: {
+          from: activeActor,
+          to: 'tiptab',
+          quantity: '0.0000 XPR',
+          memo: proofMemo,
+        },
+      }];
+
+      const transactResult = await session.transact({ actions }, { broadcast: true });
+      const transactionId = transactResult.processed.id;
+
+      // 2. Invoke our secure update-profile Supabase Edge Function to verify on-chain and save
+      const { data, error } = await supabase.functions.invoke('update-profile', {
+        body: {
+          profile: {
+            ...profile,
+            isMember: activeMember
+          },
+          actor: activeActor,
+          transactionId
+        }
+      });
+
+      if (error || !data?.success) {
+        throw new Error(error?.message || "Edge verification validation failed.");
+      }
+
+      // 3. Update local caches once backend-verified
+      localStorage.setItem(`tiptab_profile_${activeActor}`, JSON.stringify(profile));
       localStorage.setItem("tiptab_user_profile", JSON.stringify(profile));
       setUserProfile(profile);
+      
+      // Update our global candidate array
+      await fetchDbCreators();
+      return true;
 
-      // Save global profile to Supabase
-      try {
-        const membershipKey = `tiptab_membership_${actorName}`;
-        const activeMember = isMember || localStorage.getItem(membershipKey) === 'true';
-
-        await supabase.from('profiles').upsert({
-          handle: actorName,
-          name: profile.name,
-          bio: profile.bio,
-          location: profile.location,
-          coordinates: profile.coordinates,
-          categories: profile.categories,
-          avatar: profile.avatar,
-          avatar_image: profile.avatarImage || "",
-          cover_image: profile.coverImage || "",
-          cover_position: profile.coverPosition ?? 50,
-          color: profile.color,
-          twitter: profile.twitter || "",
-          website: profile.website || "",
-          video_url: profile.videoUrl || "",
-          instagram: profile.instagram || "",
-          spotify: profile.spotify || "",
-          snipverse: profile.snipverse || "",
-          facebook: profile.facebook || "",
-          kick: profile.kick || "",
-          rumble: profile.rumble || "",
-          twitch: profile.twitch || "",
-          tiktok: profile.tiktok || "",
-          youtube_live: profile.youtubeLive || "",
-          instagram_live: profile.instagramLive || "",
-          is_member: activeMember
-        }, { onConflict: 'handle' });
-        // Re-fetch creator list to immediately update live preview
-        fetchDbCreators();
-      } catch (err) {
-        console.error("Failed to sync profile to Supabase", err);
-      }
+    } catch (err: any) {
+      console.error("Secure profile update failed:", err);
+      
+      // Fallback: Notify user clearly of authentication error or signature cancel
+      throw new Error(err.message || "Crypto proof transaction not completed. Profile changes rejected.");
     }
   };
 

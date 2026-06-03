@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
-import { User, AtSign, MapPin, Globe, Twitter, Save, Image as ImageIcon, Upload, X, Video, Instagram, CheckCircle2, Music, Radio, Youtube, Twitch, ShieldCheck, Move, Facebook, MessageSquare, Trash2, AlertTriangle, CalendarDays, Hourglass, Lock, Sparkles, Loader2 } from "lucide-react";
+import { User, AtSign, AtSign as AtSignIcon, MapPin, Globe, Twitter, Save, Image as ImageIcon, Upload, X, Video, Instagram, CheckCircle2, Music, Radio, Youtube, Twitch, ShieldCheck, Move, Facebook, MessageSquare, Trash2, AlertTriangle, CalendarDays, Hourglass, Lock, Sparkles, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -82,7 +82,7 @@ const CATEGORIES = [
 
 interface ProfileEditorProps {
   initialData: Creator;
-  onSave: (updatedData: Creator) => void;
+  onSave: (updatedData: Creator) => Promise<boolean>;
   minimal?: boolean;
 }
 
@@ -167,7 +167,6 @@ export const ProfileEditor = ({ initialData, onSave, minimal = false }: ProfileE
     setIsCityRecognized(!!CITY_COORDINATES[typedLocation] || (formData.coordinates && (formData.coordinates[0] !== 0 || formData.coordinates[1] !== 0)));
   }, [formData.location, formData.coordinates]);
 
-  // Handle outside clicks to close the suggestion dropdown safely
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (suggestionsRef.current && !suggestionsRef.current.contains(event.target as Node)) {
@@ -206,7 +205,6 @@ export const ProfileEditor = ({ initialData, onSave, minimal = false }: ProfileE
   };
 
   const handleSelectSuggestion = (sug: any) => {
-    // Format descriptive clean name (e.g. City, Country)
     const address = sug.address;
     const city = address.city || address.town || address.village || address.suburb || address.state || "";
     const country = address.country || "";
@@ -241,11 +239,9 @@ export const ProfileEditor = ({ initialData, onSave, minimal = false }: ProfileE
       if (typedLocation && (formData.coordinates[0] === 0 && formData.coordinates[1] === 0)) {
         const typedLower = typedLocation.split(',')[0].trim().toLowerCase();
         
-        // Step 1: Check fast local dictionary
         if (CITY_COORDINATES[typedLower]) {
           finalCoordinates = CITY_COORDINATES[typedLower];
         } else {
-          // Step 2: OSM dynamic fallback
           try {
             const response = await fetch(
               `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(typedLocation)}&format=json&limit=1`,
@@ -270,20 +266,27 @@ export const ProfileEditor = ({ initialData, onSave, minimal = false }: ProfileE
         ...formData,
         coordinates: finalCoordinates
       };
-      
-      onSave(updatedCreator);
-      setHasChanged(false);
-      
+
       toast({
-        title: "Profile Updated",
-        description: minimal 
-          ? `Location saved as ${formData.location} for Leaderboard rankings.` 
-          : `Location saved as ${formData.location}. Map pin and profile updated.`,
+        title: "Waiting for Signature",
+        description: "Please approve the cryptographic proof transaction in your WebAuth wallet.",
       });
-    } catch (error) {
+      
+      const success = await onSave(updatedCreator);
+      
+      if (success) {
+        setHasChanged(false);
+        toast({
+          title: "Profile Securely Saved",
+          description: minimal 
+            ? `Verified on-chain. Location updated for Leaderboard rankings.` 
+            : `Verified on-chain. Map pin and profile securely updated.`,
+        });
+      }
+    } catch (error: any) {
       toast({
-        title: "Update Failed",
-        description: "There was an error saving your changes.",
+        title: "Update Rejected",
+        description: error.message || "Crypto proof transaction cancelled or timed out.",
         variant: "destructive",
       });
     } finally {
@@ -311,7 +314,6 @@ export const ProfileEditor = ({ initialData, onSave, minimal = false }: ProfileE
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
-      // 512KB Limit (512 * 1024 bytes)
       if (file.size > 512 * 1024) {
         toast({
           title: "Image Too Large",
@@ -349,7 +351,6 @@ export const ProfileEditor = ({ initialData, onSave, minimal = false }: ProfileE
       });
       return;
     }
-    // 512KB Limit (512 * 1024 bytes)
     if (file.size > 512 * 1024) {
       toast({
         title: "Banner Too Large",
@@ -370,7 +371,6 @@ export const ProfileEditor = ({ initialData, onSave, minimal = false }: ProfileE
     reader.readAsDataURL(file);
   };
 
-  // Drag and Drop Handlers
   const handleDragOver = (e: React.DragEvent<HTMLDivElement>) => {
     e.preventDefault();
     e.stopPropagation();
@@ -419,7 +419,6 @@ export const ProfileEditor = ({ initialData, onSave, minimal = false }: ProfileE
   const handleDeleteAccount = async () => {
     if (!actor) return;
     try {
-      // Set is_member to false and clear profile metadata to completely remove them from the platform index
       const { error } = await supabase
         .from('profiles')
         .upsert({ 
@@ -449,7 +448,6 @@ export const ProfileEditor = ({ initialData, onSave, minimal = false }: ProfileE
       
       if (error) throw error;
 
-      // Clean up all possible variant keys from localStorage
       const handleLower = actor.toLowerCase();
       const keysToRemove = [
         `tiptab_profile_${actor}`,
@@ -475,7 +473,6 @@ export const ProfileEditor = ({ initialData, onSave, minimal = false }: ProfileE
 
       setIsDeleteModalOpen(false);
       
-      // Perform full wallet de-authentication first to prevent rendering a logged-in state mismatch
       await logout();
       navigate("/");
     } catch (err: any) {
@@ -506,7 +503,15 @@ export const ProfileEditor = ({ initialData, onSave, minimal = false }: ProfileE
               : "bg-white/5 text-white/20 border-white/5 cursor-not-allowed"
           )}
         >
-          {isSaving ? "Saving..." : <><Save className="h-4 w-4" /> Save Changes</>}
+          {isSaving ? (
+            <>
+              <Loader2 className="h-4 w-4 animate-spin" /> Verifying On-Chain Proof...
+            </>
+          ) : (
+            <>
+              <Save className="h-4 w-4" /> Save Securely
+            </>
+          )}
         </Button>
       </CardHeader>
       <CardContent className="p-8">
@@ -609,7 +614,6 @@ export const ProfileEditor = ({ initialData, onSave, minimal = false }: ProfileE
                         className="w-full h-full object-cover select-none pointer-events-none" 
                         style={{ objectPosition: `50% ${formData.coverPosition || 50}%` }}
                       />
-                      {/* Drag-over indicator overlay when an image is already uploaded */}
                       {isDraggingCover && (
                         <div className="absolute inset-0 bg-purple-600/80 backdrop-blur-sm flex flex-col items-center justify-center gap-3 animate-in fade-in duration-200">
                           <Upload className="h-10 w-10 text-white animate-bounce" />
@@ -778,7 +782,6 @@ export const ProfileEditor = ({ initialData, onSave, minimal = false }: ProfileE
                   )}
                 </div>
 
-                {/* Floating Autocomplete Suggestions list */}
                 {showSuggestions && suggestions.length > 0 && (
                   <div className="absolute top-[84px] left-0 right-0 z-50 bg-[#1a102d] border border-white/10 rounded-2xl shadow-2xl p-2 max-h-60 overflow-y-auto no-scrollbar animate-in fade-in duration-200">
                     {suggestions.map((sug, i) => {
@@ -815,7 +818,7 @@ export const ProfileEditor = ({ initialData, onSave, minimal = false }: ProfileE
                       </div>
                     </div>
                     <div className="relative">
-                      <AtSign className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-orange-500/50" />
+                      <AtSignIcon className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-orange-500/50" />
                       <Input 
                         id="handle"
                         value={formData.handle}
@@ -1057,7 +1060,7 @@ export const ProfileEditor = ({ initialData, onSave, minimal = false }: ProfileE
                     <div className="space-y-2">
                       <Label htmlFor="tiktok" className="text-white/60 font-bold uppercase tracking-widest text-[10px]">TikTok Live</Label>
                       <div className="relative">
-                        <svg className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 fill-white" viewBox="0 0 24 24"><path d="M12.525.02c1.31-.02 2.61-.01 3.91-.02.08 1.53.63 3.09 1.75 4.17 1.12 1.11 2.7 1.62 4.24 1.79v4.03c-1.44-.05-2.89-.35-4.2-.97-.57-.26-1.1-.59-1.62-.93-.01 2.92.01 5.84-.02 8.75-.08 1.4-.54 2.79-1.35 3.94-1.31 1.92-3.58 3.17-5.91 3.21-1.43.08-2.86-.31-4.08-1.03-2.02-1.19-3.34-3.37-3.65-5.71-.28-2.26.74-4.63 2.58-5.91 1.64-1.49 3.7-1.49 5.66-1.02v4.53c-.31-.19-.71-.24-1.07-.23-.39.03-.77.17-1.02.47-.5.62-.14 1.53.55 1.81.47.24 1.13.14 1.51-.25.23-.27.35-.63.35-.98.01-3.55-.01-7.1.02-10.65z"/></svg>
+                        <svg className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 fill-white" viewBox="0 0 24 24"><path d="M12.525.02c1.31-.02 2.61-.01 3.91-.02.08 1.53.63 3.09 1.75 4.17 1.12 1.11 2.7 1.62 4.24 1.79v4.03c-1.44-.05-2.89-.35-4.2-.97-.57-.26-1.1-.59-1.62-.93-.01 2.92.01 5.84-.02 8.75-.08 1.4-.54 2.79-1.35 3.94-1.31 1.92-3.58 3.17-5.91 3.21-1.43.08-2.86-.31-4.08-1.03-2.02-1.19-3.34-3.37-3.65-5.71-.28-2.26.74-4.63 2.58-5.91 1.64-1.15 3.7-1.49 5.66-1.02v4.53c-.31-.19-.71-.24-1.07-.23-.39.03-.77.17-1.02.47-.5.62-.14 1.53.55 1.81.47.24 1.13.14 1.51-.25.23-.27.35-.63.35-.98.01-3.55-.01-7.1.02-10.65z"/></svg>
                         <Input 
                           id="tiktok"
                           value={formData.tiktok}
@@ -1087,7 +1090,7 @@ export const ProfileEditor = ({ initialData, onSave, minimal = false }: ProfileE
               {/* Social Profiles */}
               <div className="pt-8 border-t border-white/5 space-y-8">
                 <div className="flex items-center gap-3">
-                  <AtSign className="h-4 w-4 text-cyan-400" />
+                  <AtSignIcon className="h-4 w-4 text-cyan-400" />
                   <h3 className="text-[10px] font-black uppercase tracking-[0.3em] text-white/40">Social Network Profiles</h3>
                 </div>
 
