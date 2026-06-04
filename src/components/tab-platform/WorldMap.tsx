@@ -78,12 +78,12 @@ export const WorldMap = ({ creators, onSelectCreator }: WorldMapProps) => {
                   <Geography
                     key={geo.rsmKey}
                     geography={geo}
-                    fill="rgba(255,255,255,0.06)"
-                    stroke="rgba(255,255,255,0.12)"
+                    fill="rgba(255,255,255,0.1)"
+                    stroke="rgba(255,255,255,0.2)"
                     strokeWidth={0.5}
                     style={{
                       default: { outline: "none", transition: "all 300ms ease" },
-                      hover: { fill: "rgba(255,255,255,0.1)", outline: "none" },
+                      hover: { fill: "rgba(255,255,255,0.18)", outline: "none" },
                       pressed: { outline: "none" }
                     }}
                   />
