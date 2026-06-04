@@ -36,7 +36,7 @@ export const TippingModal = ({ creator, onClose }: TippingModalProps) => {
   const [message, setMessage] = useState("");
   const [isProcessing, setIsProcessing] = useState(false);
   const { toast } = useToast();
-  const { session, actor, login, isConnected, recordTip } = useXpr();
+  const { session, actor, login, isConnected, recordTip, logDbTransaction } = useXpr();
 
   const formatValue = (val: string) => {
     const numericValue = parseFloat(val);
@@ -100,6 +100,9 @@ export const TippingModal = ({ creator, onClose }: TippingModalProps) => {
       if (asset === "TAB") {
         recordTip(Math.floor(amountNum));
       }
+
+      // Log successful tip to public.transactions_log
+      await logDbTransaction(actor, recipient, amountNum, asset, 'tip', message.trim() || 'Tipped via TipTab Map');
 
       // Record successful tip/vote to DB and Local Storage to ensure real-time standings update
       try {

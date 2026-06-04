@@ -34,6 +34,7 @@ interface XprContextType {
   setCustomEndpoint?: (endpoint: string) => void;
   refreshBalances: () => Promise<void>;
   recordTip: (amount: number) => void;
+  logDbTransaction: (sender: string, recipient: string, amount: number, asset: string, purpose: 'tip' | 'membership' | 'boost' | 'showcase', memo?: string) => Promise<void>;
   isConnected: boolean;
   isLoading: boolean;
   isAdmin: boolean;
@@ -205,6 +206,28 @@ export const XprProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     keepAlive();
   }, []);
 
+  const logDbTransaction = async (
+    sender: string,
+    recipient: string,
+    amount: number,
+    asset: string,
+    purpose: 'tip' | 'membership' | 'boost' | 'showcase',
+    memo: string = ""
+  ) => {
+    try {
+      await supabase.from('transactions_log').insert({
+        sender: sender.toLowerCase().trim(),
+        recipient: recipient.toLowerCase().trim(),
+        amount,
+        asset: asset.toUpperCase().trim(),
+        purpose,
+        memo: memo.trim()
+      });
+    } catch (err) {
+      console.error("Failed to sync secure transaction log:", err);
+    }
+  };
+
   const boostStream = async (handle: string, asset: 'XPR' | 'TAB' = 'XPR'): Promise<boolean> => {
     if (!session || !isMember) return false;
     try {
@@ -219,6 +242,10 @@ export const XprProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         data: { from: session.auth.actor, to: 'tiptab', quantity: formattedAmount, memo: `Boost: ${handle.slice(0, 16)}` },
       };
       await session.transact({ actions: [action] }, { broadcast: true });
+      
+      // Log Boost to live DB ledger
+      await logDbTransaction(session.auth.actor.toString(), 'tiptab', parseFloat(price), asset, 'boost', `Boosted @${handle}`);
+
       const newFeatured = [...featuredHandles, handle.replace('@', '').toLowerCase()];
       setFeaturedHandles(newFeatured);
       localStorage.setItem("tiptab_featured_handles", JSON.stringify(newFeatured));
@@ -574,7 +601,7 @@ export const XprProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   };
 
   const value = {
-    session, actor: activeActor, balances, isMember, membershipDate, membershipLevel, setIsMember, setMembershipDate, setMembershipLevel, login, logout, refreshBalances, recordTip,
+    session, actor: activeActor, balances, isMember, membershipDate, membershipLevel, setIsMember, setMembershipDate, setMembershipLevel, login, logout, refreshBalances, recordTip, logDbTransaction,
     isConnected: !!session, isLoading, isAdmin: !!adminHook.currentAdminObj, adminRole: adminHook.currentAdminObj ? adminHook.currentAdminObj.role : null,
     isPermanentAdmin: adminHook.isCurrentAdminPermanent, ...adminHook, ...platformHook, ...socialHook,
     userProfile, updateUserProfile, featuredHandles, boostStream, distributeXprRewards, dbCreators, fetchDbCreators
