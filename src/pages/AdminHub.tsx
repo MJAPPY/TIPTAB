@@ -251,67 +251,93 @@ const AdminHub = () => {
     try {
       const activeCount = dbCreators.length;
 
-      // Fetch votes count and calculate analytics metrics
-      const { data: voteData, error: voteError } = await supabase
-        .from('votes')
-        .select('voter_handle, candidate_handle, tab_amount, created_at');
+      // 1. Safe Votes Fetch with Local Fallback
+      let combinedVotes = [];
+      try {
+        const { data: voteData, error: voteError } = await supabase
+          .from('votes')
+          .select('voter_handle, candidate_handle, tab_amount, created_at');
+        if (voteData && !voteError) {
+          combinedVotes = [...voteData];
+        }
+      } catch (err) {
+        console.error("Failed to fetch votes from database:", err);
+      }
+
+      try {
+        const localVotes = JSON.parse(localStorage.getItem('tiptab_local_votes') || '[]');
+        localVotes.forEach((lv: any) => {
+          if (!combinedVotes.some((cv: any) => 
+            cv.voter_handle === lv.voter_handle && 
+            cv.candidate_handle === lv.candidate_handle && 
+            cv.tab_amount === lv.tab_amount &&
+            cv.created_at === lv.created_at
+          )) {
+            combinedVotes.push(lv);
+          }
+        });
+      } catch (err) {
+        console.error("Failed to merge local votes:", err);
+      }
 
       let uniqueVoters = new Set<string>();
       let totalTabAmount = 0;
       let tippingVelocity = 0;
       let avgTipSize = 0;
 
-      if (voteData && !voteError) {
-        voteData.forEach(v => {
-          if (v.voter_handle) uniqueVoters.add(v.voter_handle.toLowerCase().trim());
-          totalTabAmount += Number(v.tab_amount || 0);
-        });
+      combinedVotes.forEach((v: any) => {
+        if (v.voter_handle) uniqueVoters.add(v.voter_handle.toLowerCase().trim());
+        totalTabAmount += Number(v.tab_amount || 0);
+      });
 
-        const totalTipsCount = voteData.length;
-        avgTipSize = totalTipsCount > 0 ? Math.round(totalTabAmount / totalTipsCount) : 0;
-        
-        const dayAgo = new Date(Date.now() - 24 * 60 * 60 * 1000);
-        const recentTips = voteData.filter(v => new Date(v.created_at) >= dayAgo).length;
-        tippingVelocity = Math.ceil(recentTips / 24) || 0;
+      const totalTipsCount = combinedVotes.length;
+      avgTipSize = totalTipsCount > 0 ? Math.round(totalTabAmount / totalTipsCount) : 0;
+      
+      const dayAgo = new Date(Date.now() - 24 * 60 * 60 * 1000);
+      const recentTips = combinedVotes.filter((v: any) => new Date(v.created_at) >= dayAgo).length;
+      tippingVelocity = Math.ceil(recentTips / 24) || 0;
+
+      // 2. Safe Recent Profiles Fetch
+      let newProfiles = 0;
+      const dayAgoStr = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
+      try {
+        const { data: recentProfiles, error: recentError } = await supabase
+          .from('profiles')
+          .select('created_at')
+          .gte('created_at', dayAgoStr);
+        if (recentProfiles && !recentError) {
+          newProfiles = recentProfiles.length;
+        }
+      } catch (err) {
+        console.error("Failed to fetch recent profiles:", err);
       }
 
-      // Profiles created in last 24h
-      const dayAgoStr = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
-      const { count: newProfiles, error: newProfilesError } = await supabase
-        .from('profiles')
-        .select('*', { count: 'exact', head: true })
-        .gte('created_at', dayAgoStr);
-
+      // Always update state with calculated values
       setAnalyticsStats({
         activeMembers: activeCount,
         supporterBase: uniqueVoters.size,
         tippingVelocity,
         avgTipSize,
-        newProfiles24h: newProfiles || 0,
+        newProfiles24h: newProfiles,
         performanceBoosts24h: activeCount > 0 ? Math.ceil(activeCount / 3) : 0
       });
 
       // --- ADVANCED REAL-TIME TREASURY AGGREGATION ---
-      // We calculate real network metrics based on database state:
       const proCreatorsCount = dbCreators.filter(c => c.membershipLevel === 'pro').length;
       const totalActivationFeeXpr = proCreatorsCount * parseFloat(membershipFee || "2500");
       const totalActivationFeeXmd = proCreatorsCount * parseFloat(membershipFeeXmd || "2.50");
       const totalActivationFeeXusdc = proCreatorsCount * parseFloat(membershipFeeXusdc || "2.50");
 
-      // Calculate on-chain boost allocations (boosted streams x boost prices)
       const boostedCount = featuredHandles.length;
       const boostPriceXprNum = parseFloat(boostPrice || "1000");
       const boostPriceTabNum = parseFloat(boostTabPrice || "1800");
       const boostPriceXusdcNum = parseFloat(boostPriceXusdc || "1.00");
 
-      // Aggregated votes transaction volume
-      const totalVotesVolumeTab = totalTabAmount;
-
       setRealTreasuryTotals({
         xprActivation: totalActivationFeeXpr,
         xprBoost: boostedCount * boostPriceXprNum,
-        tabActivation: 0, // TAB is not used for activation, only tipping/boosting
-        tabBoost: (boostedCount * boostPriceTabNum) + totalVotesVolumeTab,
+        tabActivation: 0,
+        tabBoost: (boostedCount * boostPriceTabNum) + totalTabAmount,
         xmdActivation: totalActivationFeeXmd,
         xmdBoost: 0,
         xusdcActivation: totalActivationFeeXusdc,
@@ -2315,7 +2341,7 @@ const AdminHub = () => {
                                      </DropdownMenuItem>
                                      <DropdownMenuItem onClick={() => updateAdminRole(admin.id, 'treasurer')} className="font-bold rounded-xl cursor-pointer h-11 focus:bg-cyan-500/10 focus:text-cyan-400">
                                         Set as Treasurer
-                                     </DropdownMenuItem>
+                                      </DropdownMenuItem>
                                      <div className="h-px bg-white/5 my-1" />
                                      {isPermanentAdmin && (
                                        <DropdownMenuItem 
