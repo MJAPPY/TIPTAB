@@ -171,8 +171,7 @@ const AdminHub = () => {
     session,
     resetLiveTicker,
     dbCreators,
-    fetchDbCreators,
-    featuredHandles
+    fetchDbCreators
   } = useXpr();
   
   const navigate = useNavigate();
@@ -229,24 +228,12 @@ const AdminHub = () => {
   // Live leaderboard winners state for Rewards Console (initialized cleanly)
   const [winners, setWinners] = useState<{ account: string; role: string; rank: number; reward: string }[]>([]);
 
-  // State to hold dynamically computed real-time treasury data
-  const [realTreasuryTotals, setRealTreasuryTotals] = useState({
-    xprActivation: 0,
-    xprBoost: 0,
-    tabActivation: 0,
-    tabBoost: 0,
-    xmdActivation: 0,
-    xmdBoost: 0,
-    xusdcActivation: 0,
-    xusdcBoost: 0
-  });
-
   // Sync moderated list with real database creators
   useEffect(() => {
     setModeratedCreators(dbCreators);
   }, [dbCreators]);
 
-  // Fetch real database live stats & compute actual treasury metrics dynamically
+  // Fetch real database live stats
   const fetchLiveStats = useCallback(async () => {
     try {
       const activeCount = dbCreators.length;
@@ -290,38 +277,10 @@ const AdminHub = () => {
         newProfiles24h: newProfiles || 0,
         performanceBoosts24h: activeCount > 0 ? Math.ceil(activeCount / 3) : 0
       });
-
-      // --- ADVANCED REAL-TIME TREASURY AGGREGATION ---
-      // We calculate real network metrics based on database state:
-      const proCreatorsCount = dbCreators.filter(c => c.membershipLevel === 'pro').length;
-      const totalActivationFeeXpr = proCreatorsCount * parseFloat(membershipFee || "2500");
-      const totalActivationFeeXmd = proCreatorsCount * parseFloat(membershipFeeXmd || "2.50");
-      const totalActivationFeeXusdc = proCreatorsCount * parseFloat(membershipFeeXusdc || "2.50");
-
-      // Calculate on-chain boost allocations (boosted streams x boost prices)
-      const boostedCount = featuredHandles.length;
-      const boostPriceXprNum = parseFloat(boostPrice || "1000");
-      const boostPriceTabNum = parseFloat(boostTabPrice || "1800");
-      const boostPriceXusdcNum = parseFloat(boostPriceXusdc || "1.00");
-
-      // Aggregated votes transaction volume
-      const totalVotesVolumeTab = totalTabAmount;
-
-      setRealTreasuryTotals({
-        xprActivation: totalActivationFeeXpr,
-        xprBoost: boostedCount * boostPriceXprNum,
-        tabActivation: 0, // TAB is not used for activation, only tipping/boosting
-        tabBoost: (boostedCount * boostPriceTabNum) + totalVotesVolumeTab,
-        xmdActivation: totalActivationFeeXmd,
-        xmdBoost: 0,
-        xusdcActivation: totalActivationFeeXusdc,
-        xusdcBoost: boostedCount * boostPriceXusdcNum
-      });
-
     } catch (e) {
       console.error("Failed to fetch live admin stats:", e);
     }
-  }, [dbCreators, featuredHandles, membershipFee, membershipFeeXmd, membershipFeeXusdc, boostPrice, boostTabPrice, boostPriceXusdc]);
+  }, [dbCreators]);
 
   // Fetch showcase sites from Supabase/Local Storage
   const fetchShowcaseSites = useCallback(async () => {
@@ -512,44 +471,19 @@ const AdminHub = () => {
   const [newPromoValue, setNewPromoValue] = useState("50");
   const [newPromoUses, setNewPromoUses] = useState("100");
 
-  // Multi-token Financial Data dynamically computed from real-time database totals
-  const treasuryData = useMemo(() => {
-    const staticBase = [
-      { 
-        symbol: "XPR", 
-        totalActivation: realTreasuryTotals.xprActivation || 25000, 
-        boostVolume: realTreasuryTotals.xprBoost || 3000, 
-        color: "text-orange-500", 
-        bg: "from-orange-500/10", 
-        icon: Zap 
-      },
-      { 
-        symbol: "TAB", 
-        totalActivation: realTreasuryTotals.tabActivation || 0, 
-        boostVolume: realTreasuryTotals.tabBoost || 18000, 
-        color: "text-purple-400", 
-        bg: "from-purple-500/10", 
-        icon: Sparkles 
-      },
-      { 
-        symbol: "XMD", 
-        totalActivation: realTreasuryTotals.xmdActivation || 25, 
-        boostVolume: realTreasuryTotals.xmdBoost || 0, 
-        color: "text-cyan-400", 
-        bg: "from-cyan-500/10", 
-        icon: Globe 
-      },
-      { 
-        symbol: "XUSDC", 
-        totalActivation: realTreasuryTotals.xusdcActivation || 25, 
-        boostVolume: realTreasuryTotals.xusdcBoost || 3, 
-        color: "text-green-400", 
-        bg: "from-green-500/10", 
-        icon: HandCoins 
-      }
+  // Multi-token Financial Data loaded from localStorage
+  const [rawTreasuryData, setRawTreasuryData] = useState(() => {
+    const saved = localStorage.getItem("tiptab_treasury_ledger");
+    return saved ? JSON.parse(saved) : [
+      { symbol: "XPR", totalActivation: 0, boostVolume: 0, color: "text-orange-500", bg: "from-orange-500/10", icon: Zap },
+      { symbol: "TAB", totalActivation: 0, boostVolume: 0, color: "text-purple-400", bg: "from-purple-500/10", icon: Sparkles },
+      { symbol: "XMD", totalActivation: 0, boostVolume: 0, color: "text-cyan-400", bg: "from-cyan-500/10", icon: Globe },
+      { symbol: "XUSDC", totalActivation: 0, boostVolume: 0, color: "text-green-400", bg: "from-green-500/10", icon: HandCoins }
     ];
+  });
 
-    return staticBase.map((item: any) => {
+  const treasuryData = useMemo(() => {
+    return rawTreasuryData.map((item: any) => {
       // 50% SPLIT: 50% to Rewards, 50% to Admin Net
       const rewards = item.boostVolume * 0.5;
       const adminBoostShare = item.boostVolume * 0.5;
@@ -562,19 +496,16 @@ const AdminHub = () => {
         splitPolicy: "50/50 Rewards Split"
       };
     });
-  }, [realTreasuryTotals]);
+  }, [rawTreasuryData]);
 
   const handleResetTreasury = () => {
-    setRealTreasuryTotals({
-      xprActivation: 0,
-      xprBoost: 0,
-      tabActivation: 0,
-      tabBoost: 0,
-      xmdActivation: 0,
-      xmdBoost: 0,
-      xusdcActivation: 0,
-      xusdcBoost: 0
-    });
+    const resetData = rawTreasuryData.map((item: any) => ({
+      ...item,
+      totalActivation: 0,
+      boostVolume: 0
+    }));
+    setRawTreasuryData(resetData);
+    localStorage.setItem("tiptab_treasury_ledger", JSON.stringify(resetData));
     setIsResetTreasuryOpen(false);
     toast({
       title: "Ledger Reset Successful",
@@ -1508,6 +1439,7 @@ const AdminHub = () => {
                                       {asset.revenue.toLocaleString()} <span className={cn("text-lg", asset.color)}>{asset.symbol}</span>
                                     </p>
                                   </div>
+                                animate-pulse
                                </div>
 
                                <div className="grid grid-cols-2 gap-6 pt-6 border-t border-white/5">
@@ -1848,7 +1780,7 @@ const AdminHub = () => {
                   </CardContent>
                 </Card>
                 <Card className="lg:col-span-8 bg-[#1a112d] border border-white/10 rounded-[32px] overflow-hidden shadow-2xl">
-                  <CardHeader className="p-8 border-b border-white/5 bg-white/[0.02]">
+                  <CardHeader className="p-8 border-b border-white/5">
                     <CardTitle className="text-xl font-black text-white italic uppercase">Active Promo Codes</CardTitle>
                   </CardHeader>
                   <CardContent className="p-0">
