@@ -120,38 +120,28 @@ export const Hero = ({ creators, onJoin }: HeroProps) => {
             </div>
           </div>
           
-          {/* Right Visual Image Showcase Card Side (Desktop) */}
+          {/* Right Visual Image Showcase Side (Desktop) */}
           <div className="flex-1 relative lg:block hidden">
             <div className="relative z-10 flex items-center justify-center">
-              {/* Backlit glow matching the theme */}
-              <div className="absolute inset-0 bg-purple-600/20 blur-[130px] rounded-full scale-110" />
-              <div className="absolute -inset-10 bg-orange-500/10 blur-[90px] rounded-full" />
+              {/* Radial BACKLIT Glow balls that spill out behind the floating image */}
+              <div className="absolute w-[350px] h-[350px] bg-purple-600/30 blur-[100px] rounded-full scale-110 animate-pulse-slow" />
+              <div className="absolute w-[250px] h-[250px] bg-orange-500/20 blur-[80px] rounded-full scale-90 translate-x-12 -translate-y-12" />
               
-              {/* Interactive Glassmorphic Frame Container */}
-              <div className="relative group max-w-[540px] w-full aspect-[4/3] rounded-[48px] p-2.5 bg-gradient-to-br from-orange-500/40 via-purple-500/20 to-cyan-500/30 border border-white/20 shadow-[0_50px_100px_-20px_rgba(0,0,0,0.9),0_0_40px_rgba(168,85,247,0.2)] hover:scale-[1.02] transition-transform duration-700 ease-out cursor-pointer overflow-hidden">
-                {/* Internal card glass reflection overlay */}
-                <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-white/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none z-20" />
-                
-                {/* Double frame corner accents */}
-                <div className="absolute top-4 left-4 h-4 w-4 border-t-2 border-l-2 border-orange-400/80 z-20" />
-                <div className="absolute bottom-4 right-4 h-4 w-4 border-b-2 border-r-2 border-purple-400/80 z-20" />
-                
-                {/* Embedded Floating Active Indicator */}
-                <div className="absolute top-6 right-6 z-20 flex items-center gap-2 px-3 py-1.5 rounded-full bg-black/60 backdrop-blur-md border border-white/10 shadow-lg">
-                  <div className="h-2 w-2 rounded-full bg-emerald-400 animate-pulse shadow-[0_0_8px_rgba(52,211,153,0.8)]" />
-                  <span className="text-[9px] font-black uppercase tracking-wider text-white">Live Network Showcase</span>
-                </div>
+              {/* Borderless Floating Container */}
+              <div className="relative max-w-[500px] w-full aspect-[4/3] rounded-[40px] overflow-hidden shadow-[0_30px_100px_-20px_rgba(168,85,247,0.35),0_15px_50px_-15px_rgba(249,115,22,0.25)] hover:scale-[1.015] hover:shadow-[0_40px_120px_-15px_rgba(168,85,247,0.5),0_20px_60px_-10px_rgba(249,115,22,0.35)] transition-all duration-700 ease-out">
+                {/* 3D Glass Light Sweeping overlay */}
+                <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-white/[0.05] to-transparent pointer-events-none z-25" />
 
-                {/* Substantially stylized image container */}
-                <div className="relative w-full h-full rounded-[38px] overflow-hidden bg-black/65">
-                  <img 
-                    src={HERO_IMAGE_URL} 
-                    alt="TIPTAB Ecosystem Showcase"
-                    className="w-full h-full object-cover relative z-10 opacity-90 group-hover:opacity-100 group-hover:scale-[1.05] transition-all duration-700 ease-out filter contrast-[1.05] saturate-[1.05]"
-                  />
-                  {/* Bottom Vignette */}
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/10 to-transparent z-15 pointer-events-none" />
-                </div>
+                {/* Main Image Layer */}
+                <img 
+                  src={HERO_IMAGE_URL} 
+                  alt="TIPTAB Ecosystem Showcase"
+                  className="w-full h-full object-cover opacity-90 hover:opacity-100 transition-all duration-700 filter contrast-[1.03] saturate-[1.05]"
+                />
+
+                {/* Dark Vignette Overlay that melts the borders seamlessly into the dark `#0a0514` page background */}
+                <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,transparent_20%,rgba(10,5,20,0.85)_100%)] z-20 pointer-events-none" />
+                <div className="absolute inset-0 bg-gradient-to-t from-[#0a0514] via-[#0a0514]/10 to-transparent z-20 pointer-events-none" />
               </div>
             </div>
           </div>
