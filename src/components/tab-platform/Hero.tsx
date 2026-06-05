@@ -5,6 +5,9 @@ import { useXpr } from "@/contexts/XprContext";
 import { TOKEN_LOGOS } from "@/constants/logos";
 import { cn } from "@/lib/utils";
 
+// Import the image file through Vite so it resolves to a valid public URL in the preview iframe
+import heroImage from "../../../.dyad/media/7dd414cfd4dba583ba648b6242083b32facc3ab33dacc2cff0f25b3218dcdfc7.jpg";
+
 interface HeroProps {
   creators: Creator[];
   onJoin?: () => void;
@@ -24,8 +27,6 @@ export const Hero = ({ creators, onJoin }: HeroProps) => {
     { symbol: "LOAN", color: "text-blue-500", glow: "rgba(59,130,246,0.3)" },
     { symbol: "XMT", color: "text-emerald-400", glow: "rgba(16,185,129,0.3)" },
   ];
-
-  const HERO_IMAGE_URL = "dyad-media://media/TIPTAB/.dyad/media/7dd414cfd4dba583ba648b6242083b32facc3ab33dacc2cff0f25b3218dcdfc7.jpg";
 
   return (
     <section className="relative pt-8 md:pt-16 pb-24 md:pb-32 overflow-hidden">
@@ -123,25 +124,17 @@ export const Hero = ({ creators, onJoin }: HeroProps) => {
           {/* Right Visual Image Showcase Side (Desktop) */}
           <div className="flex-1 relative lg:block hidden">
             <div className="relative z-10 flex items-center justify-center">
-              {/* Radial BACKLIT Glow balls that spill out behind the floating image */}
-              <div className="absolute w-[350px] h-[350px] bg-purple-600/30 blur-[100px] rounded-full scale-110 animate-pulse-slow" />
-              <div className="absolute w-[250px] h-[250px] bg-orange-500/20 blur-[80px] rounded-full scale-90 translate-x-12 -translate-y-12" />
+              {/* Massive backlighting glows */}
+              <div className="absolute w-[450px] h-[450px] bg-purple-600/20 blur-[130px] rounded-full animate-pulse z-0" />
+              <div className="absolute w-[350px] h-[350px] bg-orange-500/15 blur-[100px] rounded-full translate-x-12 -translate-y-12 z-0" />
               
-              {/* Borderless Floating Container */}
-              <div className="relative max-w-[500px] w-full aspect-[4/3] rounded-[40px] overflow-hidden shadow-[0_30px_100px_-20px_rgba(168,85,247,0.35),0_15px_50px_-15px_rgba(249,115,22,0.25)] hover:scale-[1.015] hover:shadow-[0_40px_120px_-15px_rgba(168,85,247,0.5),0_20px_60px_-10px_rgba(249,115,22,0.35)] transition-all duration-700 ease-out">
-                {/* 3D Glass Light Sweeping overlay */}
-                <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-white/[0.05] to-transparent pointer-events-none z-25" />
-
-                {/* Main Image Layer */}
+              {/* 100% Borderless, Floating Image Container with soft radial gradient masking */}
+              <div className="relative max-w-[520px] w-full aspect-[4/3] z-10 flex items-center justify-center [mask-image:radial-gradient(circle_at_center,rgba(0,0,0,1)_35%,rgba(0,0,0,0)_75%)] [-webkit-mask-image:radial-gradient(circle_at_center,rgba(0,0,0,1)_35%,rgba(0,0,0,0)_75%)] select-none pointer-events-none">
                 <img 
-                  src={HERO_IMAGE_URL} 
+                  src={heroImage} 
                   alt="TIPTAB Ecosystem Showcase"
-                  className="w-full h-full object-cover opacity-90 hover:opacity-100 transition-all duration-700 filter contrast-[1.03] saturate-[1.05]"
+                  className="w-full h-full object-cover opacity-85 hover:opacity-100 scale-105 transition-all duration-700 filter contrast-[1.05] saturate-[1.05]"
                 />
-
-                {/* Dark Vignette Overlay that melts the borders seamlessly into the dark `#0a0514` page background */}
-                <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,transparent_20%,rgba(10,5,20,0.85)_100%)] z-20 pointer-events-none" />
-                <div className="absolute inset-0 bg-gradient-to-t from-[#0a0514] via-[#0a0514]/10 to-transparent z-20 pointer-events-none" />
               </div>
             </div>
           </div>
