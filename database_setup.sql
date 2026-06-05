@@ -121,30 +121,44 @@ GRANT SELECT, INSERT, UPDATE, DELETE ON TABLE public.profile_views TO authentica
 GRANT SELECT, INSERT, UPDATE, DELETE ON TABLE public.profile_views TO service_role;
 GRANT SELECT, INSERT, UPDATE ON TABLE public.profile_views TO anon;
 
--- 9. RLS POLICIES
+-- 9. SAFE RLS POLICIES (Drop existing policies first to prevent conflict errors)
 
 -- Profiles policies
+DROP POLICY IF EXISTS "profiles_select_policy" ON public.profiles;
+DROP POLICY IF EXISTS "profiles_insert_policy" ON public.profiles;
+DROP POLICY IF EXISTS "profiles_update_policy" ON public.profiles;
 CREATE POLICY "profiles_select_policy" ON public.profiles FOR SELECT USING (true);
 CREATE POLICY "profiles_insert_policy" ON public.profiles FOR INSERT WITH CHECK (length(handle) > 0);
 CREATE POLICY "profiles_update_policy" ON public.profiles FOR UPDATE USING (length(handle) > 0) WITH CHECK (length(handle) > 0);
 
 -- Platform settings policies
+DROP POLICY IF EXISTS "settings_select_policy" ON public.platform_settings;
+DROP POLICY IF EXISTS "settings_update_policy" ON public.platform_settings;
 CREATE POLICY "settings_select_policy" ON public.platform_settings FOR SELECT USING (true);
 CREATE POLICY "settings_update_policy" ON public.platform_settings FOR UPDATE USING (true);
 
 -- Showcase sites policies
+DROP POLICY IF EXISTS "showcase_select_policy" ON public.showcase_sites;
+DROP POLICY IF EXISTS "showcase_insert_policy" ON public.showcase_sites;
+DROP POLICY IF EXISTS "showcase_update_policy" ON public.showcase_sites;
 CREATE POLICY "showcase_select_policy" ON public.showcase_sites FOR SELECT USING (true);
 CREATE POLICY "showcase_insert_policy" ON public.showcase_sites FOR INSERT WITH CHECK (length(title) >= 1 AND length(site_url) >= 1);
 CREATE POLICY "showcase_update_policy" ON public.showcase_sites FOR UPDATE USING (length(title) >= 1 AND length(site_url) >= 1);
 
 -- Votes policies
+DROP POLICY IF EXISTS "votes_select_policy" ON public.votes;
+DROP POLICY IF EXISTS "votes_insert_policy" ON public.votes;
 CREATE POLICY "votes_select_policy" ON public.votes FOR SELECT USING (true);
 CREATE POLICY "votes_insert_policy" ON public.votes FOR INSERT WITH CHECK (true);
 
 -- Ledger transactions policies
+DROP POLICY IF EXISTS "ledger_select_policy" ON public.ledger_transactions;
+DROP POLICY IF EXISTS "ledger_insert_policy" ON public.ledger_transactions;
 CREATE POLICY "ledger_select_policy" ON public.ledger_transactions FOR SELECT USING (true);
 CREATE POLICY "ledger_insert_policy" ON public.ledger_transactions FOR INSERT WITH CHECK (true);
 
 -- Profile views policies
+DROP POLICY IF EXISTS "views_select_policy" ON public.profile_views;
+DROP POLICY IF EXISTS "views_insert_policy" ON public.profile_views;
 CREATE POLICY "views_select_policy" ON public.profile_views FOR SELECT USING (true);
 CREATE POLICY "views_insert_policy" ON public.profile_views FOR INSERT WITH CHECK (true);
