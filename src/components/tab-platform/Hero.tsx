@@ -26,12 +26,15 @@ export const Hero = ({ creators, onJoin }: HeroProps) => {
   ];
 
   return (
-    <section className="relative pt-8 md:pt-16 pb-24 md:pb-32 overflow-hidden">
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[1000px] h-[1000px] bg-purple-600/10 blur-[160px] rounded-full -z-10" />
-      <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-orange-500/5 blur-[120px] rounded-full -z-10" />
+    <section className="relative pt-8 md:pt-16 pb-24 md:pb-32 overflow-hidden bg-[#0a0514]">
+      {/* Background glow animations */}
+      <div className="absolute top-1/2 left-1/4 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-purple-600/10 blur-[130px] rounded-full -z-10" />
+      <div className="absolute top-10 right-10 w-[500px] h-[500px] bg-orange-500/5 blur-[120px] rounded-full -z-10" />
       
-      <div className="container mx-auto px-6">
-        <div className="flex flex-col lg:flex-row items-center justify-between gap-12 lg:gap-20">
+      <div className="container mx-auto px-6 relative z-10">
+        <div className="flex flex-col lg:flex-row items-center justify-between gap-12 lg:gap-16">
+          
+          {/* Hero text section */}
           <div className="flex-1 text-left space-y-8 md:space-y-10 max-w-3xl">
             <div className="inline-flex items-center gap-3 px-4 py-2 rounded-full bg-white/10 border border-white/20 backdrop-blur-md shadow-2xl">
               <Heart className="h-4 w-4 text-purple-500 fill-purple-500" />
@@ -116,30 +119,35 @@ export const Hero = ({ creators, onJoin }: HeroProps) => {
             </div>
           </div>
           
-          <div className="flex-1 relative lg:block hidden">
-            <div className="relative z-10 flex items-center justify-center">
-              <div className="absolute inset-0 bg-purple-500/10 blur-[120px] rounded-full scale-150" />
+          {/* Seamlessly Blended Poster Artwork */}
+          <div className="flex-1 relative w-full lg:max-w-[480px] xl:max-w-[520px]">
+            <div className="relative overflow-hidden rounded-[40px]">
+              {/* Top blend overlay */}
+              <div className="absolute top-0 left-0 right-0 h-16 bg-gradient-to-b from-[#0a0514] to-transparent z-10 pointer-events-none" />
+              {/* Bottom blend overlay */}
+              <div className="absolute bottom-0 left-0 right-0 h-20 bg-gradient-to-t from-[#0a0514] to-transparent z-10 pointer-events-none" />
+              {/* Left blend overlay */}
+              <div className="absolute top-0 bottom-0 left-0 w-16 bg-gradient-to-r from-[#0a0514] to-transparent z-10 pointer-events-none" />
+              {/* Right blend overlay */}
+              <div className="absolute top-0 bottom-0 right-0 w-16 bg-gradient-to-l from-[#0a0514] to-transparent z-10 pointer-events-none" />
               
-              <div className="relative group">
-                <img 
-                  src="/logo.png" 
-                  alt="TIPTAB Logo"
-                  className="w-full max-w-[480px] mx-auto drop-shadow-[0_0_50px_rgba(168,85,247,0.4)] animate-delayed-spin cursor-pointer transition-transform duration-700 group-hover:scale-105"
-                />
-              </div>
+              {/* Radial glow spotlight behind poster to make it pop */}
+              <div className="absolute inset-0 bg-radial-spotlight pointer-events-none opacity-40 mix-blend-color-dodge" />
+
+              <img 
+                src="/tiptabhero.jpg" 
+                alt="TIP TAB Network Poster" 
+                className="w-full object-cover transition-transform duration-700 hover:scale-[1.03] select-none pointer-events-none rounded-[40px]"
+              />
             </div>
           </div>
+
         </div>
       </div>
 
       <style>{`
-        @keyframes delayed-spin {
-          0%, 50% { transform: rotate(0deg); }
-          100% { transform: rotate(360deg); }
-        }
-        .animate-delayed-spin {
-          animation: delayed-spin 20s cubic-bezier(0.4, 0, 0.2, 1) infinite;
-          animation-delay: 10s;
+        .bg-radial-spotlight {
+          background: radial-gradient(circle at 50% 50%, rgba(168, 85, 247, 0.4) 0%, transparent 70%);
         }
       `}</style>
     </section>
