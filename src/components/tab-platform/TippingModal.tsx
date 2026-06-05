@@ -16,11 +16,6 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Label } from "@/components/ui/label";
 import { supabase } from "@/integrations/supabase/client";
 
-interface TippingModalProps {
-  creator: Creator | null;
-  onClose: () => void;
-}
-
 const ASSET_CONFIGS: Record<string, { code: string; precision: number }> = {
   TAB: { code: 'tokencreate', precision: 0 },
   XPR: { code: 'eosio.token', precision: 4 },
@@ -101,32 +96,45 @@ export const TippingModal = ({ creator, onClose }: TippingModalProps) => {
         recordTip(Math.floor(amountNum));
       }
 
-      // Record successful tip/vote to DB and Local Storage to ensure real-time standings update
+      // Record successful tip and ledger entry into Supabase
       try {
-        const quarterId = `Q${new Date().getFullYear()}-${Math.floor(new Date().getMonth() / 3) + 1}`;
         const cleanRecipient = creator.handle.toLowerCase().replace('@', '').trim();
         const cleanVoter = actor.toLowerCase().replace('@', '').trim();
-        
-        const newVote = {
-          voter_handle: cleanVoter,
-          candidate_handle: cleanRecipient,
-          tab_amount: Math.floor(amountNum),
-          week_identifier: quarterId,
-          created_at: new Date().toISOString()
-        };
 
-        const localVotes = JSON.parse(localStorage.getItem('tiptab_local_votes') || '[]');
-        localVotes.push(newVote);
-        localStorage.setItem('tiptab_local_votes', JSON.stringify(localVotes));
-
-        await supabase.from('votes').insert({
-          voter_handle: cleanVoter,
-          candidate_handle: cleanRecipient,
-          tab_amount: Math.floor(amountNum),
-          week_identifier: quarterId
+        // 1. Log to the primary unified financial transaction ledger
+        await supabase.from('network_activity').insert({
+          activity_type: 'tip',
+          sender_handle: cleanVoter,
+          recipient_handle: cleanRecipient,
+          amount: amountNum,
+          asset_symbol: asset,
+          memo: message.trim() || 'Tip appreciation'
         });
+
+        // 2. Log to votes (for legacy standings leaderboard)
+        if (asset === 'TAB') {
+          const quarterId = `Q${new Date().getFullYear()}-${Math.floor(new Date().getMonth() / 3) + 1}`;
+          const newVote = {
+            voter_handle: cleanVoter,
+            candidate_handle: cleanRecipient,
+            tab_amount: Math.floor(amountNum),
+            week_identifier: quarterId,
+            created_at: new Date().toISOString()
+          };
+
+          const localVotes = JSON.parse(localStorage.getItem('tiptab_local_votes') || '[]');
+          localVotes.push(newVote);
+          localStorage.setItem('tiptab_local_votes', JSON.stringify(localVotes));
+
+          await supabase.from('votes').insert({
+            voter_handle: cleanVoter,
+            candidate_handle: cleanRecipient,
+            tab_amount: Math.floor(amountNum),
+            week_identifier: quarterId
+          });
+        }
       } catch (dbErr) {
-        console.error("Database sync tip record omitted:", dbErr);
+        console.error("Database sync tip record error:", dbErr);
       }
 
       toast({

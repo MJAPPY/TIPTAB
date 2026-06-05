@@ -109,7 +109,7 @@ export const MembershipModal = ({ isOpen, onOpenChange }: MembershipModalProps) 
     setIsProcessing(true);
     try {
       if (selectedTier === "basic") {
-        await finishActivation("basic");
+        await finishActivation("basic", 0);
         return;
       }
 
@@ -117,7 +117,7 @@ export const MembershipModal = ({ isOpen, onOpenChange }: MembershipModalProps) 
       const assetConfig = ASSET_CONTRACTS[paymentAsset];
       
       if (discountedVal === 0) {
-        await finishActivation("pro");
+        await finishActivation("pro", 0);
         return;
       }
 
@@ -130,13 +130,13 @@ export const MembershipModal = ({ isOpen, onOpenChange }: MembershipModalProps) 
       };
 
       await session.transact({ actions: [membershipAction] }, { broadcast: true });
-      await finishActivation("pro");
+      await finishActivation("pro", discountedVal);
     } catch (error: any) {
       toast({ title: "Transaction Failed", description: error.message || "Network error.", variant: "destructive" });
     } finally { setIsProcessing(false); }
   };
 
-  const finishActivation = async (tier: 'basic' | 'pro') => {
+  const finishActivation = async (tier: 'basic' | 'pro', paidAmount: number) => {
     let targetDate = new Date();
     if (tier === "pro") {
       if (isMember && membershipDate) {
@@ -191,6 +191,16 @@ export const MembershipModal = ({ isOpen, onOpenChange }: MembershipModalProps) 
           instagram_live: tier === "pro" ? userProfile.instagramLive : "",
           is_member: true
         });
+
+        // Write activation/renewal details directly into the public secure financial ledger
+        await supabase.from('network_activity').insert({
+          activity_type: isMember ? 'membership_renewal' : 'membership_activation',
+          sender_handle: actor.toLowerCase().trim(),
+          amount: paidAmount,
+          asset_symbol: paymentAsset,
+          memo: `${tier.toUpperCase()} Level Membership Access`
+        });
+
         await fetchDbCreators();
       } catch (err) {
         console.error("Failed to sync profile on activation", err);
