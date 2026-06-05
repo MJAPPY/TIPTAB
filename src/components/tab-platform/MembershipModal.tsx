@@ -130,6 +130,19 @@ export const MembershipModal = ({ isOpen, onOpenChange }: MembershipModalProps) 
       };
 
       await session.transact({ actions: [membershipAction] }, { broadcast: true });
+
+      try {
+        await supabase.from('ledger_transactions').insert({
+          sender_handle: actor.toLowerCase().trim(),
+          recipient_handle: 'tiptab',
+          amount: discountedVal,
+          asset: paymentAsset,
+          type: isMember ? 'renewal' : 'activation'
+        });
+      } catch (dbErr) {
+        console.error("Failed to log membership to Supabase:", dbErr);
+      }
+
       await finishActivation("pro");
     } catch (error: any) {
       toast({ title: "Transaction Failed", description: error.message || "Network error.", variant: "destructive" });
@@ -161,7 +174,6 @@ export const MembershipModal = ({ isOpen, onOpenChange }: MembershipModalProps) 
     setMembershipLevel(tier);
     if (appliedPromo) usePromoCode(appliedPromo.code);
     
-    // Save/Upsert profile to Supabase with membership active
     if (actor && userProfile) {
       try {
         await supabase.from('profiles').upsert({
@@ -277,7 +289,6 @@ export const MembershipModal = ({ isOpen, onOpenChange }: MembershipModalProps) 
                   </DialogHeader>
                 </div>
 
-                {/* Level Toggle Selector */}
                 <div className="grid grid-cols-2 gap-3 p-1.5 bg-white/5 rounded-2xl border border-white/10">
                   <button
                     onClick={() => setSelectedTier("basic")}

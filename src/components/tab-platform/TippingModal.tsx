@@ -101,7 +101,6 @@ export const TippingModal = ({ creator, onClose }: TippingModalProps) => {
         recordTip(Math.floor(amountNum));
       }
 
-      // Record successful tip/vote to DB and Local Storage to ensure real-time standings update
       try {
         const quarterId = `Q${new Date().getFullYear()}-${Math.floor(new Date().getMonth() / 3) + 1}`;
         const cleanRecipient = creator.handle.toLowerCase().replace('@', '').trim();
@@ -124,6 +123,14 @@ export const TippingModal = ({ creator, onClose }: TippingModalProps) => {
           candidate_handle: cleanRecipient,
           tab_amount: Math.floor(amountNum),
           week_identifier: quarterId
+        });
+
+        await supabase.from('ledger_transactions').insert({
+          sender_handle: cleanVoter,
+          recipient_handle: cleanRecipient,
+          amount: amountNum,
+          asset: asset,
+          type: 'tip'
         });
       } catch (dbErr) {
         console.error("Database sync tip record omitted:", dbErr);

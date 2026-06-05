@@ -75,7 +75,6 @@ const Dashboard = () => {
   const [transferMessage, setTransferMessage] = useState("");
   const [isSending, setIsSending] = useState(false);
 
-  // Analytics Metrics State
   const [tipsReceived, setTipsReceived] = useState(0);
   const [xprReceived, setXprReceived] = useState(0);
   const [profileViews, setProfileViews] = useState(0);
@@ -84,7 +83,6 @@ const Dashboard = () => {
   const alcorUrl = "https://alcor.exchange/v/xpr/swap?input=xpr-eosio.token&output=tab-tokencreate";
   const metalPayUrl = "https://onramp.metalpay.com/buy/xpr";
 
-  // Watch storage updates to cleanly sync workspace modes clicked in the dropdown
   useEffect(() => {
     const checkMode = () => {
       const saved = localStorage.getItem("tiptab_dash_mode");
@@ -100,39 +98,41 @@ const Dashboard = () => {
   const fetchDashboardAnalytics = useCallback(async () => {
     if (!actor) return;
     try {
-      // Query the live Supabase votes/tips table for real-time totals
-      const { data: voteData, error } = await supabase
-        .from('votes')
-        .select('tab_amount, voter_handle, created_at')
-        .eq('candidate_handle', actor.toLowerCase().trim());
+      const { data: tipData, error: tipError } = await supabase
+        .from('ledger_transactions')
+        .select('amount, asset')
+        .eq('recipient_handle', actor.toLowerCase().trim())
+        .eq('type', 'tip');
 
-      if (voteData && !error) {
-        const totalTips = voteData.reduce((sum, v) => sum + Number(v.tab_amount || 0), 0);
-        setTipsReceived(totalTips);
-        
-        // Get saved custom parameters
-        const viewsKey = `tiptab_views_${actor}`;
-        let savedViews = localStorage.getItem(viewsKey);
-        if (!savedViews) {
-          const calculatedViews = Math.max(12, voteData.length * 4 + 8);
-          localStorage.setItem(viewsKey, calculatedViews.toString());
-          savedViews = calculatedViews.toString();
-        }
-        const viewsNum = parseInt(savedViews);
-        setProfileViews(viewsNum);
+      let tabTotal = 0;
+      let xprTotal = 0;
 
-        // Get unique voters as engagement signal
-        const uniqueVoters = new Set(voteData.map(v => v.voter_handle?.toLowerCase().trim())).size;
-        const rate = viewsNum > 0 ? ((uniqueVoters / viewsNum) * 100).toFixed(1) : "0.0";
-        setEngagementRate(parseFloat(rate));
+      if (tipData && !tipError) {
+        tipData.forEach(t => {
+          if (t.asset === 'TAB') tabTotal += Number(t.amount || 0);
+          if (t.asset === 'XPR') xprTotal += Number(t.amount || 0);
+        });
+        setTipsReceived(tabTotal);
+        setXprReceived(xprTotal);
       }
 
-      // Keep local backups for other custom metrics
-      const localXpr = localStorage.getItem(`tiptab_xpr_received_${actor}`);
-      if (localXpr) {
-        setXprReceived(parseInt(localXpr));
-      } else {
-        setXprReceived(0);
+      const { count: viewCount, error: viewError } = await supabase
+        .from('profile_views')
+        .select('*', { count: 'exact', head: true })
+        .eq('profile_handle', actor.toLowerCase().trim());
+      
+      const totalViews = viewCount || 0;
+      setProfileViews(totalViews);
+
+      const { data: voteData, error: voteError } = await supabase
+        .from('votes')
+        .select('voter_handle')
+        .eq('candidate_handle', actor.toLowerCase().trim());
+      
+      if (voteData && !voteError) {
+        const uniqueVoters = new Set(voteData.map(v => v.voter_handle?.toLowerCase().trim())).size;
+        const rate = totalViews > 0 ? ((uniqueVoters / totalViews) * 100).toFixed(1) : "0.0";
+        setEngagementRate(parseFloat(rate));
       }
     } catch (err) {
       console.error("Dashboard database fetch error:", err);
@@ -141,8 +141,6 @@ const Dashboard = () => {
 
   useEffect(() => {
     fetchDashboardAnalytics();
-
-    // Query interval to keep current dashboard statistics always up to date
     const interval = setInterval(fetchDashboardAnalytics, 15000);
     return () => clearInterval(interval);
   }, [actor, fetchDashboardAnalytics]);
@@ -171,13 +169,6 @@ const Dashboard = () => {
     setIsRefreshing(true);
     await refreshBalances();
     await fetchDashboardAnalytics();
-    if (actor) {
-      setProfileViews(prev => {
-        const next = prev + 1;
-        localStorage.setItem(`tiptab_views_${actor}`, next.toString());
-        return next;
-      });
-    }
     setTimeout(() => setIsRefreshing(false), 800);
     toast({ title: "Workspace Synced", description: "All balances and metrics updated with live chain telemetry." });
   };
@@ -216,6 +207,18 @@ const Dashboard = () => {
       await session.transact({ actions }, { broadcast: true });
       if (transferSymbol === "TAB") recordTip(Math.floor(amountNum));
 
+      try {
+        await supabase.from('ledger_transactions').insert({
+          sender_handle: actor.toLowerCase().trim(),
+          recipient_handle: transferRecipient.toLowerCase().trim(),
+          amount: amountNum,
+          asset: transferSymbol,
+          type: 'tip'
+        });
+      } catch (dbErr) {
+        console.error("Transact database logging failed:", dbErr);
+      }
+
       toast({
         title: "Transfer Complete",
         description: `Successfully sent ${formattedQuantity} to @${transferRecipient}`,
@@ -253,7 +256,6 @@ const Dashboard = () => {
     return diffDays < 30; 
   };
 
-  // Safe early returns below all hook definitions to comply with React Hook Rules
   if (!isConnected && !isAuthLoading) {
     return (
       <div className="min-h-screen bg-[#0a0514] flex flex-col items-center justify-center p-6 text-center">
@@ -360,7 +362,6 @@ const Dashboard = () => {
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
-              {/* TAB Balance */}
               <Card className="bg-[#130b21]/60 border-white/10 text-white rounded-[32px] sm:rounded-[40px] p-6 sm:p-10 shadow-2xl relative overflow-hidden group hover:border-orange-500/30 transition-all flex flex-col h-[280px]">
                 <div className="absolute -top-12 -right-12 w-32 h-32 bg-orange-500/10 blur-3xl rounded-full group-hover:bg-orange-500/20 transition-all" />
                 <CardHeader className="p-0">
@@ -379,7 +380,6 @@ const Dashboard = () => {
                 </CardContent>
               </Card>
 
-              {/* XPR Balance */}
               <Card className="bg-[#130b21]/60 border-white/10 text-white rounded-[32px] sm:rounded-[40px] p-6 sm:p-10 shadow-2xl relative overflow-hidden group hover:border-purple-500/30 transition-all flex flex-col h-[280px]">
                 <div className="absolute -top-12 -right-12 w-32 h-32 bg-purple-500/10 blur-3xl rounded-full group-hover:bg-purple-500/20 transition-all" />
                 <CardHeader className="p-0">
@@ -401,7 +401,6 @@ const Dashboard = () => {
                 </CardContent>
               </Card>
 
-              {/* Fiat Stable Balances (XUSDC / XMD) */}
               <Card className="bg-[#130b21]/60 border-white/10 text-white rounded-[32px] sm:rounded-[40px] p-6 sm:p-10 shadow-2xl relative overflow-hidden group hover:border-green-500/30 transition-all flex flex-col h-[280px]">
                 <div className="absolute -top-12 -right-12 w-32 h-32 bg-green-500/10 blur-3xl rounded-full group-hover:bg-green-500/20 transition-all" />
                 <CardHeader className="p-0">

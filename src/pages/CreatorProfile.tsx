@@ -45,13 +45,12 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } f
 const ASSET_CONFIGS: Record<string, { code: string; precision: number }> = {
   TAB: { code: 'tokencreate', precision: 0 },
   XPR: { code: 'eosio.token', precision: 4 },
-  XMD: { code: 'moneda.token', precision: 6 },
+  XMD: { code: 'xmd.token', precision: 6 },
   XUSDC: { code: 'xtokens', precision: 6 },
   METAL: { code: 'token.metal', precision: 8 },
   LOAN: { code: 'loan.token', precision: 4 },
 };
 
-// Target production URL for sharing
 const PRODUCTION_URL = "https://tiptab.org";
 
 const CreatorProfile = () => {
@@ -70,12 +69,10 @@ const CreatorProfile = () => {
   const [isShareOpen, setIsShareOpen] = useState(false);
   const [isCopied, setIsCopied] = useState(false);
   
-  // Interaction Counts
   const [likeCount, setLikeCount] = useState(130);
   const [fireworkCount, setFireworkCount] = useState(42);
   const [applauseCount, setApplauseCount] = useState(84);
 
-  // Ensure page starts at top when handle changes
   useEffect(() => {
     window.scrollTo(0, 0);
   }, [handle]);
@@ -84,21 +81,35 @@ const CreatorProfile = () => {
     if (!handle) return;
     const cleanHandle = handle.replace(/^@/, "").toLowerCase().trim();
     
+    const logProfileView = async () => {
+      try {
+        await supabase.from('profile_views').insert({
+          profile_handle: cleanHandle,
+          viewer_handle: actor || 'anonymous'
+        });
+      } catch (e) {
+        console.error("View logging bypassed:", e);
+      }
+    };
+    logProfileView();
+  }, [handle, actor]);
+
+  useEffect(() => {
+    if (!handle) return;
+    const cleanHandle = handle.replace(/^@/, "").toLowerCase().trim();
+    
     const loadCreator = async () => {
-      // Priority 1: Check if viewing own profile (live context data)
       if (actor === cleanHandle && userProfile) {
         setCreator(userProfile);
         return;
       }
 
-      // Priority 2: Check database creators list in memory
       const foundInDb = dbCreators.find(c => c.handle.toLowerCase() === cleanHandle);
       if (foundInDb) {
         setCreator(foundInDb);
         return;
       }
 
-      // Priority 3: Direct Supabase Fetch (Crucial for cold launches/QR scans!)
       try {
         const { data: dbProfile, error: dbError } = await supabase
           .from('profiles')
@@ -142,14 +153,12 @@ const CreatorProfile = () => {
         console.error("Direct profile load error", e);
       }
       
-      // Priority 4: Check for any local storage overrides for this specific handle
       const localOverride = localStorage.getItem(`tiptab_profile_${cleanHandle}`);
       if (localOverride) {
         setCreator(JSON.parse(localOverride));
         return;
       }
       
-      // Priority 5: Fallback to general user profile (legacy key)
       const savedUser = localStorage.getItem("tiptab_user_profile");
       if (savedUser) {
         const localUser = JSON.parse(savedUser) as Creator;
@@ -159,14 +168,12 @@ const CreatorProfile = () => {
         }
       }
 
-      // Only navigate away if we are certain the profile does not exist anywhere
       navigate("/");
     };
 
     loadCreator();
   }, [handle, navigate, actor, userProfile, dbCreators]);
 
-  // Load reactions dynamically based on creator and global reset flag
   useEffect(() => {
     if (!creator) return;
     const handleLower = creator.handle.toLowerCase().replace('@', '').trim();
@@ -278,7 +285,6 @@ const CreatorProfile = () => {
         recordTip(Math.floor(amountNum));
       }
 
-      // Record successful tip/vote to DB and Local Storage to ensure real-time standings update
       try {
         const quarterId = `Q${new Date().getFullYear()}-${Math.floor(new Date().getMonth() / 3) + 1}`;
         const cleanRecipient = creator.handle.toLowerCase().replace('@', '').trim();
@@ -301,6 +307,14 @@ const CreatorProfile = () => {
           candidate_handle: cleanRecipient,
           tab_amount: Math.floor(amountNum),
           week_identifier: quarterId
+        });
+
+        await supabase.from('ledger_transactions').insert({
+          sender_handle: cleanVoter,
+          recipient_handle: cleanRecipient,
+          amount: amountNum,
+          asset: asset,
+          type: 'tip'
         });
       } catch (dbErr) {
         console.error("Database sync tip record omitted:", dbErr);
@@ -392,7 +406,6 @@ const CreatorProfile = () => {
     );
   }
 
-  // Adjusted quick tiers: TAB is high numeric, stablecoins/XPR are lower
   const quickAmounts = asset === "TAB" ? ["10", "50", "100", "250"] : ["1", "5", "10", "25"];
 
   const liveStreams = [
@@ -406,12 +419,12 @@ const CreatorProfile = () => {
   const isOwner = actor === creator.handle.replace('@', '').toLowerCase();
   const isBoosted = featuredHandles.includes(creator.handle.replace('@', '').toLowerCase());
   const favorited = isFavorite(creator.handle);
-  const cleanHandle = creator.handle.replace(/^@/, "").toLowerCase().trim();
-  const shareUrl = `${PRODUCTION_URL}/tip/${cleanHandle}`;
-  const customShareText = `Got some free time? have a bit of fun & check out ${creator.name} at the global appreciation hub on $xpr network. ${PRODUCTION_URL}/tip/${cleanHandle}`;
+  const cleanHandleObj = creator.handle.replace(/^@/, "").toLowerCase().trim();
+  const shareUrlObj = `${PRODUCTION_URL}/tip/${cleanHandleObj}`;
+  const customShareText = `Got some free time? have a bit of fun & check out ${creator.name} at the global appreciation hub on $xpr network. ${PRODUCTION_URL}/tip/${cleanHandleObj}`;
 
   return (
-    <div className="min-h-screen bg-[#0a0514] text-white selection:bg-purple-500/30">
+    <div className="min-h-screen bg-[#0a0514] text-white selection:bg-orange-500/30">
       <Header onBecomeCreator={() => setIsMembershipOpen(true)} />
       <LiveReactions />
 
@@ -814,7 +827,6 @@ const CreatorProfile = () => {
 
       <MembershipModal isOpen={isMembershipOpen} onOpenChange={setIsMembershipOpen} />
 
-      {/* Enhanced Share Options Dialog */}
       <Dialog open={isShareOpen} onOpenChange={setIsShareOpen}>
         <DialogContent className="bg-[#1e1438]/95 backdrop-blur-3xl border-white/10 text-white rounded-[40px] p-8 max-sm shadow-[0_0_100px_rgba(0,0,0,0.8)] border-t-purple-500/20">
           <DialogHeader className="text-center space-y-3">
@@ -854,7 +866,7 @@ const CreatorProfile = () => {
                 className="h-16 rounded-2xl bg-purple-600/10 border border-purple-600/30 hover:bg-purple-600/20 text-white font-black text-sm uppercase tracking-widest gap-3 justify-start px-6 transition-all"
                >
                  <a 
-                  href={`https://snipverse.com/submit?title=${encodeURIComponent(customShareText)}&url=${encodeURIComponent(shareUrl)}`} 
+                  href={`https://snipverse.com/submit?title=${encodeURIComponent(customShareText)}&url=${encodeURIComponent(shareUrlObj)}`} 
                   target="_blank" 
                   rel="noopener noreferrer"
                  >
@@ -865,7 +877,7 @@ const CreatorProfile = () => {
             </div>
             <div className="bg-white/5 border border-white/10 p-4 rounded-2xl">
                <p className="text-[10px] font-black uppercase tracking-[0.2em] text-white/20 mb-2">Live production link</p>
-               <p className="text-[11px] font-bold text-purple-400 truncate select-all">{shareUrl}</p>
+               <p className="text-[11px] font-bold text-purple-400 truncate select-all">{shareUrlObj}</p>
             </div>
           </div>
         </DialogContent>
