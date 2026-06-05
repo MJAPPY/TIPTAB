@@ -59,7 +59,7 @@ const CreatorProfile = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const { toast } = useToast();
-  const { session, actor, login, isConnected, recordTip, isMember, featuredHandles, boostStream, boostPrice, boostTabPrice, userProfile, isFavorite, toggleFavorite, dbCreators } = useXpr();
+  const { session, actor, login, isConnected, recordTip, recordTxInDb, isMember, featuredHandles, boostStream, boostPrice, boostTabPrice, userProfile, isFavorite, toggleFavorite, dbCreators } = useXpr();
   
   const [creator, setCreator] = useState<Creator | null>(null);
   const [tipAmount, setTipAmount] = useState("50");
@@ -278,33 +278,9 @@ const CreatorProfile = () => {
         recordTip(Math.floor(amountNum));
       }
 
-      // Record successful tip/vote to DB and Local Storage to ensure real-time standings update
-      try {
-        const quarterId = `Q${new Date().getFullYear()}-${Math.floor(new Date().getMonth() / 3) + 1}`;
-        const cleanRecipient = creator.handle.toLowerCase().replace('@', '').trim();
-        const cleanVoter = actor.toLowerCase().replace('@', '').trim();
-        
-        const newVote = {
-          voter_handle: cleanVoter,
-          candidate_handle: cleanRecipient,
-          tab_amount: Math.floor(amountNum),
-          week_identifier: quarterId,
-          created_at: new Date().toISOString()
-        };
-
-        const localVotes = JSON.parse(localStorage.getItem('tiptab_local_votes') || '[]');
-        localVotes.push(newVote);
-        localStorage.setItem('tiptab_local_votes', JSON.stringify(localVotes));
-
-        await supabase.from('votes').insert({
-          voter_handle: cleanVoter,
-          candidate_handle: cleanRecipient,
-          tab_amount: Math.floor(amountNum),
-          week_identifier: quarterId
-        });
-      } catch (dbErr) {
-        console.error("Database sync tip record omitted:", dbErr);
-      }
+      // Record successful tip/vote to DB with dynamic asset support!
+      const quarterId = `Q${new Date().getFullYear()}-${Math.floor(new Date().getMonth() / 3) + 1}`;
+      await recordTxInDb(actor, recipient, amountNum, asset, 'tip', message.trim(), quarterId);
 
       toast({
         title: "Tip Sent!",
@@ -406,9 +382,9 @@ const CreatorProfile = () => {
   const isOwner = actor === creator.handle.replace('@', '').toLowerCase();
   const isBoosted = featuredHandles.includes(creator.handle.replace('@', '').toLowerCase());
   const favorited = isFavorite(creator.handle);
-  const cleanHandle = creator.handle.replace(/^@/, "").toLowerCase().trim();
-  const shareUrl = `${PRODUCTION_URL}/tip/${cleanHandle}`;
-  const customShareText = `Got some free time? have a bit of fun & check out ${creator.name} at the global appreciation hub on $xpr network. ${PRODUCTION_URL}/tip/${cleanHandle}`;
+  const cleanHandle2 = creator.handle.replace(/^@/, "").toLowerCase().trim();
+  const shareUrl = `${PRODUCTION_URL}/tip/${cleanHandle2}`;
+  const customShareText = `Got some free time? have a bit of fun & check out ${creator.name} at the global appreciation hub on $xpr network. ${PRODUCTION_URL}/tip/${cleanHandle2}`;
 
   return (
     <div className="min-h-screen bg-[#0a0514] text-white selection:bg-purple-500/30">
@@ -602,7 +578,7 @@ const CreatorProfile = () => {
                     )}
                     {creator.rumble && (
                       <a href={creator.rumble} target="_blank" rel="noopener noreferrer" className="h-9 w-9 md:h-10 md:w-10 rounded-xl bg-white/5 flex items-center justify-center hover:bg-[#85C742] transition-all shrink-0">
-                        <Video className="h-4 md:h-5 w-4 md:w-5" />
+                        <Video className="h-4 w-4" />
                       </a>
                     )}
                     {creator.facebook && (

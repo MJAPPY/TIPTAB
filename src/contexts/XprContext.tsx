@@ -34,6 +34,7 @@ interface XprContextType {
   setCustomEndpoint?: (endpoint: string) => void;
   refreshBalances: () => Promise<void>;
   recordTip: (amount: number) => void;
+  recordTxInDb: (sender: string, recipient: string, amount: number, asset: string, type: string, memo?: string, weekId?: string) => Promise<void>;
   isConnected: boolean;
   isLoading: boolean;
   isAdmin: boolean;
@@ -176,6 +177,30 @@ export const XprProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     }
   }, []);
 
+  const recordTxInDb = async (
+    sender: string,
+    recipient: string,
+    amount: number,
+    asset: string,
+    type: string,
+    memo?: string,
+    weekId?: string
+  ) => {
+    try {
+      await supabase.from('platform_transactions').insert({
+        sender_handle: sender.toLowerCase().replace('@', '').trim(),
+        recipient_handle: recipient.toLowerCase().replace('@', '').trim(),
+        amount,
+        asset: asset.toUpperCase().trim(),
+        type,
+        memo: memo || "",
+        week_identifier: weekId || null
+      });
+    } catch (err) {
+      console.error("Failed to insert transaction metadata in Supabase:", err);
+    }
+  };
+
   useEffect(() => {
     const purgeSpecificAccount = async () => {
       try {
@@ -219,6 +244,12 @@ export const XprProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         data: { from: session.auth.actor, to: 'tiptab', quantity: formattedAmount, memo: `Boost: ${handle.slice(0, 16)}` },
       };
       await session.transact({ actions: [action] }, { broadcast: true });
+      
+      // Persist transaction record directly to Supabase
+      const actorName = session.auth.actor.toString();
+      const amountNum = parseFloat(price);
+      await recordTxInDb(actorName, 'tiptab', amountNum, asset, 'boost', `Boosted @${handle}`);
+
       const newFeatured = [...featuredHandles, handle.replace('@', '').toLowerCase()];
       setFeaturedHandles(newFeatured);
       localStorage.setItem("tiptab_featured_handles", JSON.stringify(newFeatured));
@@ -575,7 +606,7 @@ export const XprProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
   const value = {
     session, actor: activeActor, balances, isMember, membershipDate, membershipLevel, setIsMember, setMembershipDate, setMembershipLevel, login, logout, refreshBalances, recordTip,
-    isConnected: !!session, isLoading, isAdmin: !!adminHook.currentAdminObj, adminRole: adminHook.currentAdminObj ? adminHook.currentAdminObj.role : null,
+    recordTxInDb, isConnected: !!session, isLoading, isAdmin: !!adminHook.currentAdminObj, adminRole: adminHook.currentAdminObj ? adminHook.currentAdminObj.role : null,
     isPermanentAdmin: adminHook.isCurrentAdminPermanent, ...adminHook, ...platformHook, ...socialHook,
     userProfile, updateUserProfile, featuredHandles, boostStream, distributeXprRewards, dbCreators, fetchDbCreators
   };

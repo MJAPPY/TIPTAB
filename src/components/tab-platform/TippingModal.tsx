@@ -36,7 +36,7 @@ export const TippingModal = ({ creator, onClose }: TippingModalProps) => {
   const [message, setMessage] = useState("");
   const [isProcessing, setIsProcessing] = useState(false);
   const { toast } = useToast();
-  const { session, actor, login, isConnected, recordTip } = useXpr();
+  const { session, actor, login, isConnected, recordTip, recordTxInDb } = useXpr();
 
   const formatValue = (val: string) => {
     const numericValue = parseFloat(val);
@@ -101,33 +101,9 @@ export const TippingModal = ({ creator, onClose }: TippingModalProps) => {
         recordTip(Math.floor(amountNum));
       }
 
-      // Record successful tip/vote to DB and Local Storage to ensure real-time standings update
-      try {
-        const quarterId = `Q${new Date().getFullYear()}-${Math.floor(new Date().getMonth() / 3) + 1}`;
-        const cleanRecipient = creator.handle.toLowerCase().replace('@', '').trim();
-        const cleanVoter = actor.toLowerCase().replace('@', '').trim();
-        
-        const newVote = {
-          voter_handle: cleanVoter,
-          candidate_handle: cleanRecipient,
-          tab_amount: Math.floor(amountNum),
-          week_identifier: quarterId,
-          created_at: new Date().toISOString()
-        };
-
-        const localVotes = JSON.parse(localStorage.getItem('tiptab_local_votes') || '[]');
-        localVotes.push(newVote);
-        localStorage.setItem('tiptab_local_votes', JSON.stringify(localVotes));
-
-        await supabase.from('votes').insert({
-          voter_handle: cleanVoter,
-          candidate_handle: cleanRecipient,
-          tab_amount: Math.floor(amountNum),
-          week_identifier: quarterId
-        });
-      } catch (dbErr) {
-        console.error("Database sync tip record omitted:", dbErr);
-      }
+      // Record successful tip/vote to DB with dynamic asset support!
+      const quarterId = `Q${new Date().getFullYear()}-${Math.floor(new Date().getMonth() / 3) + 1}`;
+      await recordTxInDb(actor, recipient, amountNum, asset, 'tip', message.trim(), quarterId);
 
       toast({
         title: "Tip Sent Successfully!",
