@@ -48,7 +48,7 @@ export const MembershipModal = ({ isOpen, onOpenChange }: MembershipModalProps) 
   const [isProcessing, setIsProcessing] = useState(false);
   const [paymentAsset, setPaymentAsset] = useState<keyof typeof ASSET_CONTRACTS>("XPR");
   const { toast } = useToast();
-  const { session, actor, login, isConnected, setIsMember, setMembershipDate, setMembershipLevel, isMember, membershipDate, membershipFee, membershipFeeXmd, membershipFeeXusdc, membershipFeeMetal, membershipFeeLoan, membershipFeeXmt, applyPromoCode, usePromoCode, userProfile, fetchDbCreators, recordTxInDb } = useXpr();
+  const { session, actor, login, isConnected, setIsMember, setMembershipDate, setMembershipLevel, isMember, membershipDate, membershipFee, membershipFeeXmd, membershipFeeXusdc, membershipFeeMetal, membershipFeeLoan, membershipFeeXmt, applyPromoCode, usePromoCode, userProfile, fetchDbCreators } = useXpr();
 
   const [promoInput, setPromoInput] = useState("");
   const [appliedPromo, setAppliedPromo] = useState<PromoCode | null>(null);
@@ -130,10 +130,6 @@ export const MembershipModal = ({ isOpen, onOpenChange }: MembershipModalProps) 
       };
 
       await session.transact({ actions: [membershipAction] }, { broadcast: true });
-      
-      // Persist transaction record directly inside Supabase
-      await recordTxInDb(actor, 'tiptab', discountedVal, paymentAsset, 'activation', isMember ? 'Pro Renewal' : 'Pro Activation');
-
       await finishActivation("pro");
     } catch (error: any) {
       toast({ title: "Transaction Failed", description: error.message || "Network error.", variant: "destructive" });
