@@ -100,44 +100,39 @@ const Dashboard = () => {
   const fetchDashboardAnalytics = useCallback(async () => {
     if (!actor) return;
     try {
-      const cleanActor = actor.toLowerCase().trim();
+      // Query the live Supabase votes/tips table for real-time totals
+      const { data: voteData, error } = await supabase
+        .from('votes')
+        .select('tab_amount, voter_handle, created_at')
+        .eq('candidate_handle', actor.toLowerCase().trim());
 
-      // Query live unified transactions_log for precise tipping metrics
-      const { data: logData, error: logError } = await supabase
-        .from('transactions_log')
-        .select('*')
-        .eq('recipient', cleanActor)
-        .eq('purpose', 'tip');
-
-      if (logData && !logError) {
-        // TAB tip total
-        const tabSum = logData
-          .filter(t => t.asset === 'TAB')
-          .reduce((sum, t) => sum + Number(t.amount || 0), 0);
-        setTipsReceived(tabSum);
-
-        // XPR tip total
-        const xprSum = logData
-          .filter(t => t.asset === 'XPR')
-          .reduce((sum, t) => sum + Number(t.amount || 0), 0);
-        setXprReceived(xprSum);
-
-        // Unique senders as engagement signal
-        const uniqueSenders = new Set(logData.map(t => t.sender.toLowerCase().trim())).size;
-
-        // Custom view counter
+      if (voteData && !error) {
+        const totalTips = voteData.reduce((sum, v) => sum + Number(v.tab_amount || 0), 0);
+        setTipsReceived(totalTips);
+        
+        // Get saved custom parameters
         const viewsKey = `tiptab_views_${actor}`;
         let savedViews = localStorage.getItem(viewsKey);
         if (!savedViews) {
-          const calculatedViews = Math.max(12, logData.length * 4 + 8);
+          const calculatedViews = Math.max(12, voteData.length * 4 + 8);
           localStorage.setItem(viewsKey, calculatedViews.toString());
           savedViews = calculatedViews.toString();
         }
         const viewsNum = parseInt(savedViews);
         setProfileViews(viewsNum);
 
-        const rate = viewsNum > 0 ? ((uniqueSenders / viewsNum) * 100).toFixed(1) : "0.0";
+        // Get unique voters as engagement signal
+        const uniqueVoters = new Set(voteData.map(v => v.voter_handle?.toLowerCase().trim())).size;
+        const rate = viewsNum > 0 ? ((uniqueVoters / viewsNum) * 100).toFixed(1) : "0.0";
         setEngagementRate(parseFloat(rate));
+      }
+
+      // Keep local backups for other custom metrics
+      const localXpr = localStorage.getItem(`tiptab_xpr_received_${actor}`);
+      if (localXpr) {
+        setXprReceived(parseInt(localXpr));
+      } else {
+        setXprReceived(0);
       }
     } catch (err) {
       console.error("Dashboard database fetch error:", err);

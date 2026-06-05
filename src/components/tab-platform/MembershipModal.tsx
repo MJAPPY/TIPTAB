@@ -48,7 +48,7 @@ export const MembershipModal = ({ isOpen, onOpenChange }: MembershipModalProps) 
   const [isProcessing, setIsProcessing] = useState(false);
   const [paymentAsset, setPaymentAsset] = useState<keyof typeof ASSET_CONTRACTS>("XPR");
   const { toast } = useToast();
-  const { session, actor, login, isConnected, setIsMember, setMembershipDate, setMembershipLevel, isMember, membershipDate, membershipFee, membershipFeeXmd, membershipFeeXusdc, membershipFeeMetal, membershipFeeLoan, membershipFeeXmt, applyPromoCode, usePromoCode, userProfile, fetchDbCreators, logDbTransaction } = useXpr();
+  const { session, actor, login, isConnected, setIsMember, setMembershipDate, setMembershipLevel, isMember, membershipDate, membershipFee, membershipFeeXmd, membershipFeeXusdc, membershipFeeMetal, membershipFeeLoan, membershipFeeXmt, applyPromoCode, usePromoCode, userProfile, fetchDbCreators } = useXpr();
 
   const [promoInput, setPromoInput] = useState("");
   const [appliedPromo, setAppliedPromo] = useState<PromoCode | null>(null);
@@ -130,10 +130,6 @@ export const MembershipModal = ({ isOpen, onOpenChange }: MembershipModalProps) 
       };
 
       await session.transact({ actions: [membershipAction] }, { broadcast: true });
-      
-      // Log Membership payment to database
-      await logDbTransaction(actor, 'tiptab', discountedVal, paymentAsset, 'membership', `${selectedTier.toUpperCase()} Membership`);
-
       await finishActivation("pro");
     } catch (error: any) {
       toast({ title: "Transaction Failed", description: error.message || "Network error.", variant: "destructive" });

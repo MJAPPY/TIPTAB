@@ -85,7 +85,7 @@ const Showcase = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
-  const { actor, isConnected, login, session, refreshBalances, logDbTransaction } = useXpr();
+  const { actor, isConnected, login, session, refreshBalances } = useXpr();
   const { toast } = useToast();
 
   const [dbSites, setDbSites] = useState<ShowcaseSite[]>([]);
@@ -216,9 +216,6 @@ const Showcase = () => {
       };
 
       await session.transact({ actions: [transferAction] }, { broadcast: true });
-
-      // Log Directory showcase payment to DB
-      await logDbTransaction(actor, 'tiptab', 5000, 'XPR', 'showcase', `Showcase: ${title.trim().slice(0, 20)}`);
 
       // 2. If transfer succeeds, save project to Directory
       const newSite = {

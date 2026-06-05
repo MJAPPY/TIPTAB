@@ -45,7 +45,7 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } f
 const ASSET_CONFIGS: Record<string, { code: string; precision: number }> = {
   TAB: { code: 'tokencreate', precision: 0 },
   XPR: { code: 'eosio.token', precision: 4 },
-  XMD: { code: 'xmd.token', precision: 6 },
+  XMD: { code: 'moneda.token', precision: 6 },
   XUSDC: { code: 'xtokens', precision: 6 },
   METAL: { code: 'token.metal', precision: 8 },
   LOAN: { code: 'loan.token', precision: 4 },
@@ -59,7 +59,7 @@ const CreatorProfile = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const { toast } = useToast();
-  const { session, actor, login, isConnected, recordTip, isMember, featuredHandles, boostStream, boostPrice, boostTabPrice, userProfile, isFavorite, toggleFavorite, dbCreators, logDbTransaction } = useXpr();
+  const { session, actor, login, isConnected, recordTip, isMember, featuredHandles, boostStream, boostPrice, boostTabPrice, userProfile, isFavorite, toggleFavorite, dbCreators } = useXpr();
   
   const [creator, setCreator] = useState<Creator | null>(null);
   const [tipAmount, setTipAmount] = useState("50");
@@ -277,9 +277,6 @@ const CreatorProfile = () => {
       if (asset === "TAB") {
         recordTip(Math.floor(amountNum));
       }
-
-      // Log successful tip to public.transactions_log
-      await logDbTransaction(actor, recipient, amountNum, asset, 'tip', message.trim() || 'Tipped via TipTab Profile');
 
       // Record successful tip/vote to DB and Local Storage to ensure real-time standings update
       try {
