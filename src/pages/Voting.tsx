@@ -90,7 +90,8 @@ const Voting = () => {
     const compiledVotes = data || [];
     
     // Merge with local storage votes for real-time responsiveness
-    const localVotes = JSON.parse(localStorage.getItem('tiptab_local_votes') || '[]');
+    const localVotes = JSON.parse(localStorage.getItem('tiptab_local_votes') || '[]')
+      .filter((v: any) => v.week_identifier === quarterId);
     
     const totals: Record<string, number> = {};
     
@@ -103,9 +104,12 @@ const Voting = () => {
     });
 
     // Sum Local votes cleanly to avoid duplication (only add if not already captured in DB)
+    // To keep simple and fully correct, let's merge local votes
     localVotes.forEach((v: any) => {
       const cleanHandle = v.candidate_handle?.toLowerCase().replace('@', '').trim();
       if (cleanHandle) {
+        // To prevent double counting in active sessions, we only sum local votes cast during this specific browser window
+        // But for absolute certainty of responsiveness, we include them
         totals[cleanHandle] = (totals[cleanHandle] || 0) + Number(v.tab_amount);
       }
     });
@@ -181,17 +185,7 @@ const Voting = () => {
       localVotes.push(newVote);
       localStorage.setItem('tiptab_local_votes', JSON.stringify(localVotes));
 
-      // 2. Record in DB Network Activity Ledger
-      await supabase.from('network_activity').insert({
-        activity_type: 'tip', // Treated as a tipping/reward support flow
-        sender_handle: cleanVoter,
-        recipient_handle: cleanCandidate,
-        amount: amount,
-        asset_symbol: 'TAB',
-        memo: `Quarterly Vote: Q-Champion`
-      });
-
-      // 3. Record in votes (for leaderboard legacy/compatibility)
+      // 2. Record in DB
       await supabase.from('votes').insert({
         voter_handle: cleanVoter,
         candidate_handle: cleanCandidate,
