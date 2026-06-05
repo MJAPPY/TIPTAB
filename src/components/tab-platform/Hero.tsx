@@ -25,18 +25,14 @@ export const Hero = ({ creators, onJoin }: HeroProps) => {
     { symbol: "XMT", color: "text-emerald-400", glow: "rgba(16,185,129,0.3)" },
   ];
 
-  const HERO_IMAGE_URL = "dyad-media://media/TIPTAB/.dyad/media/7dd414cfd4dba583ba648b6242083b32facc3ab33dacc2cff0f25b3218dcdfc7.jpg";
-
   return (
     <section className="relative pt-8 md:pt-16 pb-24 md:pb-32 overflow-hidden">
-      {/* Background radial spotlights */}
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[1000px] h-[1000px] bg-purple-600/10 blur-[160px] rounded-full -z-10" />
       <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-orange-500/5 blur-[120px] rounded-full -z-10" />
       
       <div className="container mx-auto px-6">
         <div className="flex flex-col lg:flex-row items-center justify-between gap-12 lg:gap-20">
-          {/* Left Content Side */}
-          <div className="flex-1 text-left space-y-8 md:space-y-10 max-w-3xl relative z-10">
+          <div className="flex-1 text-left space-y-8 md:space-y-10 max-w-3xl">
             <div className="inline-flex items-center gap-3 px-4 py-2 rounded-full bg-white/10 border border-white/20 backdrop-blur-md shadow-2xl">
               <Heart className="h-4 w-4 text-purple-500 fill-purple-500" />
               <span className="text-white/90 text-xs font-black uppercase tracking-[0.2em]">Powered by XPR Network</span>
@@ -120,43 +116,32 @@ export const Hero = ({ creators, onJoin }: HeroProps) => {
             </div>
           </div>
           
-          {/* Right Visual Image Showcase Card Side (Desktop) */}
           <div className="flex-1 relative lg:block hidden">
             <div className="relative z-10 flex items-center justify-center">
-              {/* Backlit glow matching the theme */}
-              <div className="absolute inset-0 bg-purple-600/20 blur-[130px] rounded-full scale-110" />
-              <div className="absolute -inset-10 bg-orange-500/10 blur-[90px] rounded-full" />
+              <div className="absolute inset-0 bg-purple-500/10 blur-[120px] rounded-full scale-150" />
               
-              {/* Interactive Glassmorphic Frame Container */}
-              <div className="relative group max-w-[540px] w-full aspect-[4/3] rounded-[48px] p-2.5 bg-gradient-to-br from-orange-500/40 via-purple-500/20 to-cyan-500/30 border border-white/20 shadow-[0_50px_100px_-20px_rgba(0,0,0,0.9),0_0_40px_rgba(168,85,247,0.2)] hover:scale-[1.02] transition-transform duration-700 ease-out cursor-pointer overflow-hidden">
-                {/* Internal card glass reflection overlay */}
-                <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-white/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none z-20" />
-                
-                {/* Double frame corner accents */}
-                <div className="absolute top-4 left-4 h-4 w-4 border-t-2 border-l-2 border-orange-400/80 z-20" />
-                <div className="absolute bottom-4 right-4 h-4 w-4 border-b-2 border-r-2 border-purple-400/80 z-20" />
-                
-                {/* Embedded Floating Active Indicator */}
-                <div className="absolute top-6 right-6 z-20 flex items-center gap-2 px-3 py-1.5 rounded-full bg-black/60 backdrop-blur-md border border-white/10 shadow-lg">
-                  <div className="h-2 w-2 rounded-full bg-emerald-400 animate-pulse shadow-[0_0_8px_rgba(52,211,153,0.8)]" />
-                  <span className="text-[9px] font-black uppercase tracking-wider text-white">Live Network Showcase</span>
-                </div>
-
-                {/* Substantially stylized image container */}
-                <div className="relative w-full h-full rounded-[38px] overflow-hidden bg-black/65">
-                  <img 
-                    src={HERO_IMAGE_URL} 
-                    alt="TIPTAB Ecosystem Showcase"
-                    className="w-full h-full object-cover relative z-10 opacity-90 group-hover:opacity-100 group-hover:scale-[1.05] transition-all duration-700 ease-out filter contrast-[1.05] saturate-[1.05]"
-                  />
-                  {/* Bottom Vignette */}
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/10 to-transparent z-15 pointer-events-none" />
-                </div>
+              <div className="relative group">
+                <img 
+                  src="/logo.png" 
+                  alt="TIPTAB Logo"
+                  className="w-full max-w-[480px] mx-auto drop-shadow-[0_0_50px_rgba(168,85,247,0.4)] animate-delayed-spin cursor-pointer transition-transform duration-700 group-hover:scale-105"
+                />
               </div>
             </div>
           </div>
         </div>
       </div>
+
+      <style>{`
+        @keyframes delayed-spin {
+          0%, 50% { transform: rotate(0deg); }
+          100% { transform: rotate(360deg); }
+        }
+        .animate-delayed-spin {
+          animation: delayed-spin 20s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+          animation-delay: 10s;
+        }
+      `}</style>
     </section>
   );
 };
