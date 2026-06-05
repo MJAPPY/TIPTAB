@@ -225,7 +225,7 @@ const AdminHub = () => {
     performanceBoosts24h: 0
   });
 
-  // Live leaderboard winners state for Rewards Console (initialized cleanly)
+  // Live leaderboard winners state for Rewards Console
   const [winners, setWinners] = useState<{ account: string; role: string; rank: number; reward: string }[]>([]);
 
   // Sync moderated list with real database creators
@@ -233,7 +233,15 @@ const AdminHub = () => {
     setModeratedCreators(dbCreators);
   }, [dbCreators]);
 
-  // Fetch real database live stats
+  // Multi-token Financial Data loaded and synced from Supabase database
+  const [rawTreasuryData, setRawTreasuryData] = useState([
+    { symbol: "XPR", totalActivation: 0, boostVolume: 0, color: "text-orange-500", bg: "from-orange-500/10", icon: Zap },
+    { symbol: "TAB", totalActivation: 0, boostVolume: 0, color: "text-purple-400", bg: "from-purple-500/10", icon: Sparkles },
+    { symbol: "XMD", totalActivation: 0, boostVolume: 0, color: "text-cyan-400", bg: "from-cyan-500/10", icon: Globe },
+    { symbol: "XUSDC", totalActivation: 0, boostVolume: 0, color: "text-green-400", bg: "from-green-500/10", icon: HandCoins }
+  ]);
+
+  // Fetch real database live stats and sync rawTreasuryData directly from ledger_transactions
   const fetchLiveStats = useCallback(async () => {
     try {
       const activeCount = dbCreators.length;
@@ -277,6 +285,40 @@ const AdminHub = () => {
         newProfiles24h: newProfiles || 0,
         performanceBoosts24h: activeCount > 0 ? Math.ceil(activeCount / 3) : 0
       });
+
+      // Fetch real Supabase ledger_transactions to accurately sync platform treasury cards
+      const { data: txData, error: txError } = await supabase
+        .from('ledger_transactions')
+        .select('amount, asset, type');
+
+      if (txData && !txError) {
+        const sums: Record<string, { totalActivation: number; boostVolume: number }> = {
+          XPR: { totalActivation: 0, boostVolume: 0 },
+          TAB: { totalActivation: 0, boostVolume: 0 },
+          XMD: { totalActivation: 0, boostVolume: 0 },
+          XUSDC: { totalActivation: 0, boostVolume: 0 },
+        };
+
+        txData.forEach(tx => {
+          const sym = tx.asset?.toUpperCase().trim();
+          if (sums[sym]) {
+            const amt = Number(tx.amount || 0);
+            if (tx.type === 'activation' || tx.type === 'renewal') {
+              sums[sym].totalActivation += amt;
+            } else if (tx.type === 'boost') {
+              sums[sym].boostVolume += amt;
+            }
+          }
+        });
+
+        setRawTreasuryData([
+          { symbol: "XPR", totalActivation: sums.XPR.totalActivation, boostVolume: sums.XPR.boostVolume, color: "text-orange-500", bg: "from-orange-500/10", icon: Zap },
+          { symbol: "TAB", totalActivation: sums.TAB.totalActivation, boostVolume: sums.TAB.boostVolume, color: "text-purple-400", bg: "from-purple-500/10", icon: Sparkles },
+          { symbol: "XMD", totalActivation: sums.XMD.totalActivation, boostVolume: sums.XMD.boostVolume, color: "text-cyan-400", bg: "from-cyan-500/10", icon: Globe },
+          { symbol: "XUSDC", totalActivation: sums.XUSDC.totalActivation, boostVolume: sums.XUSDC.boostVolume, color: "text-green-400", bg: "from-green-500/10", icon: HandCoins }
+        ]);
+      }
+
     } catch (e) {
       console.error("Failed to fetch live admin stats:", e);
     }
@@ -470,17 +512,6 @@ const AdminHub = () => {
   const [newPromoType, setNewPromoType] = useState<'free' | 'percent'>("percent");
   const [newPromoValue, setNewPromoValue] = useState("50");
   const [newPromoUses, setNewPromoUses] = useState("100");
-
-  // Multi-token Financial Data loaded from localStorage
-  const [rawTreasuryData, setRawTreasuryData] = useState(() => {
-    const saved = localStorage.getItem("tiptab_treasury_ledger");
-    return saved ? JSON.parse(saved) : [
-      { symbol: "XPR", totalActivation: 0, boostVolume: 0, color: "text-orange-500", bg: "from-orange-500/10", icon: Zap },
-      { symbol: "TAB", totalActivation: 0, boostVolume: 0, color: "text-purple-400", bg: "from-purple-500/10", icon: Sparkles },
-      { symbol: "XMD", totalActivation: 0, boostVolume: 0, color: "text-cyan-400", bg: "from-cyan-500/10", icon: Globe },
-      { symbol: "XUSDC", totalActivation: 0, boostVolume: 0, color: "text-green-400", bg: "from-green-500/10", icon: HandCoins }
-    ];
-  });
 
   const treasuryData = useMemo(() => {
     return rawTreasuryData.map((item: any) => {
@@ -1439,7 +1470,6 @@ const AdminHub = () => {
                                       {asset.revenue.toLocaleString()} <span className={cn("text-lg", asset.color)}>{asset.symbol}</span>
                                     </p>
                                   </div>
-                                animate-pulse
                                </div>
 
                                <div className="grid grid-cols-2 gap-6 pt-6 border-t border-white/5">

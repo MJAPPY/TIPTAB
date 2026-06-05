@@ -219,6 +219,20 @@ export const XprProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         data: { from: session.auth.actor, to: 'tiptab', quantity: formattedAmount, memo: `Boost: ${handle.slice(0, 16)}` },
       };
       await session.transact({ actions: [action] }, { broadcast: true });
+      
+      // Store in Supabase ledger transactions
+      try {
+        await supabase.from('ledger_transactions').insert({
+          sender_handle: session.auth.actor.toString().toLowerCase().trim(),
+          recipient_handle: 'tiptab',
+          amount: parseFloat(price),
+          asset: asset,
+          type: 'boost'
+        });
+      } catch (dbErr) {
+        console.error("Boost ledger insertion failed:", dbErr);
+      }
+
       const newFeatured = [...featuredHandles, handle.replace('@', '').toLowerCase()];
       setFeaturedHandles(newFeatured);
       localStorage.setItem("tiptab_featured_handles", JSON.stringify(newFeatured));

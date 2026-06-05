@@ -75,10 +75,16 @@ const Dashboard = () => {
   const [transferMessage, setTransferMessage] = useState("");
   const [isSending, setIsSending] = useState(false);
 
+  // Analytics State Variables
   const [tipsReceived, setTipsReceived] = useState(0);
   const [xprReceived, setXprReceived] = useState(0);
   const [profileViews, setProfileViews] = useState(0);
   const [engagementRate, setEngagementRate] = useState(0);
+
+  // Supporter State Variables (Personal Analytics)
+  const [tipsSent, setTipsSent] = useState(0);
+  const [xprSent, setXprSent] = useState(0);
+  const [votesCast, setVotesCast] = useState(0);
 
   const alcorUrl = "https://alcor.exchange/v/xpr/swap?input=xpr-eosio.token&output=tab-tokencreate";
   const metalPayUrl = "https://onramp.metalpay.com/buy/xpr";
@@ -94,56 +100,6 @@ const Dashboard = () => {
     };
     checkMode();
   }, [isMember, activeTab]);
-
-  const fetchDashboardAnalytics = useCallback(async () => {
-    if (!actor) return;
-    try {
-      const { data: tipData, error: tipError } = await supabase
-        .from('ledger_transactions')
-        .select('amount, asset')
-        .eq('recipient_handle', actor.toLowerCase().trim())
-        .eq('type', 'tip');
-
-      let tabTotal = 0;
-      let xprTotal = 0;
-
-      if (tipData && !tipError) {
-        tipData.forEach(t => {
-          if (t.asset === 'TAB') tabTotal += Number(t.amount || 0);
-          if (t.asset === 'XPR') xprTotal += Number(t.amount || 0);
-        });
-        setTipsReceived(tabTotal);
-        setXprReceived(xprTotal);
-      }
-
-      const { count: viewCount, error: viewError } = await supabase
-        .from('profile_views')
-        .select('*', { count: 'exact', head: true })
-        .eq('profile_handle', actor.toLowerCase().trim());
-      
-      const totalViews = viewCount || 0;
-      setProfileViews(totalViews);
-
-      const { data: voteData, error: voteError } = await supabase
-        .from('votes')
-        .select('voter_handle')
-        .eq('candidate_handle', actor.toLowerCase().trim());
-      
-      if (voteData && !voteError) {
-        const uniqueVoters = new Set(voteData.map(v => v.voter_handle?.toLowerCase().trim())).size;
-        const rate = totalViews > 0 ? ((uniqueVoters / totalViews) * 100).toFixed(1) : "0.0";
-        setEngagementRate(parseFloat(rate));
-      }
-    } catch (err) {
-      console.error("Dashboard database fetch error:", err);
-    }
-  }, [actor]);
-
-  useEffect(() => {
-    fetchDashboardAnalytics();
-    const interval = setInterval(fetchDashboardAnalytics, 15000);
-    return () => clearInterval(interval);
-  }, [actor, fetchDashboardAnalytics]);
 
   const viewIsMember = useMemo(() => isMember && dashboardMode === "creator", [isMember, dashboardMode]);
 
@@ -255,6 +211,90 @@ const Dashboard = () => {
     const diffDays = (expiry.getTime() - now.getTime()) / (1000 * 60 * 60 * 24);
     return diffDays < 30; 
   };
+
+  const fetchDashboardAnalytics = useCallback(async () => {
+    if (!actor) return;
+    const cleanActor = actor.toLowerCase().trim();
+    try {
+      // 1. Fetch Creator metrics (Tips Received)
+      const { data: tipData, error: tipError } = await supabase
+        .from('ledger_transactions')
+        .select('amount, asset')
+        .eq('recipient_handle', cleanActor)
+        .eq('type', 'tip');
+
+      let tabTotal = 0;
+      let xprTotal = 0;
+
+      if (tipData && !tipError) {
+        tipData.forEach(t => {
+          if (t.asset === 'TAB') tabTotal += Number(t.amount || 0);
+          if (t.asset === 'XPR') xprTotal += Number(t.amount || 0);
+        });
+        setTipsReceived(tabTotal);
+        setXprReceived(xprTotal);
+      }
+
+      // 2. Fetch Supporter metrics (Tips Sent)
+      const { data: sentData, error: sentError } = await supabase
+        .from('ledger_transactions')
+        .select('amount, asset')
+        .eq('sender_handle', cleanActor)
+        .eq('type', 'tip');
+
+      let tabSentTotal = 0;
+      let xprSentTotal = 0;
+
+      if (sentData && !sentError) {
+        sentData.forEach(s => {
+          if (s.asset === 'TAB') tabSentTotal += Number(s.amount || 0);
+          if (s.asset === 'XPR') xprSentTotal += Number(s.amount || 0);
+        });
+        setTipsSent(tabSentTotal);
+        setXprSent(xprSentTotal);
+      }
+
+      // 3. Fetch Creator Views
+      const { count: viewCount, error: viewError } = await supabase
+        .from('profile_views')
+        .select('*', { count: 'exact', head: true })
+        .eq('profile_handle', cleanActor);
+      
+      const totalViews = viewCount || 0;
+      setProfileViews(totalViews);
+
+      // 4. Fetch engagement rates (unique voters ratio)
+      const { data: voteData, error: voteError } = await supabase
+        .from('votes')
+        .select('voter_handle')
+        .eq('candidate_handle', cleanActor);
+      
+      if (voteData && !voteError) {
+        const uniqueVoters = new Set(voteData.map(v => v.voter_handle?.toLowerCase().trim())).size;
+        const rate = totalViews > 0 ? ((uniqueVoters / totalViews) * 100).toFixed(1) : "0.0";
+        setEngagementRate(parseFloat(rate));
+      }
+
+      // 5. Fetch Supporter Votes cast
+      const { data: myVotes, error: myVotesError } = await supabase
+        .from('votes')
+        .select('tab_amount')
+        .eq('voter_handle', cleanActor);
+
+      if (myVotes && !myVotesError) {
+        const totalVotes = myVotes.reduce((sum, v) => sum + Number(v.tab_amount || 0), 0);
+        setVotesCast(totalVotes);
+      }
+    } catch (err) {
+      console.error("Dashboard database fetch error:", err);
+    }
+  }, [actor]);
+
+  useEffect(() => {
+    fetchDashboardAnalytics();
+    const interval = setInterval(fetchDashboardAnalytics, 15000);
+    return () => clearInterval(interval);
+  }, [actor, fetchDashboardAnalytics]);
 
   if (!isConnected && !isAuthLoading) {
     return (
@@ -434,50 +474,69 @@ const Dashboard = () => {
             <div className="pt-4">
               <div className="h-px bg-white/10 w-full mb-8" />
               <h3 className="text-xs font-black uppercase tracking-[0.25em] text-white/40 mb-6 flex items-center gap-2">
-                <TrendingUp className="h-4 w-4 text-purple-400" /> Channel Metrics & Discovery
+                <TrendingUp className="h-4 w-4 text-purple-400" /> 
+                {dashboardMode === "creator" ? "Channel Metrics & Discovery" : "Supporting Activity Ledger"}
               </h3>
               
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 sm:gap-8">
                 <Card className="bg-[#130b21]/40 border-white/10 text-white rounded-[32px] p-6 sm:p-8 shadow-2xl relative overflow-hidden group hover:border-green-500/30 transition-all flex flex-col h-[220px]">
                   <CardHeader className="p-0">
                     <div className="flex items-center justify-between">
-                      <CardDescription className="text-slate-400 font-black uppercase tracking-[0.2em] text-[10px]">TAB Received</CardDescription>
+                      <CardDescription className="text-slate-400 font-black uppercase tracking-[0.2em] text-[10px]">
+                        {dashboardMode === "creator" ? "TAB Received" : "TAB Sent"}
+                      </CardDescription>
                       <HandCoins className="h-4 w-4 text-green-400" />
                     </div>
                   </CardHeader>
                   <CardContent className="p-0 mt-4 flex flex-col flex-1 justify-between">
-                    <span className="text-3xl sm:text-4xl font-black tracking-tighter text-slate-100">{tipsReceived.toLocaleString()}</span>
-                    <p className="text-[10px] text-white/30 font-bold uppercase tracking-widest pt-2">Accumulated TAB rewards</p>
+                    <span className="text-3xl sm:text-4xl font-black tracking-tighter text-slate-100">
+                      {dashboardMode === "creator" ? tipsReceived.toLocaleString() : tipsSent.toLocaleString()}
+                    </span>
+                    <p className="text-[10px] text-white/30 font-bold uppercase tracking-widest pt-2">
+                      {dashboardMode === "creator" ? "Accumulated TAB rewards" : "Total TAB tips contributed"}
+                    </p>
                   </CardContent>
                 </Card>
 
                 <Card className="bg-[#130b21]/40 border-white/10 text-white rounded-[32px] p-6 sm:p-8 shadow-2xl relative overflow-hidden group hover:border-purple-500/30 transition-all flex flex-col h-[220px]">
                   <CardHeader className="p-0">
                     <div className="flex items-center justify-between">
-                      <CardDescription className="text-slate-400 font-black uppercase tracking-[0.2em] text-[10px]">XPR Received</CardDescription>
+                      <CardDescription className="text-slate-400 font-black uppercase tracking-[0.2em] text-[10px]">
+                        {dashboardMode === "creator" ? "XPR Received" : "XPR Sent"}
+                      </CardDescription>
                       <Coins className="h-4 w-4 text-purple-400" />
                     </div>
                   </CardHeader>
                   <CardContent className="p-0 mt-4 flex flex-col flex-1 justify-between">
-                    <span className="text-3xl sm:text-4xl font-black tracking-tighter text-slate-100">{xprReceived.toLocaleString()}</span>
-                    <p className="text-[10px] text-white/30 font-bold uppercase tracking-widest pt-2">Accumulated XPR rewards</p>
+                    <span className="text-3xl sm:text-4xl font-black tracking-tighter text-slate-100">
+                      {dashboardMode === "creator" ? xprReceived.toLocaleString() : xprSent.toLocaleString()}
+                    </span>
+                    <p className="text-[10px] text-white/30 font-bold uppercase tracking-widest pt-2">
+                      {dashboardMode === "creator" ? "Accumulated XPR rewards" : "Total XPR tips contributed"}
+                    </p>
                   </CardContent>
                 </Card>
 
                 <Card className="bg-[#130b21]/40 border-white/10 text-white rounded-[32px] p-6 sm:p-8 shadow-2xl relative overflow-hidden group hover:border-cyan-500/30 transition-all flex flex-col h-[220px]">
                   <CardHeader className="p-0">
                     <div className="flex items-center justify-between">
-                      <CardDescription className="text-slate-400 font-black uppercase tracking-[0.2em] text-[10px]">Impressions</CardDescription>
+                      <CardDescription className="text-slate-400 font-black uppercase tracking-[0.2em] text-[10px]">
+                        {dashboardMode === "creator" ? "Impressions" : "Votes Cast"}
+                      </CardDescription>
                       <Eye className="h-4 w-4 text-cyan-400" />
                     </div>
                   </CardHeader>
                   <CardContent className="p-0 mt-4 flex flex-col flex-1 justify-between">
-                    <span className="text-3xl sm:text-4xl font-black tracking-tighter text-slate-100">{profileViews.toLocaleString()}</span>
-                    <p className="text-[10px] text-white/30 font-bold uppercase tracking-widest pt-2">Global map visits</p>
+                    <span className="text-3xl sm:text-4xl font-black tracking-tighter text-slate-100">
+                      {dashboardMode === "creator" ? profileViews.toLocaleString() : votesCast.toLocaleString()}
+                    </span>
+                    <p className="text-[10px] text-white/30 font-bold uppercase tracking-widest pt-2">
+                      {dashboardMode === "creator" ? "Global map visits" : "TAB votes submitted"}
+                    </p>
                   </CardContent>
                 </Card>
 
-                {isMember && membershipDate ? (
+                {viewIsMember && membershipDate ? (
                   <Card className="bg-[#130b21]/40 border-white/10 text-white rounded-[32px] p-6 sm:p-8 shadow-2xl relative overflow-hidden group hover:border-purple-500/30 transition-all flex flex-col h-[220px]">
                     <CardHeader className="p-0">
                       <div className="flex items-center justify-between">
